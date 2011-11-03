@@ -1,0 +1,13 @@
+## Interface: 40200
+## Title: GuildGreet |cFFFFA0A0Extended by gOOvER|r
+## Version: 40200.2
+## Author: gOOvER |cFFFFA0A0 (taken over from Urbin & Greya, Mordikaiin/Rozak)|r
+## X-Date: 2011-07-25
+## X-Category: Guild
+## X-Website: http://wow.curse-gaming.com/downloads/details/7529/
+## URL: http://wow.curse-gaming.com/downloads/details/7529/
+## Description: Keeps a log of guildies waiting for your greeting
+## Notes: Keeps a log of guildies waiting for your greeting
+## SavedVariables: GLDG_Data
+## OptionalDeps: myAddOns
+GuildGreet.xml

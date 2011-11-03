@@ -1,0 +1,36 @@
+<Bindings>
+	<Binding name="GUILDGREETCONFIG" header="GUILDGREET" runOnUp="true">
+		if ( keystate == "down" ) then
+			if getglobal(GLDG_GUI):IsVisible() then
+				getglobal(GLDG_GUI):Hide();
+			else
+				getglobal(GLDG_GUI):Show();
+			end
+		end
+	</Binding>
+	<Binding name="GUILDGREETCLEAR" header="GUILDGREET" runOnUp="true">
+		if ( keystate == "down" ) then
+			GLDG_ClearList();
+		end
+	</Binding>
+	<Binding name="GUILDGREETTEST" header="GUILDGREET" runOnUp="true">
+		if ( keystate == "down" ) then
+			GLDG_Test();
+		end
+	</Binding>
+	<Binding name="GUILDGREETGREETGUILD" header="GUILDGREET" runOnUp="true">
+		if ( keystate == "down" ) then
+			GLDG_KeyGreet();
+		end
+	</Binding>
+	<Binding name="GUILDGREETBYEGUILD" header="GUILDGREET" runOnUp="true">
+		if ( keystate == "down" ) then
+			GLDG_KeyBye();
+		end
+	</Binding>
+	<Binding name="GUILDGREETLATERGUILD" header="GUILDGREET" runOnUp="true">
+		if ( keystate == "down" ) then
+			GLDG_KeyLater();
+		end
+	</Binding>
+</Bindings>

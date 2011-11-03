@@ -1,0 +1,4608 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Script file="localization.en.lua"/>
+	<Script file="localization.de.lua"/>
+	<Script file="todo.lua"/>
+	<Script file="history.lua"/>
+	<Script file="help.lua"/>
+	<Script file="GuildGreet.lua"/>
+	<Frame name="GuildGreet">
+		<Scripts>
+			<OnLoad>GLDG_OnLoad(self)</OnLoad>
+			<OnEvent>GLDG_OnEvent(self, event, ...)</OnEvent>
+			<OnUpdate>GLDG_OnUpdate(self, elapsed)</OnUpdate>
+		</Scripts>
+	</Frame>
+
+<!--> ============================================================================================================== <-->
+	<!-->List frame template: name line<-->
+	<Button name="GLDG_LineTemplate" hidden="true" virtual="true">
+		<Size><AbsDimension x="160" y="15"/></Size>
+		<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" tile="true"/>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentText" inherits="GameFontHighlight" justifyH="LEFT"/>
+				<FontString name="$parentText2" inherits="GameFontHighlight" justifyH="RIGHT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>self:RegisterForClicks("LeftButtonDown", "RightButtonDown")</OnLoad>
+			<OnEnter>GLDG_ShowToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+			<OnClick>GLDG_ClickName(button, getglobal(self:GetName().."Text"):GetText())</OnClick>
+		</Scripts>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+	</Button>
+
+	<!-->List frame<-->
+	<Frame name="GuildGreetList" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
+		<Size><AbsDimension x="160" y="90"/></Size>
+		<Anchors><Anchor point="LEFT"/></Anchors>
+		<TitleRegion>
+			<Size><AbsDimension x="160" y="15"/></Size>
+			<Anchors><Anchor point="TOP"/></Anchors>
+		</TitleRegion>
+		<Frames>
+			<Frame name="$parentTitle" inherits="UIParent">
+				<Size><AbsDimension x="160" y="15"/></Size>
+				<Anchors><Anchor point="TOP"/></Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentTexture"/>
+					</Layer>
+					<Layer level="BORDER">
+						<FontString name="$parentText" inherits="GameFontNormal"/>
+					</Layer>
+				</Layers>
+			</Frame>
+			<!-->Close button<-->
+			<Button name="$parentClose" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentTitle" relativePoint="TOPRIGHT">
+						<Offset><AbsDimension x="26" y="8"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClearList()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<!-->Player lines downwards<-->
+			<Button name="$parentLine1" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentTitle" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine2" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine1" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine3" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine2" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine4" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine3" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine5" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine4" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine6" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine5" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine7" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine6" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine8" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine7" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine9" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine8" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine10" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine9" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine11" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine10" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine12" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine11" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine13" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine12" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine14" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine13" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine15" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine14" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<!-->Player lines downwards<-->
+			<Button name="$parentULine1" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentTitle" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine2" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine1" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine3" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine2" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine4" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine3" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine5" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine4" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine6" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine5" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine7" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine6" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine8" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine7" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine9" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine8" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine10" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine9" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine11" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine10" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine12" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine11" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine13" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine12" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine14" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine13" relativePoint="TOP"/></Anchors>
+			</Button>
+			<Button name="$parentULine15" inherits="GLDG_LineTemplate">
+				<Anchors><Anchor point="BOTTOM" relativeTo="$parentULine14" relativePoint="TOP"/></Anchors>
+			</Button>
+		</Frames>
+	</Frame>
+
+<!--> ============================================================================================================== <-->
+	<!-->Configuration frame template: tab<-->
+	<Button name="GLDG_TabTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>GLDG_ClickTab(self, self:GetName())</OnClick>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-->Configuration frame<-->
+	<Frame name="GuildGreetFrame" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
+		<Size><AbsDimension x="600" y="450"/></Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset><AbsDimension x="0" y="120"/></Offset>
+			</Anchor>
+		</Anchors>
+		<TitleRegion>
+			<Size><AbsDimension x="600" y="15"/></Size>
+			<Anchors><Anchor point="TOP"/></Anchors>
+		</TitleRegion>
+		<Backdrop bgFile="TileSet\Generic\Black" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-->Title box<-->
+				<Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size><AbsDimension x="300" y="64"/></Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset><AbsDimension x="0" y="12"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<!-->Close box<-->
+				<Texture file="Interface\DialogFrame\UI-DialogBox-Corner">
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset><AbsDimension x="-5" y="-5"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<!-->Title text<-->
+				<FontString name="$parentTitle" inherits="GameFontNormal">
+					<Anchors><Anchor point="TOP"></Anchor></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Close button<-->
+			<Button name="$parentClose" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="TOPRIGHT">
+						<Offset><AbsDimension x="-17" y="-17"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!-->Tabs<-->
+			<Button name="$parentTab1" inherits="GLDG_TabTemplate" id="1" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="6"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentTab2" inherits="GLDG_TabTemplate" id="2" hidden="true">
+				<Anchors><Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT"/></Anchors>
+			</Button>
+			<Button name="$parentTab3" inherits="GLDG_TabTemplate" id="3" hidden="true">
+				<Anchors><Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT"/></Anchors>
+			</Button>
+			<Button name="$parentTab4" inherits="GLDG_TabTemplate" id="4" hidden="true">
+				<Anchors><Anchor point="LEFT" relativeTo="$parentTab3" relativePoint="RIGHT"/></Anchors>
+			</Button>
+			<Button name="$parentTab5" inherits="GLDG_TabTemplate" id="5" hidden="true">
+				<Anchors><Anchor point="LEFT" relativeTo="$parentTab4" relativePoint="RIGHT"/></Anchors>
+			</Button>
+			<Button name="$parentTab6" inherits="GLDG_TabTemplate" id="6" hidden="true">
+				<Anchors><Anchor point="LEFT" relativeTo="$parentTab5" relativePoint="RIGHT"/></Anchors>
+			</Button>
+		</Frames>
+ 	</Frame>
+
+<!--> ============================================================================================================== <-->
+	<!-->Configuration frame template: tab<-->
+	<Button name="GLDG_SubTabTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>GLDG_ClickSubTab(self, self:GetName())</OnClick>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-->Configuration frame<-->
+ 	<Frame name="$parentSettings" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true">
+		<Size><AbsDimension x="580" y="390"/></Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset><AbsDimension x="0" y="10"/></Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="TileSet\Generic\Black" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true"/>
+		<Frames>
+			<!-->Tabs<-->
+			<Button name="$parentTab1" inherits="GLDG_SubTabTemplate" id="1" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="6"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentTab2" inherits="GLDG_SubTabTemplate" id="2" hidden="true">
+				<Anchors><Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT"/></Anchors>
+			</Button>
+			<Button name="$parentTab3" inherits="GLDG_SubTabTemplate" id="3" hidden="true">
+				<Anchors><Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT"/></Anchors>
+			</Button>
+			<Button name="$parentTab4" inherits="GLDG_SubTabTemplate" id="4" hidden="true">
+				<Anchors><Anchor point="LEFT" relativeTo="$parentTab3" relativePoint="RIGHT"/></Anchors>
+			</Button>
+			<Button name="$parentTab5" inherits="GLDG_SubTabTemplate" id="5" hidden="true">
+				<Anchors><Anchor point="LEFT" relativeTo="$parentTab4" relativePoint="RIGHT"/></Anchors>
+			</Button>
+			<Button name="$parentTab6" inherits="GLDG_SubTabTemplate" id="6" hidden="true">
+				<Anchors><Anchor point="LEFT" relativeTo="$parentTab5" relativePoint="RIGHT"/></Anchors>
+			</Button>
+		</Frames>
+ 	</Frame>
+
+<!--> ============================================================================================================== <-->
+	<!-->Configuration general tab template: header text<-->
+	<FontString name="GLDG_HeaderText" inherits="GameFontNormal" virtual="true">
+		<Size><AbsDimension x="560" y="25"/></Size>
+		<Scripts>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</FontString>
+
+	<!-->Configuration general tab template: option text<-->
+	<FontString name="GLDG_OptionText" inherits="GameFontNormal" justifyH="RIGHT" virtual="true">
+		<Color r="0.68" g="0.80" b="1"/>
+		<Size><AbsDimension x="250" y="25"/></Size>
+		<Scripts>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</FontString>
+
+	<!-->Configuration general tab template: option text, left aligned<-->
+	<FontString name="GLDG_LOptionText" inherits="GLDG_OptionText" justifyH="LEFT" virtual="true">
+		<Size><AbsDimension x="500" y="25"/></Size>
+		<Scripts>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</FontString>
+
+	<!-->Configuration general tab<-->
+ 	<Frame name="$parentGeneral" setAllPoints="true" parent="GuildGreetFrameSettings" enableMouse="true">
+ 		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Greeting options header<-->
+				<FontString name="$parentHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Relog slider text<-->
+				<FontString name="$parentRelogText" inherits="GLDG_OptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->min level up slider text<-->
+				<FontString name="$parentMinLevelUpText" inherits="GLDG_OptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-35"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->update time slider text<-->
+				<FontString name="$parentUpdateTimeText" inherits="GLDG_OptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-70"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Greet as main checkbox text<-->
+				<FontString name="$parentGreetAsMainText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-105"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Randomize checkbox text<-->
+				<FontString name="$parentRandomizeText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-125"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Whisper<-->
+				<FontString name="$parentWhisperText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-145"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->WhisperLevelup<-->
+				<FontString name="$parentWhisperLevelupText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="340" y="-145"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->IncludeOwn<-->
+				<FontString name="$parentIncludeOwnText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-165"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->AutoAssign<-->
+				<FontString name="$parentAutoAssignText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-185"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->AutoAssignEgp<-->
+				<FontString name="$parentAutoAssignEgpText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="380" y="-185"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->UseFriends<-->
+				<FontString name="$parentUseFriendsText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-205"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->ChannelName<-->
+				<FontString name="$parentChannelNameText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="210" y="-225"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+
+				<!-->List Settings header<-->
+				<FontString name="$parentListHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset><AbsDimension x="0" y="70"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->List direction checkbox text<-->
+				<FontString name="$parentListdirectText" inherits="GLDG_LOptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentListHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->List header visible checkbox text<-->
+				<FontString name="$parentListheaderText" inherits="GLDG_OptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentListHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="340" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Listsize slider text<-->
+				<FontString name="$parentListsizeText" inherits="GLDG_OptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentListHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-20"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Relog slider<-->
+			<Slider name="$parentRelogSlider" inherits="OptionsSliderTemplate">
+				<Size><AbsDimension x="240" y="25"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentRelogText" relativePoint="RIGHT">
+						<Offset><AbsDimension x="15" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."Low"):SetText("0")
+						getglobal(self:GetName().."High"):SetText("120")
+						self:SetMinMaxValues(0,120)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnValueChanged>GLDG_UpdateRelog(self)</OnValueChanged>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Slider>
+			<!-->Min level up slider<-->
+			<Slider name="$parentMinLevelUpSlider" inherits="OptionsSliderTemplate">
+				<Size><AbsDimension x="240" y="25"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMinLevelUpText" relativePoint="RIGHT">
+						<Offset><AbsDimension x="15" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."Low"):SetText("0")
+						getglobal(self:GetName().."High"):SetText("80")
+						self:SetMinMaxValues(0,80)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnValueChanged>GLDG_UpdateMinLevelUp(self)</OnValueChanged>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Slider>
+			<!-->UpdateTime slider<-->
+			<Slider name="$parentUpdateTimeSlider" inherits="OptionsSliderTemplate">
+				<Size><AbsDimension x="240" y="25"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentUpdateTimeText" relativePoint="RIGHT">
+						<Offset><AbsDimension x="15" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."Low"):SetText("0")
+						getglobal(self:GetName().."High"):SetText("180")
+						self:SetMinMaxValues(0,18)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnValueChanged>GLDG_UpdateUpdateTime(self)</OnValueChanged>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Slider>
+			<!-->Greet as main checkbox<-->
+			<CheckButton name="$parentGreetAsMainBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentGreetAsMainText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.GreetAsMain = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->Randomize checkbox<-->
+			<CheckButton name="$parentRandomizeBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentRandomizeText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.Randomize = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->Whisper checkbox<-->
+			<CheckButton name="$parentWhisperBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentWhisperText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.Whisper = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->WhisperLevelup checkbox<-->
+			<CheckButton name="$parentWhisperLevelupBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentWhisperLevelupText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.WhisperLevelup = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->IncludeOwn checkbox<-->
+			<CheckButton name="$parentIncludeOwnBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentIncludeOwnText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.IncludeOwn = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->AutoAssign checkbox<-->
+			<CheckButton name="$parentAutoAssignBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentAutoAssignText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.AutoAssign = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->AutoAssignEgp checkbox<-->
+			<CheckButton name="$parentAutoAssignEgpBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentAutoAssignEgpText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.AutoAssignEgp = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->UseFriends checkbox<-->
+			<CheckButton name="$parentUseFriendsBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentUseFriendsText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.UseFriends = self:GetChecked()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<!-->ChannelName<-->
+			<Button name="$parentChannelNameDropboxButton" inherits="UIDropDownMenuTemplate">
+				<Size>
+					<AbsDimension x="160" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentHeader" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="TOP" relativeTo="$parentChannelNameText" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						GLDG_DropDownTemplate_OnLoad(self);
+					</OnLoad>
+					<OnShow>
+						GLDG_DropDownTemplate_OnShow(self);
+					</OnShow>
+					<OnClick>
+						ToggleDropDownMenu(1, nil, self);
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+
+
+			<!-->Listdirection checkbox<-->
+			<CheckButton name="$parentListdirectBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentListdirectText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.ListUp = self:GetChecked()
+						GLDG_ShowQueue()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->Listheader checkbox<-->
+			<CheckButton name="$parentListheaderBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentListheaderText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.ListVisible = self:GetChecked()
+						GLDG_ShowQueue()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->Listsize slider<-->
+			<Slider name="$parentListsizeSlider" inherits="OptionsSliderTemplate">
+				<Size><AbsDimension x="240" y="25"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentListsizeText" relativePoint="RIGHT">
+						<Offset><AbsDimension x="15" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."Low"):SetText("1")
+						getglobal(self:GetName().."High"):SetText("15")
+						self:SetMinMaxValues(1,15)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnValueChanged>GLDG_UpdateListsize(self)</OnValueChanged>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Slider>
+		</Frames>
+ 	</Frame>
+
+<!--> ============================================================================================================== <-->
+	<!-->Configuration chat tab<-->
+ 	<Frame name="$parentChat" setAllPoints="true" parent="GuildGreetFrameSettings" enableMouse="true" hidden="true">
+ 		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Greeting options header<-->
+				<FontString name="$parentHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->chatframe selection slider text<-->
+				<FontString name="$parentChatFrameText" inherits="GLDG_OptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->ListNames<-->
+				<FontString name="$parentListNamesText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-30"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentListNamesOffText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-50"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentListLevelUpText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-80"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentListLevelUpOffText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-100"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentListAchievmentsText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-120"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentListQuitText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-150"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentExtendChatText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-180"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentExtendIgnoredText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-200"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentExtendMainText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-220"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentExtendAliasText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-240"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentAddPostfixText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-260"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentShowWhoSpamText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-290"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->ChatFrame slider<-->
+			<Slider name="$parentChatFrameSlider" inherits="OptionsSliderTemplate">
+				<Size><AbsDimension x="240" y="25"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentChatFrameText" relativePoint="RIGHT">
+						<Offset><AbsDimension x="15" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."Low"):SetText("0")
+						getglobal(self:GetName().."High"):SetText(string.format("%d", NUM_CHAT_WINDOWS))
+						self:SetMinMaxValues(0,NUM_CHAT_WINDOWS)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnValueChanged>GLDG_UpdateChatFrame(self)</OnValueChanged>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Slider>
+			<!-->ListNames checkbox<-->
+			<CheckButton name="$parentListNamesBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentListNamesText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ListNames = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentListNamesOffBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentListNamesOffText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ListNamesOff = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentListLevelUpBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentListLevelUpText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ListLevelUp = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentListLevelUpOffBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentListLevelUpOffText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ListLevelUpOff = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentListAchievmentsBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentListAchievmentsText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ListAchievments = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentListQuitBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentListQuitText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ListQuit = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentExtendChatBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentExtendChatText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ExtendChat = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentExtendIgnoredBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentExtendIgnoredText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ExtendIgnored = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentExtendMainBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentExtendMainText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ExtendMain = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentExtendAliasBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentExtendAliasText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ExtendAlias = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentAddPostfixBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentAddPostfixText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.AddPostfix = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentShowWhoSpamBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentShowWhoSpamText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ShowWhoSpam = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+ 	</Frame>
+
+<!--> ============================================================================================================== <-->
+	<!-->Configuration greeting tab<-->
+ 	<Frame name="$parentGreeting" setAllPoints="true" parent="GuildGreetFrameSettings" enableMouse="true" hidden="true">
+ 		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Greeting options header<-->
+				<FontString name="$parentHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->GreetGuild<-->
+				<FontString name="$parentGreetGuildText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->GreetChannel<-->
+				<FontString name="$parentGreetChannelText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-20"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->AutoGreet<-->
+				<FontString name="$parentAutoGreetText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-50"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<!-->Greeting options sub header<-->
+				<FontString name="$parentSubHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-80"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->SupressGreet<-->
+				<FontString name="$parentSupressGreetText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-130"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->SupressJoin<-->
+				<FontString name="$parentSupressJoinText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-150"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->SupressLevel<-->
+				<FontString name="$parentSupressLevelText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-170"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->SupressRank<-->
+				<FontString name="$parentSupressRankText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-190"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->SupressAchievment<-->
+				<FontString name="$parentSupressAchievmentText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-210"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<!-->NoGratsOnLogin<-->
+				<FontString name="$parentNoGratsOnLoginText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-240"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<!-->Alias sub header<-->
+				<FontString name="$parentGuildAliasHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-270"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentGuildAliasWarning" inherits="GLDG_HeaderText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentGuildAliasHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="30" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->GreetGuild checkbox<-->
+			<CheckButton name="$parentGreetGuildBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentGreetGuildText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.GreetGuild[GLDG_Realm.." - "..GLDG_Player] = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->GreetChannel checkbox<-->
+			<CheckButton name="$parentGreetChannelBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentGreetChannelText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.GreetChannel[GLDG_Realm.." - "..GLDG_Player] = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->AutoGreet checkbox<-->
+			<CheckButton name="$parentAutoGreetBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentAutoGreetText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.AutoGreet[GLDG_Realm.." - "..GLDG_Player] = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<!-->SupressAll button<-->
+			<Button name="$parentSupressAll" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="100" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSubHeader" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="40" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_SupressAll()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<!-->SupressNone button<-->
+			<Button name="$parentSupressNone" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="100" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentSubHeader" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+					<Anchor point="LEFT" relativeTo="$parentSupressAll" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_SupressNone()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+
+			<!-->SupressGreet checkbox<-->
+			<CheckButton name="$parentSupressGreetBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentSupressGreetText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.SupressGreet = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->SupressJoin checkbox<-->
+			<CheckButton name="$parentSupressJoinBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentSupressJoinText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.SupressJoin = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->SupressLevel checkbox<-->
+			<CheckButton name="$parentSupressLevelBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentSupressLevelText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.SupressLevel = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->SupressRank checkbox<-->
+			<CheckButton name="$parentSupressRankBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentSupressRankText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.SupressRank = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->SupressAchievment checkbox<-->
+			<CheckButton name="$parentSupressAchievmentBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentSupressAchievmentText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.SupressAchievment = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<!-->NoGratsOnLogin checkbox<-->
+			<CheckButton name="$parentNoGratsOnLoginBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentNoGratsOnLoginText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.NoGratsOnLogin = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<!-->Guild Alias<-->
+			<EditBox name="$parentGuildAliasEditbox" letters="50" autoFocus="false">
+				<Size><AbsDimension x="300" y="30"/></Size>
+				<FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentGuildAliasHeader" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="30" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size><AbsDimension x="158" y="32"/></Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="-8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size><AbsDimension x="158" y="32"/></Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset><AbsDimension x="8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						GLDG_ClickGuildAliasSet()
+					</OnEnterPressed>
+					<OnEscapePressed>
+						GLDG_ClickGuildAliasClear()
+					</OnEscapePressed>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</EditBox>
+			<Button name="$parentGuildAliasSet" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="100" y="20"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildAliasEditbox" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickGuildAliasSet()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentGuildAliasClear" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="100" y="20"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildAliasSet" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickGuildAliasClear()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+
+		</Frames>
+ 	</Frame>
+
+<!--> ============================================================================================================== <-->
+	<!-->Configuration debug tab<-->
+ 	<Frame name="$parentDebug" setAllPoints="true" parent="GuildGreetFrameSettings" enableMouse="true" hidden="true">
+ 		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Greeting options header<-->
+				<FontString name="$parentHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset><AbsDimension x="0" y="-25"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->EnableDump<-->
+				<FontString name="$parentEnableDumpText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->VerboseDump<-->
+				<FontString name="$parentVerboseDumpText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-20"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<!-->DumpSets<-->
+				<FontString name="$parentDumpSetText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-50"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->CurrentIndex<-->
+				<FontString name="$parentCurrentIndexText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-70"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->EnableDump checkbox<-->
+			<CheckButton name="$parentEnableDumpBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentEnableDumpText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickDumpEnable(self:GetChecked())</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->EnableDump checkbox<-->
+			<CheckButton name="$parentVerboseDumpBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentVerboseDumpText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickDumpVerbose(self:GetChecked())</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<!-->Clear button<-->
+			<Button name="$parentClearButton" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="200" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentCurrentIndexText" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="-10"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickDumpClear()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<!-->ClearAll button<-->
+			<Button name="$parentClearAllButton" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="150" y="20"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentClearButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickDumpClearAll()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<!-->New button<-->
+			<Button name="$parentNewButton" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="150" y="20"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentClearAllButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickDumpNew()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>GLDG_ShowDump()</OnShow>
+		</Scripts>
+ 	</Frame>
+
+<!--> ============================================================================================================== <-->
+	<!-->Configuration other tab<-->
+ 	<Frame name="$parentOther" setAllPoints="true" parent="GuildGreetFrameSettings" enableMouse="true" hidden="true">
+ 		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Greeting options header<-->
+				<FontString name="$parentHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset><AbsDimension x="0" y="-25"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->UseLocalTime<-->
+				<FontString name="$parentUseLocalTimeText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->ShowNewerVersions<-->
+				<FontString name="$parentShowNewerVersionsText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-30"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->AutoWho<-->
+				<FontString name="$parentAutoWhoText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-60"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->DeltaPopup<-->
+				<FontString name="$parentDeltaPopupText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-90"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->ExtendPlayerMenu<-->
+				<FontString name="$parentExtendPlayerMenuText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="-120"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->UseLocalTime checkbox<-->
+			<CheckButton name="$parentUseLocalTimeBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentUseLocalTimeText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.UseLocalTime = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->ShowNewerVersions checkbox<-->
+			<CheckButton name="$parentShowNewerVersionsBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentShowNewerVersionsText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ShowNewerVersions = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->AutoWho checkbox<-->
+			<CheckButton name="$parentAutoWhoBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentAutoWhoText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.AutoWho = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->DeltaPopup checkbox<-->
+			<CheckButton name="$parentDeltaPopupBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentDeltaPopupText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.DeltaPopup = self:GetChecked()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->ExtendPlayerMenu checkbox<-->
+			<CheckButton name="$parentExtendPlayerMenuBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentExtendPlayerMenuText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.ExtendPlayerMenu = self:GetChecked();GLDG_QueryReloadUI()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+ 	</Frame>
+
+<!--> ============================================================================================================== <-->
+	<!-->Configuration greetings tab template: collection line<-->
+	<Button name="GLDG_CollectLineTemplate" virtual= "true">
+		<Size><AbsDimension x="100" y="15"/></Size>
+		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentText" inherits="GameFontHighlight" justifyH="LEFT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>GLDG_ClickCollection(self, getglobal(self:GetName().."Text"):GetText())</OnClick>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-->Configuration greetings tab template: collection button<-->
+	<Button name="GLDG_CollectButtonTemplate" inherits="UIPanelButtonTemplate" virtual= "true">
+		<Size><AbsDimension x="200" y="20"/></Size>
+		<Scripts>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-->Configuration greetings tab template: message group selection button<-->
+	<Button name="GLDG_GroupSelectTemplate" inherits="UIPanelButtonTemplate" virtual= "true">
+		<Size><AbsDimension x="120" y="22"/></Size>
+		<Scripts>
+			<OnClick>GLDG_ClickGreetButton(self, self:GetID())</OnClick>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-->Configuration greetings tab template: message line<-->
+	<Button name="GLDG_MessageLineTemplate" virtual= "true">
+		<Size><AbsDimension x="500" y="15"/></Size>
+		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentText" inherits="GameFontHighlight" justifyH="LEFT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>GLDG_ClickGreeting(self, self:GetID())</OnClick>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-->Configuration greetings tab<-->
+ 	<Frame name="$parentGreetings" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
+ 		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Greetings tab header<-->
+				<FontString name="$parentHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset><AbsDimension x="0" y="-25"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Collections list header<-->
+				<FontString name="$parentCollectHeader" inherits="GLDG_OptionText">
+					<Size><AbsDimension x="160" y="25"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-50"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Greetings list header<-->
+				<FontString name="$parentGreetHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset><AbsDimension x="0" y="-160"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Editbox header<-->
+				<FontString name="$parentEditboxHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentGreetHeader" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="-170"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Collections scrollbar<-->
+			<ScrollFrame name="$parentCollectbar" inherits="FauxScrollFrameTemplate">
+				<Size><AbsDimension x="30" y="75"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentCollectHeader" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="55" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>GLDG_ShowCollections()</OnShow>
+					<OnVerticalScroll>FauxScrollFrame_OnVerticalScroll(self, offset, 15, GLDG_ShowCollections)</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<!-->Collections lines<-->
+			<Button name="$parentCollect1" inherits="GLDG_CollectLineTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentCollectbar" relativePoint="TOPLEFT">
+						<Offset><AbsDimension x="30" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentCollect2" inherits="GLDG_CollectLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentCollect1" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentCollect3" inherits="GLDG_CollectLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentCollect2" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentCollect4" inherits="GLDG_CollectLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentCollect3" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentCollect5" inherits="GLDG_CollectLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentCollect4" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<!-->Collections buttons<-->
+			<Button name="$parentColNewDel" inherits="GLDG_CollectButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentCollectbar" relativePoint="TOPRIGHT">
+						<Offset><AbsDimension x="30" y="5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickNewCol(self, self:GetParent():GetName())</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentColRealm" inherits="GLDG_CollectButtonTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentColNewDel" relativePoint="BOTTOM"/></Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickChangeCustom(self, "realm", self:GetParent():GetName())</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentColGuild" inherits="GLDG_CollectButtonTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentColRealm" relativePoint="BOTTOM"/></Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickChangeCustom(self, "guild", self:GetParent():GetName())</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentColPlayer" inherits="GLDG_CollectButtonTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentColGuild" relativePoint="BOTTOM"/></Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickChangeCustom(self, "char", self:GetParent():GetName())</OnClick>
+				</Scripts>
+			</Button>
+			<!-->Collections subframe<-->
+			<Frame name="$parentSub">
+				<Size><AbsDimension x="220" y="110"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset><AbsDimension x="0" y="-50"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<!-->Message selection buttons<-->
+			<!--> Login (Line 1)<-->
+			<Button name="$parentSelDefault" inherits="GLDG_GroupSelectTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentGreetHeader" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="24" y="2"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!--> Relog <-->
+			<Button name="$parentSelRelog" inherits="GLDG_GroupSelectTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSelDefault" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!--> Join guild <-->
+			<Button name="$parentSelJoin" inherits="GLDG_GroupSelectTemplate" id="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSelRelog" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!--> New rank / promotion <-->
+			<Button name="$parentSelRank" inherits="GLDG_GroupSelectTemplate" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSelJoin" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!--> Level up (Line 2)<-->
+			<Button name="$parentSelLevel" inherits="GLDG_GroupSelectTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentSelDefault" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!--> Goodbye player (day) <-->
+			<Button name="$parentSelBye" inherits="GLDG_GroupSelectTemplate" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSelLevel" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!--> Goodbye player (night) <-->
+			<Button name="$parentSelNight" inherits="GLDG_GroupSelectTemplate" id="7">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSelBye" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!--> Achievment <-->
+			<Button name="$parentSelAchievment" inherits="GLDG_GroupSelectTemplate" id="16">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSelNight" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!--> Greet guild (Line 3) <-->
+			<Button name="$parentSelGuild" inherits="GLDG_GroupSelectTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentSelLevel" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!--> Goodbye guild (day) <-->
+			<Button name="$parentSelByeGuild" inherits="GLDG_GroupSelectTemplate" id="10">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSelGuild" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!--> Goodbye guild (night) <-->
+			<Button name="$parentSelNightGuild" inherits="GLDG_GroupSelectTemplate" id="11">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSelByeGuild" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!--> See you later guild<-->
+			<Button name="$parentSelLaterGuild" inherits="GLDG_GroupSelectTemplate" id="14">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSelNightGuild" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!--> Greet channel (Line 4) <-->
+			<Button name="$parentSelChannel" inherits="GLDG_GroupSelectTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentSelGuild" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!--> Goodbye channel (day) <-->
+			<Button name="$parentSelByeChannel" inherits="GLDG_GroupSelectTemplate" id="12">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSelChannel" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!--> Goodbye channel (night) <-->
+			<Button name="$parentSelNightChannel" inherits="GLDG_GroupSelectTemplate" id="13">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSelByeChannel" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!--> See you later channel<-->
+			<Button name="$parentSelLaterChannel" inherits="GLDG_GroupSelectTemplate" id="15">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSelNightChannel" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!-->Selection messages scrollbar<-->
+			<ScrollFrame name="$parentScrollbar" inherits="FauxScrollFrameTemplate">
+				<Size><AbsDimension x="30" y="75"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentGreetHeader" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="-30" y="-90"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>FauxScrollFrame_OnVerticalScroll(self, offset, 15, GLDG_ClickGreetScrollBar)</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<!-->Selection messages lines<-->
+			<Button name="$parentLine1" inherits="GLDG_MessageLineTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentScrollbar" relativePoint="TOPLEFT">
+						<Offset><AbsDimension x="30" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentLine2" inherits="GLDG_MessageLineTemplate" id="2">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine1" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine3" inherits="GLDG_MessageLineTemplate" id="3">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine2" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine4" inherits="GLDG_MessageLineTemplate" id="4">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine3" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine5" inherits="GLDG_MessageLineTemplate" id="5">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine4" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<!-->Selection editbox<-->
+			<EditBox name="$parentEditbox" letters="200" autoFocus="false">
+				<Size><AbsDimension x="500" y="30"/></Size>
+				<FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEditboxHeader" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="30" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size><AbsDimension x="258" y="32"/></Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="-8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size><AbsDimension x="258" y="32"/></Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset><AbsDimension x="8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEscapePressed>
+						GLDG_SelMsgNum = nil
+						GLDG_ClickGreetRemove(self, self:GetParent():GetName())
+					</OnEscapePressed>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</EditBox>
+			<!-->Selection editbox buttons<-->
+			<Button name="$parentMsgAdd" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="100" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEditbox" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="150" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickGreetAdd(self, self:GetParent():GetName())</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentMsgDel" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="100" y="20"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMsgAdd" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickGreetRemove(self, self:GetParent():GetName())</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				getglobal(self:GetName().."Collectbar"):Show()
+				GLDG_ClickGreetButton(self)
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<!-->Configuration greetings tab subframe template: custom Gnabber line<-->
+	<FontString name="GLDG_CustomLineTemplate" inherits="GameFontNormal" virtual="true">
+		<Color r="1" g="1" b="1"/>
+		<Size><AbsDimension x="200" y="20"/></Size>
+	</FontString>
+
+	<!-->Configuration greetings tab subframe: display current custom Gnabber<-->
+	<Frame name="$parentCustom" parent="GuildGreetFrameGreetingsSub" hidden="true" enableMouse="true" setAllPoints="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Current custom config header<-->
+				<FontString name="$parentHeader" inherits="GameFontNormal">
+					<Color r="0.68" g="0.80" b="1"/>
+					<Size><AbsDimension x="230" y="25"/></Size>
+					<Anchors><Anchor point="TOP"/></Anchors>
+				</FontString>
+				<!-->Current custom config lines<-->
+				<FontString name="$parentRealm" inherits="GLDG_CustomLineTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="-20"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentGuild" inherits="GLDG_CustomLineTemplate">
+					<Anchors><Anchor point="TOP" relativeTo="$parentRealm" relativePoint="BOTTOM"/></Anchors>
+				</FontString>
+				<FontString name="$parentChar" inherits="GLDG_CustomLineTemplate">
+					<Anchors><Anchor point="TOP" relativeTo="$parentGuild" relativePoint="BOTTOM"/></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<!-->Configuration greetings tab subframe: create new collection<-->
+	<Frame name="$parentNew" parent="GuildGreetFrameGreetingsSub" hidden="true" enableMouse="true" setAllPoints="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<!-->New collection header<-->
+				<FontString name="$parentHeader" inherits="GameFontNormal">
+					<Color r="0.68" g="0.80" b="1"/>
+					<Size><AbsDimension x="230" y="25"/></Size>
+					<Anchors><Anchor point="TOP"/></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Editbox<-->
+			<EditBox name="$parentEditbox" letters="12" autoFocus="true">
+				<Size><AbsDimension x="160" y="30"/></Size>
+				<FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT"/>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM"/></Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size><AbsDimension x="88" y="32"/></Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="-8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size><AbsDimension x="88" y="32"/></Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset><AbsDimension x="8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEscapePressed>self:SetText("")</OnEscapePressed>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</EditBox>
+			<!-->Buttons<-->
+			<Button name="$parentAdd" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="80" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEditbox" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="-5" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickNewColAdd(self, self:GetParent():GetParent():GetParent():GetName())</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancel" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="80" y="20"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAdd" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ShowCustom(self:GetParent():GetParent():GetParent():GetName())</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<!-->Configuration greetings tab subframe template: change collection button<-->
+	<Button name="GLDG_ChangeButtonTemplate" inherits="UIPanelButtonTemplate" virtual= "true">
+		<Size><AbsDimension x="150" y="20"/></Size>
+		<Scripts>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-->Configuration greetings tab subframe: change custom Gnabber<-->
+	<Frame name="$parentChange" parent="GuildGreetFrameGreetingsSub" hidden="true" enableMouse="true" setAllPoints="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Current custom config header<-->
+				<FontString name="$parentHeader" inherits="GameFontNormal">
+					<Color r="0.68" g="0.80" b="1"/>
+					<Size><AbsDimension x="230" y="25"/></Size>
+					<Anchors><Anchor point="TOP"/></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentSelection" inherits="GLDG_ChangeButtonTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM"/></Anchors>
+				<Scripts>
+					<OnShow>if GLDG_SelColName then self:Enable() else self:Disable() end</OnShow>
+					<OnClick>GLDG_ChangeCollect("selection", self:GetParent():GetParent():GetParent():GetName())</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentGlobal" inherits="GLDG_ChangeButtonTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentSelection" relativePoint="BOTTOM"/></Anchors>
+				<Scripts>
+					<OnClick>GLDG_ChangeCollect("global", self:GetParent():GetParent():GetParent():GetName())</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentClear" inherits="GLDG_ChangeButtonTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentGlobal" relativePoint="BOTTOM"/></Anchors>
+				<Scripts>
+					<OnClick>GLDG_ChangeCollect("clear", self:GetParent():GetParent():GetParent():GetName())</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancel" inherits="GLDG_ChangeButtonTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentClear" relativePoint="BOTTOM"/></Anchors>
+				<Scripts>
+					<OnClick>GLDG_ShowCustom(self:GetParent():GetParent():GetParent():GetName())</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+
+
+<!--> ============================================================================================================== <-->
+	<!-->Configuration players tab template: player line<-->
+	<Button name="GLDG_PlayerHeaderTemplate" virtual= "true">
+		<Size><AbsDimension x="420" y="15"/></Size>
+		<!--
+		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		-->
+		<Layers>
+			<Layer level="BORDER">
+				<!-- char name -->
+				<FontString name="$parentName" inherits="GLDG_HeaderText" justifyH="LEFT">
+					<Size><AbsDimension x="100" /></Size>
+					<Scripts>
+						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
+						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+						<OnLeave>GameTooltip:Hide()</OnLeave>
+					</Scripts>
+				</FontString>
+				<!-- type: main/alt -->
+				<FontString name="$parentType" inherits="GLDG_HeaderText" justifyH="LEFT">
+					<Size><AbsDimension x="50" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentName" relativePoint="RIGHT"/></Anchors>
+					<Scripts>
+						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
+						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+						<OnLeave>GameTooltip:Hide()</OnLeave>
+					</Scripts>
+				</FontString>
+				<!-- alias -->
+				<FontString name="$parentAlias" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size><AbsDimension x="50" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentType" relativePoint="RIGHT"/></Anchors>
+					<Scripts>
+						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
+						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+						<OnLeave>GameTooltip:Hide()</OnLeave>
+					</Scripts>
+				</FontString>
+				<!-- guild -->
+				<FontString name="$parentGuild" inherits="GLDG_HeaderText" justifyH="LEFT">
+					<Size><AbsDimension x="160" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentAlias" relativePoint="RIGHT"/></Anchors>
+					<Scripts>
+						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
+						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+						<OnLeave>GameTooltip:Hide()</OnLeave>
+					</Scripts>
+				</FontString>
+				<!-- channel -->
+				<FontString name="$parentChannel" inherits="GLDG_HeaderText" justifyH="LEFT">
+					<Size><AbsDimension x="20" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentGuild" relativePoint="RIGHT"/></Anchors>
+					<Scripts>
+						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
+						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+						<OnLeave>GameTooltip:Hide()</OnLeave>
+					</Scripts>
+				</FontString>
+				<!-- friend -->
+				<FontString name="$parentFriend" inherits="GLDG_HeaderText" justifyH="LEFT">
+					<Size><AbsDimension x="20" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentChannel" relativePoint="RIGHT"/></Anchors>
+					<Scripts>
+						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
+						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+						<OnLeave>GameTooltip:Hide()</OnLeave>
+					</Scripts>
+				</FontString>
+				<!-- #friends -->
+				<FontString name="$parentNumFriends" inherits="GLDG_HeaderText" justifyH="RIGHT">
+					<Size><AbsDimension x="20" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentFriend" relativePoint="RIGHT"/></Anchors>
+					<Scripts>
+						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
+						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+						<OnLeave>GameTooltip:Hide()</OnLeave>
+					</Scripts>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+	<Button name="GLDG_PlayerLineTemplate" virtual= "true">
+		<Size><AbsDimension x="420" y="15"/></Size>
+		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<Layers>
+			<Layer level="BORDER">
+				<!-- char name -->
+				<FontString name="$parentName" inherits="GameFontHighlight" justifyH="LEFT">
+					<Size><AbsDimension x="100" /></Size>
+				</FontString>
+				<!-- main/alt -->
+				<FontString name="$parentType" inherits="GameFontHighlight" justifyH="LEFT">
+					<Size><AbsDimension x="50" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentName" relativePoint="RIGHT"/></Anchors>
+				</FontString>
+				<!-- alias -->
+				<FontString name="$parentAlias" inherits="GameFontHighlight" justifyH="LEFT">
+					<Size><AbsDimension x="50" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentType" relativePoint="RIGHT"/></Anchors>
+				</FontString>
+				<!-- main (same position as alias) -->
+				<FontString name="$parentMain" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size><AbsDimension x="50" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentType" relativePoint="RIGHT"/></Anchors>
+				</FontString>
+				<!-- guild -->
+				<FontString name="$parentGuild" inherits="GameFontHighlight" justifyH="LEFT">
+					<Size><AbsDimension x="160" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentAlias" relativePoint="RIGHT"/></Anchors>
+				</FontString>
+				<!-- channel -->
+				<FontString name="$parentChannel" inherits="GameFontHighlight" justifyH="LEFT">
+					<Size><AbsDimension x="20" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentGuild" relativePoint="RIGHT"/></Anchors>
+				</FontString>
+				<!-- friend -->
+				<FontString name="$parentFriend" inherits="GameFontHighlight" justifyH="LEFT">
+					<Size><AbsDimension x="20" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentChannel" relativePoint="RIGHT"/></Anchors>
+				</FontString>
+				<!-- #friends -->
+				<FontString name="$parentNumFriends" inherits="GameFontHighlight" justifyH="RIGHT">
+					<Size><AbsDimension x="20" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentFriend" relativePoint="RIGHT"/></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				GLDG_ClickPlayer(string.gsub(getglobal(self:GetName().."Name"):GetText(), "%*", ""))
+			</OnClick>
+			<OnEnter>GLDG_ShowPlayerToolTip(self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-->Configuration players tab template: player action button<-->
+	<Button name="GLDG_PlayerActionTemplate" inherits="UIPanelButtonTemplate" virtual= "true">
+		<Size><AbsDimension x="130" y="20"/></Size>
+		<Scripts>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-->Configuration players tab<-->
+ 	<Frame name="$parentPlayers" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
+ 		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Player tab header<-->
+				<FontString name="$parentHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset><AbsDimension x="0" y="-20"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Show ignore option text<-->
+				<FontString name="$parentIgnoreText" inherits="GLDG_LOptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="-250" y="-315"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Show alt option texts<-->
+				<FontString name="$parentAltText" inherits="GLDG_LOptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentIgnoreText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentAlt2Text" inherits="GLDG_LOptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentIgnoreText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="160" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Filter unassigned text<-->
+				<FontString name="$parentUnassignedText" inherits="GLDG_LOptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentAltText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Filter guild members text<-->
+				<FontString name="$parentGuildText" inherits="GLDG_LOptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentUnassignedText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Filter online text<-->
+				<FontString name="$parentOnlineText" inherits="GLDG_LOptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentGuildText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Filter my friends text<-->
+				<FontString name="$parentMyFriendsText" inherits="GLDG_LOptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentUnassignedText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="160" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Filter with friends text<-->
+				<FontString name="$parentWithFriendsText" inherits="GLDG_LOptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentMyFriendsText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Filter current channel text<-->
+				<FontString name="$parentCurrentChannelText" inherits="GLDG_LOptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentUnassignedText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="320" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Filter with channel text<-->
+				<FontString name="$parentWithChannelText" inherits="GLDG_LOptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentCurrentChannelText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->GuildSort text<-->
+				<FontString name="$parentGuildSortText" inherits="GLDG_LOptionText">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentAltText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="320" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Players header<-->
+			<Button name="$parentHeaderLine" inherits="GLDG_PlayerHeaderTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="20" y="-45"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!-->Players lines<-->
+			<Button name="$parentLine1" inherits="GLDG_PlayerLineTemplate" id="1">
+				<!--
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="20" y="-45"/></Offset>
+					</Anchor>
+				</Anchors>
+				-->
+				<Anchors><Anchor point="TOP" relativeTo="$parentHeaderLine" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine2" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine1" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine3" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine2" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine4" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine3" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine5" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine4" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine6" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine5" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine7" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine6" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine8" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine7" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine9" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine8" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine10" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine9" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine11" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine10" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine12" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine11" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine13" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine12" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine14" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine13" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine15" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine14" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine16" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine15" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine17" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine16" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine18" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine17" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine19" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine18" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine20" inherits="GLDG_PlayerLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine19" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<!-->Players scrollbar<-->
+			<ScrollFrame name="$parentPlayerbar" inherits="FauxScrollFrameTemplate" enableMouse="true">
+				<Size><AbsDimension x="420" y="300"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentLine1" relativePoint="TOPRIGHT">
+						<Offset><AbsDimension x="-425" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>FauxScrollFrame_OnVerticalScroll(self, offset, 15, GLDG_ClickPlayerBar)</OnVerticalScroll>
+					<OnMouseWheel>ScrollFrameTemplate_OnMouseWheel(self, delta)</OnMouseWheel>
+				</Scripts>
+			</ScrollFrame>
+			<!-->Ignore checkbox<-->
+			<CheckButton name="$parentIgnoreBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentIgnoreText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.ShowIgnore = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->Alt checkboxes<-->
+			<CheckButton name="$parentAltBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentAltText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.ShowAlt = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentAlt2Box" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentAlt2Text" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.GroupAlt = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->Unassigned Box<-->
+			<CheckButton name="$parentUnassignedBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentUnassignedText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.FilterUnassigned = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<!-->Guild Box<-->
+			<CheckButton name="$parentGuildBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentGuildText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.FilterGuild = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->Online Box<-->
+			<CheckButton name="$parentOnlineBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentOnlineText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.FilterOnline = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->MyFriends Box<-->
+			<CheckButton name="$parentMyFriendsBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentMyFriendsText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.FilterMyFriends = self:GetChecked()
+						if GLDG_Data.FilterMyFriends then GLDG_Data.FilterWithFriends = nil end
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->WithFriends Box<-->
+			<CheckButton name="$parentWithFriendsBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentWithFriendsText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.FilterWithFriends = self:GetChecked()
+						if GLDG_Data.FilterWithFriends then GLDG_Data.FilterMyFriends = nil end
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->CurrentChannel Box<-->
+			<CheckButton name="$parentCurrentChannelBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentCurrentChannelText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.FilterCurrentChannel = self:GetChecked()
+						if GLDG_Data.FilterCurrentChannel then GLDG_Data.FilterWithChannel = nil end
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->WithChannel Box<-->
+			<CheckButton name="$parentWithChannelBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentWithChannelText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.FilterWithChannel = self:GetChecked()
+						if GLDG_Data.FilterWithChannel then GLDG_Data.FilterCurrentChannel = nil end
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->GuildSort Box<-->
+			<CheckButton name="$parentGuildSortBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentGuildSortText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.GuildSort = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<!-->GuildFilter<-->
+			<!--
+			<Button name="$parentGuildFilterDropboxButton" inherits="UIDropDownMenuTemplate">
+				<Size>
+					<AbsDimension x="160" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentLine20" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="20" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						GLDG_GuildFilterDropDownTemplate_OnLoad(self);
+					</OnLoad>
+					<OnShow>
+						GLDG_GuildFilterDropDownTemplate_OnShow(self);
+					</OnShow>
+					<OnClick>
+						ToggleDropDownMenu(1, nil, self);
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			-->
+
+
+			<!-->Action button subframe<-->
+			<Frame name="$parentAction">
+				<Size><AbsDimension x="130" y="200"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset><AbsDimension x="-10" y="-42"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<!-->Configuration subframe<-->
+			<Frame name="$parentSub">
+				<Size><AbsDimension x="130" y="200"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="-10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnShow>GLDG_ListPlayers()</OnShow>
+		</Scripts>
+ 	</Frame>
+
+
+ 	<!-->Configuration players tab subframe: set alias<-->
+ 	 <Frame name="$parentButtons" parent="GuildGreetFramePlayersAction" hidden="true" enableMouse="true" setAllPoints="true">
+		<Frames>
+			<!-->Player actionbuttons<-->
+			<Button name="$parentCheck" inherits="GLDG_PlayerActionTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Convert_Plausibility_Check()</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentIgnore" inherits="GLDG_PlayerActionTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentCheck" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="0" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickIgnore()</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentAlias" inherits="GLDG_PlayerActionTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentIgnore" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="0" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickAlias(self)</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentMain" inherits="GLDG_PlayerActionTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentAlias" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="0" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickMain()</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentAlt" inherits="GLDG_PlayerActionTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentMain" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="0" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickAlt(self)</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentGuild" inherits="GLDG_PlayerActionTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentAlt" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="0" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickGuild(self)</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentWho" inherits="GLDG_PlayerActionTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentGuild" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="0" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickWho()</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentRemove" inherits="GLDG_PlayerActionTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentWho" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="0" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickRemove()</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentNote" inherits="GLDG_PlayerActionTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentRemove" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="0" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickNote(self)</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+ 	 </Frame>
+
+
+ 	<!-->Configuration players tab subframe: set alias<-->
+ 	 <Frame name="$parentAlias" parent="GuildGreetFramePlayersSub" hidden="true" enableMouse="true" setAllPoints="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Editbox header<-->
+				<FontString name="$parentHeader" inherits="GameFontNormal">
+					<Color r="0.68" g="0.80" b="1"/>
+					<Size><AbsDimension x="110" y="40"/></Size>
+					<Anchors><Anchor point="TOP"/></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Editbox<-->
+			<EditBox name="$parentEditbox" letters="30" autoFocus="true">
+				<Size><AbsDimension x="110" y="30"/></Size>
+				<FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT"/>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM"/>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset><AbsDimension x="7" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size><AbsDimension x="108" y="32"/></Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="-8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size><AbsDimension x="108" y="32"/></Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset><AbsDimension x="8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEscapePressed>self:SetText("")</OnEscapePressed>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</EditBox>
+			<!-->Buttons<-->
+			<Button name="$parentSet" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="130" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEditbox" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="-7" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickAliasSet(getglobal(self:GetParent():GetName().."Editbox"):GetText())</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentDel" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="130" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSet" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickAliasRemove()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>GLDG_ShowPlayerAlias(self:GetName())</OnShow>
+		</Scripts>
+ 	 </Frame>
+
+ 	<!-->Configuration players tab subframe: set alias<-->
+ 	 <Frame name="$parentGuild" parent="GuildGreetFramePlayersSub" hidden="true" enableMouse="true" setAllPoints="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Editbox header<-->
+				<FontString name="$parentHeader" inherits="GameFontNormal">
+					<Color r="0.68" g="0.80" b="1"/>
+					<Size><AbsDimension x="110" y="40"/></Size>
+					<Anchors><Anchor point="TOP"/></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Editbox<-->
+			<EditBox name="$parentEditbox" letters="30" autoFocus="true">
+				<Size><AbsDimension x="110" y="30"/></Size>
+				<FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT"/>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM"/>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset><AbsDimension x="7" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size><AbsDimension x="108" y="32"/></Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="-8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size><AbsDimension x="108" y="32"/></Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset><AbsDimension x="8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEscapePressed>self:SetText("")</OnEscapePressed>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</EditBox>
+			<!-->Buttons<-->
+			<Button name="$parentSet" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="130" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEditbox" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="-7" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickGuildSet(getglobal(self:GetParent():GetName().."Editbox"):GetText())</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentDel" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="130" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSet" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickGuildRemove()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>GLDG_ShowPlayerGuild(self:GetName())</OnShow>
+		</Scripts>
+ 	 </Frame>
+
+ 	<!-->Configuration players tab subframe: set note<-->
+ 	 <Frame name="$parentNote" parent="GuildGreetFramePlayersSub" hidden="true" enableMouse="true" setAllPoints="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Editbox header<-->
+				<FontString name="$parentHeader" inherits="GameFontNormal">
+					<Color r="0.68" g="0.80" b="1"/>
+					<Size><AbsDimension x="110" y="40"/></Size>
+					<Anchors><Anchor point="TOP"/></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Editbox<-->
+			<EditBox name="$parentEditbox" letters="30" autoFocus="true">
+				<Size><AbsDimension x="110" y="30"/></Size>
+				<FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT"/>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM"/>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset><AbsDimension x="7" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size><AbsDimension x="108" y="32"/></Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="-8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size><AbsDimension x="108" y="32"/></Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset><AbsDimension x="8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEscapePressed>self:SetText("")</OnEscapePressed>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</EditBox>
+			<!-->Buttons<-->
+			<Button name="$parentSet" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="130" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEditbox" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="-7" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickNoteSet(getglobal(self:GetParent():GetName().."Editbox"):GetText())</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentDel" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="130" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSet" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickNoteRemove()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>GLDG_ShowPlayerNote(self:GetName())</OnShow>
+		</Scripts>
+ 	 </Frame>
+
+	<!-->Configuration players tab subframe template: main/alt line<-->
+	<Button name="GLDG_MainLineTemplate" virtual= "true">
+		<Size><AbsDimension x="110" y="15"/></Size>
+		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentText" inherits="GameFontHighlight" justifyH="LEFT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>GLDG_ClickMainAlt(self, getglobal(self:GetName().."Text"):GetText())</OnClick>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+ 	<!-->Configuration players tab subframe: list of mains for new alt<-->
+	<Frame name="$parentMainAlt" parent="GuildGreetFramePlayersSub" hidden="true" enableMouse="true" setAllPoints="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Main/alt header<-->
+				<FontString name="$parentHeader" inherits="GameFontNormal">
+					<Color r="0.68" g="0.80" b="1"/>
+					<Size><AbsDimension x="130" y="25"/></Size>
+					<Anchors><Anchor point="TOP"/></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Main/alt lines<-->
+			<Button name="$parentLine1" inherits="GLDG_MainLineTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM"/>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentLine2" inherits="GLDG_MainLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine1" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine3" inherits="GLDG_MainLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine2" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine4" inherits="GLDG_MainLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine3" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine5" inherits="GLDG_MainLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine4" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine6" inherits="GLDG_MainLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine5" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine7" inherits="GLDG_MainLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine6" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine8" inherits="GLDG_MainLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine7" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine9" inherits="GLDG_MainLineTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine8" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<!-->Main/alt scrollbar<-->
+			<ScrollFrame name="$parentScrollbar" inherits="FauxScrollFrameTemplate">
+				<Size><AbsDimension x="110" y="135"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentLine1" relativePoint="TOPRIGHT">
+						<Offset><AbsDimension x="-115" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>GLDG_ShowMainAlt(self)</OnShow>
+					<OnVerticalScroll>FauxScrollFrame_OnVerticalScroll(self, offset, 15, GLDG_ShowMainAlt)</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+		</Frames>
+		<Scripts>
+			<OnShow>getglobal(self:GetName().."Scrollbar"):Show()</OnShow>
+		</Scripts>
+	</Frame>
+
+
+
+<!--> ============================================================================================================== <-->
+	<!-->Configuration cleanup tab<-->
+ 	<Frame name="$parentCleanup" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
+ 		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Cleanup tab header<-->
+				<FontString name="$parentHeader" inherits="GLDG_HeaderText">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset><AbsDimension x="0" y="-25"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Info text<-->
+				<FontString name="$parentInfo" inherits="GLDG_LOptionText">
+					<Size><AbsDimension x="420" y="80"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="20" y="-45"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->guild header<-->
+				<FontString name="$parentGuildHeader" inherits="GLDG_HeaderText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentInfo" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-5"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->guild info<-->
+				<FontString name="$parentGuildInfo" inherits="GLDG_LOptionText">
+					<Size><AbsDimension x="420" y="60"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentGuildHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->friends header<-->
+				<FontString name="$parentFriendsHeader" inherits="GLDG_HeaderText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentGuildInfo" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-5"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->friends info<-->
+				<FontString name="$parentFriendsInfo" inherits="GLDG_LOptionText">
+					<Size><AbsDimension x="420" y="40"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentFriendsHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->channel header<-->
+				<FontString name="$parentChannelHeader" inherits="GLDG_HeaderText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentFriendsInfo" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-5"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->channel info<-->
+				<FontString name="$parentChannelInfo" inherits="GLDG_LOptionText">
+					<Size><AbsDimension x="420" y="30"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentChannelHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->orphan header<-->
+				<FontString name="$parentOrphanHeader" inherits="GLDG_HeaderText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentChannelInfo" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-5"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->orphan info<-->
+				<FontString name="$parentOrphanInfo" inherits="GLDG_LOptionText">
+					<Size><AbsDimension x="420" y="30"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentOrphanHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->guild cleanup button<-->
+			<Button name="$parentGuild" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="250" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentGuildHeader" relativePoint="TOPLEFT">
+						<Offset><AbsDimension x="420" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickCleanup(self, "guild")</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<!-->friends cleanup button<-->
+			<Button name="$parentFriends" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="250" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentFriendsHeader" relativePoint="TOPLEFT">
+						<Offset><AbsDimension x="420" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickCleanup(self, "friends")</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<!-->channel cleanup button<-->
+			<Button name="$parentChannel" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="250" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentChannelHeader" relativePoint="TOPLEFT">
+						<Offset><AbsDimension x="420" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickCleanup(self, "channel")</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<!-->orphan cleanup button<-->
+			<Button name="$parentOrphan" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="250" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentOrphanHeader" relativePoint="TOPLEFT">
+						<Offset><AbsDimension x="420" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickOrphanCleanup()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+
+
+			<!-->Configuration subframe<-->
+			<Frame name="$parentSub">
+				<Size><AbsDimension x="150" y="200"/></Size>
+				<Anchors><Anchor point="BOTTOMRIGHT"/></Anchors>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnShow>GLDG_CleanupShowTab()</OnShow>
+		</Scripts>
+ 	</Frame>
+
+	<!-->Configuration players tab subframe template: main/alt line<-->
+	<Button name="GLDG_CleanupTemplate" virtual= "true">
+		<Size><AbsDimension x="110" y="15"/></Size>
+		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentText" inherits="GameFontHighlight" justifyH="LEFT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>GLDG_ClickCleanupEntry(self, getglobal(self:GetName().."Text"):GetText())</OnClick>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+ 	<!-->Configuration players tab subframe: list of mains for new alt<-->
+	<Frame name="$parentEntries" parent="GuildGreetFrameCleanupSub" hidden="true" enableMouse="true" setAllPoints="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Main/alt header<-->
+				<FontString name="$parentHeader" inherits="GameFontNormal">
+					<Color r="0.68" g="0.80" b="1"/>
+					<Size><AbsDimension x="130" y="25"/></Size>
+					<Anchors><Anchor point="TOP"/></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Main/alt lines<-->
+			<Button name="$parentLine1" inherits="GLDG_CleanupTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM"/>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentLine2" inherits="GLDG_CleanupTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine1" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine3" inherits="GLDG_CleanupTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine2" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine4" inherits="GLDG_CleanupTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine3" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine5" inherits="GLDG_CleanupTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine4" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine6" inherits="GLDG_CleanupTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine5" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine7" inherits="GLDG_CleanupTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine6" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine8" inherits="GLDG_CleanupTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine7" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<Button name="$parentLine9" inherits="GLDG_CleanupTemplate">
+				<Anchors><Anchor point="TOP" relativeTo="$parentLine8" relativePoint="BOTTOM"/></Anchors>
+			</Button>
+			<!-->Main/alt scrollbar<-->
+			<ScrollFrame name="$parentScrollbar" inherits="FauxScrollFrameTemplate">
+				<Size><AbsDimension x="110" y="135"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentLine1" relativePoint="TOPRIGHT">
+						<Offset><AbsDimension x="-115" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>GLDG_ShowCleanupEntries(self)</OnShow>
+					<OnVerticalScroll>FauxScrollFrame_OnVerticalScroll(self, offset, 15, GLDG_ShowCleanupEntries)</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+		</Frames>
+		<Scripts>
+			<OnShow>getglobal(self:GetName().."Scrollbar"):Show()</OnShow>
+		</Scripts>
+	</Frame>
+
+
+
+<!--> ============================================================================================================== <-->
+	<!-->Configuration colour tab template: colour line<-->
+	<FontString name="GLDG_ColourHeaderTextTemplate" inherits="GameFontNormal" justifyH="LEFT" virtual="true">
+		<Size><AbsDimension x="150" y="25"/></Size>
+	</FontString>
+
+	<FontString name="GLDG_ColourOptionTextTemplate" inherits="GameFontNormal" justifyH="LEFT" virtual="true">
+		<Color r="0.68" g="0.80" b="1"/>
+		<Size><AbsDimension x="150" y="25"/></Size>
+	</FontString>
+
+	<FontString name="GLDG_ColourColumnHeaderTextTemplate" inherits="GameFontNormal" justifyH="CENTER" virtual="true">
+		<Size><AbsDimension x="120" y="25"/></Size>
+	</FontString>
+
+	<Button name="GLDG_ColourLineTemplate" virtual= "true">
+		<Size><AbsDimension x="30" y="20"/></Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTexture"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+	<Button name="GLDG_ColourActionTemplate" inherits="UIPanelButtonTemplate" virtual= "true">
+		<Size><AbsDimension x="70" y="25"/></Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentText" inherits="GameFontHighlight" justifyH="LEFT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>GLDG_ColourClick(self:GetName())</OnClick>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-->Configuration colour tab<-->
+ 	<Frame name="$parentColour" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
+ 		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Category headers and options<-->
+				<FontString name="$parentHeaderChat" inherits="GLDG_ColourHeaderTextTemplate">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="20" y="-25"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentComingOnline" inherits="GLDG_ColourOptionTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderChat" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentGoingOffline" inherits="GLDG_ColourOptionTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentComingOnline" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentIsOffline" inherits="GLDG_ColourOptionTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentGoingOffline" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentAlias" inherits="GLDG_ColourOptionTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentIsOffline" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<FontString name="$parentHeaderList" inherits="GLDG_ColourHeaderTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentAlias" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="-10"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentList" inherits="GLDG_ColourOptionTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderList" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentRelog" inherits="GLDG_ColourOptionTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentList" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentNew" inherits="GLDG_ColourOptionTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentRelog" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentLevel" inherits="GLDG_ColourOptionTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentNew" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentRank" inherits="GLDG_ColourOptionTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentLevel" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentAchievment" inherits="GLDG_ColourOptionTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentRank" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<FontString name="$parentHeaderCommon" inherits="GLDG_ColourHeaderTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentAchievment" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="-10"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHelp" inherits="GLDG_ColourOptionTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderCommon" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHeader" inherits="GLDG_ColourOptionTextTemplate">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHelp" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<!-->Column headers<-->
+				<FontString name="$parentColHeaderGuild" inherits="GLDG_ColourColumnHeaderTextTemplate">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentHeaderChat" relativePoint="RIGHT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentColHeaderFriends" inherits="GLDG_ColourColumnHeaderTextTemplate">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentColHeaderGuild" relativePoint="RIGHT">
+							<Offset><AbsDimension x="10" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentColHeaderChannel" inherits="GLDG_ColourColumnHeaderTextTemplate">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentColHeaderFriends" relativePoint="RIGHT">
+							<Offset><AbsDimension x="10" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Guild - Buttons<-->
+			<Button name="$parentGuildOnlineButton" inherits="GLDG_ColourActionTemplate" id="1">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentComingOnline" relativePoint="RIGHT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildGoOfflineButton" inherits="GLDG_ColourActionTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentGuildOnlineButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildIsOfflineButton" inherits="GLDG_ColourActionTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentGuildGoOfflineButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildAliasButton" inherits="GLDG_ColourActionTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentGuildIsOfflineButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="$parentGuildListButton" inherits="GLDG_ColourActionTemplate" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentList" relativePoint="RIGHT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildRelogButton" inherits="GLDG_ColourActionTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentGuildListButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildNewButton" inherits="GLDG_ColourActionTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentGuildRelogButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildLevelButton" inherits="GLDG_ColourActionTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentGuildNewButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildRankButton" inherits="GLDG_ColourActionTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentGuildLevelButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildAchievmentButton" inherits="GLDG_ColourActionTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentGuildRankButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!-->Guild - Colour fields<-->
+			<Button name="$parentGuildOnlineColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildOnlineButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				></Anchors>
+			</Button>
+			<Button name="$parentGuildGoOfflineColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildGoOfflineButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildIsOfflineColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildIsOfflineButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildAliasColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildAliasButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="$parentGuildListColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildListButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildRelogColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildRelogButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildNewColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildNewButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildLevelColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildLevelButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildRankColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildRankButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentGuildAchievmentColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildAchievmentButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+
+			<!-->Friends - Buttons<-->
+			<Button name="$parentFriendsOnlineButton" inherits="GLDG_ColourActionTemplate" id="1">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildOnlineColour" relativePoint="RIGHT">
+						<Offset><AbsDimension x="20" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsGoOfflineButton" inherits="GLDG_ColourActionTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentFriendsOnlineButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsIsOfflineButton" inherits="GLDG_ColourActionTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentFriendsGoOfflineButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsAliasButton" inherits="GLDG_ColourActionTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentFriendsIsOfflineButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="$parentFriendsListButton" inherits="GLDG_ColourActionTemplate" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuildListColour" relativePoint="RIGHT">
+						<Offset><AbsDimension x="20" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsRelogButton" inherits="GLDG_ColourActionTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentFriendsListButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsNewButton" inherits="GLDG_ColourActionTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentFriendsRelogButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsLevelButton" inherits="GLDG_ColourActionTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentFriendsNewButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsRankButton" inherits="GLDG_ColourActionTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentFriendsLevelButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsAchievmentButton" inherits="GLDG_ColourActionTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentFriendsRankButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!-->Friends - Colour fields<-->
+			<Button name="$parentFriendsOnlineColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFriendsOnlineButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				></Anchors>
+			</Button>
+			<Button name="$parentFriendsGoOfflineColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFriendsGoOfflineButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsIsOfflineColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFriendsIsOfflineButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsAliasColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFriendsAliasButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="$parentFriendsListColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFriendsListButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsRelogColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFriendsRelogButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsNewColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFriendsNewButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsLevelColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFriendsLevelButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsRankColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFriendsRankButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFriendsAchievmentColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFriendsAchievmentButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+
+			<!-->Channel - Buttons<-->
+			<Button name="$parentChannelOnlineButton" inherits="GLDG_ColourActionTemplate" id="1">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFriendsOnlineColour" relativePoint="RIGHT">
+						<Offset><AbsDimension x="20" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelGoOfflineButton" inherits="GLDG_ColourActionTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentChannelOnlineButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelIsOfflineButton" inherits="GLDG_ColourActionTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentChannelGoOfflineButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelAliasButton" inherits="GLDG_ColourActionTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentChannelIsOfflineButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="$parentChannelListButton" inherits="GLDG_ColourActionTemplate" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFriendsListColour" relativePoint="RIGHT">
+						<Offset><AbsDimension x="20" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelRelogButton" inherits="GLDG_ColourActionTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentChannelListButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelNewButton" inherits="GLDG_ColourActionTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentChannelRelogButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelLevelButton" inherits="GLDG_ColourActionTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentChannelNewButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelRankButton" inherits="GLDG_ColourActionTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentChannelLevelButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelAchievmentButton" inherits="GLDG_ColourActionTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentChannelRankButton" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!-->Channel - Colour fields<-->
+			<Button name="$parentChannelOnlineColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentChannelOnlineButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				></Anchors>
+			</Button>
+			<Button name="$parentChannelGoOfflineColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentChannelGoOfflineButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelIsOfflineColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentChannelIsOfflineButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelAliasColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentChannelAliasButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="$parentChannelListColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentChannelListButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelRelogColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentChannelRelogButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelNewColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentChannelNewButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelLevelColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentChannelLevelButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelRankColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentChannelRankButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentChannelAchievmentColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentChannelAchievmentButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+
+			<!-->Common - Buttons and fields<-->
+			<Button name="$parentHelpButton" inherits="GLDG_ColourActionTemplate" id="1">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentHelp" relativePoint="RIGHT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentHeaderButton" inherits="GLDG_ColourActionTemplate" id="1">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentHeader" relativePoint="RIGHT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentHelpColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentHelpButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				></Anchors>
+			</Button>
+			<Button name="$parentHeaderColour" inherits="GLDG_ColourLineTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentHeaderButton" relativePoint="RIGHT">
+						<Offset><AbsDimension x="10" y="0"/></Offset>
+					</Anchor>
+				></Anchors>
+			</Button>
+
+			<!-->Default button<-->
+			<Button name="$parentDefaultButton" inherits="UIPanelButtonTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="-20" y="25"/></Offset>
+					</Anchor>
+				></Anchors>
+				<Size><AbsDimension x="150" y="25"/></Size>
+				<Layers>
+					<Layer level="BORDER">
+						<FontString name="$parentText" inherits="GameFontHighlight" justifyH="CENTER"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>GLDG_ColourRestoreDefaults()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+
+		</Frames>
+		<Scripts>
+			<OnShow>GLDG_ColoursShow()</OnShow>
+		</Scripts>
+ 	</Frame>
+
+
+<!--> ============================================================================================================== <-->
+	<FontString name="GLDG_ColourTextTemplate" inherits="GameFontNormal" virtual="true">
+		<Size><AbsDimension x="50" y="25"/></Size>
+	</FontString>
+
+	<EditBox name="GLDG_ColourBoxTemplate" letters="3" autoFocus="false" virtual="true" numeric="true">
+		<Size><AbsDimension x="50" y="30"/></Size>
+		<FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="RIGHT"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+					<Size><AbsDimension x="58" y="32"/></Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset><AbsDimension x="-8" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+					<Size><AbsDimension x="58" y="32"/></Size>
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset><AbsDimension x="8" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEscapePressed>
+				self:ClearFocus()
+				GLDG_ColourCancelEdit(self, self:GetName())
+			</OnEscapePressed>
+			<OnEnterPressed>
+				self:ClearFocus()
+				GLDG_ColourEnter(self, self:GetName(), self:GetNumber())
+			</OnEnterPressed>
+			<OnTabPressed>
+				self:ClearFocus()
+				GLDG_ColourEnter(self, self:GetName(), self:GetNumber())
+				GLDG_ColourTab(self, self:GetName())
+			</OnTabPressed>
+			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+			<OnLeave>GameTooltip:Hide()</OnLeave>
+		</Scripts>
+	</EditBox>
+
+	<ColorSelect name="GLDG_ColorPickerFrame" toplevel="true" parent="UIParent" movable="true" enableMouse="true" enableKeyboard="true" hidden="true">
+		<Size>
+			<AbsDimension x="365" y="275"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="GuildGreetFrame" relativePoint="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="-50" y="50"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<TitleRegion>
+			<Size><AbsDimension x="256" y="64"/></Size>
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="0" y="12"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</TitleRegion>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="GLDG_ColorSwatch">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="225" y="-32"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+				</Texture>
+				<Texture name="GLDG_ColorPickerFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="COLOR_PICKER">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="GLDG_ColorPickerFrameHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="OVERLAY">
+				<!-->Red, Green, Blue headers<-->
+				<FontString name="GuildGreetColourFrameRedText" inherits="GLDG_ColourTextTemplate">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="30" y="-170"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="GuildGreetColourFrameGreenText" inherits="GLDG_ColourTextTemplate">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="GuildGreetColourFrameRedText" relativePoint="RIGHT">
+							<Offset><AbsDimension x="30" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="GuildGreetColourFrameBlueText" inherits="GLDG_ColourTextTemplate">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="GuildGreetColourFrameGreenText" relativePoint="RIGHT">
+							<Offset><AbsDimension x="30" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="GLDG_ColorPickerCancelButton" inherits="GameMenuButtonTemplate" text="CANCEL">
+				<Size>
+					<AbsDimension x="130" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(self:GetParent());
+						if ( GLDG_ColorPickerFrame.cancelFunc ) then
+							GLDG_ColorPickerFrame.cancelFunc(GLDG_ColorPickerFrame.previousValues);
+						end
+						PlaySound("igMainMenuOptionCheckBoxOn");
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="GLDG_ColorPickerOkayButton" inherits="GameMenuButtonTemplate" text="OKAY">
+				<Size>
+					<AbsDimension x="130" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="20" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(self:GetParent());
+						GLDG_ColorPickerFrame.func(1);
+						if ( GLDG_ColorPickerFrame.opacityFunc ) then
+							GLDG_ColorPickerFrame.opacityFunc();
+						end
+						PlaySound("igMainMenuOptionCheckBoxOn");
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<EditBox name="GuildGreetColourFrameRed" inherits="GLDG_ColourBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GuildGreetColourFrameRedText" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<EditBox name="GuildGreetColourFrameGreen" inherits="GLDG_ColourBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GuildGreetColourFrameGreenText" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<EditBox name="GuildGreetColourFrameBlue" inherits="GLDG_ColourBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GuildGreetColourFrameBlueText" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<Slider name="GLDG_OpacitySliderFrame" orientation="VERTICAL" minValue="0" maxValue="1" valueStep="0.01" defaultValue="1">
+				<Size>
+					<AbsDimension x="16" y="128"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GLDG_ColorSwatch" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="32" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="8"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="8"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="3" right="3" top="6" bottom="6"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentText" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="BOTTOM" relativePoint="TOP"/>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontHighlightSmall" text="0%">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="2" y="3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontHighlightSmall" text="100%">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GuildGreetColourFrameOpacityText" inherits="GLDG_ColourTextTemplate">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset><AbsDimension x="-10" y="-138"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<EditBox name="GuildGreetColourFrameOpacity" inherits="GLDG_ColourBoxTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GuildGreetColourFrameOpacityText" relativePoint="BOTTOMLEFT">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+							<OnLeave>GameTooltip:Hide()</OnLeave>
+						</Scripts>
+					</EditBox>
+				</Frames>
+				<Scripts>
+					<OnValueChanged>
+						if ( GLDG_ColorPickerFrame.opacityFunc ) then
+							GLDG_ColorPickerFrame.opacityFunc();
+						end
+					</OnValueChanged>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+				<ThumbTexture file="Interface\Buttons\UI-SliderBar-Button-Vertical">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+				</ThumbTexture>
+			</Slider>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				if ( self.hasOpacity ) then
+					GLDG_OpacitySliderFrame:Show();
+					GLDG_OpacitySliderFrame:SetValue(self.opacity);
+					self:SetWidth(365);
+				else
+					GLDG_OpacitySliderFrame:Hide();
+					self:SetWidth(305);
+				end
+			</OnShow>
+			<OnColorSelect>
+				GLDG_ColorSwatch:SetTexture(r, g, b);
+				if ( self.func ) then
+					self.func();
+				end
+			</OnColorSelect>
+			<OnKeyDown>
+				if (key == "ESCAPE") then
+					HideUIPanel(self);
+					if ( GLDG_ColorPickerFrame.cancelFunc ) then
+						GLDG_ColorPickerFrame.cancelFunc(GLDG_ColorPickerFrame.previousValues);
+					end
+				end
+			</OnKeyDown>
+		</Scripts>
+		<ColorWheelTexture name="GLDG_ColorPickerWheel">
+			<Size>
+				<AbsDimension x="128" y="128"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="16" y="-32"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</ColorWheelTexture>
+		<ColorWheelThumbTexture file="Interface\Buttons\UI-ColorPicker-Buttons">
+			<Size>
+				<AbsDimension x="10" y="10"/>
+			</Size>
+			<TexCoords left="0" right="0.15625" top="0" bottom="0.625"/>
+		</ColorWheelThumbTexture>
+		<ColorValueTexture>
+			<Size>
+				<AbsDimension x="32" y="128"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GLDG_ColorPickerWheel" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="24" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</ColorValueTexture>
+		<ColorValueThumbTexture file="Interface\Buttons\UI-ColorPicker-Buttons">
+			<Size>
+				<AbsDimension x="48" y="14"/>
+			</Size>
+			<TexCoords left="0.25" right="1.0" top="0" bottom="0.875"/>
+		</ColorValueThumbTexture>
+	</ColorSelect>
+
+<!--> ============================================================================================================== <-->
+	<!-->Todo list <-->
+ 	<Frame name="$parentTodo" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
+ 		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Category headers and options<-->
+				<FontString name="$parentTodoText" inherits="GLDG_ColourHeaderTextTemplate">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="40" y="-25"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Category headers and options<-->
+				<FontString name="$parentHistoryText" inherits="GLDG_ColourHeaderTextTemplate">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="240" y="-25"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->Category headers and options<-->
+				<FontString name="$parentHelpText" inherits="GLDG_ColourHeaderTextTemplate">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="440" y="-25"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="$parentTodoBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentTodoText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_TodoSetMode("todo")</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHistoryBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentHistoryText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_TodoSetMode("history")</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHelpBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentHelpText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_TodoSetMode("help")</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+		<Scripts>
+			<OnShow>GLDG_TodoShow(self)</OnShow>
+		</Scripts>
+ 	</Frame>
+
+
+
+<!--> ============================================================================================================== <-->
+	<!-->Interface options frame<-->
+	<Frame name="GuildGreetOptions">
+	<Layers>
+		<Layer level="OVERLAY">
+			<!-->Cleanup tab header<-->
+			<FontString name="$parentHeader" inherits="GLDG_HeaderText" justifyH="LEFT">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="10" y="-10"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+			<OnLoad>GLDG_OnLoadOptions(self)</OnLoad>
+		</Scripts>
+	</Frame>
+
+<!--> ============================================================================================================== <-->
+
+
+</Ui>
