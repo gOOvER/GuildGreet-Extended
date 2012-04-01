@@ -1,0 +1,156 @@
+------------------------------------------------------------------------
+r16 | goover | 2011-11-30 06:26:04 +0000 (Wed, 30 Nov 2011) | 1 line
+Changed paths:
+   A /tags/4.3.0 Release (from /trunk:15)
+
+Tagging as 4.3.0 Release
+------------------------------------------------------------------------
+r15 | goover | 2011-11-30 06:17:41 +0000 (Wed, 30 Nov 2011) | 1 line
+Changed paths:
+   M /trunk/GuildGreet.toc
+
+Tagged as 4.3.0
+------------------------------------------------------------------------
+r14 | goover | 2011-11-11 14:52:04 +0000 (Fri, 11 Nov 2011) | 2 lines
+Changed paths:
+   M /trunk/.pkgmeta
+   A /trunk/Libs
+   A /trunk/Libs/AceAddon-3.0
+   A /trunk/Libs/AceAddon-3.0/AceAddon-3.0.lua
+   A /trunk/Libs/AceAddon-3.0/AceAddon-3.0.xml
+   A /trunk/Libs/AceBucket-3.0
+   A /trunk/Libs/AceBucket-3.0/AceBucket-3.0.lua
+   A /trunk/Libs/AceBucket-3.0/AceBucket-3.0.xml
+   A /trunk/Libs/AceComm-3.0
+   A /trunk/Libs/AceComm-3.0/AceComm-3.0.lua
+   A /trunk/Libs/AceComm-3.0/AceComm-3.0.xml
+   A /trunk/Libs/AceComm-3.0/ChatThrottleLib.lua
+   A /trunk/Libs/AceConfig-3.0
+   A /trunk/Libs/AceConfig-3.0/AceConfig-3.0.lua
+   A /trunk/Libs/AceConfig-3.0/AceConfig-3.0.xml
+   A /trunk/Libs/AceConfig-3.0/AceConfigCmd-3.0
+   A /trunk/Libs/AceConfig-3.0/AceConfigCmd-3.0/AceConfigCmd-3.0.lua
+   A /trunk/Libs/AceConfig-3.0/AceConfigCmd-3.0/AceConfigCmd-3.0.xml
+   A /trunk/Libs/AceConfig-3.0/AceConfigDialog-3.0
+   A /trunk/Libs/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
+   A /trunk/Libs/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.xml
+   A /trunk/Libs/AceConfig-3.0/AceConfigRegistry-3.0
+   A /trunk/Libs/AceConfig-3.0/AceConfigRegistry-3.0/AceConfigRegistry-3.0.lua
+   A /trunk/Libs/AceConfig-3.0/AceConfigRegistry-3.0/AceConfigRegistry-3.0.xml
+   A /trunk/Libs/AceConsole-3.0
+   A /trunk/Libs/AceConsole-3.0/AceConsole-3.0.lua
+   A /trunk/Libs/AceConsole-3.0/AceConsole-3.0.xml
+   A /trunk/Libs/AceDB-3.0
+   A /trunk/Libs/AceDB-3.0/AceDB-3.0.lua
+   A /trunk/Libs/AceDB-3.0/AceDB-3.0.xml
+   A /trunk/Libs/AceDBOptions-3.0
+   A /trunk/Libs/AceDBOptions-3.0/AceDBOptions-3.0.lua
+   A /trunk/Libs/AceDBOptions-3.0/AceDBOptions-3.0.xml
+   A /trunk/Libs/AceEvent-3.0
+   A /trunk/Libs/AceEvent-3.0/AceEvent-3.0.lua
+   A /trunk/Libs/AceEvent-3.0/AceEvent-3.0.xml
+   A /trunk/Libs/AceGUI-3.0
+   A /trunk/Libs/AceGUI-3.0/AceGUI-3.0.lua
+   A /trunk/Libs/AceGUI-3.0/AceGUI-3.0.xml
+   A /trunk/Libs/AceGUI-3.0/widgets
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIContainer-BlizOptionsGroup.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIContainer-DropDownGroup.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIContainer-Frame.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIContainer-InlineGroup.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIContainer-ScrollFrame.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIContainer-SimpleGroup.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIContainer-TabGroup.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIContainer-TreeGroup.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIContainer-Window.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-Button.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-CheckBox.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-ColorPicker.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-DropDown-Items.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-DropDown.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-EditBox.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-Heading.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-Icon.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-InteractiveLabel.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-Keybinding.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-Label.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-MultiLineEditBox.lua
+   A /trunk/Libs/AceGUI-3.0/widgets/AceGUIWidget-Slider.lua
+   A /trunk/Libs/AceHook-3.0
+   A /trunk/Libs/AceHook-3.0/AceHook-3.0.lua
+   A /trunk/Libs/AceHook-3.0/AceHook-3.0.xml
+   A /trunk/Libs/AceLocale-3.0
+   A /trunk/Libs/AceLocale-3.0/AceLocale-3.0.lua
+   A /trunk/Libs/AceLocale-3.0/AceLocale-3.0.xml
+   A /trunk/Libs/AceSerializer-3.0
+   A /trunk/Libs/AceSerializer-3.0/AceSerializer-3.0.lua
+   A /trunk/Libs/AceSerializer-3.0/AceSerializer-3.0.xml
+   A /trunk/Libs/AceTab-3.0
+   A /trunk/Libs/AceTab-3.0/AceTab-3.0.lua
+   A /trunk/Libs/AceTab-3.0/AceTab-3.0.xml
+   A /trunk/Libs/AceTimer-3.0
+   A /trunk/Libs/AceTimer-3.0/AceTimer-3.0.lua
+   A /trunk/Libs/AceTimer-3.0/AceTimer-3.0.xml
+   A /trunk/Libs/CallbackHandler-1.0
+   A /trunk/Libs/CallbackHandler-1.0/CallbackHandler-1.0.lua
+   A /trunk/Libs/CallbackHandler-1.0/CallbackHandler-1.0.xml
+   A /trunk/Libs/LibStub
+   A /trunk/Libs/LibStub/LibStub.lua
+
+- Added ACE3 Libs for Future Development (Not used yet)
+- Small Fixes
+------------------------------------------------------------------------
+r13 | goover | 2011-11-11 06:14:11 +0000 (Fri, 11 Nov 2011) | 1 line
+Changed paths:
+   M /trunk/GuildGreet.toc
+   M /trunk/GuildGreet.xml
+   M /trunk/LICENCE.txt
+   A /trunk/Locale
+   A /trunk/Locale/deDE.lua
+   A /trunk/Locale/enUS.lua
+   A /trunk/Locale/locale.xml
+   D /trunk/localization.de.lua
+   D /trunk/localization.en.lua
+
+Move Lang Files to an own Folder
+------------------------------------------------------------------------
+r12 | goover | 2011-11-11 06:07:28 +0000 (Fri, 11 Nov 2011) | 1 line
+Changed paths:
+   A /trunk/.pkgmeta
+   A /trunk/Bindings.xml
+   A /trunk/CHANGELOG.txt
+   A /trunk/GuildGreet.lua
+   A /trunk/GuildGreet.toc
+   A /trunk/GuildGreet.xml
+   A /trunk/LICENCE.txt
+   A /trunk/help.lua
+   A /trunk/history.lua
+   A /trunk/localization.de.lua
+   A /trunk/localization.en.lua
+   A /trunk/manual.txt
+   A /trunk/readme.txt
+   A /trunk/todo.lua
+
+First Commit to SVN
+------------------------------------------------------------------------
+r11 | goover | 2011-11-11 06:06:33 +0000 (Fri, 11 Nov 2011) | 2 lines
+Changed paths:
+   D /trunk/.pkgmeta
+   D /trunk/Bindings.xml
+   D /trunk/CHANGELOG.txt
+   D /trunk/GuildGreet.lua
+   D /trunk/GuildGreet.toc
+   D /trunk/GuildGreet.xml
+   D /trunk/LICENCE.txt
+   D /trunk/help.lua
+   D /trunk/history.lua
+   D /trunk/libs
+   D /trunk/locales
+   D /trunk/localization.de.lua
+   D /trunk/localization.en.lua
+   D /trunk/manual.txt
+   D /trunk/readme.txt
+   D /trunk/todo.lua
+
+delete old Trunk
+
+------------------------------------------------------------------------
