@@ -1,4 +1,4 @@
---[[--------------------------------------------------------
+﻿--[[--------------------------------------------------------
 -- GuildGreet, a World of Warcraft social guild assistant --
 ------------------------------------------------------------
 CODE INDEX (search on index for fast access):
@@ -729,11 +729,22 @@ function GLDG_InitFrame(frameName)
 		_G[name.."ChannelInfo"]:SetText(GLDG_TXT.cleanupChannelInfo)
 		_G[name.."OrphanHeader"]:SetText(GLDG_TXT.cleanupOrphanHeader)
 		_G[name.."OrphanInfo"]:SetText(GLDG_TXT.cleanupOrphanInfo)
-
+--~~~ MSN1: Added assigning of program variables for 2 new buttons' text (for deleting and displaying guildless characters)
+		_G[name.."GuildlessHeader"]:SetText(GLDG_TXT.cleanupGuildlessHeader)
+		_G[name.."GuildlessInfo"]:SetText(GLDG_TXT.cleanupGuildlessInfo)
+		_G[name.."DisplayGuildlessHeader"]:SetText(GLDG_TXT.displayGuildlessHeader)
+		_G[name.."DisplayGuildlessInfo"]:SetText(GLDG_TXT.displayGuildlessInfo)		
+--~~~~
+		
 		_G[name.."Guild"]:SetText(GLDG_TXT.cleanupGuild)
 		_G[name.."Friends"]:SetText(GLDG_TXT.cleanupFriends)
 		_G[name.."Channel"]:SetText(GLDG_TXT.cleanupChannel)
 		_G[name.."Orphan"]:SetText(GLDG_TXT.cleanupOrphan)
+--~~~ MSN1: Added assigning of program variables for 2 new buttons' mouseover popup window info (for deleting and displaying guildless characters)
+		_G[name.."Guildless"]:SetText(GLDG_TXT.cleanupGuildless)
+		_G[name.."DisplayGuildless"]:SetText(GLDG_TXT.displayGuildless)
+--~~~~
+
 	elseif (frameName == "Colour") then
 		-- Column header
 		_G[name.."ColHeaderGuild"]:SetText(GLDG_TXT.colGuild)
@@ -5988,6 +5999,10 @@ function GLDG_ShowHelpToolTip(self, element)
 
 	local name = ""
 
+--~~~ MSN1: Display element for debugging purposes, to see what is in tooltip variable table (commented out now)
+--	GLDG_Print(element)
+--~~~~
+	
 	-- cut off leading frame name
 	if (string.find(element, GLDG_GUI)) then
 		name = string.sub(element, string.len(GLDG_GUI)+1)
@@ -6063,15 +6078,16 @@ end
 ------------------------------------------------------------
 -- extracted from r,g,b = RAID_CLASS_COLORS[enClass] * 255
 local classColors = {}
-classColors["MAGE"]	= "|cFF69CCF0";
-classColors["PRIEST"]	= "|cFFFFFFFF";
-classColors["WARLOCK"]	= "|cFF9682C9";
-classColors["PALADIN"]	= "|cFFF58CBA";
-classColors["DRUID"]	= "|cFFFF7D0A";
-classColors["SHAMAN"]	= "|cFF00DBBA";
-classColors["WARRIOR"]	= "|cFFBE9C6E";
-classColors["ROGUE"]	= "|cFFFFF569";
-classColors["HUNTER"]	= "|cFFAAD473";
+classColors["MAGE"]			= "|cFF69CCF0";
+classColors["PRIEST"]		= "|cFFFFFFFF";
+classColors["WARLOCK"]		= "|cFF9682C9";
+classColors["PALADIN"]		= "|cFFF58CBA";
+classColors["DRUID"]		= "|cFFFF7D0A";
+classColors["SHAMAN"]		= "|cFF00DBBA";
+classColors["WARRIOR"]		= "|cFFBE9C6E";
+classColors["ROGUE"]		= "|cFFFFF569";
+classColors["HUNTER"]		= "|cFFAAD473";
+classColors["DEADKNIGHT"]	= "|cFFC41F3B";
 
 ------------------------------------------------------------
 function GLDG_ChatFilter(chatFrame, event, ...) -- chatFrame = self
@@ -7060,6 +7076,60 @@ function GLDG_ClickOrphanCleanup()
 	_G[GLDG_GUI.."CleanupFriends"]:Enable()
 	_G[GLDG_GUI.."CleanupChannel"]:Enable()
 end
+
+------------------------------------------------------------
+--~~~ MSN1: New function to delete guildless characters, displays list and count after deletion
+function GLDG_ClickGuildlessCleanup()
+	guildless_count = 0
+	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupGuildless)
+	for p in pairs(GLDG_DataChar) do
+		if (not GLDG_DataChar[p].guild) then
+			guildless_count = guildless_count + 1
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemovedGuildless1.." ["..p.."] "..GLDG_TXT.cleanupRemovedGuildless2)			
+--Delete the character
+			GLDG_DataChar[p] = nil
+		end
+	end
+	GLDG_Print("Amount of guildless players removed: "..guildless_count)
+	
+	-- Hide the subframe window
+	_G[GLDG_GUI.."CleanupSubEntries"]:Hide()
+
+	-- re-enable buttons
+	_G[GLDG_GUI.."CleanupGuild"]:Enable()
+	_G[GLDG_GUI.."CleanupFriends"]:Enable()
+	_G[GLDG_GUI.."CleanupChannel"]:Enable()
+end
+--~~~~
+
+------------------------------------------------------------
+--~~~ MSN1: New function to display guildless characters, displays list of guildless, then count of guildless and with guild after deletion
+function GLDG_ClickGuildlessDisplay()
+	guildless_count = 0
+	haveguild_count = 0
+	total_count = 0
+	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.displayGuildless)
+	for p in pairs(GLDG_DataChar) do
+		if (not GLDG_DataChar[p].guild) then
+			guildless_count = guildless_count + 1
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.displayRemovedGuildless1.." ["..p.."] "..GLDG_TXT.displayRemovedGuildless2)			
+		else
+			haveguild_count = haveguild_count + 1
+		end
+		total_count = total_count + 1
+	end
+	GLDG_Print("Amount of guildless players: "..guildless_count)
+	GLDG_Print("Amount of players with guild: "..haveguild_count)
+	GLDG_Print("Total amount of players: "..total_count)
+	-- Hide the subframe window
+	_G[GLDG_GUI.."CleanupSubEntries"]:Hide()
+
+	-- re-enable buttons
+	_G[GLDG_GUI.."CleanupGuild"]:Enable()
+	_G[GLDG_GUI.."CleanupFriends"]:Enable()
+	_G[GLDG_GUI.."CleanupChannel"]:Enable()
+end
+--~~~~
 
 ------------------------------------------------------------
 function GLDG_ShowCleanupEntries(frame)
