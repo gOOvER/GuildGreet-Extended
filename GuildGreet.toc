@@ -1,6 +1,6 @@
 ## Interface: 40300
 ## Title: GuildGreet |cFFFFA0A0Extended by gOOvER|r
-## Version: 4.4.0-Release
+## Version: 4.4.0
 ## Author: gOOvER |cFFFFA0A0 (taken over from Urbin & Greya, Mordikaiin/Rozak)|r
 ## X-Date: 2012-07-16
 ## X-Category: Guild
