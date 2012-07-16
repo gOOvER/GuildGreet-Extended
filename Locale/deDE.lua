@@ -21,7 +21,7 @@ BINDING_NAME_GUILDGREETLATERGUILD	= "Gilde und Channel vorübergehend verabschie
 
 -- Names for the tabs
 GLDG_TXT.TabSettings	= "Einstellungen"
-GLDG_TXT.TabGreetings	= "Grü\195\159e"
+GLDG_TXT.TabGreetings	= "Grüsse"
 GLDG_TXT.TabPlayers	= "Charaktere"
 GLDG_TXT.TabCleanup	= "Aufräumen"
 GLDG_TXT.TabColour	= "Farben"
@@ -137,13 +137,13 @@ GLDG_TXT.deltaPopup	= "Zeige Popup-Liste aller Offline-Änderung beim Einloggen"
 GLDG_TXT.extendPlayerMenu = "Kontextmenu für Spieler aktivieren (kann zu Taint Problemem mit dem Raidframe führen, siehe Tooltip)"
 
 -- Settings tab: player list settings
-GLDG_TXT.listheader	= "Konfigurationsoptionen für die Anzeige von Spielern, die auf eine Begrü\195\159ung warten"
+GLDG_TXT.listheader	= "Konfigurationsoptionen für die Anzeige von Spielern, die auf eine Begrüssung warten"
 GLDG_TXT.listdirect	= "Liste wächst nach oben statt unten"
 GLDG_TXT.listvisible	= "Listen überschrift ist immer sichtbar"
 GLDG_TXT.listsize	= "Maximal %d Spieler in Schlange anzeigen"
 
 -- Greetings tab
-GLDG_TXT.greetheader	= "Verwaltet die Nachrichten, die Du zur Begrü\195\159ung verwendst"
+GLDG_TXT.greetheader	= "Verwaltet die Nachrichten, die Du zur Begrüssung verwendst"
 GLDG_TXT.collectheader	= "Persönliche Sammlung"
 GLDG_TXT.cbnew		= "Neue Sammlung erzeugen"
 GLDG_TXT.cbdel		= "Markierung entfernen"
@@ -157,7 +157,7 @@ GLDG_TXT.selection	= "Markierte Sammlung"
 -- Greetins tab: selection header and buttons
 GLDG_TXT.colglobal	= "Standardeinstellungen"
 GLDG_TXT.colcustom	= "Sammlung \'%s\'"
-GLDG_TXT.msgheader	= "%s : wähle die Gru\195\159kategorie, welche Du bearbeiten willst"
+GLDG_TXT.msgheader	= "%s : wähle die Grusskategorie, welche Du bearbeiten willst"
 GLDG_TXT.default	= "Einloggen"
 GLDG_TXT.relog		= "Reloggen"
 GLDG_TXT.joining	= "Gildenbeitritt"
@@ -177,9 +177,9 @@ GLDG_TXT.achievment	= "Erfolg"
 
 
 -- Greetings tab: greetings editbox
-GLDG_TXT.Greet		= "Gru\195\159 beim Einloggen editieren: erste Verwendung %s wird zum Spielernamen"
-GLDG_TXT.GreetBack	= "Gru\195\159 beim Reloggen editieren: erste Verwendung %s wird zum Spielernamen"
-GLDG_TXT.Welcome	= "Gru\195\159 beim Beitritt editieren: erste Verwendung %s wird zum Spielernamen"
+GLDG_TXT.Greet		= "Gruss beim Einloggen editieren: erste Verwendung %s wird zum Spielernamen"
+GLDG_TXT.GreetBack	= "Gruss beim Reloggen editieren: erste Verwendung %s wird zum Spielernamen"
+GLDG_TXT.Welcome	= "Gruss beim Beitritt editieren: erste Verwendung %s wird zum Spielernamen"
 GLDG_TXT.NewRank	= "Gratulation bei Beförderung editieren: erstes %s Spieler, zweites %s neuer Rang"
 GLDG_TXT.NewLevel	= "Gratulation beim level-up editieren: erstes %s Spieler, zweites %s neuer Level"
 GLDG_TXT.Bye		= "Spielerabschied (Tag) editieren: erste Verwendung %s wird zum Spielernamen"
@@ -274,10 +274,22 @@ GLDG_TXT.cleanupChannelHeader	= "Bereinigung von Channeln"
 GLDG_TXT.cleanupChannelInfo	= "Dieser Knopf erlaubt Dir, einen Kanal zu wählen, der aus der Referenz aller Charaktere entfernt wird. Das nächste mal, wo sie diesem Kanal beitreten werden dieser automatisch wieder referenziert."
 GLDG_TXT.cleanupOrphanHeader	= "Bereinigung von 'Waisen'"
 GLDG_TXT.cleanupOrphanInfo	= "Dieser Knopf entfernt alle Charaktere, die weder Main noch Twink sind und keine Freunde oder Channels referenziert haben."
+--~~~ MSN1: Added initialization of static variables for 2 new buttons' text (for deleting and displaying guildless characters)
+GLDG_TXT.cleanupGuildlessHeader	= "Gildenlose aufräumen"
+GLDG_TXT.cleanupGuildlessInfo	= "Dieser Button entfernt alle, welche nicht in einer Gilde (Gildenlos) sind"
+GLDG_TXT.displayGuildlessHeader	= "Gildenlos Anzeige"
+GLDG_TXT.displayGuildlessInfo	= "This button displays all characters that do NOT belong to a Guild and displays final counts for both guildless and with a guild."
+--~~~~
+
 GLDG_TXT.cleanupGuild		= "Wähle zu entfernende Gilde"
 GLDG_TXT.cleanupFriends		= "Wähle zu entfernenden Freund"
 GLDG_TXT.cleanupChannel		= "Wähle zu entfernenden Channel"
 GLDG_TXT.cleanupOrphan		= "Bereinige 'Waisen'"
+--~~~ MSN1: Added initialization of static variables for 2 new buttons' mouseover popup window info (for deleting and displaying guildless characters)
+GLDG_TXT.cleanupGuildless	= "Cleanup Gildenlose"
+GLDG_TXT.displayGuildless	= "Zeige Gildenlose"
+--~~~~
+
 GLDG_TXT.cleanupHeaderEntryGuild	= "Wähle eine zu entfernende Gilde"
 GLDG_TXT.cleanupHeaderEntryFriends	= "Wähle einen zu entfernenden Freund"
 GLDG_TXT.cleanupHeaderEntryChannel	= "Wähle einen zu entfernenden Channel"
@@ -298,7 +310,14 @@ GLDG_TXT.cleanupNotfound2		= "wurde nicht in der Liste der verfügbaren Einträg
 GLDG_TXT.cleanupOrphan			= "Bereinigung von 'Waisen'"
 GLDG_TXT.cleanupRemovedOrphan1		= "'Waise'"
 GLDG_TXT.cleanupRemovedOrphan2		= "wurde entfernt"
-
+--~~~ MSN1: Added initialization of static variables for 2 new buttons' displaying of list/count, for deleting and displaying guildless characters
+GLDG_TXT.cleanupGuildless		= "Guildless cleanup"
+GLDG_TXT.cleanupRemovedGuildless1	= "Removed guildless"
+GLDG_TXT.cleanupRemovedGuildless2	= ""
+GLDG_TXT.displayGuildless		= "Guildless display"
+GLDG_TXT.displayRemovedGuildless1	= "Can remove guildless"
+GLDG_TXT.displayRemovedGuildless2	= ""
+--~~~~
 
 -- Colour tab
 GLDG_TXT.colGuild	= "Gilde"

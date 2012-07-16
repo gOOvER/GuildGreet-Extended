@@ -174,7 +174,8 @@
 
 	<!-->Configuration frame<-->
 	<Frame name="GuildGreetFrame" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
-		<Size><AbsDimension x="600" y="450"/></Size>
+	
+	<Size><AbsDimension x="600" y="550"/></Size> <!-->~~~ MSN1: Changed y from 450 to 550 to increase window size to accomodate new guildless button functions<-->
 		<Anchors>
 			<Anchor point="CENTER">
 				<Offset><AbsDimension x="0" y="120"/></Offset>
@@ -3307,7 +3308,41 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-
+				<!-->~~~ MSN1: Added to 'Cleanup' tab: guildless header for new button to delete and display guildless characters<-->
+				<FontString name="$parentGuildlessHeader" inherits="GLDG_HeaderText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentOrphanInfo" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-5"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->~~~ MSN1: Added to 'Cleanup' tab: guildless info for new button to delete and display guildless characters<-->
+				<FontString name="$parentGuildlessInfo" inherits="GLDG_LOptionText">
+					<Size><AbsDimension x="420" y="30"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentGuildlessHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->~~~ MSN1: Added to 'Cleanup' tab: display guildless header for new button to display guildless characters<-->
+				<FontString name="$parentDisplayGuildlessHeader" inherits="GLDG_HeaderText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentGuildlessInfo" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-5"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->~~~ MSN1: Added to 'Cleanup' tab: display guildless info for new button to display guildless characters<-->
+				<FontString name="$parentDisplayGuildlessInfo" inherits="GLDG_LOptionText">
+					<Size><AbsDimension x="420" y="30"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentDisplayGuildlessHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>				
+				
 			</Layer>
 		</Layers>
 		<Frames>
@@ -3367,8 +3402,36 @@
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
 			</Button>
+			<!-->~~~ MSN1: Added to 'Cleanup' tab: guildless cleanup button to delete and display guildless characters<-->
+			<Button name="$parentGuildless" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="250" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentGuildlessHeader" relativePoint="TOPLEFT">
+						<Offset><AbsDimension x="420" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickGuildlessCleanup()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
 
-
+			<!-->~~~ MSN1: Added to 'Cleanup' tab: guildless display button to display guildless characters<-->
+			<Button name="$parentDisplayGuildless" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="250" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentDisplayGuildlessHeader" relativePoint="TOPLEFT">
+						<Offset><AbsDimension x="420" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickGuildlessDisplay()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>			
+			
 			<!-->Configuration subframe<-->
 			<Frame name="$parentSub">
 				<Size><AbsDimension x="150" y="200"/></Size>

@@ -268,10 +268,21 @@ GLDG_TXT.cleanupChannelHeader	= "Channel cleanup"
 GLDG_TXT.cleanupChannelInfo	= "This button allows you to remove a channel from all characters that belong to it. The next time they revisit the channel, it will again be added to them automatically."
 GLDG_TXT.cleanupOrphanHeader	= "Orphan cleanup"
 GLDG_TXT.cleanupOrphanInfo	= "This button removes all characters that are not main or alt, have no friends and belong to no channel."
+--~~~ MSN1: Added initialization of static variables for 2 new buttons' text (for deleting and displaying guildless characters)
+GLDG_TXT.cleanupGuildlessHeader	= "Guildless cleanup"
+GLDG_TXT.cleanupGuildlessInfo	= "This button removes all characters that do NOT belong to a Guild."
+GLDG_TXT.displayGuildlessHeader	= "Guildless display"
+GLDG_TXT.displayGuildlessInfo	= "This button displays all characters that do NOT belong to a Guild and displays final counts for both guildless and with a guild."
+--~~~~
+
 GLDG_TXT.cleanupGuild		= "Choose guild to clean up"
 GLDG_TXT.cleanupFriends		= "Choose friend to clean up"
 GLDG_TXT.cleanupChannel		= "Choose channel to clean up"
 GLDG_TXT.cleanupOrphan		= "Cleanup orphans"
+--~~~ MSN1: Added initialization of static variables for 2 new buttons' mouseover popup window info (for deleting and displaying guildless characters)
+GLDG_TXT.cleanupGuildless	= "Cleanup Guildless"
+GLDG_TXT.displayGuildless	= "Display Guildless"
+--~~~~
 GLDG_TXT.cleanupHeaderEntryGuild	= "Select a guild to remove"
 GLDG_TXT.cleanupHeaderEntryFriends	= "Select a friend to remove"
 GLDG_TXT.cleanupHeaderEntryChannel	= "Select a channel to remove"
@@ -292,6 +303,15 @@ GLDG_TXT.cleanupNotfound2		= "was not found in list of available entries for mod
 GLDG_TXT.cleanupOrphan			= "Orphan cleanup"
 GLDG_TXT.cleanupRemovedOrphan1		= "Removed orphan"
 GLDG_TXT.cleanupRemovedOrphan2		= ""
+--~~~ MSN1: Added initialization of static variables for 2 new buttons' displaying of list/count, for deleting and displaying guildless characters
+GLDG_TXT.cleanupGuildless		= "Guildless cleanup"
+GLDG_TXT.cleanupRemovedGuildless1	= "Removed guildless"
+GLDG_TXT.cleanupRemovedGuildless2	= ""
+GLDG_TXT.displayGuildless		= "Guildless display"
+GLDG_TXT.displayRemovedGuildless1	= "Can remove guildless"
+GLDG_TXT.displayRemovedGuildless2	= ""
+--~~~~
+
 
 -- Colour tab
 GLDG_TXT.colGuild	= "Guild" -- todo: obsolete
@@ -794,6 +814,12 @@ GLDG_TXT.elements.name.CleanupOrphan		= "Cleanup Orphans"
 GLDG_TXT.elements.tip.CleanupOrphan		= "Use this button to remove all characters from the database that are neither main or alt, don't have an alias and have neither friend nor channel references.\r\nGuild membership does not protect orphans from being deleted. Guild members, friends and channel members will be readded automatically when they are next detected."
 GLDG_TXT.elements.name.CleanupSubEntriesLine	= "Select entry to be cleaned up"
 GLDG_TXT.elements.tip.CleanupSubEntriesLine	= "Choose an entry (guild name, friend name or channel name) from the list to delete all references to this entry from all managed characters."
+--~~~ MSN1: Added initialization of static variables for 2 new buttons' mouseover popup window info (for deleting and displaying guildless characters)
+GLDG_TXT.elements.name.CleanupGuildless		= "Cleanup Guildless"
+GLDG_TXT.elements.tip.CleanupGuildless		= "Use this button to remove all characters from the database that don't have a Guild."
+GLDG_TXT.elements.name.CleanupDisplayGuildless	= "Display Guildless"
+GLDG_TXT.elements.tip.CleanupDisplayGuildless	= "Use this button to display all characters from the database that don't have a Guild and counts for those that both do and don't have guilds."
+--~~~~
 
 
 GLDG_TXT.elements.name.GreetingsSelLevel	= "Level up phrases"
