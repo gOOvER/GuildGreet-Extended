@@ -105,7 +105,7 @@ GLDG_IS_OFFLINE_COLOUR		= GLDG_DEFAULT_IS_OFFLINE_COLOUR
 GLDG_GOES_OFFLINE_COLOUR	= GLDG_DEFAULT_GOES_OFFLINE_COLOUR
 GLDG_ALIAS_COLOUR		= GLDG_DEFAULT_ALIAS_COLOUR
 
-GLDG_LEVEL_CAP = 85
+GLDG_LEVEL_CAP = 90
 
 --------------------------
 -- _01_ Addon Variables --
@@ -6088,6 +6088,7 @@ classColors["WARRIOR"]		= "|cFFBE9C6E";
 classColors["ROGUE"]		= "|cFFFFF569";
 classColors["HUNTER"]		= "|cFFAAD473";
 classColors["DEADKNIGHT"]	= "|cFFC41F3B";
+classColors["MONK"]      = "|cFF558A84";
 
 ------------------------------------------------------------
 function GLDG_ChatFilter(chatFrame, event, ...) -- chatFrame = self
