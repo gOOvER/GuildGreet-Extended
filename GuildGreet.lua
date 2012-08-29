@@ -46,7 +46,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 201011			-- Number code for this version
+GDLG_VNMBR	= 201208			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
