@@ -1,8 +1,8 @@
-## Interface: 50001
+## Interface: 50100
 ## Title: GuildGreet |cFFFFA0A0Extended|
-## Version: 5.0.0
+## Version: 5.1.0
 ## Author: gOOvER |cFFFFA0A0 (taken over from Urbin & Greya, Mordikaiin/Rozak)|r
-## X-Date: 2012-08-28
+## X-Date: 2013-01-20
 ## X-Category: Guild
 ## X-Website: http://wow.curse-gaming.com/downloads/details/7529/
 ## URL: http://wow.curse-gaming.com/downloads/details/7529/
