@@ -10,7 +10,7 @@
 ## Notes: Keeps a log of guildies waiting for your greeting
 ## SavedVariables: GLDG_Data
 ## OptionalDeps: myAddOns
-## X-Curse-Packaged-Version: 5.0.0 Release
+## X-Curse-Packaged-Version: 5.2.0 Release
 ## X-Curse-Project-Name: GuildGreet Extended
 ## X-Curse-Project-ID: guild-greet-extended
 ## X-Curse-Repository-ID: wow/guild-greet-extended/mainline
