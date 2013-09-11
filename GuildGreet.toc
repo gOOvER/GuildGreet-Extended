@@ -1,8 +1,8 @@
-## Interface: 50000
-## Title: GuildGreet |cFFFFA0A0Extended by gOOvER|r
-## Version: 5.0.0
+## Interface: 50300
+## Title: GuildGreet |cFFFFA0A0Extended|
+## Version: 5.3.0
 ## Author: gOOvER |cFFFFA0A0 (taken over from Urbin & Greya, Mordikaiin/Rozak)|r
-## X-Date: 2012-07-01
+## X-Date: 2013-05-22
 ## X-Category: Guild
 ## X-Website: http://wow.curse-gaming.com/downloads/details/7529/
 ## URL: http://wow.curse-gaming.com/downloads/details/7529/
@@ -10,11 +10,11 @@
 ## Notes: Keeps a log of guildies waiting for your greeting
 ## SavedVariables: GLDG_Data
 ## OptionalDeps: myAddOns
-## X-Curse-Packaged-Version: 5.0.0 Alpha
+## X-Curse-Packaged-Version: 5.3.0 Release
 ## X-Curse-Project-Name: GuildGreet Extended
 ## X-Curse-Project-ID: guild-greet-extended
 ## X-Curse-Repository-ID: wow/guild-greet-extended/mainline
-## X-Curse-Packaged-Version: r20120401065950
+## X-Curse-Packaged-Version: 5.2.0-2-g7706703
 ## X-Curse-Project-Name: GuildGreet Extended
 ## X-Curse-Project-ID: guild-greet-extended
 ## X-Curse-Repository-ID: wow/guild-greet-extended/mainline

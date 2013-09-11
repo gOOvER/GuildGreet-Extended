@@ -46,7 +46,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 201207			-- Number code for this version
+GDLG_VNMBR	= 201303			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -86,24 +86,24 @@ GLDG_PROMO	= string.format(ERR_GUILD_PROMOTE_SSS, "(.+)", "(.+)", "(.+)")
 GLDG_DEMOTE	= string.format(ERR_GUILD_DEMOTE_SSS, ".+", "(.+)", "(.+)")
 GLDG_ACHIEVE    = string.format(ACHIEVEMENT_BROADCAST, "(.+)", "(.+)")
 
-GLDG_DEFAULT_ONLINE_COLOUR			= "|cFFA0FFA0"
+GLDG_DEFAULT_ONLINE_COLOUR		= "|cFFA0FFA0"
 GLDG_DEFAULT_IS_OFFLINE_COLOUR		= "|cFFFFFFFF"
 GLDG_DEFAULT_GOES_OFFLINE_COLOUR	= "|cFF7F7F7F"
-GLDG_DEFAULT_HELP_COLOUR			= "|cFFFFFF7F"
-GLDG_DEFAULT_ALIAS_COLOUR			= "|cFFFFA0A0"
-GLDG_DEFAULT_HEADER_COLOUR			= "|c7FFF0000"
+GLDG_DEFAULT_HELP_COLOUR		= "|cFFFFFF7F"
+GLDG_DEFAULT_ALIAS_COLOUR		= "|cFFFFA0A0"
+GLDG_DEFAULT_HEADER_COLOUR		= "|c7FFF0000"
 
-GLDG_DEFAULT_LIST_COLOUR			= "|cFFFF7F00"
-GLDG_DEFAULT_NEW_COLOUR				= "|cFFFF3F3F"
-GLDG_DEFAULT_LVL_COLOUR				= "|cFF7F7F7F"
-GLDG_DEFAULT_RANK_COLOUR			= "|cFFCC00CC"
-GLDG_DEFAULT_RELOG_COLOUR			= "|cFF3FFF3F"
+GLDG_DEFAULT_LIST_COLOUR		= "|cFFFF7F00"
+GLDG_DEFAULT_NEW_COLOUR			= "|cFFFF3F3F"
+GLDG_DEFAULT_LVL_COLOUR			= "|cFF7F7F7F"
+GLDG_DEFAULT_RANK_COLOUR		= "|cFFCC00CC"
+GLDG_DEFAULT_RELOG_COLOUR		= "|cFF3FFF3F"
 GLDG_DEFAULT_ACHIEVMENT_COLOUR		= "|cFF001FFF"
 
-GLDG_ONLINE_COLOUR			= GLDG_DEFAULT_ONLINE_COLOUR
+GLDG_ONLINE_COLOUR		= GLDG_DEFAULT_ONLINE_COLOUR
 GLDG_IS_OFFLINE_COLOUR		= GLDG_DEFAULT_IS_OFFLINE_COLOUR
 GLDG_GOES_OFFLINE_COLOUR	= GLDG_DEFAULT_GOES_OFFLINE_COLOUR
-GLDG_ALIAS_COLOUR			= GLDG_DEFAULT_ALIAS_COLOUR
+GLDG_ALIAS_COLOUR		= GLDG_DEFAULT_ALIAS_COLOUR
 
 GLDG_LEVEL_CAP = 90
 
@@ -112,7 +112,7 @@ GLDG_LEVEL_CAP = 90
 --------------------------
 
 -- Stored data
-GLDG_Data = {}				-- Data saved between sessions
+GLDG_Data = {}			-- Data saved between sessions
 GLDG_DataGreet = nil		-- Pointer to relevant greeting section in GLDG_Data
 GLDGL_DataChar = nil		-- Pointer to relevant character section in GLDG_Data
 
@@ -6088,7 +6088,7 @@ classColors["WARRIOR"]		= "|cFFBE9C6E";
 classColors["ROGUE"]		= "|cFFFFF569";
 classColors["HUNTER"]		= "|cFFAAD473";
 classColors["DEADKNIGHT"]	= "|cFFC41F3B";
-classColors["MONK"]			= "|cFF558A84";
+classColors["MONK"]      = "|cFF558A84";
 
 ------------------------------------------------------------
 function GLDG_ChatFilter(chatFrame, event, ...) -- chatFrame = self
