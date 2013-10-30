@@ -450,7 +450,7 @@ function GLDG_Init()
 	end
 
 	-- store realm and player names
-	if not GLDG_Realm then GLDG_Realm = GetCVar("realmName") end
+	if not GLDG_Realm then GLDG_Realm = GetRealmName() end
 	if not GLDG_Player then GLDG_Player = UnitName("player") end
 
 	-- Clear obsolete options
@@ -953,7 +953,7 @@ function GLDG_InitRoster()
 	GLDG_Convert()
 
 	-- Retreive realm, player and guild name if needed
-	if not GLDG_Realm then GLDG_Realm = GetCVar("realmName") end
+	if not GLDG_Realm then GLDG_Realm = GetRealmName() end
 	if not GLDG_Player then GLDG_Player = UnitName("player") end
 	if not GLDG_GuildName or GLDG_GuildName == "" then GLDG_GuildName = GetGuildInfo("player") end
 	if not GLDG_GuildName then GLDG_GuildName = "" end
