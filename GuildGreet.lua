@@ -99,24 +99,25 @@ GLDG_LEVEL_CAP = 90
 --------------------------
 
 -- Stored data
-GLDG_Data = {}			-- Data saved between sessions
-GLDG_DataGreet = nil		-- Pointer to relevant greeting section in GLDG_Data
-GLDGL_DataChar = nil		-- Pointer to relevant character section in GLDG_Data
+GLDG_Data = {}			        -- Data saved between sessions
+GLDG_DataGreet = nil		    -- Pointer to relevant greeting section in GLDG_Data
+GLDGL_DataChar = nil		    -- Pointer to relevant character section in GLDG_Data
 
 -- Initialization
-GLDG_Main = nil			-- Main program window
-GLDG_Realm = nil		-- Name of the current realm
-GLDG_Player = nil		-- Name of the current player
-GLDG_GuildName = nil		-- Name of your guild
-GLDG_GuildAlias = nil		-- Alias of your guild
-GLDG_NewGuild = nil		-- Set if initializing a new guild
+GLDG_Main = nil			        -- Main program window
+GLDG_Realm = nil		        -- Name of the current realm
+GLDG_Player = nil		        -- Name of the current player
+GLDG_shortName = nil            -- Playername without Server
+GLDG_GuildName = nil		    -- Name of your guild
+GLDG_GuildAlias = nil		    -- Alias of your guild
+GLDG_NewGuild = nil		        -- Set if initializing a new guild
 GLDG_InitialGuildUpdate = nil	-- To make sure we get at least one update
 GLDG_InitialFriendsUpdate = nil	-- To make sure we get at least one update
-GLDG_UpdateRequest = 0		-- If set with time, update will be performed
+GLDG_UpdateRequest = 0		    -- If set with time, update will be performed
 GLDG_UpdateRequestFriends = 0	-- If set with time, update will be performed
-GLDG_InitComplete = nil		-- Set in initialization is done
-GLDG_InitCheck = 0		-- Check for changes and display them; 0 = not started, 1 = pending guild, 2 = pending friends, 4 = pending channel, 8 = done guild, 16 = done friends, 32 = done channel
-GLDG_ChangesText = {}		-- text for popup display
+GLDG_InitComplete = nil		    -- Set in initialization is done
+GLDG_InitCheck = 0		        -- Check for changes and display them; 0 = not started, 1 = pending guild, 2 = pending friends, 4 = pending channel, 8 = done guild, 16 = done friends, 32 = done channel
+GLDG_ChangesText = {}		    -- text for popup display
 
 -- Various
 GLDG_Debug = false		-- Show debugging
@@ -124,7 +125,7 @@ GLDG_Debug = false		-- Show debugging
 -- Core variables
 GLDG_Online = {}		-- Time of player going online
 GLDG_Offline = {}		-- Time of player going offline			-- todo: make this persistent?
-GLDG_RankUpdate = {}		-- Set with time for all players getting promoted during the session
+GLDG_RankUpdate = {}	-- Set with time for all players getting promoted during the session
 GLDG_Queue = {}			-- List of players waiting to be greeted
 
 -- Configuration: greetings tab
