@@ -1196,8 +1196,8 @@ function GLDG_RosterImport()
 	if maxMembers == nil then maxMembers = nil end
 	for i = 1, maxMembers do
 		local pl, rn, ri, lv, cl, zn, pn, on, ol, st, enClass = GetGuildRosterInfo(i)
-		local shortName, realm = string.split("-", name)
-		if GLDG_Realm == realm then name = shortName end
+		local GLDG_shortName, realm = string.split("-", pl)
+		if GLDG_Realm == realm then pl = GLDG_shortName end
 		if pl then
 			cnt = cnt +1
 			if not GLDG_DataChar[pl] then
@@ -1616,8 +1616,8 @@ function GLDG_getOnlineList()
 	local i
 	for i = 0, numTotal do
 		local name, rank, rankIndex, level, class, zone, note, officernote, online, status = GetGuildRosterInfo(i);
-		local shortName, realm = string.split("-", name)
-		if GLDG_Realm == realm then name = shortName end
+		local GLDG_shortName, realm = string.split("-", name)
+		if GLDG_Realm == realm then name = GLDG_shortName end
 		if ((name ~= nil) and ( online ~= nil)) then
 			onList[name] = true;
 		end
