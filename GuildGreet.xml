@@ -175,14 +175,14 @@
 	<!-->Configuration frame<-->
 	<Frame name="GuildGreetFrame" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
 	
-	<Size><AbsDimension x="600" y="550"/></Size> <!-->~~~ MSN1: Changed y from 450 to 550 to increase window size to accomodate new guildless button functions<-->
+	<Size><AbsDimension x="800" y="550"/></Size>
 		<Anchors>
 			<Anchor point="CENTER">
 				<Offset><AbsDimension x="0" y="120"/></Offset>
 			</Anchor>
 		</Anchors>
 		<TitleRegion>
-			<Size><AbsDimension x="600" y="15"/></Size>
+			<Size><AbsDimension x="750" y="15"/></Size>
 			<Anchors><Anchor point="TOP"/></Anchors>
 		</TitleRegion>
 		<Backdrop bgFile="TileSet\Generic\Black" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true"/>
@@ -260,7 +260,7 @@
 
 	<!-->Configuration frame<-->
  	<Frame name="$parentSettings" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true">
-		<Size><AbsDimension x="580" y="390"/></Size>
+		<Size><AbsDimension x="780" y="390"/></Size>
 		<Anchors>
 			<Anchor point="CENTER">
 				<Offset><AbsDimension x="0" y="10"/></Offset>
@@ -297,7 +297,7 @@
 <!--> ============================================================================================================== <-->
 	<!-->Configuration general tab template: header text<-->
 	<FontString name="GLDG_HeaderText" inherits="GameFontNormal" virtual="true">
-		<Size><AbsDimension x="560" y="25"/></Size>
+		<Size><AbsDimension x="760" y="25"/></Size>
 		<Scripts>
 			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 			<OnLeave>GameTooltip:Hide()</OnLeave>
@@ -307,7 +307,7 @@
 	<!-->Configuration general tab template: option text<-->
 	<FontString name="GLDG_OptionText" inherits="GameFontNormal" justifyH="RIGHT" virtual="true">
 		<Color r="0.68" g="0.80" b="1"/>
-		<Size><AbsDimension x="250" y="25"/></Size>
+		<Size><AbsDimension x="300" y="25"/></Size>
 		<Scripts>
 			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 			<OnLeave>GameTooltip:Hide()</OnLeave>
@@ -316,7 +316,7 @@
 
 	<!-->Configuration general tab template: option text, left aligned<-->
 	<FontString name="GLDG_LOptionText" inherits="GLDG_OptionText" justifyH="LEFT" virtual="true">
-		<Size><AbsDimension x="500" y="25"/></Size>
+		<Size><AbsDimension x="700" y="25"/></Size>
 		<Scripts>
 			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 			<OnLeave>GameTooltip:Hide()</OnLeave>
@@ -411,7 +411,7 @@
 				<FontString name="$parentAutoAssignEgpText" inherits="GLDG_LOptionText" justifyH="LEFT">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
-							<Offset><AbsDimension x="380" y="-185"/></Offset>
+							<Offset><AbsDimension x="480" y="-185"/></Offset>
 						</Anchor>
 					</Anchors>
 				</FontString>
@@ -499,8 +499,8 @@
 				<Scripts>
 					<OnLoad>
 						getglobal(self:GetName().."Low"):SetText("0")
-						getglobal(self:GetName().."High"):SetText("80")
-						self:SetMinMaxValues(0,80)
+						getglobal(self:GetName().."High"):SetText("90")
+						self:SetMinMaxValues(0,90)
 						self:SetValueStep(1)
 					</OnLoad>
 					<OnValueChanged>GLDG_UpdateMinLevelUp(self)</OnValueChanged>
@@ -1662,7 +1662,7 @@
 
 	<!-->Configuration greetings tab template: message line<-->
 	<Button name="GLDG_MessageLineTemplate" virtual= "true">
-		<Size><AbsDimension x="500" y="15"/></Size>
+		<Size><AbsDimension x="700" y="15"/></Size>
 		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
@@ -2195,7 +2195,7 @@
 <!--> ============================================================================================================== <-->
 	<!-->Configuration players tab template: player line<-->
 	<Button name="GLDG_PlayerHeaderTemplate" virtual= "true">
-		<Size><AbsDimension x="420" y="15"/></Size>
+		<Size><AbsDimension x="620" y="15"/></Size>
 		<!--
 		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
@@ -2204,7 +2204,7 @@
 			<Layer level="BORDER">
 				<!-- char name -->
 				<FontString name="$parentName" inherits="GLDG_HeaderText" justifyH="LEFT">
-					<Size><AbsDimension x="100" /></Size>
+					<Size><AbsDimension x="200" /></Size>
 					<Scripts>
 						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
 						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
@@ -2280,14 +2280,14 @@
 	</Button>
 
 	<Button name="GLDG_PlayerLineTemplate" virtual= "true">
-		<Size><AbsDimension x="420" y="15"/></Size>
+		<Size><AbsDimension x="620" y="15"/></Size>
 		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
 			<Layer level="BORDER">
 				<!-- char name -->
 				<FontString name="$parentName" inherits="GameFontHighlight" justifyH="LEFT">
-					<Size><AbsDimension x="100" /></Size>
+					<Size><AbsDimension x="200" /></Size>
 				</FontString>
 				<!-- main/alt -->
 				<FontString name="$parentType" inherits="GameFontHighlight" justifyH="LEFT">
