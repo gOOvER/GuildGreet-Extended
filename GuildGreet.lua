@@ -1617,9 +1617,9 @@ function GLDG_getOnlineList()
 	local i
 	for i = 0, numTotal do
 		local name, rank, rankIndex, level, class, zone, note, officernote, online, status = GetGuildRosterInfo(i);
-		local GLDG_shortName, realm = string.split("-", name)
-		if GLDG_Realm == realm then name = GLDG_shortName end
 		if ((name ~= nil) and ( online ~= nil)) then
+			local GLDG_shortName, realm = string.split("-", name)
+			if GLDG_Realm == realm then name = GLDG_shortName end
 			onList[name] = true;
 		end
 	end
