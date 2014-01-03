@@ -1617,9 +1617,9 @@ function GLDG_getOnlineList()
 	local i
 	for i = 0, numTotal do
 		local name, rank, rankIndex, level, class, zone, note, officernote, online, status = GetGuildRosterInfo(i);
-		local GLDG_shortName, realm = string.split("-", name)
-		if GLDG_Realm == realm then name = GLDG_shortName end
 		if ((name ~= nil) and ( online ~= nil)) then
+			local GLDG_shortName, realm = string.split("-", name)
+			if GLDG_Realm == realm then name = GLDG_shortName end
 			onList[name] = true;
 		end
 	end
@@ -1899,6 +1899,8 @@ function GLDG_SystemMsg(msg)
 	local _, _, player = string.find(msg, GLDG_ONLINE)
 	if player then
 		GLDG_DebugPrint("detected player coming online: "..player)
+		local GLDG_shortName, realm = string.split("-", player)
+		if GLDG_Realm == realm then player = GLDG_shortName end
 		if (GLDG_DataChar[player] and not GLDG_DataChar[player].ignore) then
 
 			if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_GuildName) and GLDG_DataChar[player].friends and GLDG_DataChar[player].friends[GLDG_Player] and not GLDG_Data.UseFriends then
