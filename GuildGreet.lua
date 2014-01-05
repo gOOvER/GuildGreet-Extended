@@ -1988,6 +1988,8 @@ function GLDG_SystemMsg(msg)
 	-- Check players going offline
 	local _, _, player = string.find(msg, GLDG_OFFLINE)
 	if player then
+		local GLDG_shortName, realm = string.split("-", player)
+		if GLDG_Realm == realm then player = GLDG_shortName end
 		GLDG_DebugPrint("detected player going offline: "..player)
 		if (GLDG_DataChar[player] and not GLDG_DataChar[player].ignore) then
 			GLDG_DebugPrint("player "..player.." is a member of our guild")
@@ -2044,6 +2046,8 @@ function GLDG_SystemMsg(msg)
 	-- Check players joining the guild
 	local _, _, player = string.find(msg, GLDG_JOINED)
 	if player then
+		local GLDG_shortName, realm = string.split("-", player)
+		if GLDG_Realm == realm then player = GLDG_shortName end
 		if (not GLDG_DataChar[player]) then
 			GLDG_DataChar[player] = {}
 		end
@@ -2064,6 +2068,10 @@ function GLDG_SystemMsg(msg)
 
 	-- Check for promotions
 	local _, _, promo, player, rank = string.find(msg, GLDG_PROMO)
+	if player then
+		local GLDG_shortName, realm = string.split("-", player)
+		if GLDG_Realm == realm then player = GLDG_shortName end
+	end
 	if player and (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.NewRank)) > 0) and (not GLDG_Data.SupressRank) and (not GLDG_DataChar[player].ignore) then
 		GLDG_DebugPrint("detected player getting promotion: "..player.." -> "..rank)
 		GLDG_DataChar[player].promoter = promo
@@ -2080,6 +2088,8 @@ function GLDG_SystemMsg(msg)
 	-- Check for demotions
 	local _, _, player, rank = string.find(msg, GLDG_DEMOTE)
 	if player then
+		local GLDG_shortName, realm = string.split("-", player)
+		if GLDG_Realm == realm then player = GLDG_shortName end
 		GLDG_DebugPrint("detected player getting demotion: "..player.." -> "..rank)
 		GLDG_DataChar[player].promoter = nil
 		GLDG_DataChar[player].rankname = rank
