@@ -1198,7 +1198,7 @@ function GLDG_RosterImport()
 	for i = 1, maxMembers do
 		local pl, rn, ri, lv, cl, zn, pn, on, ol, st, enClass = GetGuildRosterInfo(i)
 		local GLDG_shortName, realm = string.split("-", pl)
-		if GLDG_Realm == realm then pl = GLDG_shortName end
+		if string.gsub(GLDG_Realm, " ", "") == realm then pl = GLDG_shortName end
 		if pl then
 			cnt = cnt +1
 			if not GLDG_DataChar[pl] then
@@ -1619,7 +1619,7 @@ function GLDG_getOnlineList()
 		local name, rank, rankIndex, level, class, zone, note, officernote, online, status = GetGuildRosterInfo(i);
 		if ((name ~= nil) and ( online ~= nil)) then
 			local GLDG_shortName, realm = string.split("-", name)
-			if GLDG_Realm == realm then name = GLDG_shortName end
+			if string.gsub(GLDG_Realm, " ", "") == realm then name = GLDG_shortName end
 			onList[name] = true;
 		end
 	end
@@ -1900,7 +1900,7 @@ function GLDG_SystemMsg(msg)
 	if player then
 		GLDG_DebugPrint("detected player coming online: "..player)
 		local GLDG_shortName, realm = string.split("-", player)
-		if GLDG_Realm == realm then player = GLDG_shortName end
+		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
 		if (GLDG_DataChar[player] and not GLDG_DataChar[player].ignore) then
 
 			if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_GuildName) and GLDG_DataChar[player].friends and GLDG_DataChar[player].friends[GLDG_Player] and not GLDG_Data.UseFriends then
@@ -1989,7 +1989,7 @@ function GLDG_SystemMsg(msg)
 	local _, _, player = string.find(msg, GLDG_OFFLINE)
 	if player then
 		local GLDG_shortName, realm = string.split("-", player)
-		if GLDG_Realm == realm then player = GLDG_shortName end
+		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
 		GLDG_DebugPrint("detected player going offline: "..player)
 		if (GLDG_DataChar[player] and not GLDG_DataChar[player].ignore) then
 			GLDG_DebugPrint("player "..player.." is a member of our guild")
@@ -2047,7 +2047,7 @@ function GLDG_SystemMsg(msg)
 	local _, _, player = string.find(msg, GLDG_JOINED)
 	if player then
 		local GLDG_shortName, realm = string.split("-", player)
-		if GLDG_Realm == realm then player = GLDG_shortName end
+		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
 		if (not GLDG_DataChar[player]) then
 			GLDG_DataChar[player] = {}
 		end
@@ -2070,7 +2070,7 @@ function GLDG_SystemMsg(msg)
 	local _, _, promo, player, rank = string.find(msg, GLDG_PROMO)
 	if player then
 		local GLDG_shortName, realm = string.split("-", player)
-		if GLDG_Realm == realm then player = GLDG_shortName end
+		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
 	end
 	if player and (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.NewRank)) > 0) and (not GLDG_Data.SupressRank) and (not GLDG_DataChar[player].ignore) then
 		GLDG_DebugPrint("detected player getting promotion: "..player.." -> "..rank)
@@ -2089,7 +2089,7 @@ function GLDG_SystemMsg(msg)
 	local _, _, player, rank = string.find(msg, GLDG_DEMOTE)
 	if player then
 		local GLDG_shortName, realm = string.split("-", player)
-		if GLDG_Realm == realm then player = GLDG_shortName end
+		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
 		GLDG_DebugPrint("detected player getting demotion: "..player.." -> "..rank)
 		GLDG_DataChar[player].promoter = nil
 		GLDG_DataChar[player].rankname = rank
@@ -6898,7 +6898,7 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 	-- check for entries of characters with the same realm in the DB
 	for p in pairs(GLDG_DataChar) do
 		local GLDG_shortName, realm = string.split("-", p)
-		if GLDG_Realm == realm then
+		if string.gsub(GLDG_Realm, " ", "") == realm then p = GLDG_shortName end
 			fixNeeded = true
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ".." delete ["..p.."]")
 			GLDG_DataChar[p] = nil
