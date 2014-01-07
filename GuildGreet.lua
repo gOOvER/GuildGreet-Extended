@@ -6898,7 +6898,7 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 	-- check for entries of characters with the same realm in the DB
 	for p in pairs(GLDG_DataChar) do
 		local GLDG_shortName, realm = string.split("-", p)
-		if string.gsub(GLDG_Realm, " ", "") == realm then p = GLDG_shortName end
+		if string.gsub(GLDG_Realm, " ", "") == realm then
 			fixNeeded = true
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ".." delete ["..p.."]")
 			GLDG_DataChar[p] = nil
