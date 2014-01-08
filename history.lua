@@ -1,4 +1,6 @@
 GLDG_History = "This list shows the changes in the last few versions (a complete history is available in the readme.txt file included with the addon.\r\n\r\n"..
+"|cFFFFFF7F5.4.7-beta1|r\r\n"..
+"add detect if note contains 'alt<space><main name>[ <discardable text]'\r\n"..
 "|cFFFFFF7F40200.2|r\r\n"..
 "- re-added option to enable/disable player context menu. The menu will be disabled\r\n"..
 "  by default, as it seems to cause taint issues. Go to the 'other' tab in the config\r\n"..

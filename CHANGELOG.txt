@@ -1,5 +1,8 @@
 CHANGELOG:
 
+5.4.7-beta1
+- add detect if note contains "alt <main name>[ <discardable text]
+
 40200.2
 - re-added option to enable/disable player context menu. The menu will be disabled by default, as it seems to cause taint issues. Go to the 'other' tab in the config window to enable/disable it (needs reload of UI)
 

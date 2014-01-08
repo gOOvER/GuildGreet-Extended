@@ -46,7 +46,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 201303			-- Number code for this version
+GDLG_VNMBR	= 201312			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -65,45 +65,32 @@ GLDG_SubTab2Frame.Tab4 = "Debug"
 GLDG_SubTab2Frame.Tab5 = "Other"
 
 
---ACHIEVEMENT_BROADCAST = "%s has earned the achievement %s!";
---ERR_FRIEND_ONLINE_SS = "|Hplayer:%s|h[%s]|h has come online."; -- The name is passed in twice to accomodate player name links - "|Hplayer:%s|h[%s]|h" should not be localized.
---ERR_FRIEND_OFFLINE_S = "%s has gone offline.";
-
---ERR_GUILD_PROMOTE_SSS = "%s has promoted %s to %s."; -- promoter's name, player's name, new rank
---GLDG_PROMO	= string.format(ERR_GUILD_PROMOTE_SSS, "(.+)", "(.+)", "(.+)")
---local _, _, promo, player, rank = string.find(msg, GLDG_PROMO)
-
---ERR_GUILD_DEMOTE_SSS = "%s has demoted %s to %s."; -- demoter's name, player's name, new rank
---GLDG_DEMOTE	= string.format(ERR_GUILD_DEMOTE_SSS, ".+", "(.+)", "(.+)")
---local _, _, player, rank = string.find(msg, GLDG_DEMOTE)
-
-
 -- Strings we look for
-GLDG_ONLINE 	= ".*%[(.+)%]%S*"..string.sub(ERR_FRIEND_ONLINE_SS, 20)
-GLDG_OFFLINE	= string.format(ERR_FRIEND_OFFLINE_S, "(.+)")
-GLDG_JOINED	= string.format(ERR_GUILD_JOIN_S, "(.+)")
-GLDG_PROMO	= string.format(ERR_GUILD_PROMOTE_SSS, "(.+)", "(.+)", "(.+)")
-GLDG_DEMOTE	= string.format(ERR_GUILD_DEMOTE_SSS, ".+", "(.+)", "(.+)")
+GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(ERR_FRIEND_ONLINE_SS, 20)
+GLDG_OFFLINE		= string.format(ERR_FRIEND_OFFLINE_S, "(.+)")
+GLDG_JOINED			= string.format(ERR_GUILD_JOIN_S, "(.+)")
+GLDG_PROMO			= string.format(ERR_GUILD_PROMOTE_SSS, "(.+)", "(.+)", "(.+)")
+GLDG_DEMOTE			= string.format(ERR_GUILD_DEMOTE_SSS, ".+", "(.+)", "(.+)")
 GLDG_ACHIEVE    = string.format(ACHIEVEMENT_BROADCAST, "(.+)", "(.+)")
 
-GLDG_DEFAULT_ONLINE_COLOUR		= "|cFFA0FFA0"
+GLDG_DEFAULT_ONLINE_COLOUR				= "|cFFA0FFA0"
 GLDG_DEFAULT_IS_OFFLINE_COLOUR		= "|cFFFFFFFF"
 GLDG_DEFAULT_GOES_OFFLINE_COLOUR	= "|cFF7F7F7F"
-GLDG_DEFAULT_HELP_COLOUR		= "|cFFFFFF7F"
-GLDG_DEFAULT_ALIAS_COLOUR		= "|cFFFFA0A0"
-GLDG_DEFAULT_HEADER_COLOUR		= "|c7FFF0000"
+GLDG_DEFAULT_HELP_COLOUR					= "|cFFFFFF7F"
+GLDG_DEFAULT_ALIAS_COLOUR					= "|cFFFFA0A0"
+GLDG_DEFAULT_HEADER_COLOUR				= "|c7FFF0000"
 
-GLDG_DEFAULT_LIST_COLOUR		= "|cFFFF7F00"
-GLDG_DEFAULT_NEW_COLOUR			= "|cFFFF3F3F"
-GLDG_DEFAULT_LVL_COLOUR			= "|cFF7F7F7F"
-GLDG_DEFAULT_RANK_COLOUR		= "|cFFCC00CC"
-GLDG_DEFAULT_RELOG_COLOUR		= "|cFF3FFF3F"
+GLDG_DEFAULT_LIST_COLOUR					= "|cFFFF7F00"
+GLDG_DEFAULT_NEW_COLOUR						= "|cFFFF3F3F"
+GLDG_DEFAULT_LVL_COLOUR						= "|cFF7F7F7F"
+GLDG_DEFAULT_RANK_COLOUR					= "|cFFCC00CC"
+GLDG_DEFAULT_RELOG_COLOUR					= "|cFF3FFF3F"
 GLDG_DEFAULT_ACHIEVMENT_COLOUR		= "|cFF001FFF"
 
-GLDG_ONLINE_COLOUR		= GLDG_DEFAULT_ONLINE_COLOUR
+GLDG_ONLINE_COLOUR				= GLDG_DEFAULT_ONLINE_COLOUR
 GLDG_IS_OFFLINE_COLOUR		= GLDG_DEFAULT_IS_OFFLINE_COLOUR
 GLDG_GOES_OFFLINE_COLOUR	= GLDG_DEFAULT_GOES_OFFLINE_COLOUR
-GLDG_ALIAS_COLOUR		= GLDG_DEFAULT_ALIAS_COLOUR
+GLDG_ALIAS_COLOUR					= GLDG_DEFAULT_ALIAS_COLOUR
 
 GLDG_LEVEL_CAP = 90
 
@@ -112,32 +99,35 @@ GLDG_LEVEL_CAP = 90
 --------------------------
 
 -- Stored data
-GLDG_Data = {}			-- Data saved between sessions
-GLDG_DataGreet = nil		-- Pointer to relevant greeting section in GLDG_Data
-GLDGL_DataChar = nil		-- Pointer to relevant character section in GLDG_Data
+GLDG_Data = {}			        -- Data saved between sessions
+GLDG_DataGreet = nil		    -- Pointer to relevant greeting section in GLDG_Data
+GLDGL_DataChar = nil		    -- Pointer to relevant character section in GLDG_Data
 
 -- Initialization
-GLDG_Main = nil			-- Main program window
-GLDG_Realm = nil		-- Name of the current realm
-GLDG_Player = nil		-- Name of the current player
-GLDG_GuildName = nil		-- Name of your guild
-GLDG_GuildAlias = nil		-- Alias of your guild
-GLDG_NewGuild = nil		-- Set if initializing a new guild
+GLDG_Main = nil			        -- Main program window
+GLDG_Realm = nil		        -- Name of the current realm
+GLDG_Player = nil		        -- Name of the current player
+GLDG_shortName = nil            -- Playername without Server
+GLDG_GuildName = nil		    -- Name of your guild
+GLDG_GuildAlias = nil		    -- Alias of your guild
+GLDG_NewGuild = nil		        -- Set if initializing a new guild
 GLDG_InitialGuildUpdate = nil	-- To make sure we get at least one update
 GLDG_InitialFriendsUpdate = nil	-- To make sure we get at least one update
-GLDG_UpdateRequest = 0		-- If set with time, update will be performed
+GLDG_UpdateRequest = 0		    -- If set with time, update will be performed
 GLDG_UpdateRequestFriends = 0	-- If set with time, update will be performed
-GLDG_InitComplete = nil		-- Set in initialization is done
-GLDG_InitCheck = 0		-- Check for changes and display them; 0 = not started, 1 = pending guild, 2 = pending friends, 4 = pending channel, 8 = done guild, 16 = done friends, 32 = done channel
-GLDG_ChangesText = {}		-- text for popup display
+GLDG_InitComplete = nil		    -- Set in initialization is done
+GLDG_InitCheck = 0		        -- Check for changes and display them; 0 = not started, 1 = pending guild, 2 = pending friends, 4 = pending channel, 8 = done guild, 16 = done friends, 32 = done channel
+GLDG_ChangesText = {}		    -- text for popup display
 
 -- Various
 GLDG_Debug = false		-- Show debugging
+
 -- Core variables
 GLDG_Online = {}		-- Time of player going online
 GLDG_Offline = {}		-- Time of player going offline			-- todo: make this persistent?
-GLDG_RankUpdate = {}		-- Set with time for all players getting promoted during the session
+GLDG_RankUpdate = {}	-- Set with time for all players getting promoted during the session
 GLDG_Queue = {}			-- List of players waiting to be greeted
+
 -- Configuration: greetings tab
 GLDG_SelColName = nil		-- Name of the currently selected collection
 GLDG_NumColRows = 5		-- Maximum number of collections that can be displayed
@@ -146,6 +136,7 @@ GLDG_Selection = "Greet"	-- Selected greeting category
 GLDG_SelMsgNum = nil		-- Number of the currently selected message
 GLDG_NumSelRows = 5		-- Maximum number of greetings that can be displayed
 GLDG_GreetOffset = 0		-- Offset for displaying greetings
+
 -- Configuration: players tab
 GLDG_SelPlrName = nil		-- Name of the currently selected player
 GLDG_NumPlrRows = 20		-- Maximum number of players that can be displayed
@@ -154,12 +145,16 @@ GLDG_PlayerOffset = 0		-- Offset for displaying players
 GLDG_NumMain = 0		-- Number of players defined as main
 GLDG_NumAlts = 0		-- Number of players that are alts for current selected player
 GLDG_NumSubRows = 9		-- Maximum number of mains that can be displayed on subframe
+
 -- update timer
 GLDG_UPDATE_TIME = 10		-- Number of seconds to query guild and friends list (default)
+
 -- channel parse counter
 GLDG_unregister = 0		-- Number of pending requests
+
 -- auto greet flag
 GLDG_autoGreeted = 0		-- To make sure auto greet is only done once per login
+
 -- auto check consistency
 GLDG_autoConsistencyCheckReady = nil
 GLDG_autoConsistencyChecked = nil
@@ -179,6 +174,7 @@ function GLDG_OnLoad(self)
 	-- Slash commands for CLI
 	SLASH_GLDG1 = "/guildgreet"
 	SLASH_GLDG2 = "/gg"
+	SLASH_GLDG3 = "/greet"
 	SlashCmdList.GLDG = GLDG_SlashHandler
 end
 
@@ -450,7 +446,7 @@ function GLDG_Init()
 	end
 
 	-- store realm and player names
-	if not GLDG_Realm then GLDG_Realm = GetCVar("realmName") end
+	if not GLDG_Realm then GLDG_Realm = GetRealmName() end
 	if not GLDG_Player then GLDG_Player = UnitName("player") end
 
 	-- Clear obsolete options
@@ -953,7 +949,7 @@ function GLDG_InitRoster()
 	GLDG_Convert()
 
 	-- Retreive realm, player and guild name if needed
-	if not GLDG_Realm then GLDG_Realm = GetCVar("realmName") end
+	if not GLDG_Realm then GLDG_Realm = GetRealmName() end
 	if not GLDG_Player then GLDG_Player = UnitName("player") end
 	if not GLDG_GuildName or GLDG_GuildName == "" then GLDG_GuildName = GetGuildInfo("player") end
 	if not GLDG_GuildName then GLDG_GuildName = "" end
@@ -1190,6 +1186,7 @@ function GLDG_RosterImport()
 	-- Update guildrank names
 	GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName] = {}
 	for i = 1, GuildControlGetNumRanks() do GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][GuildControlGetRankName(i)] = i end
+	
 	-- Add info about all players of your guild
 	local mains = {}
 	local alts = {}
@@ -1200,6 +1197,8 @@ function GLDG_RosterImport()
 	if maxMembers == nil then maxMembers = nil end
 	for i = 1, maxMembers do
 		local pl, rn, ri, lv, cl, zn, pn, on, ol, st, enClass = GetGuildRosterInfo(i)
+		local GLDG_shortName, realm = string.split("-", pl)
+		if string.gsub(GLDG_Realm, " ", "") == realm then pl = GLDG_shortName end
 		if pl then
 			cnt = cnt +1
 			if not GLDG_DataChar[pl] then
@@ -1252,6 +1251,21 @@ function GLDG_RosterImport()
 					alts[pl] = main
 				elseif (on and string.sub(on, 1, 6)=="alt - ") then
 					local main = string.sub(on, 7)
+					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
+					if a then
+						main = c
+					end
+					alts[pl] = main
+				-- detect if note contains "alt <main name>[ <discardable text]"
+				elseif (string.sub(pn, 1, 4)=="alt ") then
+					local main = string.sub(pn, 5)
+					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
+					if a then
+						main = c
+					end
+					alts[pl] = main
+				elseif (on and string.sub(on, 1, 4)=="alt ") then
+					local main = string.sub(on, 5)
 					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
 					if a then
 						main = c
@@ -1619,6 +1633,8 @@ function GLDG_getOnlineList()
 	for i = 0, numTotal do
 		local name, rank, rankIndex, level, class, zone, note, officernote, online, status = GetGuildRosterInfo(i);
 		if ((name ~= nil) and ( online ~= nil)) then
+			local GLDG_shortName, realm = string.split("-", name)
+			if string.gsub(GLDG_Realm, " ", "") == realm then name = GLDG_shortName end
 			onList[name] = true;
 		end
 	end
@@ -1898,6 +1914,8 @@ function GLDG_SystemMsg(msg)
 	local _, _, player = string.find(msg, GLDG_ONLINE)
 	if player then
 		GLDG_DebugPrint("detected player coming online: "..player)
+		local GLDG_shortName, realm = string.split("-", player)
+		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
 		if (GLDG_DataChar[player] and not GLDG_DataChar[player].ignore) then
 
 			if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_GuildName) and GLDG_DataChar[player].friends and GLDG_DataChar[player].friends[GLDG_Player] and not GLDG_Data.UseFriends then
@@ -1985,6 +2003,8 @@ function GLDG_SystemMsg(msg)
 	-- Check players going offline
 	local _, _, player = string.find(msg, GLDG_OFFLINE)
 	if player then
+		local GLDG_shortName, realm = string.split("-", player)
+		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
 		GLDG_DebugPrint("detected player going offline: "..player)
 		if (GLDG_DataChar[player] and not GLDG_DataChar[player].ignore) then
 			GLDG_DebugPrint("player "..player.." is a member of our guild")
@@ -2041,6 +2061,8 @@ function GLDG_SystemMsg(msg)
 	-- Check players joining the guild
 	local _, _, player = string.find(msg, GLDG_JOINED)
 	if player then
+		local GLDG_shortName, realm = string.split("-", player)
+		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
 		if (not GLDG_DataChar[player]) then
 			GLDG_DataChar[player] = {}
 		end
@@ -2061,6 +2083,10 @@ function GLDG_SystemMsg(msg)
 
 	-- Check for promotions
 	local _, _, promo, player, rank = string.find(msg, GLDG_PROMO)
+	if player then
+		local GLDG_shortName, realm = string.split("-", player)
+		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
+	end
 	if player and (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.NewRank)) > 0) and (not GLDG_Data.SupressRank) and (not GLDG_DataChar[player].ignore) then
 		GLDG_DebugPrint("detected player getting promotion: "..player.." -> "..rank)
 		GLDG_DataChar[player].promoter = promo
@@ -2077,6 +2103,8 @@ function GLDG_SystemMsg(msg)
 	-- Check for demotions
 	local _, _, player, rank = string.find(msg, GLDG_DEMOTE)
 	if player then
+		local GLDG_shortName, realm = string.split("-", player)
+		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
 		GLDG_DebugPrint("detected player getting demotion: "..player.." -> "..rank)
 		GLDG_DataChar[player].promoter = nil
 		GLDG_DataChar[player].rankname = rank
@@ -6879,6 +6907,16 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 			fixNeeded = true
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..p.."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertFix9)
 			GLDG_DataChar[GLDG_DataChar[p].alt].main = true
+		end
+	end
+	
+	-- check for entries of characters with the same realm in the DB
+	for p in pairs(GLDG_DataChar) do
+		local GLDG_shortName, realm = string.split("-", p)
+		if string.gsub(GLDG_Realm, " ", "") == realm then
+			fixNeeded = true
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ".." delete ["..p.."]")
+			GLDG_DataChar[p] = nil
 		end
 	end
 
