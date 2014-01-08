@@ -55,7 +55,6 @@ GLDG_Tab2Frame.Tab2 = "Greetings"
 GLDG_Tab2Frame.Tab3 = "Players"
 GLDG_Tab2Frame.Tab4 = "Cleanup"
 GLDG_Tab2Frame.Tab5 = "Colour"
-GLDG_Tab2Frame.Tab6 = "Todo"
 
 GLDG_SubTab2Frame = {}
 GLDG_SubTab2Frame.Tab1 = "General"
@@ -783,11 +782,6 @@ function GLDG_InitFrame(frameName)
 		_G[name.."ChannelLevelColour"]:Hide()
 		_G[name.."ChannelAchievmentButton"]:Hide()
 		_G[name.."ChannelAchievmentColour"]:Hide()
-	elseif (frameName == "Todo") then
-		_G[name.."TodoText"]:SetText(GLDG_TXT.infoTodo)
-		_G[name.."HistoryText"]:SetText(GLDG_TXT.infoHistory)
-		_G[name.."HelpText"]:SetText(GLDG_TXT.infoHelp)
-		GLDG_UpdateTodoCheckboxes()
 	elseif (frameName == "SettingsGeneral") then
 		-- Greeting options texts
 		_G[name.."Header"]:SetText(GLDG_TXT.optheader)
@@ -890,24 +884,6 @@ function GLDG_InitFrame(frameName)
 		_G[name.."DeltaPopupBox"]:SetChecked(GLDG_Data.DeltaPopup)
 		_G[name.."ExtendPlayerMenuText"]:SetText(GLDG_TXT.extendPlayerMenu)
 		_G[name.."ExtendPlayerMenuBox"]:SetChecked(GLDG_Data.ExtendPlayerMenu)
-	end
-end
-
-------------------------------------------------------------
-function GLDG_UpdateTodoCheckboxes()
-	local name = GLDG_GUI.."Todo"
-	if (GLDG_Data.InfoMode and GLDG_Data.InfoMode=="todo") then
-		_G[name.."TodoBox"]:SetChecked(true)
-		_G[name.."HistoryBox"]:SetChecked(false)
-		_G[name.."HelpBox"]:SetChecked(false)
-	elseif (GLDG_Data.InfoMode and GLDG_Data.InfoMode=="history") then
-		_G[name.."TodoBox"]:SetChecked(false)
-		_G[name.."HistoryBox"]:SetChecked(true)
-		_G[name.."HelpBox"]:SetChecked(false)
-	else
-		_G[name.."TodoBox"]:SetChecked(false)
-		_G[name.."HistoryBox"]:SetChecked(false)
-		_G[name.."HelpBox"]:SetChecked(true)
 	end
 end
 
@@ -7282,89 +7258,4 @@ function GLDG_AddToStartupList(entry)
 end
 
 
---------------------------
--- _36_ todo tab
---------------------------
-GLDG_TodoList = nil
-
-------------------------------------------------------------
-function GLDG_TodoShow(frame)
-	if not frame then return end
-
-	-- create the frames on first entry
-	if not GLDG_TodoList then
-		GLDG_TodoList = {
-			nilFrame = {
-				GetName = function() return "Global" end
-			},
-		}
-
-		GLDG_TodoList.List = CreateFrame("Frame", frame:GetName().."List", frame)
-		GLDG_TodoList.List:SetPoint("TOP", frame:GetName().."TodoText", "BOTTOM")
-		GLDG_TodoList.List:SetPoint("LEFT", frame:GetName(), "LEFT", 10, 0)
-		GLDG_TodoList.List:SetPoint("RIGHT", frame:GetName(), "RIGHT", -10, 0)
-		GLDG_TodoList.List:SetPoint("BOTTOM", frame:GetName(), "BOTTOM", 0, 10)
-		GLDG_TodoList.List:SetFrameStrata("DIALOG")
-		--GLDG_TodoList.List:SetHeight(560)
-		--GLDG_TodoList.List:SetWidth(500)
-		GLDG_TodoList.List:SetBackdrop({
-			bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-			edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-			tile = true, tileSize = 32, edgeSize = 32,
-			insets = { left = 9, right = 9, top = 9, bottom = 9 }
-		})
-		GLDG_TodoList.List:SetBackdropColor(0,0,0, 0.8)
-		GLDG_TodoList.List:SetScript("OnShow", GLDG_TodoShowText)
-
-		GLDG_TodoList.List.Scroll = CreateFrame("ScrollFrame", frame:GetName().."Scroll", GLDG_TodoList.List, "UIPanelScrollFrameTemplate")
-		GLDG_TodoList.List.Scroll:SetPoint("TOPLEFT", GLDG_TodoList.List, "TOPLEFT", 20, -20)
-		GLDG_TodoList.List.Scroll:SetPoint("BOTTOMRIGHT", GLDG_TodoList.List, "BOTTOMRIGHT", -30, 20)
-
-		local l, b, w, h = GLDG_TodoList.List.Scroll:GetRect()
-		GLDG_TodoList.List.Box = CreateFrame("EditBox", frame:GetName().."Box", GLDG_TodoList.List.Scroll)
-		GLDG_TodoList.List.Box:SetPoint("TOPLEFT", GLDG_TodoList.List, "TOPLEFT", 20, -20)
-		GLDG_TodoList.List.Box:SetPoint("BOTTOMRIGHT", GLDG_TodoList.List, "BOTTOMRIGHT", -30, 20)
-		GLDG_TodoList.List.Box:SetWidth(w)	-- 460
-		GLDG_TodoList.List.Box:SetHeight(h)	-- 85
-		GLDG_TodoList.List.Box:SetMultiLine(true)
-		GLDG_TodoList.List.Box:SetAutoFocus(false)
-		GLDG_TodoList.List.Box:SetFontObject(GameFontHighlight)
-		GLDG_TodoList.List.Box:SetScript("OnTextChanged", GLDG_UpdateTodo)
-		GLDG_TodoList.List.Box:SetBackdropColor(0.5,0.5,0.5, 0.8)
-
-		GLDG_TodoList.List.Scroll:SetScrollChild(GLDG_TodoList.List.Box)
-	end
-end
-
-------------------------------------------------------------
-function GLDG_TodoShowText()
-	GLDG_TodoList.List.Box:SetText(GLDG_Todo)
-end
-
-------------------------------------------------------------
-function GLDG_UpdateTodo()
-	if (GLDG_Data.InfoMode and GLDG_Data.InfoMode == "todo") then
-		GLDG_TodoList.List.Box:SetText(GLDG_Todo)
-	elseif (GLDG_Data.InfoMode and GLDG_Data.InfoMode == "history") then
-		GLDG_TodoList.List.Box:SetText(GLDG_History)
-	else
-		GLDG_Data.InfoMode = "help"
-		GLDG_TodoList.List.Box:SetText(GLDG_HelpText)
-	end
-	GLDG_TodoList.List.Scroll:UpdateScrollChildRect()
-	GLDG_TodoList.List.Box:ClearFocus()
-end
-
-------------------------------------------------------------
-function GLDG_TodoSetMode(mode)
-	if (mode == "todo") then
-		GLDG_TodoList.List.Box:SetText(GLDG_Todo)
-	elseif (mode == "history") then
-		GLDG_TodoList.List.Box:SetText(GLDG_History)
-	else
-		mode = "help"
-		GLDG_TodoList.List.Box:SetText(GLDG_HelpText)
-	end
-	GLDG_Data.InfoMode = mode
-	GLDG_UpdateTodoCheckboxes()
-end
+-------------------------------------------------------------
