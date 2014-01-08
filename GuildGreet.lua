@@ -37,7 +37,6 @@ _32_ guild alert check
 _33_ cleanup
 _34_ interface options
 _35_ startup popup handling
-_36_ todo tab
 
 ]]----------------------------------------------------------
 
@@ -46,7 +45,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 201312			-- Number code for this version
+GDLG_VNMBR	= 201401			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
