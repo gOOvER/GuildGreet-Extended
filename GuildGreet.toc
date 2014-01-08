@@ -1,6 +1,6 @@
 ## Interface: 50400
 ## Title: GuildGreet-Extended
-## Version: 5.4.7-beta1
+## Version: 5.4.7
 ## Author: gOOvER |cFFFFA0A0 (taken over from Urbin & Greya, Mordikaiin/Rozak)|r
 ## X-Date: 2014-01-08
 ## X-Category: Guild
