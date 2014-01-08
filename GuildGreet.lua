@@ -59,7 +59,6 @@ GLDG_SubTab2Frame = {}
 GLDG_SubTab2Frame.Tab1 = "General"
 GLDG_SubTab2Frame.Tab2 = "Chat"
 GLDG_SubTab2Frame.Tab3 = "Greeting"
-GLDG_SubTab2Frame.Tab4 = "Debug"
 GLDG_SubTab2Frame.Tab5 = "Other"
 
 
@@ -868,9 +867,6 @@ function GLDG_InitFrame(frameName)
 		-- guild alias
 		_G[name.."GuildAliasSet"]:SetText(GLDG_TXT.set)
 		_G[name.."GuildAliasClear"]:SetText(GLDG_TXT.clear)
-	elseif (frameName == "SettingsDebug") then
-		_G[name.."Header"]:SetText(GLDG_TXT.dumpHeader)
-		GLDG_ShowDump()
 	elseif (frameName == "SettingsOther") then
 		_G[name.."Header"]:SetText(GLDG_TXT.otherheader)
 		_G[name.."UseLocalTimeBox"]:SetChecked(GLDG_Data.UseLocalTime)
