@@ -59,7 +59,6 @@ GLDG_SubTab2Frame = {}
 GLDG_SubTab2Frame.Tab1 = "General"
 GLDG_SubTab2Frame.Tab2 = "Chat"
 GLDG_SubTab2Frame.Tab3 = "Greeting"
-GLDG_SubTab2Frame.Tab5 = "Other"
 
 
 -- Strings we look for
