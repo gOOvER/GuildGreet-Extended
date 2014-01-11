@@ -3247,7 +3247,7 @@ function GLDG_UpdateChatFrame(self)
 		GLDG_updatingChatFrame = true
 
 		-- Store the new value
-		GLDG_Data.ChatFrame = self:GetValue()
+		GLDG_Data.ChatFrame = math.floor(self:GetValue())
 
 		--if (GLDG_Data.ChatFrame > NUM_CHAT_WINDOWS) then
 		--	local oldValue = GLDG_Data.ChatFrame
