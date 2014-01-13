@@ -12,5 +12,6 @@
 ## OptionalDeps: myAddOns
 
 
+
 Locale\locale.xml
 GuildGreet.xml

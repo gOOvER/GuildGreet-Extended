@@ -453,7 +453,8 @@ function GLDG_Init()
 	if not GLDG_Data.MinLevelUp then GLDG_Data.MinLevelUp = 0 end
 	if not GLDG_Data.UpdateTime then GLDG_Data.UpdateTime = GLDG_UPDATE_TIME end
 	if not GLDG_Data.ListSize then GLDG_Data.ListSize = 5 end
-	if not GLDG_Data.ChatFrame then GLDG_Data.ChatFrame = 0 end
+	if not GLDG_Data.PlayerChatFrame then GLDG_Data.PlayerChatFrame = {} end
+	if not GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] then GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] = 0 end
 
 	if not GLDG_Data.Greet then GLDG_Data.Greet = GLDG_GREET end
 	if not GLDG_Data.GreetBack then GLDG_Data.GreetBack = GLDG_GREETBACK end
@@ -814,7 +815,7 @@ function GLDG_InitFrame(frameName)
 	elseif (frameName == "SettingsChat") then
 		-- List settings
 		_G[name.."Header"]:SetText(GLDG_TXT.chatheader)
-		_G[name.."ChatFrameSlider"]:SetValue(GLDG_Data.ChatFrame)
+		_G[name.."ChatFrameSlider"]:SetValue(GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm])
 		_G[name.."ListNamesBox"]:SetChecked(GLDG_Data.ListNames)
 		_G[name.."ListNamesOffBox"]:SetChecked(GLDG_Data.ListNamesOff)
 		_G[name.."ListLevelUpBox"]:SetChecked(GLDG_Data.ListLevelUp)
@@ -3243,11 +3244,12 @@ end
 
 ------------------------------------------------------------
 function GLDG_UpdateChatFrame(self)
-	if not GLDG_updatingChatFrame then
+	local text = _G[self:GetParent():GetName().."ChatFrameText"]
+	if not GLDG_updatingChatFrame and GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] ~= math.floor(self:GetValue()) then
 		GLDG_updatingChatFrame = true
 
 		-- Store the new value
-		GLDG_Data.ChatFrame = math.floor(self:GetValue())
+		GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] = math.floor(self:GetValue())
 
 		--if (GLDG_Data.ChatFrame > NUM_CHAT_WINDOWS) then
 		--	local oldValue = GLDG_Data.ChatFrame
@@ -3257,21 +3259,46 @@ function GLDG_UpdateChatFrame(self)
 		--end
 
 		-- Update display
-		local text = _G[self:GetParent():GetName().."ChatFrameText"]
-		if (GLDG_Data.ChatFrame == 0) then
+		--local text = _G[self:GetParent():GetName().."ChatFrameText"]
+		if (GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] == 0) then
 			text:SetText(GLDG_TXT.defaultChatFrame)
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Now using default chat frame")
 		else
-			local name, fontSize, r, g, b, alpha, shown, locked, docked = GetChatWindowInfo(GLDG_Data.ChatFrame)
-			text:SetText(string.format(GLDG_TXT.chatFrame, GLDG_Data.ChatFrame, name))
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Now using chat frame "..GLDG_Data.ChatFrame.." ("..name..")")
+			local name, fontSize, r, g, b, alpha, shown, locked, docked = GetChatWindowInfo(GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm])
+			text:SetText(string.format(GLDG_TXT.chatFrame, GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm], name))
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Now using chat frame "..GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm].." ("..name..")")
 		end
 
 		GLDG_updatingChatFrame = nil
+	else
+		if (GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] == 0) then
+			text:SetText(GLDG_TXT.defaultChatFrame)
+		else
+			local name, fontSize, r, g, b, alpha, shown, locked, docked = GetChatWindowInfo(GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm])
+			text:SetText(string.format(GLDG_TXT.chatFrame, GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm], name))
+		end
 	end
 end
 
 ------------------------------------------------------------
+
+function GLDG_GetNumActiveChatFrames()
+        local count = 0;
+        local chatFrame;
+        for i=1, NUM_CHAT_WINDOWS do
+                local _, _, _, _, _, _, shown, locked, docked = GetChatWindowInfo(i);
+                chatFrame = _G["ChatFrame"..i];
+                if ( chatFrame ) then
+                        if ( shown or chatFrame.isDocked ) then
+                                count = count + 1;
+                        end
+                end
+        end
+        return count;
+end
+
+------------------------------------------------------------
+
 function GLDG_DropDownTemplate_OnLoad(self)
 	UIDropDownMenu_Initialize(self, GLDG_DropDown_Initialize);
 	UIDropDownMenu_SetWidth(self, 150);
@@ -4704,10 +4731,10 @@ end
 ------------------------------------------------------------
 function GLDG_Print(msg, forceDefault)
 	if not (msg) then return end
-	if ((GLDG_Data==nil) or (GLDG_Data.ChatFrame == nil) or (GLDG_Data.ChatFrame==0) or forceDefault) then
+	if ((GLDG_Data==nil) or (GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] == nil) or (GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm]==0) or forceDefault) then
 		DEFAULT_CHAT_FRAME:AddMessage(msg)
 	else
-		_G["ChatFrame"..GLDG_Data.ChatFrame]:AddMessage(msg)
+		_G["ChatFrame"..GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm]]:AddMessage(msg)
 	end
 end
 

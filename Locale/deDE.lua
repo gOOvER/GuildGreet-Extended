@@ -569,7 +569,7 @@ GLDG_TXT.elements.name.SettingsGeneralListsizeSlider	= "Grösse der Grusslisten"
 GLDG_TXT.elements.tip.SettingsGeneralListsizeSlider	= "Hier wird eingestellt, wie viele Einträge die Grussliste anzeigt. Falls mehr Charaktere zu grüssen sind, als die Liste Platz bietet, werden die ältesten Einträge angezeigt."
 
 GLDG_TXT.elements.name.SettingsChatChatFrameSlider	= "Chat Frame"
-GLDG_TXT.elements.tip.SettingsChatChatFrameSlider	= "Definiert, welches Chat Frame verwendet wird, um die Chat-Nachrichten von GuildGreet anzuzeigen."
+GLDG_TXT.elements.tip.SettingsChatChatFrameSlider	= "Definiert, welches Chat Frame verwendet wird, um die Chat-Nachrichten von GuildGreet anzuzeigen. \r\n\r\n|cFFFF0000Sollten nicht alle auswählbar sein, benutze den Befehl \r\n|r/reload|cFFFF0000.|r"
 GLDG_TXT.elements.name.SettingsChatListNamesBox		= "Liste beim Einloggen"
 GLDG_TXT.elements.tip.SettingsChatListNamesBox		= "Falls diese Box aktiviert ist, wird eine Liste des Mains und aller Twinks des einloggenden Charakters in den Chat geschrieben"
 GLDG_TXT.elements.name.SettingsChatListNamesOffBox	= "Liste beim Ausloggen"
@@ -600,7 +600,7 @@ GLDG_TXT.elements.tip.SettingsGreetingGreetGuildBox	= "Falls diese Box aktiviert
 GLDG_TXT.elements.name.SettingsGreetingGreetChannelBox	= "Channel grüssen"
 GLDG_TXT.elements.tip.SettingsGreetingGreetChannelBox	= "Falls diese Box aktiviert ist, wird beim Drücken der (zuweisbaren) 'Gruss', 'Abschied' und 'Bis später' Tasten eine entsprechende Nachricht an den Channel geschickt. Die Tasten können in der spielweiten Tastenzuweisung konfiguriert werden."
 GLDG_TXT.elements.name.SettingsGreetingAutoGreetBox	= "Automatisch grüssem"
-GLDG_TXT.elements.tip.SettingsGreetingAutoGreetBox	= "Falls diese Box aktiviert ist, wird ein Gruss an die Gilde und/oder den Channel gesendet (je nach obiger Konfiguration), wenn Du einlogst.\r\n|cFFFF0000Vorsichtig benutzen:\r\nDieses Feature grüsst jedesmal, wenn ihr Euch mit einem Charakter einloggt oder das Interface mit |r/console reloadui|cFFFF0000 neu lädt, ihr könnt damit also leicht Eure Freunde nerven."
+GLDG_TXT.elements.tip.SettingsGreetingAutoGreetBox	= "Falls diese Box aktiviert ist, wird ein Gruss an die Gilde und/oder den Channel gesendet (je nach obiger Konfiguration), wenn Du einlogst.\r\n|cFFFF0000Vorsichtig benutzen:\r\nDieses Feature grüsst jedesmal, wenn ihr Euch mit einem Charakter einloggt oder das Interface mit |r/reload|cFFFF0000 neu lädt, ihr könnt damit also leicht Eure Freunde nerven."
 
 GLDG_TXT.elements.name.SettingsGreetingSupressAll	= "Alle Grüsse unterdrücken"
 GLDG_TXT.elements.tip.SettingsGreetingSupressAll	= "Drücke diesen Knopf um alle vier untenstehenden Checkboxen zu aktivieren. Dies unterdrückt sämtliche Einträge in die Grussliste, die Ausgabe in den Chat wird davon nicht beeinflusst.\r\nDieser Knopf ist praktisch, wenn Du in Instanzen nicht abgelenkt werden willst."

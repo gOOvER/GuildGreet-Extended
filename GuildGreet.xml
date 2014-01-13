@@ -854,8 +854,8 @@
 				<Scripts>
 					<OnLoad>
 						getglobal(self:GetName().."Low"):SetText("0")
-						getglobal(self:GetName().."High"):SetText(string.format("%d", NUM_CHAT_WINDOWS))
-						self:SetMinMaxValues(0,NUM_CHAT_WINDOWS)
+						getglobal(self:GetName().."High"):SetText(GLDG_GetNumActiveChatFrames())
+						self:SetMinMaxValues(0,GLDG_GetNumActiveChatFrames())
 						self:SetValueStep(1)
 					</OnLoad>
 					<OnValueChanged>GLDG_UpdateChatFrame(self)</OnValueChanged>

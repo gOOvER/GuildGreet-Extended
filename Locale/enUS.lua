@@ -570,7 +570,7 @@ GLDG_TXT.elements.name.SettingsGeneralListsizeSlider	= "Greet list size"
 GLDG_TXT.elements.tip.SettingsGeneralListsizeSlider	= "This defines how many people to be greeted will be shown in the greet list. If there are more people to be greeted than configured in this setting, the oldest entries will be shown."
 
 GLDG_TXT.elements.name.SettingsChatChatFrameSlider	= "Chat frame"
-GLDG_TXT.elements.tip.SettingsChatChatFrameSlider	= "Defines which chat frame is used to display GuildGreet chat messages."
+GLDG_TXT.elements.tip.SettingsChatChatFrameSlider	= "Defines which chat frame is used to display GuildGreet chat messages.\r\n\r\n|cFFFF0000If not all are selectable, use the command\r\n|r/reload|cFFFF0000.|r"
 GLDG_TXT.elements.name.SettingsChatListNamesBox		= "List online"
 GLDG_TXT.elements.tip.SettingsChatListNamesBox		= "If this setting is enabled, a line printing all characters of the player that has just come online will be printed to the chat"
 GLDG_TXT.elements.name.SettingsChatListNamesOffBox	= "List offline"
