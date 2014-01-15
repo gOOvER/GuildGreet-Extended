@@ -16,7 +16,7 @@
 <!--> ============================================================================================================== <-->
 	<!-->List frame template: name line<-->
 	<Button name="GLDG_LineTemplate" hidden="true" virtual="true">
-		<Size><AbsDimension x="160" y="15"/></Size>
+		<Size><AbsDimension x="210" y="15"/></Size>
 		<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" tile="true"/>
 		<Layers>
 			<Layer level="BORDER">
@@ -35,15 +35,15 @@
 
 	<!-->List frame<-->
 	<Frame name="GuildGreetList" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
-		<Size><AbsDimension x="160" y="90"/></Size>
+		<Size><AbsDimension x="210" y="90"/></Size>
 		<Anchors><Anchor point="LEFT"/></Anchors>
 		<TitleRegion>
-			<Size><AbsDimension x="160" y="15"/></Size>
+			<Size><AbsDimension x="210" y="15"/></Size>
 			<Anchors><Anchor point="TOP"/></Anchors>
 		</TitleRegion>
 		<Frames>
 			<Frame name="$parentTitle" inherits="UIParent">
-				<Size><AbsDimension x="160" y="15"/></Size>
+				<Size><AbsDimension x="210" y="15"/></Size>
 				<Anchors><Anchor point="TOP"/></Anchors>
 				<Layers>
 					<Layer level="BACKGROUND">

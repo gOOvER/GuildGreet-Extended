@@ -431,6 +431,7 @@ function GLDG_OnEvent(self, event, ...)
 	end
 end
 
+
 -------------------------------
 -- _04_ Addon Initialization --
 -------------------------------
@@ -2058,35 +2059,39 @@ function GLDG_SystemMsg(msg)
 		local GLDG_shortName, realm = string.split("-", player)
 		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
 	end
-	if player and (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.NewRank)) > 0) and (not GLDG_Data.SupressRank) and (not GLDG_DataChar[player].ignore) then
-		GLDG_DebugPrint("detected player getting promotion: "..player.." -> "..rank)
-		GLDG_DataChar[player].promoter = promo
-		GLDG_DataChar[player].rankname = rank
-		if GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName] and GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][rank] then
-			GLDG_DataChar[player].rank = GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][rank] - 1 end
-		GLDG_RankUpdate[player] = GLDG_GetLogtime(player)
-		GLDG_DataChar[player].newrank = GLDG_DataChar[player].rank
-		if GLDG_Online[player] then
-			GLDG_Queue[player] = GLDG_GetLogtime(player)
-			GLDG_ShowQueue() end
-		return end
+	if GLDG_DataChar[player] then
+		if player and (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.NewRank)) > 0) and (not GLDG_Data.SupressRank) and (not GLDG_DataChar[player].ignore) then
+			GLDG_DebugPrint("detected player getting promotion: "..player.." -> "..rank)
+			GLDG_DataChar[player].promoter = promo
+			GLDG_DataChar[player].rankname = rank
+			if GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName] and GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][rank] then
+				GLDG_DataChar[player].rank = GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][rank] - 1 end
+			GLDG_RankUpdate[player] = GLDG_GetLogtime(player)
+			GLDG_DataChar[player].newrank = GLDG_DataChar[player].rank
+			if GLDG_Online[player] then
+				GLDG_Queue[player] = GLDG_GetLogtime(player)
+				GLDG_ShowQueue() end
+			return end
+	end
 
 	-- Check for demotions
 	local _, _, player, rank = string.find(msg, GLDG_DEMOTE)
-	if player then
-		local GLDG_shortName, realm = string.split("-", player)
-		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
-		GLDG_DebugPrint("detected player getting demotion: "..player.." -> "..rank)
-		GLDG_DataChar[player].promoter = nil
-		GLDG_DataChar[player].rankname = rank
-		if GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName] and GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][rank] then
-			GLDG_DataChar[player].rank = GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][rank] - 1 end
-		GLDG_RankUpdate[player] = GLDG_GetLogtime(player)
-		if GLDG_DataChar[player].newrank then
-			GLDG_DataChar[player].newrank = nil
-			GLDG_Queue[player] = nil
-			GLDG_ShowQueue() end
-		return end
+	if GLDG_DataChar[player] then
+		if player then
+			local GLDG_shortName, realm = string.split("-", player)
+			if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
+			GLDG_DebugPrint("detected player getting demotion: "..player.." -> "..rank)
+			GLDG_DataChar[player].promoter = nil
+			GLDG_DataChar[player].rankname = rank
+			if GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName] and GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][rank] then
+				GLDG_DataChar[player].rank = GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][rank] - 1 end
+			GLDG_RankUpdate[player] = GLDG_GetLogtime(player)
+			if GLDG_DataChar[player].newrank then
+				GLDG_DataChar[player].newrank = nil
+				GLDG_Queue[player] = nil
+				GLDG_ShowQueue() end
+			return end	
+	end
 
 end
 
