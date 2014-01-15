@@ -1,8 +1,8 @@
 ## Interface: 50400
 ## Title: GuildGreet-Extended
-## Version: 5.4.7
-## Author: gOOvER |cFFFFA0A0 (taken over from Urbin & Greya, Mordikaiin/Rozak)|r
-## X-Date: 2014-01-08
+## Version: 5.4.8
+## Author: gOOvER & Luzisto
+## X-Date: 2014-01-15
 ## X-Category: Guild
 ## X-Website: http://wow.curse-gaming.com/downloads/details/7529/
 ## URL: http://wow.curse-gaming.com/downloads/details/7529/
