@@ -263,6 +263,7 @@ function GLDG_OnEvent(self, event, ...)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_OFFICER", GLDG_ChatFilter)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", GLDG_ChatFilter)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", GLDG_ChatFilter)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", GLDG_ChatFilter)
 
 		-- Battle.net events (testing)
 		GLDG_Main:RegisterEvent("BN_CONNECTED")
@@ -293,6 +294,9 @@ function GLDG_OnEvent(self, event, ...)
 	elseif (event == "CHAT_MSG_GUILD_ACHIEVEMENT") then
 		GLDG_TreatAchievment(arg1, arg2)
 
+		elseif (event == "CHAT_MSG_ACHIEVEMENT") then
+		GLDG_TreatAchievment(arg1, arg2)	
+
 	-- who response going to social frame
 	elseif (event == "WHO_LIST_UPDATE") then
 		GLDG_ParseWho()
@@ -304,7 +308,7 @@ function GLDG_OnEvent(self, event, ...)
 	-- guild members and/or friends joining/leaving
 	elseif (event == "CHAT_MSG_SYSTEM") then
 		GLDG_SystemMsg(arg1)
-
+			
 	elseif ((event == "FRIENDLIST_UPDATE") or (event == "FRIENDLIST_SHOW")) then
 		if (GLDG_Realm and GLDG_Player) then
 			GLDG_FriendsUpdate()
@@ -5106,7 +5110,8 @@ end
 -----------------------------
 function GLDG_TreatAchievment(achievmentLink, name)
 	if not achievmentLink or not name then return end
-
+	local GLDG_shortName, realm = string.split("-", name)
+	if string.gsub(GLDG_Realm, " ", "") == realm then name = GLDG_shortName end
 	-- Check for achievments
 	local _, _, playerLink, achievment = string.find(achievmentLink, GLDG_ACHIEVE)
 	if (achievment) then
