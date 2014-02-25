@@ -1209,13 +1209,18 @@ function GLDG_RosterImport()
 					if a then
 						main = c
 					end
+					local d,e = string.gsub(main, "_", " ")
+					main = d
 					alts[pl] = main
+					print("Main: " ..main .."!")
 				elseif (on and string.sub(on, 1, 4)=="alt-") then
 					local main = string.sub(on, 5)
 					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
 					if a then
 						main = c
 					end
+					local d,e = string.gsub(main, "_", " ")
+					main = d
 					alts[pl] = main
 				-- detect if note contains "alt - <main name>[ <discardable text]"
 				elseif (string.sub(pn, 1, 6)=="alt - ") then
@@ -1224,6 +1229,8 @@ function GLDG_RosterImport()
 					if a then
 						main = c
 					end
+					local d,e = string.gsub(main, "_", " ")
+					main = d
 					alts[pl] = main
 				elseif (on and string.sub(on, 1, 6)=="alt - ") then
 					local main = string.sub(on, 7)
@@ -1231,6 +1238,8 @@ function GLDG_RosterImport()
 					if a then
 						main = c
 					end
+					local d,e = string.gsub(main, "_", " ")
+					main = d
 					alts[pl] = main
 				-- detect if note contains "alt <main name>[ <discardable text]"
 				elseif (string.sub(pn, 1, 4)=="alt ") then
@@ -1239,6 +1248,8 @@ function GLDG_RosterImport()
 					if a then
 						main = c
 					end
+					local d,e = string.gsub(main, "_", " ")
+					main = d
 					alts[pl] = main
 				elseif (on and string.sub(on, 1, 4)=="alt ") then
 					local main = string.sub(on, 5)
@@ -1246,6 +1257,8 @@ function GLDG_RosterImport()
 					if a then
 						main = c
 					end
+					local d,e = string.gsub(main, "_", " ")
+					main = d
 					alts[pl] = main
 				-- detect if note contains EGP style information
 				elseif (GLDG_Data.AutoAssignEgp and (on and tonumber(string.sub(on, 1, 1))==nil)) then
@@ -1254,6 +1267,8 @@ function GLDG_RosterImport()
 					if a then
 						main = c
 					end
+					local d,e = string.gsub(main, "_", " ")
+					main = d
 					alts[pl] = main
 				end
 			end
