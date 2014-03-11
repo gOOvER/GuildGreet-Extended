@@ -2203,8 +2203,8 @@
 		<Layers>
 			<Layer level="BORDER">
 				<!-- char name -->
-				<FontString name="$parentName" inherits="GLDG_HeaderText" justifyH="LEFT">
-					<Size><AbsDimension x="200" /></Size>
+				<FontString name="$parentName" inherits="GLDG_HeaderText" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="160" /></Size>
 					<Scripts>
 						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
 						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
@@ -2212,7 +2212,7 @@
 					</Scripts>
 				</FontString>
 				<!-- type: main/alt -->
-				<FontString name="$parentType" inherits="GLDG_HeaderText" justifyH="LEFT">
+				<FontString name="$parentType" inherits="GLDG_HeaderText" justifyH="LEFT" wordwrap="false">
 					<Size><AbsDimension x="50" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentName" relativePoint="RIGHT"/></Anchors>
 					<Scripts>
@@ -2222,8 +2222,8 @@
 					</Scripts>
 				</FontString>
 				<!-- alias -->
-				<FontString name="$parentAlias" inherits="GameFontNormalSmall" justifyH="LEFT">
-					<Size><AbsDimension x="50" /></Size>
+				<FontString name="$parentAlias" inherits="GameFontNormalSmall" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="100" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentType" relativePoint="RIGHT"/></Anchors>
 					<Scripts>
 						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
@@ -2232,8 +2232,8 @@
 					</Scripts>
 				</FontString>
 				<!-- guild -->
-				<FontString name="$parentGuild" inherits="GLDG_HeaderText" justifyH="LEFT">
-					<Size><AbsDimension x="160" /></Size>
+				<FontString name="$parentGuild" inherits="GLDG_HeaderText" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="220" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentAlias" relativePoint="RIGHT"/></Anchors>
 					<Scripts>
 						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
@@ -2242,7 +2242,7 @@
 					</Scripts>
 				</FontString>
 				<!-- channel -->
-				<FontString name="$parentChannel" inherits="GLDG_HeaderText" justifyH="LEFT">
+				<FontString name="$parentChannel" inherits="GLDG_HeaderText" justifyH="LEFT" wordwrap="false">
 					<Size><AbsDimension x="20" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentGuild" relativePoint="RIGHT"/></Anchors>
 					<Scripts>
@@ -2252,7 +2252,7 @@
 					</Scripts>
 				</FontString>
 				<!-- friend -->
-				<FontString name="$parentFriend" inherits="GLDG_HeaderText" justifyH="LEFT">
+				<FontString name="$parentFriend" inherits="GLDG_HeaderText" justifyH="LEFT" wordwrap="false">
 					<Size><AbsDimension x="20" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentChannel" relativePoint="RIGHT"/></Anchors>
 					<Scripts>
@@ -2262,7 +2262,7 @@
 					</Scripts>
 				</FontString>
 				<!-- #friends -->
-				<FontString name="$parentNumFriends" inherits="GLDG_HeaderText" justifyH="RIGHT">
+				<FontString name="$parentNumFriends" inherits="GLDG_HeaderText" justifyH="RIGHT" wordwrap="false">
 					<Size><AbsDimension x="20" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentFriend" relativePoint="RIGHT"/></Anchors>
 					<Scripts>
@@ -2286,41 +2286,41 @@
 		<Layers>
 			<Layer level="BORDER">
 				<!-- char name -->
-				<FontString name="$parentName" inherits="GameFontHighlight" justifyH="LEFT">
-					<Size><AbsDimension x="200" /></Size>
+				<FontString name="$parentName" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="160" /></Size>
 				</FontString>
 				<!-- main/alt -->
-				<FontString name="$parentType" inherits="GameFontHighlight" justifyH="LEFT">
+				<FontString name="$parentType" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
 					<Size><AbsDimension x="50" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentName" relativePoint="RIGHT"/></Anchors>
 				</FontString>
 				<!-- alias -->
-				<FontString name="$parentAlias" inherits="GameFontHighlight" justifyH="LEFT">
-					<Size><AbsDimension x="50" /></Size>
+				<FontString name="$parentAlias" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="100" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentType" relativePoint="RIGHT"/></Anchors>
 				</FontString>
 				<!-- main (same position as alias) -->
-				<FontString name="$parentMain" inherits="GameFontNormalSmall" justifyH="LEFT">
-					<Size><AbsDimension x="50" /></Size>
+				<FontString name="$parentMain" inherits="GameFontNormalSmall" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="100" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentType" relativePoint="RIGHT"/></Anchors>
 				</FontString>
 				<!-- guild -->
-				<FontString name="$parentGuild" inherits="GameFontHighlight" justifyH="LEFT">
-					<Size><AbsDimension x="160" /></Size>
+				<FontString name="$parentGuild" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="220" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentAlias" relativePoint="RIGHT"/></Anchors>
 				</FontString>
 				<!-- channel -->
-				<FontString name="$parentChannel" inherits="GameFontHighlight" justifyH="LEFT">
+				<FontString name="$parentChannel" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
 					<Size><AbsDimension x="20" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentGuild" relativePoint="RIGHT"/></Anchors>
 				</FontString>
 				<!-- friend -->
-				<FontString name="$parentFriend" inherits="GameFontHighlight" justifyH="LEFT">
+				<FontString name="$parentFriend" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
 					<Size><AbsDimension x="20" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentChannel" relativePoint="RIGHT"/></Anchors>
 				</FontString>
 				<!-- #friends -->
-				<FontString name="$parentNumFriends" inherits="GameFontHighlight" justifyH="RIGHT">
+				<FontString name="$parentNumFriends" inherits="GameFontHighlight" justifyH="RIGHT" wordwrap="false">
 					<Size><AbsDimension x="20" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentFriend" relativePoint="RIGHT"/></Anchors>
 				</FontString>
@@ -2349,7 +2349,7 @@
  		<Layers>
 			<Layer level="OVERLAY">
 				<!-->Player tab header<-->
-				<FontString name="$parentHeader" inherits="GLDG_HeaderText">
+				<FontString name="$parentHeader" inherits="GLDG_HeaderText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset><AbsDimension x="0" y="-20"/></Offset>
@@ -2357,7 +2357,7 @@
 					</Anchors>
 				</FontString>
 				<!-->Show ignore option text<-->
-				<FontString name="$parentIgnoreText" inherits="GLDG_LOptionText">
+				<FontString name="$parentIgnoreText" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOM">
 							<Offset><AbsDimension x="-250" y="-315"/></Offset>
@@ -2365,14 +2365,14 @@
 					</Anchors>
 				</FontString>
 				<!-->Show alt option texts<-->
-				<FontString name="$parentAltText" inherits="GLDG_LOptionText">
+				<FontString name="$parentAltText" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentIgnoreText" relativePoint="TOPLEFT">
 							<Offset><AbsDimension x="0" y="-15"/></Offset>
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentAlt2Text" inherits="GLDG_LOptionText">
+				<FontString name="$parentAlt2Text" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentIgnoreText" relativePoint="TOPLEFT">
 							<Offset><AbsDimension x="160" y="-15"/></Offset>
@@ -2380,7 +2380,7 @@
 					</Anchors>
 				</FontString>
 				<!-->Filter unassigned text<-->
-				<FontString name="$parentUnassignedText" inherits="GLDG_LOptionText">
+				<FontString name="$parentUnassignedText" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentAltText" relativePoint="TOPLEFT">
 							<Offset><AbsDimension x="0" y="-15"/></Offset>
@@ -2388,7 +2388,7 @@
 					</Anchors>
 				</FontString>
 				<!-->Filter guild members text<-->
-				<FontString name="$parentGuildText" inherits="GLDG_LOptionText">
+				<FontString name="$parentGuildText" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentUnassignedText" relativePoint="TOPLEFT">
 							<Offset><AbsDimension x="0" y="-15"/></Offset>
@@ -2396,7 +2396,7 @@
 					</Anchors>
 				</FontString>
 				<!-->Filter online text<-->
-				<FontString name="$parentOnlineText" inherits="GLDG_LOptionText">
+				<FontString name="$parentOnlineText" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentGuildText" relativePoint="TOPLEFT">
 							<Offset><AbsDimension x="0" y="-15"/></Offset>
@@ -2404,7 +2404,7 @@
 					</Anchors>
 				</FontString>
 				<!-->Filter my friends text<-->
-				<FontString name="$parentMyFriendsText" inherits="GLDG_LOptionText">
+				<FontString name="$parentMyFriendsText" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentUnassignedText" relativePoint="TOPLEFT">
 							<Offset><AbsDimension x="160" y="-15"/></Offset>
@@ -2412,7 +2412,7 @@
 					</Anchors>
 				</FontString>
 				<!-->Filter with friends text<-->
-				<FontString name="$parentWithFriendsText" inherits="GLDG_LOptionText">
+				<FontString name="$parentWithFriendsText" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentMyFriendsText" relativePoint="TOPLEFT">
 							<Offset><AbsDimension x="0" y="-15"/></Offset>
@@ -2420,7 +2420,7 @@
 					</Anchors>
 				</FontString>
 				<!-->Filter current channel text<-->
-				<FontString name="$parentCurrentChannelText" inherits="GLDG_LOptionText">
+				<FontString name="$parentCurrentChannelText" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentUnassignedText" relativePoint="TOPLEFT">
 							<Offset><AbsDimension x="320" y="-15"/></Offset>
@@ -2428,7 +2428,7 @@
 					</Anchors>
 				</FontString>
 				<!-->Filter with channel text<-->
-				<FontString name="$parentWithChannelText" inherits="GLDG_LOptionText">
+				<FontString name="$parentWithChannelText" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentCurrentChannelText" relativePoint="TOPLEFT">
 							<Offset><AbsDimension x="0" y="-15"/></Offset>
@@ -2436,7 +2436,7 @@
 					</Anchors>
 				</FontString>
 				<!-->GuildSort text<-->
-				<FontString name="$parentGuildSortText" inherits="GLDG_LOptionText">
+				<FontString name="$parentGuildSortText" inherits="GLDG_LOptionText" wordwrap="false" >
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentAltText" relativePoint="TOPLEFT">
 							<Offset><AbsDimension x="320" y="0"/></Offset>

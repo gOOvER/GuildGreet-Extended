@@ -45,7 +45,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 201401			-- Number code for this version
+GDLG_VNMBR	= 500408			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -59,6 +59,8 @@ GLDG_SubTab2Frame = {}
 GLDG_SubTab2Frame.Tab1 = "General"
 GLDG_SubTab2Frame.Tab2 = "Chat"
 GLDG_SubTab2Frame.Tab3 = "Greeting"
+--GLDG_SubTab2Frame.Tab4 = "Debug"
+GLDG_SubTab2Frame.Tab4 = "Other"
 
 
 -- Strings we look for
@@ -106,6 +108,8 @@ GLDG_Player = nil		        -- Name of the current player
 GLDG_shortName = nil            -- Playername without Server
 GLDG_GuildName = nil		    -- Name of your guild
 GLDG_GuildAlias = nil		    -- Alias of your guild
+GLDG_GuildLeader = nil
+GLDG_unique_GuildName = nil
 GLDG_NewGuild = nil		        -- Set if initializing a new guild
 GLDG_InitialGuildUpdate = nil	-- To make sure we get at least one update
 GLDG_InitialFriendsUpdate = nil	-- To make sure we get at least one update
@@ -280,7 +284,7 @@ function GLDG_OnEvent(self, event, ...)
 
 	elseif (event == "GUILD_ROSTER_UPDATE") then
 		if IsInGuild() then
-			if (GLDG_GuildName and GLDG_Realm and GLDG_GuildName~="") then
+			if (GLDG_unique_GuildName and GLDG_Realm and GLDG_unique_GuildName~="") then
 				-- guild name known -> treat guild info
 				GLDG_RosterImport()
 			else
@@ -575,7 +579,7 @@ function GLDG_Init()
 	GLDG_ChannelName = ""
 
 	-- Keep version in configuration file
-	GLDG_Data.Version = GDLG_VNMBR
+--	GLDG_Data.Version = GDLG_VNMBR
 
 	-- Prepare popup dialogs
 	GLDG_PrepareReloadQuestion()
@@ -929,27 +933,42 @@ function GLDG_InitRoster()
 	if not GLDG_Player then GLDG_Player = UnitName("player") end
 	if not GLDG_GuildName or GLDG_GuildName == "" then GLDG_GuildName = GetGuildInfo("player") end
 	if not GLDG_GuildName then GLDG_GuildName = "" end
-	if (GLDG_GuildName == "") then
+	if not GLDG_unique_GuildName or GLDG_unique_GuildName == "" then
+		local maxMembers = GetNumGuildMembers()
+		if maxMembers == nil then maxMembers = nil end
+		for i = 1, maxMembers do
+			local pl, rn, ri, lv, cl, zn, pn, on, ol, st, enClass, ap, ar, isMobile = GetGuildRosterInfo(i)
+			if ri == 0 then GLDG_GuildLeader = pl end
+		end
+		if GLDG_GuildLeader then
+			GLDG_unique_GuildName = (GLDG_GuildName.."@"..GLDG_GuildLeader)
+			--print("Eindeutiger Gildenname (GG): "..GLDG_unique_GuildName.."!")
+		end
+	end
+	if not GLDG_unique_GuildName then GLDG_unique_GuildName = "" end
+	if (GLDG_unique_GuildName == "") then
 		GLDG_GuildAlias = ""
 	else
-		if not GLDG_Data.GuildAlias[GLDG_Realm.." - "..GLDG_GuildName] then
-			GLDG_Data.GuildAlias[GLDG_Realm.." - "..GLDG_GuildName] = GLDG_GuildName
+		if not GLDG_Data.GuildAlias[GLDG_unique_GuildName] then
+			GLDG_Data.GuildAlias[GLDG_unique_GuildName] = GLDG_unique_GuildName
 		end
-		GLDG_GuildAlias = GLDG_Data.GuildAlias[GLDG_Realm.." - "..GLDG_GuildName]
+		GLDG_GuildAlias = GLDG_Data.GuildAlias[GLDG_unique_GuildName]
 	end
 
 	if not (GLDG_Realm and GLDG_Player) then return end
 
 	-- create character store
-	if (GLDG_Realm) then
-		if (not GLDG_Data["Realm: "..GLDG_Realm]) then
-			GLDG_Data["Realm: "..GLDG_Realm] = {}
-		end
-		-- set character section pointer
-		GLDG_DataChar = GLDG_Data["Realm: "..GLDG_Realm]
-	else
-		GLDG_DataChar = {}
-	end
+--	if (GLDG_Realm) then
+--		if (not GLDG_Data["Realm: "..GLDG_Realm]) then
+--			GLDG_Data["Realm: "..GLDG_Realm] = {}
+--		end
+--		-- set character section pointer
+--		GLDG_DataChar = GLDG_Data["Realm: "..GLDG_Realm]
+--	else
+--		GLDG_DataChar = {}
+--	end
+	if not GLDG_Data["DataChar"] then GLDG_Data["DataChar"] = {} end
+	GLDG_DataChar = GLDG_Data["DataChar"]
 
 	if (GLDG_Realm and GLDG_Player) then
 		-- create channel name store if needed
@@ -967,10 +986,10 @@ function GLDG_InitRoster()
 	end
 	--_G[GLDG_GUI.."Settings".."ChannelNameEditbox"]:SetText(GLDG_ChannelName)
 
-	if (GLDG_Realm and GLDG_GuildName and GLDG_GuildName~="" and GLDG_Player) then
+	if (GLDG_Realm and GLDG_unique_GuildName and GLDG_unique_GuildName~="" and GLDG_Player) then
 		-- Set greetings section pointer
 		if GLDG_InitGreet(GLDG_Realm.."-"..GLDG_Player) and
-		   GLDG_InitGreet(GLDG_Realm.."-"..GLDG_GuildName) and
+		   GLDG_InitGreet(GLDG_unique_GuildName) and
 		   GLDG_InitGreet(GLDG_Realm) then
 			-- No custom collections are used
 			GLDG_DataGreet = GLDG_Data
@@ -984,10 +1003,10 @@ function GLDG_InitRoster()
 
 	-- Update config dialog (can't be done in InitFrame())
 	local name = GLDG_GUI.."SettingsGreeting"
-	if (GLDG_GuildName~="") then
+	if (GLDG_unique_GuildName~="") then
 
-		_G[name.."GuildAliasHeader"]:SetText(GLDG_TXT.guildAlias.."|cFFFFFF7F"..GLDG_GuildName.."|r")
-		if (GLDG_GuildAlias ~= GLDG_GuildName) then
+		_G[name.."GuildAliasHeader"]:SetText(GLDG_TXT.guildAlias.."|cFFFFFF7F"..GLDG_unique_GuildName.."|r")
+		if (GLDG_GuildAlias ~= GLDG_unique_GuildName) then
 			_G[name.."GuildAliasEditbox"]:SetText(GLDG_GuildAlias)
 		else
 			_G[name.."GuildAliasEditbox"]:SetText("")
@@ -998,7 +1017,7 @@ function GLDG_InitRoster()
 		_G[name.."GuildAliasSet"]:Enable("")
 		_G[name.."GuildAliasClear"]:Enable("")
 	else
-		_G[name.."GuildAliasHeader"]:SetText(GLDG_TXT.guildAlias.."|cFFFFFF7F"..GLDG_GuildName.."|r")
+		_G[name.."GuildAliasHeader"]:SetText(GLDG_TXT.guildAlias.."|cFFFFFF7F"..GLDG_unique_GuildName.."|r")
 		_G[name.."GuildAliasWarning"]:SetText(GLDG_TXT.guildNoAlias)
 		_G[name.."GuildAliasEditbox"]:SetText("")
 
@@ -1057,15 +1076,15 @@ end
 function GLDG_ClickGuildAliasSet()
 	local name = GLDG_GUI.."SettingsGreeting"
 	GLDG_GuildAlias = _G[name.."GuildAliasEditbox"]:GetText()
-	GLDG_Data.GuildAlias[GLDG_Realm.." - "..GLDG_GuildName] = GLDG_GuildAlias
+	GLDG_Data.GuildAlias[GLDG_unique_GuildName] = GLDG_GuildAlias
 
 	_G[name.."GuildAliasEditbox"]:ClearFocus()
 end
 
 ------------------------------------------------------------
 function GLDG_ClickGuildAliasClear()
-	GLDG_GuildAlias = GLDG_GuildName
-	GLDG_Data.GuildAlias[GLDG_Realm.." - "..GLDG_GuildName] = GLDG_GuildAlias
+	GLDG_GuildAlias = GLDG_unique_GuildName
+	GLDG_Data.GuildAlias[GLDG_unique_GuildName] = GLDG_GuildAlias
 
 	local name = GLDG_GUI.."SettingsGreeting"
 	_G[name.."GuildAliasEditbox"]:SetText("")
@@ -1083,7 +1102,7 @@ function GLDG_OnUpdate(self, elapsed)
 		if (GetTime() >= GLDG_UpdateRequest) then
 
 			-- yes: treat guild information
-			if not (GLDG_Realm and GLDG_GuildName and GLDG_GuildName~="") then
+			if not (GLDG_Realm and GLDG_unique_GuildName and GLDG_unique_GuildName~="") then
 				-- some information is still missing - try to get it
 				GLDG_InitRoster()
 
@@ -1153,15 +1172,58 @@ end
 ------------------------------
 
 function GLDG_RosterImport()
-	if (not GLDG_GuildName or GLDG_GuildName == "") then
+	if (not GLDG_unique_GuildName or GLDG_unique_GuildName == "") then
 		return
 	end
-
+	if GLDG_Data.Version and (GLDG_Data.Version < 500408) then
+	GLDG_Convert = 1
+	local newname
+		for i in pairs(GLDG_Data) do
+			if string.find(i, "Realm: ") then
+				local _, oldrealm = string.split(":", i)
+				for oName in pairs(GLDG_Data[i]) do
+					local uName, uRealm = string.split("-", oName)
+					if not uRealm then
+						newname = uName.."-"..string.gsub(oldrealm, " ", "")
+					else
+						newname = string.gsub(oName, " ", "")
+					end
+					if GLDG_Data[i][oName].alt then
+						local altName, altRealm = string.split("-", GLDG_Data[i][oName].alt)
+						if not altRealm then
+							GLDG_Data[i][oName].alt = altName.."-"..string.gsub(oldrealm, " ", "")							
+						else
+							GLDG_Data[i][oName].alt = string.gsub(GLDG_Data[i][oName].alt, " ", "")						
+						end
+					end
+					if GLDG_Data[i][oName].last then
+						local lastName, lastRealm = string.split("-", GLDG_Data[i][oName].last)
+						if not lastRealm then
+							GLDG_Data[i][oName].last = lastName.."-"..string.gsub(oldrealm, " ", "")							
+						else
+							GLDG_Data[i][oName].last = string.gsub(GLDG_Data[i][oName].last, " ", "")						
+						end
+					end
+					if GLDG_Data[i][oName].promoter then
+						local promoName, promoRealm = string.split("-", GLDG_Data[i][oName].promoter)
+						if not promoRealm then
+							GLDG_Data[i][oName].promoter = promoName.."-"..string.gsub(oldrealm, " ", "")							
+						else
+							GLDG_Data[i][oName].promoter = string.gsub(GLDG_Data[i][oName].promoter, " ", "")						
+						end
+					end						
+					GLDG_DataChar[newname] = GLDG_Data[i][oName]
+				end
+				GLDG_Data[i] = nil
+			end
+		end
+	GLDG_Data.Version = GDLG_VNMBR	
+	end
 	GLDG_SetActiveColourSet("guild")
 
 	-- Update guildrank names
-	GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName] = {}
-	for i = 1, GuildControlGetNumRanks() do GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][GuildControlGetRankName(i)] = i end
+	GLDG_Data.Ranks[GLDG_unique_GuildName] = {}
+	for i = 1, GuildControlGetNumRanks() do GLDG_Data.Ranks[GLDG_unique_GuildName][GuildControlGetRankName(i)] = i end
 	
 	-- Add info about all players of your guild
 	local mains = {}
@@ -1174,7 +1236,7 @@ function GLDG_RosterImport()
 	for i = 1, maxMembers do
 		local pl, rn, ri, lv, cl, zn, pn, on, ol, st, enClass = GetGuildRosterInfo(i)
 		local GLDG_shortName, realm = string.split("-", pl)
-		if string.gsub(GLDG_Realm, " ", "") == realm then pl = GLDG_shortName end
+		if not realm then pl = GLDG_shortName.."-"..string.gsub(GLDG_Realm, " ", "") end
 		if pl then
 			cnt = cnt +1
 			if not GLDG_DataChar[pl] then
@@ -1183,14 +1245,13 @@ function GLDG_RosterImport()
 				if (not GLDG_NewGuild) and (not GLDG_Data.SupressJoin) and (GLDG_TableSize(GLDG_DataGreet.Welcome) > 0) then
 					GLDG_DataChar[pl].new = true
 				end
-				GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaNewMember.." ["..pl.."]")
+				GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaNewMember.." ["..Ambiguate(pl, "guild").."]")
 			end
 			if (pl == UnitName("player")) then
 				-- This player is our own: ignore completely
 				GLDG_DataChar[pl].own = true
 				--GLDG_DataChar[pl].ignore = true
 			end
-
 			if (GLDG_Data.AutoAssign) then
 				-- detect if note contains "Main[ <discardable text>]"
 				if (pn == "Main" or string.sub(pn, 1, 5)=="Main ") then
@@ -1207,72 +1268,56 @@ function GLDG_RosterImport()
 					local main = string.sub(pn, 5)
 					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
 					if a then
-						main = c
+						main = GLDG_findMainname(c, pl)
 					end
-					local d,e = string.gsub(main, "_", " ")
-					main = d
 					alts[pl] = main
-					print("Main: " ..main .."!")
 				elseif (on and string.sub(on, 1, 4)=="alt-") then
 					local main = string.sub(on, 5)
 					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
 					if a then
-						main = c
+						main = GLDG_findMainname(c, pl)
 					end
-					local d,e = string.gsub(main, "_", " ")
-					main = d
 					alts[pl] = main
 				-- detect if note contains "alt - <main name>[ <discardable text]"
 				elseif (string.sub(pn, 1, 6)=="alt - ") then
 					local main = string.sub(pn, 7)
 					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
 					if a then
-						main = c
+						main = GLDG_findMainname(c, pl)
 					end
-					local d,e = string.gsub(main, "_", " ")
-					main = d
 					alts[pl] = main
 				elseif (on and string.sub(on, 1, 6)=="alt - ") then
 					local main = string.sub(on, 7)
 					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
 					if a then
-						main = c
+						main = GLDG_findMainname(c, pl)
 					end
-					local d,e = string.gsub(main, "_", " ")
-					main = d
 					alts[pl] = main
 				-- detect if note contains "alt <main name>[ <discardable text]"
 				elseif (string.sub(pn, 1, 4)=="alt ") then
 					local main = string.sub(pn, 5)
 					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
 					if a then
-						main = c
+						main = GLDG_findMainname(c, pl)
 					end
-					local d,e = string.gsub(main, "_", " ")
-					main = d
 					alts[pl] = main
 				elseif (on and string.sub(on, 1, 4)=="alt ") then
 					local main = string.sub(on, 5)
 					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
 					if a then
-						main = c
+						main = GLDG_findMainname(c, pl)
 					end
-					local d,e = string.gsub(main, "_", " ")
-					main = d
 					alts[pl] = main
 				-- detect if note contains EGP style information
 				elseif (GLDG_Data.AutoAssignEgp and (on and tonumber(string.sub(on, 1, 1))==nil)) then
 					local main = on
 					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
 					if a then
-						main = c
+						main = GLDG_findMainname(c, pl)
 					end
-					local d,e = string.gsub(main, "_", " ")
-					main = d
 					alts[pl] = main
 				end
 			end
-
 			if cl then
 				GLDG_DataChar[pl].class = cl
 			end
@@ -1280,15 +1325,15 @@ function GLDG_RosterImport()
 			if pn and pn ~= "" then
 				if GLDG_DataChar[pl].pNote then
 					if pn ~= GLDG_DataChar[pl].pNote then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteChanged.." ["..pl.."] "..GLDG_TXT.deltaFrom.." ["..GLDG_DataChar[pl].pNote.."] "..GLDG_TXT.deltaTo.." ["..pn.."]")
+						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteChanged.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaFrom.." ["..GLDG_DataChar[pl].pNote.."] "..GLDG_TXT.deltaTo.." ["..pn.."]")
 					end
 				else
-					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteAdded.." ["..pl.."]. "..GLDG_TXT.deltaIs.." ["..pn.."]")
+					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteAdded.." ["..Ambiguate(pl, "guild").."]. "..GLDG_TXT.deltaIs.." ["..pn.."]")
 				end
 				GLDG_DataChar[pl].pNote = pn
 			else
 				if GLDG_DataChar[pl].pNote then
-					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteRemoved.." ["..pl.."]. ("..GLDG_TXT.deltaWas.." ["..GLDG_DataChar[pl].pNote.."])")
+					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteRemoved.." ["..Ambiguate(pl, "guild").."]. ("..GLDG_TXT.deltaWas.." ["..GLDG_DataChar[pl].pNote.."])")
 				end
 				GLDG_DataChar[pl].pNote = nil
 			end
@@ -1297,15 +1342,15 @@ function GLDG_RosterImport()
 				if on and on ~= "" then
 					if GLDG_DataChar[pl].oNote then
 						if on ~= GLDG_DataChar[pl].oNote then
-							GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteChanged.." ["..pl.."] "..GLDG_TXT.deltaFrom.." ["..GLDG_DataChar[pl].oNote.."] "..GLDG_TXT.deltaTo.." ["..on.."]")
+							GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteChanged.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaFrom.." ["..GLDG_DataChar[pl].oNote.."] "..GLDG_TXT.deltaTo.." ["..on.."]")
 						end
 					else
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteAdded.." ["..pl.."]. "..GLDG_TXT.deltaIs.." ["..on.."]")
+						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteAdded.." ["..Ambiguate(pl, "guild").."]. "..GLDG_TXT.deltaIs.." ["..on.."]")
 					end
 					GLDG_DataChar[pl].oNote = on
 				else
 					if GLDG_DataChar[pl].oNote then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteRemoved.." ["..pl.."]. ("..GLDG_TXT.deltaWas.." ["..GLDG_DataChar[pl].oNote.."])")
+						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteRemoved.." ["..Ambiguate(pl, "guild").."]. ("..GLDG_TXT.deltaWas.." ["..GLDG_DataChar[pl].oNote.."])")
 					end
 					GLDG_DataChar[pl].oNote = nil
 				end
@@ -1326,34 +1371,34 @@ function GLDG_RosterImport()
 				if GLDG_DataChar[pl].newrank and (ri > GLDG_DataChar[pl].newrank) then
 					-- Player got demoted again
 					if (GLDG_DataChar[pl].rankname) then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..pl.."] "..GLDG_TXT.deltaDemoted1.." ["..GLDG_DataChar[pl].rankname.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaDemoted2)
+						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaDemoted1.." ["..GLDG_DataChar[pl].rankname.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaDemoted2)
 					else
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..pl.."] "..GLDG_TXT.deltaDemoted1.." ["..GLDG_DataChar[pl].newrank.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaDemoted2)
+						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaDemoted1.." ["..GLDG_DataChar[pl].newrank.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaDemoted2)
 					end
 					GLDG_DataChar[pl].promotor = nil
 					GLDG_DataChar[pl].newrank = nil
 				elseif GLDG_DataChar[pl].rank and (ri > GLDG_DataChar[pl].rank) then
 					-- Player got demoted
 					if (GLDG_DataChar[pl].rankname) then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..pl.."] "..GLDG_TXT.deltaDemoted1.." ["..GLDG_DataChar[pl].rankname.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaDemoted2)
+						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaDemoted1.." ["..GLDG_DataChar[pl].rankname.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaDemoted2)
 					else
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..pl.."] "..GLDG_TXT.deltaDemoted1.." ["..GLDG_DataChar[pl].rank.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaDemoted2)
+						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaDemoted1.." ["..GLDG_DataChar[pl].rank.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaDemoted2)
 					end
 				elseif GLDG_DataChar[pl].newrank and (ri < GLDG_DataChar[pl].newrank) then
 					-- Player got promoted again
 					if (GLDG_DataChar[pl].rankname) then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..pl.."] "..GLDG_TXT.deltaPromoted1.." ["..GLDG_DataChar[pl].rankname.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaPromoted2)
+						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaPromoted1.." ["..GLDG_DataChar[pl].rankname.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaPromoted2)
 					else
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..pl.."] "..GLDG_TXT.deltaPromoted1.." ["..GLDG_DataChar[pl].newrank.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaPromoted2)
+						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaPromoted1.." ["..GLDG_DataChar[pl].newrank.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaPromoted2)
 					end
 					GLDG_DataChar[pl].promotor = nil
 					GLDG_DataChar[pl].newrank = ri
 				elseif GLDG_DataChar[pl].rank and (ri < GLDG_DataChar[pl].rank) then
 					-- Player got promoted
 					if (GLDG_DataChar[pl].rankname) then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..pl.."] "..GLDG_TXT.deltaPromoted1.." ["..GLDG_DataChar[pl].rankname.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaPromoted2)
+						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaPromoted1.." ["..GLDG_DataChar[pl].rankname.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaPromoted2)
 					else
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..pl.."] "..GLDG_TXT.deltaPromoted1.." ["..GLDG_DataChar[pl].rank.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaPromoted2)
+						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaPromoted1.." ["..GLDG_DataChar[pl].rank.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaPromoted2)
 					end
 					GLDG_DataChar[pl].newrank = ri
 				end
@@ -1398,7 +1443,7 @@ function GLDG_RosterImport()
 				end
 				-- Add promoted player to queue if hour is known
 				if GLDG_DataChar[pl].newrank and GLDG_RankUpdate[pl] and (not GLDG_Queue[pl]) then
-					GLDG_Queue[pl] = GLDG_RankUpdate[pl]
+					GLDG_Queue[pl] = GLDG_RankUpdate[Ambiguate(pl, "guild")]
 					update = true
 				end
 
@@ -1407,13 +1452,13 @@ function GLDG_RosterImport()
 				GLDG_DataChar[pl].lvl = lv
 				GLDG_DataChar[pl].storedLvl = nil	-- if the char is online, there is no need to store an old level
 				if (GLDG_DataChar[pl].lvl > GLDG_DataChar[pl].oldlvl) then
-					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..pl.."] "..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[pl].oldlvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(lv).." "..GLDG_TXT.deltaIncrease3)
+					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[pl].oldlvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(lv).." "..GLDG_TXT.deltaIncrease3)
 					if (not GLDG_DataChar[pl].own) then
 						if GLDG_Data.ListLevelUp then
 							if (mainName) then
-								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..pl..": "..cl.."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[pl].oldlvl.." "..GLDG_TXT.lvlIncrease2.." "..lv.." "..GLDG_TXT.lvlIncrease3);
+								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(pl, "guild")..": "..cl.."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[pl].oldlvl.." "..GLDG_TXT.lvlIncrease2.." "..lv.." "..GLDG_TXT.lvlIncrease3);
 							else
-								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..pl..": "..cl.."] "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[pl].oldlvl.." "..GLDG_TXT.lvlIncrease2.." "..lv.." "..GLDG_TXT.lvlIncrease3);
+								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(pl, "guild")..": "..cl.."] "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[pl].oldlvl.." "..GLDG_TXT.lvlIncrease2.." "..lv.." "..GLDG_TXT.lvlIncrease3);
 							end
 						end
 						if ( (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[pl], GLDG_DataGreet.NewLevel)) > 0) and (not GLDG_Data.SupressLevel) and (not GLDG_DataChar[pl].ignore) and (lv > GLDG_Data.MinLevelUp)) then
@@ -1440,12 +1485,12 @@ function GLDG_RosterImport()
 				if (not GLDG_DataChar[pl].own) then
 					if (lv > GLDG_DataChar[pl].lvl) then
 						if ((GLDG_DataChar[pl].storedLvl == nil) or (lv > GLDG_DataChar[pl].storedLvl)) then
-							GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..pl.."] "..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[pl].lvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(lv).." "..GLDG_TXT.deltaIncrease3)
+							GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[pl].lvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(lv).." "..GLDG_TXT.deltaIncrease3)
 							if GLDG_Data.ListLevelUpOff then
 								if (mainName) then
-									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":"..GLDG_GOES_OFFLINE_COLOUR.." ["..pl.."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[pl].lvl.." "..GLDG_TXT.lvlIncrease2.." "..lv.." "..GLDG_TXT.lvlIncrease3.." (off)");
+									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":"..GLDG_GOES_OFFLINE_COLOUR.." ["..Ambiguate(pl, "guild").."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[pl].lvl.." "..GLDG_TXT.lvlIncrease2.." "..lv.." "..GLDG_TXT.lvlIncrease3.." (off)");
 								else
-									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":"..GLDG_GOES_OFFLINE_COLOUR.." ["..pl.."] "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[pl].lvl.." "..GLDG_TXT.lvlIncrease2.." "..lv.." "..GLDG_TXT.lvlIncrease3.." (off)");
+									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":"..GLDG_GOES_OFFLINE_COLOUR.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[pl].lvl.." "..GLDG_TXT.lvlIncrease2.." "..lv.." "..GLDG_TXT.lvlIncrease3.." (off)");
 								end
 							end
 
@@ -1460,7 +1505,7 @@ function GLDG_RosterImport()
 			if (GLDG_Online[pl] == nil) then
 				GLDG_Online[pl] = ol
 			end
-			GLDG_DataChar[pl].guild = GLDG_GuildName
+			GLDG_DataChar[pl].guild = GLDG_unique_GuildName
 		end
 	end
 
@@ -1520,6 +1565,47 @@ function GLDG_RosterImport()
 end
 
 ------------------------------------------------------------
+function GLDG_findMainname(_main, _pl)
+	if _main ~= "Main" then
+		local omain = nil
+		local oDBname = nil
+		local _, uRealm = string.split("-", _main)
+		if not uRealm then
+			omain = _main.."-"
+		else
+			omain = _main
+		end
+		local cntMains = 0
+		local maxMembers = GetNumGuildMembers()
+--		for i in pairs(GLDG_DataChar) do
+		for i = 1, maxMembers do
+			local player = GetGuildRosterInfo(i)
+			local len = string.len(omain)
+			if  string.sub(player, 1, len)==omain then
+				oDBname = player
+				cntMains = cntMains+1
+				if cntMains >= 2 then
+					if CanEditOfficerNote() then
+						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteFrom.." ["..Ambiguate(_pl, "guild").." ] "..GLDG_TXT.deltaOnoteInvalid.." "..GLDG_TXT.deltaOnoteToManyMatches.." [".._main.."]!")
+					end
+					--print("Die Offiziersnotiz von "..pl.." ist ungültig (zu viele Treffer):"..oDBname.."Zähler: "..cnt)
+					_main = nil
+					return _main
+				end
+			end
+		end
+		if cntMains == 0 then
+			if CanEditOfficerNote() then
+				GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteFrom.." ["..Ambiguate(_pl, "guild").." ] "..GLDG_TXT.deltaOnoteInvalid.." [".._main.."] "..GLDG_TXT.deltaOnoteNotFound)
+			end
+			--print("Die Offiziersnotiz von "..pl.." ist ungültig (nicht gefunden) Zähler: "..cntMains)
+		elseif cntMains == 1 then
+			_main = oDBname
+		end
+		return _main
+	end
+end
+------------------------------------------------------------
 function GLDG_RosterPurge()
 	-- Don't purge if list is not complete
 --	if not GetGuildRosterShowOffline() then
@@ -1538,14 +1624,14 @@ function GLDG_RosterPurge()
 		end
 	end
 	for p in pairs(purge) do
-		if (GLDG_DataChar[p].guild and GLDG_DataChar[p].guild==GLDG_GuildName) then
-			GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..p.."] "..GLDG_TXT.deltaLeftGuild)
+		if (GLDG_DataChar[p].guild and GLDG_DataChar[p].guild==GLDG_unique_GuildName) then
+			GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..Ambiguate(p, "guild").."] "..GLDG_TXT.deltaLeftGuild)
 			if GLDG_Data.ListQuit then
 				if (GLDG_DataChar[p] and GLDG_DataChar[p].alt) then
 					local main = GLDG_DataChar[p].alt;
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..p.."] "..GLDG_TXT.leftguild.." {"..main.."}");
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(p, "guild").."] "..GLDG_TXT.leftguild.." {"..Ambiguate(main, "guild").."}");
 				else
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..p.."] "..GLDG_TXT.leftguild);
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(p, "guild").."] "..GLDG_TXT.leftguild);
 				end
 			end
 			-- do not remove char, but remove guild tag
@@ -1579,7 +1665,7 @@ function GLDG_FindAlts(mainName, playerName, colourise)
 
 		local postfix = ""
 		if (GLDG_Data.AddPostfix) then
-			if (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_GuildName) then
+			if (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_unique_GuildName) then
 				-- no postfix for guild members
 			elseif (GLDG_DataChar[player].channels and GLDG_DataChar[player].channels[GLDG_ChannelName]) then
 				postfix = " {c}"
@@ -1592,15 +1678,15 @@ function GLDG_FindAlts(mainName, playerName, colourise)
 
 		if ( GLDG_DataChar[player].main and (player == mainName) ) then
 			if (player == playerName and details~="") then
-				altList = altList..color.."["..player..": "..details..postfix.."]"..endcolor.." ";
+				altList = altList..color.."["..Ambiguate(player, "guild")..": "..details..postfix.."]"..endcolor.." ";
 			else
-				altList = altList..color.."["..player..postfix.."]"..endcolor.." ";
+				altList = altList..color.."["..Ambiguate(player, "guild")..postfix.."]"..endcolor.." ";
 			end
 		elseif ( GLDG_DataChar[player].alt == mainName ) then
 			if (player == playerName and details~="") then
-				altList = altList..color.."("..player..": "..details..postfix..")"..endcolor.." ";
+				altList = altList..color.."("..Ambiguate(player, "guild")..": "..details..postfix..")"..endcolor.." ";
 			else
-				altList = altList..color..player..postfix..endcolor.." ";
+				altList = altList..color..Ambiguate(player, "guild")..postfix..endcolor.." ";
 			end
 		end
 	end
@@ -1624,8 +1710,8 @@ function GLDG_getOnlineList()
 	for i = 0, numTotal do
 		local name, rank, rankIndex, level, class, zone, note, officernote, online, status = GetGuildRosterInfo(i);
 		if ((name ~= nil) and ( online ~= nil)) then
-			local GLDG_shortName, realm = string.split("-", name)
-			if string.gsub(GLDG_Realm, " ", "") == realm then name = GLDG_shortName end
+		local GLDG_shortName, realm = string.split("-", name)
+		if not realm then name = GLDG_shortName.."-"..string.gsub(GLDG_Realm, " ", "") end
 			onList[name] = true;
 		end
 	end
@@ -1748,7 +1834,7 @@ function GLDG_ListForPlayer(playerName, allDetails, onList, print, guildOnly)
 
 			for player in pairs(GLDG_DataChar) do
 
-				if (not guildOnly or (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_GuildName)) then
+				if (not guildOnly or (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_unique_GuildName)) then
 					local color = "";
 					local endcolor = "";
 					if (print) then
@@ -1766,7 +1852,7 @@ function GLDG_ListForPlayer(playerName, allDetails, onList, print, guildOnly)
 
 					local postfix = ""
 					if (GLDG_Data.AddPostfix) then
-						if (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_GuildName) then
+						if (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_unique_GuildName) then
 							-- no postfix for guild members
 						elseif (GLDG_DataChar[player].channels and GLDG_DataChar[player].channels[GLDG_ChannelName]) then
 							postfix = " {c}"
@@ -1779,28 +1865,28 @@ function GLDG_ListForPlayer(playerName, allDetails, onList, print, guildOnly)
 
 					if ( GLDG_DataChar[player].main and (player == mainName) ) then
 						if ((player == playerName) and print and details ~= "") then
-							result = result..color.."["..player..": "..details..postfix.."]"..endcolor.." ";
+							result = result..color.."["..Ambiguate(player, "guild")..": "..details..postfix.."]"..endcolor.." ";
 						elseif (player == playerName) then
-							result = result..color.."["..player..postfix.."]"..endcolor.." ";
+							result = result..color.."["..Ambiguate(player, "guild")..postfix.."]"..endcolor.." ";
 						elseif (playerDetails~="" and print) then
-							result = result..color.."["..player..": "..playerDetails..postfix.."]"..endcolor.." ";
+							result = result..color.."["..Ambiguate(player, "guild")..": "..playerDetails..postfix.."]"..endcolor.." ";
 						else
-							result = result..color.."["..player..postfix.."]"..endcolor.." ";
+							result = result..color.."["..Ambiguate(player, "guild")..postfix.."]"..endcolor.." ";
 						end
 					elseif ( GLDG_DataChar[player].alt == mainName ) then
 						if ((player == playerName) and print and details ~= "") then
-							result = result..color.."("..player..": "..details..postfix..")"..endcolor.." ";
+							result = result..color.."("..Ambiguate(player, "guild")..": "..details..postfix..")"..endcolor.." ";
 						elseif (player == playerName) then
-							result = result..color..player..endcolor.." ";
+							result = result..color..Ambiguate(player, "guild")..endcolor.." ";
 						elseif (playerDetails~="" and print) then
-							result = result..color.."("..player..": "..playerDetails..postfix..")"..endcolor.." ";
+							result = result..color.."("..Ambiguate(player, "guild")..": "..playerDetails..postfix..")"..endcolor.." ";
 						else
-							result = result..color..player..postfix..endcolor.." ";
+							result = result..color..Ambiguate(player, "guild")..postfix..endcolor.." ";
 						end
 					elseif ((player == playerName) and print and details ~= "") then
-						result = result..color.."("..player..": "..details..postfix..")"..endcolor.." ";
+						result = result..color.."("..Ambiguate(player, "guild")..": "..details..postfix..")"..endcolor.." ";
 					elseif (player == playerName) then
-						result = result..color..player..postfix..endcolor.." ";
+						result = result..color..Ambiguate(player, "guild")..postfix..endcolor.." ";
 					end
 				end
 			end
@@ -1852,7 +1938,7 @@ function GLDG_ListAllPlayers(offline, print, guildOnly)
 		end
 		for player in pairs(GLDG_DataChar) do
 			if (not guildOnly and (GLDG_DataChar[player].main or not GLDG_DataChar[player].alt)) or
-			   (guildOnly and ((not GLDG_DataChar[player].main and (not GLDG_DataChar[player].alt) and GLDG_DataChar[player].guild==GLDG_GuildName) or
+			   (guildOnly and ((not GLDG_DataChar[player].main and (not GLDG_DataChar[player].alt) and GLDG_DataChar[player].guild==GLDG_unique_GuildName) or
 			                   (GLDG_DataChar[player].main and GLDG_MainOrAltInCurrentGuild(player)))) then
 					line = GLDG_ListForPlayer(player, false, onList, print);
 					result[i] = line;
@@ -1864,7 +1950,7 @@ function GLDG_ListAllPlayers(offline, print, guildOnly)
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.listonline)
 		end
 		for player in pairs(onList) do
-			if (not guildOnly or (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_GuildName)) then
+			if (not guildOnly or (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_unique_GuildName)) then
 				line = GLDG_ListForPlayer(player, false, onList, print);
 				result[i] = line;
 				i = i+1;
@@ -1881,8 +1967,8 @@ function GLDG_MainOrAltInCurrentGuild(name)
 
 	if name then
 		for p in pairs(GLDG_DataChar) do
-			if (p == name) and (GLDG_DataChar[p].guild and GLDG_DataChar[p].guild == GLDG_GuildName) or				-- is this main, and in guild?
-			   (GLDG_DataChar[p].alt == name) and (GLDG_DataChar[p].guild and GLDG_DataChar[p].guild == GLDG_GuildName) then	-- is this an alt, and in guild?
+			if (p == name) and (GLDG_DataChar[p].guild and GLDG_DataChar[p].guild == GLDG_unique_GuildName) or				-- is this main, and in guild?
+			   (GLDG_DataChar[p].alt == name) and (GLDG_DataChar[p].guild and GLDG_DataChar[p].guild == GLDG_unique_GuildName) then	-- is this an alt, and in guild?
 			   	result = true
 			end
 		end
@@ -1904,23 +1990,23 @@ function GLDG_SystemMsg(msg)
 	-- Check players coming online
 	local _, _, player = string.find(msg, GLDG_ONLINE)
 	if player then
-		GLDG_DebugPrint("detected player coming online: "..player)
 		local GLDG_shortName, realm = string.split("-", player)
-		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
+		if not realm then player = GLDG_shortName.."-"..string.gsub(GLDG_Realm, " ", "") end
+		
 		if (GLDG_DataChar[player] and not GLDG_DataChar[player].ignore) then
 
-			if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_GuildName) and GLDG_DataChar[player].friends and GLDG_DataChar[player].friends[GLDG_Player] and not GLDG_Data.UseFriends then
-				--GLDG_Print("Player ["..player.."] seems to be a friends but friend support has been disabled")
+			if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_unique_GuildName) and GLDG_DataChar[player].friends and GLDG_DataChar[player].friends[GLDG_Player] and not GLDG_Data.UseFriends then
+				--GLDG_Print("Player ["..Ambiguate(player, "guild").."] seems to be a friends but friend support has been disabled")
 				-- this is "only" a friend but friend support has been disabled, stop treating player
 				return
 			end
 
 			-- always send to guild channel if we're in a guild
-			if (GLDG_GuildName ~= "") then
+			if (GLDG_unique_GuildName ~= "") then
 				SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
 			end
 
-			GLDG_DebugPrint("player "..player.." is a member of our guild")
+			GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is a member of our guild")
 			GLDG_Online[player] = GetTime()
 
 			if GLDG_Data.ListNames then
@@ -1947,9 +2033,9 @@ function GLDG_SystemMsg(msg)
 						local alias = GLDG_findAlias(player, 1);
 
 						if (details ~= "") then
-							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_ONLINE_COLOUR..player..": "..details.."|r"..alias)
+							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_ONLINE_COLOUR..Ambiguate(player, "guild")..": "..details.."|r"..alias)
 						else
-							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_ONLINE_COLOUR..player.."|r"..alias)
+							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_ONLINE_COLOUR..Ambiguate(player, "guild").."|r"..alias)
 						end
 					end
 				end
@@ -1974,15 +2060,15 @@ function GLDG_SystemMsg(msg)
 			if GLDG_Offline[player] and (GLDG_Online[player] - GLDG_Offline[player] < GLDG_Data.RelogTime * 60) then
 				return
 			end
-			GLDG_DebugPrint("player "..player.." is not been online in the last "..GLDG_Data.RelogTime.." minutes.")
+			GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is not been online in the last "..GLDG_Data.RelogTime.." minutes.")
 			if GLDG_Offline[player] and ((GLDG_TableSize(GLDG_DataGreet.GreetBack) == 0) or (GLDG_Data.SupressGreet)) then
 				return
 			end
-			GLDG_DebugPrint("player "..player.." is not been online before")
+			GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is not been online before")
 			if not (GLDG_Offline[player] or GLDG_DataChar[player].new or GLDG_DataChar[player].newlvl or GLDG_DataChar[player].newrank) and (GLDG_Data.SupressGreet or (GLDG_TableSize(GLDG_DataGreet.Greet) == 0)) then
 				return
 			end
-			GLDG_DebugPrint("player "..player.." should be greeted")
+			GLDG_DebugPrint("player "..Ambiguate(player, "guild").." should be greeted")
 			GLDG_Queue[player] = GLDG_GetLogtime(player)
 
 			GLDG_ShowQueue()
@@ -1995,10 +2081,10 @@ function GLDG_SystemMsg(msg)
 	local _, _, player = string.find(msg, GLDG_OFFLINE)
 	if player then
 		local GLDG_shortName, realm = string.split("-", player)
-		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
+		if not realm then player = GLDG_shortName.."-"..string.gsub(GLDG_Realm, " ", "") end
 		GLDG_DebugPrint("detected player going offline: "..player)
 		if (GLDG_DataChar[player] and not GLDG_DataChar[player].ignore) then
-			GLDG_DebugPrint("player "..player.." is a member of our guild")
+			GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is a member of our guild")
 			GLDG_Online[player] = nil
 			GLDG_RankUpdate[player] = nil
 			if GLDG_DataChar[player].alt then
@@ -2037,9 +2123,9 @@ function GLDG_SystemMsg(msg)
 						local alias = GLDG_findAlias(player, 0);
 
 						if (details ~= "") then
-							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_GOES_OFFLINE_COLOUR..player..": "..details.."|r"..alias)
+							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_GOES_OFFLINE_COLOUR..Ambiguate(player, "guild")..": "..details.."|r"..alias)
 						else
-							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_GOES_OFFLINE_COLOUR..player.."|r"..alias)
+							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_GOES_OFFLINE_COLOUR..Ambiguate(player, "guild").."|r"..alias)
 						end
 					end
 				end
@@ -2053,12 +2139,12 @@ function GLDG_SystemMsg(msg)
 	local _, _, player = string.find(msg, GLDG_JOINED)
 	if player then
 		local GLDG_shortName, realm = string.split("-", player)
-		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
+		if not realm then player = GLDG_shortName.."-"..string.gsub(GLDG_Realm, " ", "") end
 		if (not GLDG_DataChar[player]) then
 			GLDG_DataChar[player] = {}
 		end
-		if (GLDG_GuildName) then
-			GLDG_DataChar[player].guild = GLDG_GuildName
+		if (GLDG_unique_GuildName) then
+			GLDG_DataChar[player].guild = GLDG_unique_GuildName
 		end
 		GLDG_DebugPrint("detected player joining guild: "..player)
 		GLDG_Online[player] = GetTime()
@@ -2076,15 +2162,15 @@ function GLDG_SystemMsg(msg)
 	local _, _, promo, player, rank = string.find(msg, GLDG_PROMO)
 	if player then
 		local GLDG_shortName, realm = string.split("-", player)
-		if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
+		if not realm then player = GLDG_shortName.."-"..string.gsub(GLDG_Realm, " ", "") end
 	end
 	if GLDG_DataChar[player] then
 		if player and (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.NewRank)) > 0) and (not GLDG_Data.SupressRank) and (not GLDG_DataChar[player].ignore) then
-			GLDG_DebugPrint("detected player getting promotion: "..player.." -> "..rank)
+			--print("detected player getting promotion: "..Ambiguate(player, "guild").." -> "..rank)
 			GLDG_DataChar[player].promoter = promo
 			GLDG_DataChar[player].rankname = rank
-			if GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName] and GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][rank] then
-				GLDG_DataChar[player].rank = GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][rank] - 1 end
+			if GLDG_Data.Ranks[GLDG_unique_GuildName] and GLDG_Data.Ranks[GLDG_unique_GuildName][rank] then
+				GLDG_DataChar[player].rank = GLDG_Data.Ranks[GLDG_unique_GuildName][rank] - 1 end
 			GLDG_RankUpdate[player] = GLDG_GetLogtime(player)
 			GLDG_DataChar[player].newrank = GLDG_DataChar[player].rank
 			if GLDG_Online[player] then
@@ -2097,13 +2183,13 @@ function GLDG_SystemMsg(msg)
 	local _, _, player, rank = string.find(msg, GLDG_DEMOTE)
 	if GLDG_DataChar[player] then
 		if player then
-			local GLDG_shortName, realm = string.split("-", player)
-			if string.gsub(GLDG_Realm, " ", "") == realm then player = GLDG_shortName end
-			GLDG_DebugPrint("detected player getting demotion: "..player.." -> "..rank)
+		local GLDG_shortName, realm = string.split("-", player)
+		if not realm then player = GLDG_shortName.."-"..string.gsub(GLDG_Realm, " ", "") end
+			--print("detected player getting demotion: "..Ambiguate(player, "guild").." -> "..rank)
 			GLDG_DataChar[player].promoter = nil
 			GLDG_DataChar[player].rankname = rank
-			if GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName] and GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][rank] then
-				GLDG_DataChar[player].rank = GLDG_Data.Ranks[GLDG_Realm.."-"..GLDG_GuildName][rank] - 1 end
+			if GLDG_Data.Ranks[GLDG_unique_GuildName] and GLDG_Data.Ranks[GLDG_unique_GuildName][rank] then
+				GLDG_DataChar[player].rank = GLDG_Data.Ranks[GLDG_unique_GuildName][rank] - 1 end
 			GLDG_RankUpdate[player] = GLDG_GetLogtime(player)
 			if GLDG_DataChar[player].newrank then
 				GLDG_DataChar[player].newrank = nil
@@ -2180,7 +2266,7 @@ function GLDG_ShowQueue()
 		local colorName = "list"
 		local setName = "guild"	-- todo: still needed?
 		local postfix = "";
-		if (GLDG_DataChar[queue[cnt]].guild and GLDG_DataChar[queue[cnt]].guild==GLDG_GuildName) then
+		if (GLDG_DataChar[queue[cnt]].guild and GLDG_DataChar[queue[cnt]].guild==GLDG_unique_GuildName) then
 			-- no postfix for guild members
 		elseif (GLDG_DataChar[queue[cnt]].channels and GLDG_DataChar[queue[cnt]].channels[GLDG_ChannelName]) then
 			postfix = " {c}"
@@ -2192,7 +2278,7 @@ function GLDG_ShowQueue()
 			postfix = " {?}"
 		end
 
-		_G[line.."Text"]:SetText(GLDG_Queue[queue[cnt]]..queue[cnt])
+		_G[line.."Text"]:SetText(GLDG_Queue[queue[cnt]]..Ambiguate(queue[cnt], "guild"))
 		_G[line.."Text2"]:SetText(postfix)
 		if (GLDG_DataChar[queue[cnt]]) then
 			if GLDG_DataChar[queue[cnt]].new then
@@ -2259,33 +2345,45 @@ function GLDG_ShowToolTip(self, buttonName)
 	-- Tooltip title: use player name and color
 	local name = string.sub(_G[buttonName.."Text"]:GetText(), 9)
 	local oname = name
+	local oDBname = nil
+	local _, uRealm = string.split("-", oname)
+	if not uRealm then
+		ooname = oname.."-"
+		for i in pairs(GLDG_DataChar) do
+			if string.find(i, ooname) and GLDG_DataChar[i].guild == GLDG_unique_GuildName then
+				oDBname = i
+			end
+		end
+	else
+		oDBname = oname
+	end
 	local logtime = string.sub(_G[buttonName.."Text"]:GetText(), 2, 6)
 	local r, g, b = _G[buttonName.."Text"]:GetTextColor()
 	-- Construct tip
 	local tip = string.format(GLDG_TXT.tipdef, logtime)
-	if GLDG_DataChar[name] then
-		if GLDG_DataChar[name].new then
+	if GLDG_DataChar[oDBname] then
+		if GLDG_DataChar[oDBname].new then
 			if (logtime == "??:??") then
 				tip = GLDG_TXT.tipnew2
 			else
 				tip = string.format(GLDG_TXT.tipnew, logtime)
 			end
 
-		elseif GLDG_DataChar[name].achievment then
-			tip = string.format(GLDG_TXT.tipachv, GLDG_DataChar[name].achievment)
+		elseif GLDG_DataChar[oDBname].achievment then
+			tip = string.format(GLDG_TXT.tipachv, GLDG_DataChar[oDBname].achievment)
 
-		elseif GLDG_DataChar[name].newlvl then
-			tip = string.format(GLDG_TXT.tiplvl, GLDG_DataChar[name].lvl)
+		elseif GLDG_DataChar[oDBname].newlvl then
+			tip = string.format(GLDG_TXT.tiplvl, GLDG_DataChar[oDBname].lvl)
 
-		elseif GLDG_DataChar[name].newrank then
-			if GLDG_DataChar[name].promoter then
+		elseif GLDG_DataChar[oDBname].newrank then
+			if GLDG_DataChar[oDBname].promoter then
 				 if (logtime == "??:??") then
-				 	tip = string.format(GLDG_TXT.tiprank, GLDG_DataChar[name].promoter, GLDG_DataChar[name].rankname)
+				 	tip = string.format(GLDG_TXT.tiprank, Ambiguate(GLDG_DataChar[oDBname].promoter, "guild"), GLDG_DataChar[oDBname].rankname)
 				 else
-				 	tip = string.format(GLDG_TXT.tiprank2, logtime, GLDG_DataChar[name].promoter, GLDG_DataChar[name].rankname)
+				 	tip = string.format(GLDG_TXT.tiprank2, logtime, Ambiguate(GLDG_DataChar[oDBname].promoter, "guild"), GLDG_DataChar[oDBname].rankname)
 				 end
 			else
-				tip = string.format(GLDG_TXT.tiprank3, GLDG_DataChar[name].rankname)
+				tip = string.format(GLDG_TXT.tiprank3, GLDG_DataChar[oDBname].rankname)
 			end
 
 		elseif GLDG_Offline[name] then
@@ -2298,35 +2396,34 @@ function GLDG_ShowToolTip(self, buttonName)
 			tip = string.format(GLDG_TXT.tiprelog, logtime, timestr) end
 
 		-- If this is a main, add last used character to tip
-		if GLDG_DataChar[name].main and GLDG_DataChar[name].last then
-			tip = tip..string.format(GLDG_TXT.tiprelogalt, GLDG_DataChar[name].last)
+		if GLDG_DataChar[oDBname].main and GLDG_DataChar[oDBname].last then
+			tip = tip..string.format(GLDG_TXT.tiprelogalt, Ambiguate(GLDG_DataChar[oDBname].last, "guild"))
 
 		-- If this is not the main, add last used character and main information to tip
-		elseif GLDG_DataChar[name].alt then
-			local main = GLDG_DataChar[name].alt
+		elseif GLDG_DataChar[oDBname].alt then
+			local main = GLDG_DataChar[oDBname].alt
 			if GLDG_DataChar[main] and GLDG_DataChar[main].last then
-				tip = tip..string.format(GLDG_TXT.tiprelogalt, GLDG_DataChar[main].last)
+				tip = tip..string.format(GLDG_TXT.tiprelogalt, Ambiguate(GLDG_DataChar[main].last, "guild"))
 			end
-			tip = tip..string.format(GLDG_TXT.tipalt, GLDG_DataChar[name].alt)
+			tip = tip..string.format(GLDG_TXT.tipalt, Ambiguate(GLDG_DataChar[oDBname].alt, "guild"))
 		end
 
 		-- If player has alias, add to name
-		local oname = name
-		if GLDG_DataChar[oname].alt then
-			name = name.." ["..GLDG_DataChar[oname].alt.."]"
-			if (GLDG_DataChar[GLDG_DataChar[oname].alt] and GLDG_DataChar[GLDG_DataChar[oname].alt].alias) then
-				name = name .." ("..GLDG_DataChar[GLDG_DataChar[oname].alt].alias..")"
+		if GLDG_DataChar[oDBname].alt then
+			name = name.." ["..GLDG_DataChar[oDBname].alt.."]"
+			if (GLDG_DataChar[GLDG_DataChar[oDBname].alt] and GLDG_DataChar[GLDG_DataChar[oDBname].alt].alias) then
+				name = name .." ("..GLDG_DataChar[GLDG_DataChar[oDBname].alt].alias..")"
 			end
-		elseif GLDG_DataChar[oname].alias then
-			name = name.." ("..GLDG_DataChar[oname].alias..")"
+		elseif GLDG_DataChar[oDBname].alias then
+			name = name.." ("..GLDG_DataChar[oDBname].alias..")"
 		end
 
 		-- handle postfix
-		if (GLDG_DataChar[oname].guild and GLDG_DataChar[oname].guild==GLDG_GuildName) then
-			-- no postfix for guild members
-		elseif (GLDG_DataChar[oname].channels and GLDG_DataChar[oname].channels[GLDG_ChannelName]) then
+		if (GLDG_DataChar[oDBname].guild and GLDG_DataChar[oDBname].guild==GLDG_unique_GuildName) then
+			  -- no postfix for guild members
+		elseif (GLDG_DataChar[oDBname].channels and GLDG_DataChar[oDBname].channels[GLDG_ChannelName]) then
 			name = name.." {c}"
-		elseif (GLDG_DataChar[oname].friends and GLDG_DataChar[oname].friends[GLDG_Player]) then
+		elseif (GLDG_DataChar[oDBname].friends and GLDG_DataChar[oDBname].friends[GLDG_Player]) then
 			name = name.." {f}"
 		else
 			name = name.." {?}"
@@ -2353,53 +2450,57 @@ function GLDG_ShowToolTip(self, buttonName)
 	GameTooltip_SetDefaultAnchor(GameTooltip, self)
 	GameTooltip:SetText(name, r, g, b, 1.0, 1)
 	GameTooltip:AddLine(tip, 1, 1, 1, 1.0, 1)
-	if (GLDG_DataChar[oname].alt or GLDG_DataChar[oname].guild or GLDG_DataChar[oname].lvl) then
+	if (GLDG_DataChar[oDBname].alt or GLDG_DataChar[oDBname].guild or GLDG_DataChar[oDBname].lvl) then
 		GameTooltip:AddLine(" ", 1, 1, 1, 1.0, 1)
-		if (GLDG_DataChar[oname].alt) then
-			if (GLDG_DataChar[GLDG_DataChar[oname].alt].alias) then
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, GLDG_DataChar[oname].alt.." ("..GLDG_DataChar[GLDG_DataChar[oname].alt].alias..")", 1, 1, 0, 1, 1, 1)
+		if (GLDG_DataChar[oDBname].alt) then
+			if (GLDG_DataChar[GLDG_DataChar[oDBname].alt].alias) then
+				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, GLDG_DataChar[oDBname].alt.." ("..GLDG_DataChar[GLDG_DataChar[oDBname].alt].alias..")", 1, 1, 0, 1, 1, 1)
 			else
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, GLDG_DataChar[oname].alt, 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, Ambiguate(GLDG_DataChar[oDBname].alt, "guild"), 1, 1, 0, 1, 1, 1)
 			end
 		end
-		if (GLDG_DataChar[oname].guild) then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipGuild, GLDG_DataChar[oname].guild, 1, 1, 0, 1, 1, 1)
+		if (GLDG_DataChar[oDBname].guild) then
+			if GLDG_DataChar[oDBname].guild==GLDG_unique_GuildName then 
+				GameTooltip:AddDoubleLine(GLDG_TXT.tipGuild, GLDG_GuildName, 1, 1, 0, 1, 1, 1)
+			else
+				GameTooltip:AddDoubleLine(GLDG_TXT.tipGuild, GLDG_DataChar[oDBname].guild, 1, 1, 0, 1, 1, 1)
+			end
 		end
-		if GLDG_DataChar[oname].rank and GLDG_DataChar[oname].rankname then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, GLDG_DataChar[oname].rankname.." ("..tostring(GLDG_DataChar[oname].rank)..")", 1, 1, 0, 1, 1, 1)
+		if GLDG_DataChar[oDBname].rank and GLDG_DataChar[oDBname].rankname then
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, GLDG_DataChar[oDBname].rankname.." ("..tostring(GLDG_DataChar[oDBname].rank)..")", 1, 1, 0, 1, 1, 1)
 			added = true
-		elseif GLDG_DataChar[oname].rank then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, tostring(GLDG_DataChar[oname].rank), 1, 1, 0, 1, 1, 1)
+		elseif GLDG_DataChar[oDBname].rank then
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, tostring(GLDG_DataChar[oDBname].rank), 1, 1, 0, 1, 1, 1)
 			added = true
-		elseif GLDG_DataChar[oname].rankname then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, GLDG_DataChar[oname].rankname, 1, 1, 0, 1, 1, 1)
-			added = true
-		end
-		if GLDG_DataChar[oname].pNote then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipPlayerNote, GLDG_DataChar[oname].pNote, 1, 1, 0, 1, 1, 1)
+		elseif GLDG_DataChar[oDBname].rankname then
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, GLDG_DataChar[oDBname].rankname, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
-		if GLDG_DataChar[oname].oNote then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipOfficerNote, GLDG_DataChar[oname].oNote, 1, 1, 0, 1, 1, 1)
+		if GLDG_DataChar[oDBname].pNote then
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipPlayerNote, GLDG_DataChar[oDBname].pNote, 1, 1, 0, 1, 1, 1)
+			added = true
+		end
+		if GLDG_DataChar[oDBname].oNote then
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipOfficerNote, GLDG_DataChar[oDBname].oNote, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 
-		if GLDG_DataChar[oname].class then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipClass, GLDG_DataChar[oname].class, 1, 1, 0, 1, 1, 1)
+		if GLDG_DataChar[oDBname].class then
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipClass, GLDG_DataChar[oDBname].class, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
-		if GLDG_DataChar[oname].storedLvl then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipLevel, GLDG_DataChar[oname].storedLvl, 1, 1, 0, 1, 1, 1)
-		elseif GLDG_DataChar[oname].lvl then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipLevel, GLDG_DataChar[oname].lvl, 1, 1, 0, 1, 1, 1)
+		if GLDG_DataChar[oDBname].storedLvl then
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipLevel, GLDG_DataChar[oDBname].storedLvl, 1, 1, 0, 1, 1, 1)
+		elseif GLDG_DataChar[oDBname].lvl then
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipLevel, GLDG_DataChar[oDBname].lvl, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
-		if (GLDG_DataChar[oname].friends and GLDG_DataChar[oname].friends[GLDG_Player] and GLDG_DataChar[oname].friends[GLDG_Player]~="") then
+		if (GLDG_DataChar[oDBname].friends and GLDG_DataChar[oDBname].friends[GLDG_Player] and GLDG_DataChar[oDBname].friends[GLDG_Player]~="") then
 			GameTooltip:AddLine(" ", 1, 1, 1, 1.0, 1)
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipFriendNote, GLDG_DataChar[oname].friends[GLDG_Player], 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipFriendNote, GLDG_DataChar[oDBname].friends[GLDG_Player], 1, 1, 0, 1, 1, 1)
 		end
-		if GLDG_DataChar[oname].note then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipNote, GLDG_DataChar[oname].note, 1, 1, 0, 1, 1, 1)
+		if GLDG_DataChar[oDBname].note then
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipNote, GLDG_DataChar[oDBname].note, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 	end
@@ -2414,6 +2515,15 @@ end
 function GLDG_ClickName(button, name)
 	-- Strip timestamp from name
 	name = string.sub(name, 9)
+	local _, uRealm = string.split("-", name)
+	if not uRealm then
+		name = name.."-"
+		for i in pairs(GLDG_DataChar) do
+			if string.find(i, name) and GLDG_DataChar[i].guild == GLDG_unique_GuildName then
+				name = i
+			end
+		end
+	end
 	-- Greet the player if left click
 	if (button == "LeftButton") then
 		GLDG_SendGreet(name)
@@ -2569,15 +2679,21 @@ function GLDG_ParseCustomMessage(cname, name, msg)
 	end
 
 	-- prepare our own %-codes
-	local p_c = cname	-- %c = char
-	local p_n = name	-- %n = name as used today (depending on settings)
-	local p_a = cname	-- %a = alias
+	local p_c = Ambiguate(cname, "guild")	-- %c = char
+	local p_n = nil
+	local _, uRealm = string.split("-", name)
+	if not uRealm then
+		p_n = name	-- %n = name as used today (depending on settings)	
+	else
+		p_n = Ambiguate(name, "guild")	-- %n = name as used today (depending on settings)
+	end
+	local p_a = Ambiguate(cname, "guild")	-- %a = alias
 	if (player.alias) then
 		p_a = player.alias
 	end
-	local p_m = cname	-- %m = main if available, %c else
+	local p_m = Ambiguate(cname, "guild")	-- %m = main if available, %c else
 	if (player.alt) then
-		p_m = player.alt
+		p_m = Ambiguate(player.alt, "guild")
 	end
 	local p_A = p_m	-- %A = main alias if available, %a else if available, %m else
 	if (player.alt and GLDG_DataChar[player.alt].alias) then
@@ -2613,9 +2729,9 @@ function GLDG_ParseCustomMessage(cname, name, msg)
 	end
 	local p_g = ""	-- %g = guild alias if available, else guild if available, else empty
 	local p_G = ""	-- %G = guild name if available, else empty
-	if (GLDG_GuildName ~= "") then
-		p_g = GLDG_GuildName
-		p_G = GLDG_GuildName
+	if (GLDG_unique_GuildName ~= "") then
+		p_g = GLDG_unique_GuildName
+		p_G = GLDG_unique_GuildName
 	end
 	if (GLDG_GuildAlias ~= "") then
 		p_g = GLDG_GuildAlias
@@ -2710,13 +2826,22 @@ function GLDG_SendGreet(name, testing)
 	greetSize = GLDG_TableSize(names)
 	if GLDG_Data.Randomize and (greetSize ~= 0) then
 		name = names[math.random(greetSize)]
+		local uName, uRealm = string.split("-", oName)
+		if uRealm then
+		name = Ambiguate(name, "guild")
+		end
 	end
 
 	-- parse for our own %-codes
 	local message = GLDG_ParseCustomMessage(cname, name, msg)
 
 	-- still replace first and second %s to support old messages
-	message = string.format(message, name, option)
+--	local uName, uRealm = string.split("-", name)
+--		if uRealm then
+--			message = string.format(message, Ambiguate(name, "guild"), option)
+--		else
+			message = string.format(message, name, option)
+--		end
 
 	-- Send greeting
 	if (testing) then
@@ -2726,7 +2851,7 @@ function GLDG_SendGreet(name, testing)
 			-- manual whisper setting overrides all
 			SendChatMessage(message, "WHISPER", nil, cname)
 
-		elseif (player.guild and player.guild == GLDG_GuildName) then
+		elseif (player.guild and player.guild == GLDG_unique_GuildName) then
 			-- in same guild as this char
 			SendChatMessage(message, "GUILD")
 
@@ -2816,6 +2941,7 @@ function GLDG_SendBye(name, testing)
 	local message = GLDG_ParseCustomMessage(cname, name, msg)
 
 	-- still replace first and second %s to support old messages
+	--print("Name: "..name.." Message: "..message.." Option: "..option)
 	message = string.format(message, name, option)
 
 	-- Send good bye
@@ -2825,7 +2951,7 @@ function GLDG_SendBye(name, testing)
 		if GLDG_Data.Whisper then
 			SendChatMessage(message, "WHISPER", nil, cname)
 
-		elseif (player.guild and player.guild == GLDG_GuildName) then
+		elseif (player.guild and player.guild == GLDG_unique_GuildName) then
 			SendChatMessage(message, "GUILD")
 
 		elseif (GLDG_ChannelName and player.channels and player.channels[GLDG_ChannelName]) then
@@ -2853,7 +2979,7 @@ end
 
 ------------------------------------------------------------
 function GLDG_GreetGuild()
-	if (GLDG_GuildName=="") then return end
+	if (GLDG_unique_GuildName=="") then return end
 
 	local list = GLDG_DataGreet.Guild
 	list = GLDG_FilterMessages(nil, list)
@@ -2898,7 +3024,7 @@ end
 
 ------------------------------------------------------------
 function GLDG_ByeGuild()
-	if (GLDG_GuildName=="") then return end
+	if (GLDG_unique_GuildName=="") then return end
 
 	local list = GLDG_DataGreet.ByeGuild
 	-- if time is between 20:00 and 06:00 use night mode
@@ -2953,7 +3079,7 @@ end
 
 ------------------------------------------------------------
 function GLDG_LaterGuild()
-	if (GLDG_GuildName=="") then return end
+	if (GLDG_unique_GuildName=="") then return end
 
 	local list = GLDG_DataGreet.LaterGuild
 	list = GLDG_FilterMessages(nil, list)
@@ -3290,7 +3416,7 @@ function GLDG_UpdateChatFrame(self)
 		else
 			local name, fontSize, r, g, b, alpha, shown, locked, docked = GetChatWindowInfo(GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm])
 			text:SetText(string.format(GLDG_TXT.chatFrame, GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm], name))
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Now using chat frame "..GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm].." ("..name..")")
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Now using chat frame "..GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm].." ("..Ambiguate(name, "guild")..")")
 		end
 
 		GLDG_updatingChatFrame = nil
@@ -3522,10 +3648,10 @@ function GLDG_ShowCustom(frame)
 	if not d then f:SetText(GLDG_TXT.nodef)
 	elseif (d == "") then f:SetText(GLDG_TXT.colglobal)
 	else f:SetText(d) end
-	d = GLDG_Data.Custom[GLDG_Realm.."-"..GLDG_GuildName]
+	d = GLDG_Data.Custom[GLDG_unique_GuildName]
 	if d and (d ~= "") and not GLDG_Data.Collections[d] then
 		-- Collection no longer exists
-		GLDG_Data.Custom[GLDG_Realm.."-"..GLDG_GuildName] = nil
+		GLDG_Data.Custom[GLDG_unique_GuildName] = nil
 		d = nil end
 	f = _G[frame.."SubCustomGuild"]
 	if not d then f:SetText(GLDG_TXT.nodef)
@@ -3542,7 +3668,7 @@ function GLDG_ShowCustom(frame)
 	else f:SetText(d) end
 	-- Set greetings section pointer at is possibly changed
 	if GLDG_InitGreet(GLDG_Realm.."-"..UnitName("player")) and
-	   GLDG_InitGreet(GLDG_Realm.."-"..GLDG_GuildName) and
+	   GLDG_InitGreet(GLDG_unique_GuildName) and
 	   GLDG_InitGreet(GLDG_Realm) then
 		-- No custom collections are used
 		GLDG_DataGreet = GLDG_Data end
@@ -3598,7 +3724,7 @@ function GLDG_ClickChangeCustom(self, setting, frame)
 	GLDG_ChangeName = GLDG_Realm
 	if (setting == "guild") then
 		_G[frame.."SubChangeHeader"]:SetText(GLDG_TXT.cbguild)
-		GLDG_ChangeName = GLDG_ChangeName.."-"..GLDG_GuildName
+		GLDG_ChangeName = GLDG_unique_GuildName
 	elseif (setting == "char") then
 		_G[frame.."SubChangeHeader"]:SetText(GLDG_TXT.cbplayer)
 		GLDG_ChangeName = GLDG_ChangeName.."-"..UnitName("player")
@@ -3807,7 +3933,7 @@ function GLDG_ListPlayers()
 			local show = GLDG_Data.ShowIgnore or not p.ignore
 			show = show and ((p.alt == GLDG_SelPlrName) or (p.alt == s.alt) or not p.alt or GLDG_Data.ShowAlt)
 			show = show and (((not p.alt) and (not p.main)) or not GLDG_Data.FilterUnassigned)
-			show = show and ((p.guild and p.guild == GLDG_GuildName) or not GLDG_Data.FilterGuild)
+			show = show and ((p.guild and p.guild == GLDG_unique_GuildName) or not GLDG_Data.FilterGuild)
 			show = show and (GLDG_Online[player] or not GLDG_Data.FilterOnline)
 			show = show and ((p.friends and p.friends[GLDG_Player]) or not GLDG_Data.FilterMyFriends)
 			show = show and (p.friends or not GLDG_Data.FilterWithFriends)
@@ -4098,7 +4224,11 @@ function GLDG_ShowPlayerToolTip(element)
 		GameTooltip:SetText(head, 1, 1, 0.5, 1.0, 1)
 
 		if p.guild then
-			GameTooltip:AddLine("<"..p.guild..">", 1, 1, 0.75)
+			if p.guild==GLDG_unique_GuildName then
+				GameTooltip:AddLine("<"..GLDG_GuildName..">", 1, 1, 0.75)
+			else
+				GameTooltip:AddLine("<"..p.guild..">", 1, 1, 0.75)
+			end
 		end
 		if p.ignore then
 			GameTooltip:AddLine(GLDG_TXT.tipIgnore, 1, 0, 0)
@@ -4120,9 +4250,9 @@ function GLDG_ShowPlayerToolTip(element)
 				if GLDG_DataChar[q].alt and GLDG_DataChar[q].alt == name then
 					if first then
 						first = false
-						GameTooltip:AddDoubleLine(GLDG_TXT.tipAlts, q, 1, 1, 0, 1, 1, 1)
+						GameTooltip:AddDoubleLine(GLDG_TXT.tipAlts, Ambiguate(q, "guild"), 1, 1, 0, 1, 1, 1)
 					else
-						GameTooltip:AddDoubleLine(" ", q, 1, 1, 0, 1, 1, 1)
+						GameTooltip:AddDoubleLine(" ", Ambiguate(q, "guild"), 1, 1, 0, 1, 1, 1)
 					end
 					added = true
 					hasAlts = true
@@ -4133,19 +4263,19 @@ function GLDG_ShowPlayerToolTip(element)
 			end
 		elseif p.alt then
 			if (GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].alias) then
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, p.alt.." ("..GLDG_DataChar[p.alt].alias..")", 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, Ambiguate(p.alt, "guild").." ("..GLDG_DataChar[p.alt].alias..")", 1, 1, 0, 1, 1, 1)
 			else
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, p.alt, 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, Ambiguate(p.alt, "guild"), 1, 1, 0, 1, 1, 1)
 			end
 			local first = true
 			for q in pairs(GLDG_DataChar) do
 				if GLDG_DataChar[q].alt and GLDG_DataChar[q].alt == p.alt and q ~= name then
 					if first then
 						first = false
-						GameTooltip:AddDoubleLine(GLDG_TXT.tipAlts, q, 1, 1, 0, 1, 1, 1)
+						GameTooltip:AddDoubleLine(GLDG_TXT.tipAlts, Ambiguate(q, "guild"), 1, 1, 0, 1, 1, 1)
 						added = true
 					else
-						GameTooltip:AddDoubleLine(" ", q, 1, 1, 0, 1, 1, 1)
+						GameTooltip:AddDoubleLine(" ", Ambiguate(q, "guild"), 1, 1, 0, 1, 1, 1)
 						added = true
 					end
 				end
@@ -4158,7 +4288,11 @@ function GLDG_ShowPlayerToolTip(element)
 		end
 
 		if p.guild then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipGuild, p.guild, 1, 1, 0, 1, 1, 1)
+			if p.guild==GLDG_unique_GuildName then
+				GameTooltip:AddDoubleLine(GLDG_TXT.tipGuild, GLDG_GuildName, 1, 1, 0, 1, 1, 1)
+			else
+				GameTooltip:AddDoubleLine(GLDG_TXT.tipGuild, p.guild, 1, 1, 0, 1, 1, 1)
+			end
 			added = true
 			if p.new then
 				GameTooltip:AddDoubleLine(" ", GLDG_TXT.tipNew, 1, 1, 0, 1, 1, 1)
@@ -4239,10 +4373,10 @@ function GLDG_ShowPlayerToolTip(element)
 		end
 
 		if p.last then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipLast, p.last, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipLast, Ambiguate(p.last, "guild"), 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif p.alt and GLDG_DataChar[p.alt].last then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipLast, GLDG_DataChar[p.alt].last, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipLast, Ambiguate(GLDG_DataChar[p.alt].last, "guild"), 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 
@@ -4371,7 +4505,7 @@ function GLDG_ShowPlayerButtons()
 	-- Guild button
 	button = _G[frame.."Guild"]
 	button:Show()
-	if (p.guild and p.guild == GLDG_GuildName) then
+	if (p.guild and p.guild == GLDG_unique_GuildName) then
 		button:Disable()
 	else
 		button:Enable()
@@ -4391,7 +4525,7 @@ function GLDG_ShowPlayerButtons()
 	-- Remove button
 	button = _G[frame.."Remove"]
 	button:Show()
-	--if (not p.friends or GLDG_TableSize(p.friends)==0) and (not p.guild or p.guild ~= GLDG_GuildName) and (not p.alt) and (not p.main) then
+	--if (not p.friends or GLDG_TableSize(p.friends)==0) and (not p.guild or p.guild ~= GLDG_unique_GuildName) and (not p.alt) and (not p.main) then
 	if (not p.alt and not p.main) then
 		button:Enable()
 	else
@@ -4596,9 +4730,9 @@ end
 function GLDG_SendWho(name)
 	if name then
 		if (GLDG_Data.ShowWhoSpam) then
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.request.." ["..name.."]")
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.request.." ["..Ambiguate(name, "guild").."]")
 		end
-		SendWho('n-"'..name..'"')
+		SendWho('n-"'..Ambiguate(name, "guild")..'"')
 	end
 end
 
@@ -5016,7 +5150,7 @@ function GLDG_FriendsUpdate()
 			-- update data for this friend
 			if (GLDG_DataChar[name] == nil) then
 				GLDG_DataChar[name] = {}
-				GLDG_AddToStartupList(GLDG_TXT.deltaFriends..": "..GLDG_TXT.deltaNewFriend.." ["..name.."]")
+				GLDG_AddToStartupList(GLDG_TXT.deltaFriends..": "..GLDG_TXT.deltaNewFriend.." ["..Ambiguate(name, "guild").."]")
 			end
 			if (GLDG_DataChar[name].lvl == nil) then
 				GLDG_DataChar[name].lvl = level
@@ -5026,7 +5160,7 @@ function GLDG_FriendsUpdate()
 				if (connected) then
 					-- Update player level
 					if (level > GLDG_DataChar[name].lvl) then
-						GLDG_AddToStartupList(GLDG_TXT.deltaFriends..": ["..name.."]"..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[name].lvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(level).." "..GLDG_TXT.deltaIncrease3)
+						GLDG_AddToStartupList(GLDG_TXT.deltaFriends..": ["..Ambiguate(name, "guild").."]"..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[name].lvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(level).." "..GLDG_TXT.deltaIncrease3)
 						if GLDG_Data.ListLevelUp then
 
 							local mainName = nil
@@ -5049,9 +5183,9 @@ function GLDG_FriendsUpdate()
 							end
 
 							if (mainName) then
-								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..name.."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[name].lvl.." "..GLDG_TXT.lvlIncrease2.." "..level.." "..GLDG_TXT.lvlIncrease3);
+								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(name, "guild").."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[name].lvl.." "..GLDG_TXT.lvlIncrease2.." "..level.." "..GLDG_TXT.lvlIncrease3);
 							else
-								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..name.."] "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[name].lvl.." "..GLDG_TXT.lvlIncrease2.." "..level.." "..GLDG_TXT.lvlIncrease3);
+								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(name, "guild").."] "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[name].lvl.." "..GLDG_TXT.lvlIncrease2.." "..level.." "..GLDG_TXT.lvlIncrease3);
 							end
 						end
 						if (GLDG_TableSize(GLDG_DataGreet.NewLevel) > 0) and (not GLDG_Data.SupressLevel) and (not GLDG_DataChar[name].ignore) and (level > GLDG_Data.MinLevelUp) then
@@ -5125,8 +5259,8 @@ end
 -----------------------------
 function GLDG_TreatAchievment(achievmentLink, name)
 	if not achievmentLink or not name then return end
-	local GLDG_shortName, realm = string.split("-", name)
-	if string.gsub(GLDG_Realm, " ", "") == realm then name = GLDG_shortName end
+		local GLDG_shortName, realm = string.split("-", name)
+		if not realm then name = GLDG_shortName.."-"..string.gsub(GLDG_Realm, " ", "") end
 	-- Check for achievments
 	local _, _, playerLink, achievment = string.find(achievmentLink, GLDG_ACHIEVE)
 	if (achievment) then
@@ -5151,7 +5285,7 @@ function GLDG_TreatAchievment(achievmentLink, name)
 
 		if (main) then
 			if (GLDG_Data.ListAchievments) then
-				GLDG_Print(name..GLDG_Data.colours.help.." {"..main.."}|r "..GLDG_TXT.achieved.." "..tostring(achievment))
+				GLDG_Print(name..GLDG_Data.colours.help.." {"..Ambiguate(main, "guild").."}|r "..GLDG_TXT.achieved.." "..tostring(achievment))
 			end
 		end
 
@@ -5230,11 +5364,11 @@ function GLDG_InitChannel(data)
 					name = string.sub(name, a+1)
 				end
 
-				GLDG_DebugPrint(p..": Name ["..names[p].."] retrieved -> ["..name.."] extracted");
+				GLDG_DebugPrint(p..": Name ["..names[p].."] retrieved -> ["..Ambiguate(name, "guild").."] extracted");
 				if (name) then
 					if (not GLDG_DataChar[name]) then
 						GLDG_DataChar[name] = {}
-						GLDG_AddToStartupList(GLDG_TXT.deltaChannel..": "..GLDG_TXT.deltaNewMember.." ["..name.."]")
+						GLDG_AddToStartupList(GLDG_TXT.deltaChannel..": "..GLDG_TXT.deltaNewMember.." ["..Ambiguate(name, "guild").."]")
 					end
 					if (not GLDG_DataChar[name].channels) then
 						GLDG_DataChar[name].channels = {}
@@ -5274,15 +5408,15 @@ function GLDG_UpdateChannel(joined, player)
 		GLDG_DataChar[player].channels[GLDG_ChannelName] = GLDG_ChannelName
 
 		if (joined) then
-			GLDG_DebugPrint("Player ["..player.."] joined channel ["..GLDG_ChannelName.."]")
+			GLDG_DebugPrint("Player ["..Ambiguate(player, "guild").."] joined channel ["..GLDG_ChannelName.."]")
 
 			if (GLDG_DataChar[player] and not GLDG_DataChar[player].ignore) then
-				GLDG_DebugPrint("player "..player.." is a member of our channel")
+				GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is a member of our channel")
 				GLDG_Online[player] = GetTime()
 
 				-- if player is in our guild or on our friend's list, we've already
 				-- listed him above, otherwise, list him now
-				if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_GuildName) and
+				if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_unique_GuildName) and
 				   (not GLDG_DataChar[player].friends or not GLDG_DataChar[player].friends[GLDG_Player]) then
 					if GLDG_Data.ListNames then
 						if GLDG_DataChar[player].alt then
@@ -5308,9 +5442,9 @@ function GLDG_UpdateChannel(joined, player)
 								local alias = GLDG_findAlias(player, 1);
 
 								if (details ~= "") then
-									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_ONLINE_COLOUR..player..": "..details.."|r"..alias.." {c}")
+									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_ONLINE_COLOUR..Ambiguate(player, "guild")..": "..details.."|r"..alias.." {c}")
 								else
-									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_ONLINE_COLOUR..player.."|r"..alias.." {c}")
+									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_ONLINE_COLOUR..Ambiguate(player, "guild").."|r"..alias.." {c}")
 								end
 							end
 						end
@@ -5318,30 +5452,30 @@ function GLDG_UpdateChannel(joined, player)
 
 					if GLDG_DataChar[player].alt then GLDG_Offline[player] = GLDG_Offline[GLDG_DataChar[player].alt] end
 					if GLDG_Offline[player] and (GLDG_Online[player] - GLDG_Offline[player] < GLDG_Data.RelogTime * 60) then return end
-					GLDG_DebugPrint("player "..player.." is not been online in the last "..GLDG_Data.RelogTime.." minutes.")
+					GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is not been online in the last "..GLDG_Data.RelogTime.." minutes.")
 					if GLDG_Offline[player] and (GLDG_Data.SupressGreet or (GLDG_TableSize(GLDG_DataGreet.GreetBack) == 0)) then return end
-					GLDG_DebugPrint("player "..player.." is not been online before")
+					GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is not been online before")
 					if not GLDG_Offline[player] and (GLDG_Data.SupressGreet or (GLDG_TableSize(GLDG_DataGreet.Greet) == 0)) then return end
-					GLDG_DebugPrint("player "..player.." should be greeted")
+					GLDG_DebugPrint("player "..Ambiguate(player, "guild").." should be greeted")
 					GLDG_Queue[player] = GLDG_GetLogtime(player)
 					GLDG_ShowQueue()
 				end
 
 				-- if no class info is available, this player has never been /who queried before -> do it now
 				-- todo: queue these so they don't get lost if there are too many close together
-				if ((not GLDG_DataChar[player].guild) or (GLDG_DataChar[player].guild ~= GLDG_GuildName)) and (not GLDG_DataChar[player].class or not GLDG_DataChar[player].lvl or (GLDG_DataChar[player].lvl < GLDG_LEVEL_CAP)) and GLDG_Data.AutoWho then
+				if ((not GLDG_DataChar[player].guild) or (GLDG_DataChar[player].guild ~= GLDG_unique_GuildName)) and (not GLDG_DataChar[player].class or not GLDG_DataChar[player].lvl or (GLDG_DataChar[player].lvl < GLDG_LEVEL_CAP)) and GLDG_Data.AutoWho then
 					GLDG_SendWho(player)
 				end
 			end
 
 		else
-			GLDG_DebugPrint("Player ["..player.."] left channel ["..GLDG_ChannelName.."]")
+			GLDG_DebugPrint("Player ["..Ambiguate(player, "guild").."] left channel ["..GLDG_ChannelName.."]")
 
 			if (GLDG_DataChar[player] and not GLDG_DataChar[player].ignore) then
-				GLDG_DebugPrint("player "..player.." is a member of our channel")
+				GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is a member of our channel")
 				-- if player is in our guild or on our friend's list, we'll list
 				-- him again in a second, otherwise, list him now
-				if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_GuildName) and
+				if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_unique_GuildName) and
 				   (not GLDG_DataChar[player].friends or not GLDG_DataChar[player].friends[GLDG_Player]) then
 					GLDG_Online[player] = nil
 					GLDG_RankUpdate[player] = nil
@@ -5383,9 +5517,9 @@ function GLDG_UpdateChannel(joined, player)
 								local alias = GLDG_findAlias(player, 0);
 
 								if (details ~= "") then
-									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_GOES_OFFLINE_COLOUR..player..": "..details.."|r"..alias.." {c}")
+									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_GOES_OFFLINE_COLOUR..Ambiguate(player, "guild")..": "..details.."|r"..alias.." {c}")
 								else
-									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_GOES_OFFLINE_COLOUR..player.."|r"..alias.." {c}")
+									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_GOES_OFFLINE_COLOUR..Ambiguate(player, "guild").."|r"..alias.." {c}")
 								end
 
 
@@ -5574,20 +5708,20 @@ function GLDG_ShowDetails(name)
 	if not name then return end
 
 	if (GLDG_DataChar[name]) then
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..name.."]")
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(name, "guild").."]")
 		for p in pairs(GLDG_DataChar[name]) do
 			if type(GLDG_DataChar[name][p]) == "table" then
 				local l = ""
 				for q in pairs(GLDG_DataChar[name][p]) do
 					l = l..q.." "
 				end
-				GLDG_Print("  "..p.." = "..l)
+				GLDG_Print("  "..Ambiguate(p, "guild").." = "..l)
 			else
-				GLDG_Print("  "..p.." = "..tostring(GLDG_DataChar[name][p]))
+				GLDG_Print("  "..Ambiguate(p, "guild").." = "..tostring(GLDG_DataChar[name][p]))
 			end
 		end
 	else
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.nodata1.." ["..name.."] "..GLDG_TXT.nodata2)
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.nodata1.." ["..Ambiguate(name, "guild").."] "..GLDG_TXT.nodata2)
 	end
 end
 
@@ -5957,7 +6091,7 @@ function GLDG_ColourClick(name)
 				-- open color picker
 				GLDG_ShowColourPicker()
 			else
-				GLDG_Print("--- unknown button ["..name.."] pressed ---")
+				GLDG_Print("--- unknown button ["..Ambiguate(name, "guild").."] pressed ---")
 			end
 		end
 	else
@@ -6228,7 +6362,7 @@ function GLDG_ChatFilter(chatFrame, event, ...) -- chatFrame = self
 		end
 
 		if ((main ~= "") and msg and arg2 and (arg2 ~= GLDG_Player)) then
-			msg = GLDG_Data.colours.help.."{"..main.."}|r "..msg
+			msg = GLDG_Data.colours.help.."{"..Ambiguate(main, "guild").."}|r "..msg
 		end
 
 		--if (treated) then
@@ -6442,7 +6576,7 @@ function GLDG_ShowBigBrother()
 	if (GLDG_Data.BigBrother and GLDG_BigBrother) then
 		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.bigBrother5)
 		for p in pairs(GLDG_BigBrother) do
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..p..": "..GLDG_BigBrother[p])
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..Ambiguate(p, "guild")..": "..GLDG_BigBrother[p])
 		end
 	else
 		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.bigBrother6)
@@ -6579,7 +6713,7 @@ function GLDG_Convert_Guild(realm, guild)
 	if (GLDG_Data[key]) then
 		for name in pairs(GLDG_Data[key]) do
 			if (name ~= nil) then
-				--GLDG_Print("     Treating char ["..name.."]")
+				--GLDG_Print("     Treating char ["..Ambiguate(name, "guild").."]")
 				if (not GLDG_Data[newKey][name]) then
 					GLDG_Data[newKey][name] = {}
 				end
@@ -6633,7 +6767,7 @@ function GLDG_Convert_Channel(realm, channel)
 
 		for name in pairs(GLDG_Data[key]) do
 			if (name ~= nil) then
-				--GLDG_Print("     Treating char ["..name.."]")
+				--GLDG_Print("     Treating char ["..Ambiguate(name, "guild").."]")
 				if (not GLDG_Data[newKey][name]) then
 					GLDG_Data[newKey][name] = {}
 				end
@@ -6688,7 +6822,7 @@ function GLDG_Convert_Friends(realm)
 
 		for name in pairs(GLDG_Data[key].friends) do
 			if (name ~= nil) then
-				--GLDG_Print("     Treating char ["..name.."]")
+				--GLDG_Print("     Treating char ["..Ambiguate(name, "guild").."]")
 				if (not GLDG_Data[newKey][name]) then
 					GLDG_Data[newKey][name] = {}
 				end
@@ -6781,12 +6915,12 @@ function GLDG_Convert_Plausibility_Check(suppressOutput)
 				if (GLDG_DataChar[alt].alt) then
 					-- the main has the same problem as the current char
 					if not suppressOutput then
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..p.."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict3.." ["..GLDG_DataChar[alt].alt.."] "..GLDG_TXT.convertConflict4);
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict3.." ["..GLDG_DataChar[alt].alt.."] "..GLDG_TXT.convertConflict4);
 					end
 				else
 					-- ok, we could just de-main this char and we would be fine
 					if not suppressOutput then
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..p.."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict5);
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict5);
 					end
 				end
 			else
@@ -6794,12 +6928,12 @@ function GLDG_Convert_Plausibility_Check(suppressOutput)
 				if (GLDG_DataChar[alt].alt) then
 					-- the apparent main is not main, but has a main of its own, we could just bend to that char
 					if not suppressOutput then
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..p.."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict6.." ["..GLDG_DataChar[alt].alt.."] "..GLDG_TXT.convertConflict4);
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict6.." ["..GLDG_DataChar[alt].alt.."] "..GLDG_TXT.convertConflict4);
 					end
 				else
 					-- the apparent main is neither main nor has a main, we should probably just set it as main
 					if not suppressOutput then
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..p.."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict7);
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict7);
 					end
 				end
 			end
@@ -6810,7 +6944,7 @@ function GLDG_Convert_Plausibility_Check(suppressOutput)
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alt and GLDG_DataChar[p].alt == p) then
 			fixNeeded = true
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict11.." ["..p.."] "..GLDG_TXT.convertConflict12)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict11.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict12)
 		end
 	end
 
@@ -6822,7 +6956,7 @@ function GLDG_Convert_Plausibility_Check(suppressOutput)
 		if (GLDG_DataChar[p].alt and not GLDG_DataChar[GLDG_DataChar[p].alt]) then
 			fixNeeded = true
 			if not suppressOutput then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..p.."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertConflict13)
+				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertConflict13)
 			end
 		end
 	end
@@ -6835,7 +6969,7 @@ function GLDG_Convert_Plausibility_Check(suppressOutput)
 		if (GLDG_DataChar[p].alt and GLDG_DataChar[GLDG_DataChar[p].alt] and not GLDG_DataChar[GLDG_DataChar[p].alt].main) then
 			fixNeeded = true
 			if not suppressOutput then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..p.."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertConflict10)
+				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertConflict10)
 			end
 		end
 	end
@@ -6870,34 +7004,34 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 				-- char is main
 				if (GLDG_DataChar[alt].alt) then
 					-- the main has the same problem as the current char, let's de-main this char, and check for the higher conflict later
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..p.."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict3.." ["..GLDG_DataChar[alt].alt.."] "..GLDG_TXT.convertFix5);
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict3.." ["..GLDG_DataChar[alt].alt.."] "..GLDG_TXT.convertFix5);
 				else
 					-- ok, we could just de-main this char and we would be fine
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..p.."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertFix1);
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertFix1);
 				end
 				GLDG_DataChar[p].main = nil
 				for q in pairs(GLDG_DataChar) do
 					if GLDG_DataChar[q].alt and GLDG_DataChar[q].alt==p then
 						GLDG_DataChar[q].alt = alt
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r    "..GLDG_TXT.convertFix2.." ["..q.."] "..GLDG_TXT.convertFix3.." ["..p.."] "..GLDG_TXT.convertFix4.." ["..alt.."]");
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r    "..GLDG_TXT.convertFix2.." ["..q.."] "..GLDG_TXT.convertFix3.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertFix4.." ["..alt.."]");
 					end
 				end
 			else
 				-- char is not main - strange
 				if (GLDG_DataChar[alt].alt) then
 					-- the apparent main is not main, but has a main of its own, we could just bend to that char
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..p.."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict6.." ["..GLDG_DataChar[alt].alt.."] "..GLDG_TXT.convertFix7.." ["..p.."] "..GLDG_TXT.convertFix8);
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict6.." ["..GLDG_DataChar[alt].alt.."] "..GLDG_TXT.convertFix7.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertFix8);
 					GLDG_DataChar[p].main = nil
 					GLDG_DataChar[p].alt = GLDG_DataChar[alt].alt
 					for q in pairs(GLDG_DataChar) do
 						if GLDG_DataChar[q].alt and GLDG_DataChar[q].alt==p then
 							GLDG_DataChar[q].alt = GLDG_DataChar[alt].alt
-							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r    "..GLDG_TXT.convertFix2.." ["..q.."] "..GLDG_TXT.convertFix3.." ["..p.."] "..GLDG_TXT.convertFix4.." ["..GLDG_DataChar[alt].alt.."]");
+							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r    "..GLDG_TXT.convertFix2.." ["..q.."] "..GLDG_TXT.convertFix3.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertFix4.." ["..GLDG_DataChar[alt].alt.."]");
 						end
 					end
 				else
 					-- the apparent main is neither main nor has a main, we should probably just set the original character as main
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..p.."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertFix6.." ["..p.."]");
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertFix6.." ["..Ambiguate(p, "guild").."]");
 					GLDG_DataChar[alt].alt = p
 					GLDG_DataChar[p].alt = nil
 				end
@@ -6909,7 +7043,7 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alt and GLDG_DataChar[p].alt == p) then
 			fixNeeded = true
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict11.." ["..p.."] "..GLDG_TXT.convertFix12)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict11.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertFix12)
 			GLDG_DataChar[p].alt = nil
 		end
 	end
@@ -6918,7 +7052,7 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alt and not GLDG_DataChar[GLDG_DataChar[p].alt]) then
 			fixNeeded = true
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..p.."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertFix14)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertFix14)
 			GLDG_DataChar[p].alt = nil
 		end
 	end
@@ -6927,18 +7061,8 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alt and GLDG_DataChar[GLDG_DataChar[p].alt] and not GLDG_DataChar[GLDG_DataChar[p].alt].main) then
 			fixNeeded = true
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..p.."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertFix9)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertFix9)
 			GLDG_DataChar[GLDG_DataChar[p].alt].main = true
-		end
-	end
-	
-	-- check for entries of characters with the same realm in the DB
-	for p in pairs(GLDG_DataChar) do
-		local GLDG_shortName, realm = string.split("-", p)
-		if string.gsub(GLDG_Realm, " ", "") == realm then
-			fixNeeded = true
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ".." delete ["..p.."]")
-			GLDG_DataChar[p] = nil
 		end
 	end
 
@@ -6969,7 +7093,7 @@ function GLDG_Convert_Unnew()
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].new) then
 			GLDG_DataChar[p].new = nil
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.unnew2.." ["..p.."]")
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.unnew2.." ["..Ambiguate(p, "guild").."]")
 		end
 	end
 end
@@ -7048,7 +7172,7 @@ function GLDG_ClickCleanup(self, mode)
 
 	--GLDG_Print("Cleanup for ["..mode.."]")
 	--for p in pairs(GLDG_CleanupList) do
-	--	GLDG_Print("  "..p..": ["..GLDG_CleanupList[p].."]")
+	--	GLDG_Print("  "..Ambiguate(p, "guild")..": ["..GLDG_CleanupList[p].."]")
 	--end
 	--GLDG_Print("Done")
 
@@ -7093,13 +7217,13 @@ function GLDG_CleanupExecute(entry)
 					GLDG_DataChar[p].rankname = nil
 					GLDG_DataChar[p].pNote = nil
 					GLDG_DataChar[p].oNote = nil
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemoveGuild1.." ["..entry.."] "..GLDG_TXT.cleanupRemoveGuild2.." ["..p.."] "..GLDG_TXT.cleanupRemoveGuild3)
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemoveGuild1.." ["..entry.."] "..GLDG_TXT.cleanupRemoveGuild2.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.cleanupRemoveGuild3)
 				elseif (GLDG_CleanupMode == "friends" and GLDG_DataChar[p].friends and GLDG_DataChar[p].friends[entry]) then
 					GLDG_DataChar[p].friends[entry] = nil
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemoveFriend1.." ["..entry.."] "..GLDG_TXT.cleanupRemoveFriend2.." ["..p.."] "..GLDG_TXT.cleanupRemoveFriend3)
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemoveFriend1.." ["..entry.."] "..GLDG_TXT.cleanupRemoveFriend2.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.cleanupRemoveFriend3)
 				elseif (GLDG_CleanupMode == "channel" and GLDG_DataChar[p].channels and GLDG_DataChar[p].channels[entry]) then
 					GLDG_DataChar[p].channels[entry] = nil
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemoveChannel1.." ["..entry.."] "..GLDG_TXT.cleanupRemoveChannel2.." ["..p.."] "..GLDG_TXT.cleanupRemoveChannel3)
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemoveChannel1.." ["..entry.."] "..GLDG_TXT.cleanupRemoveChannel2.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.cleanupRemoveChannel3)
 				end
 			end
 		else
@@ -7125,7 +7249,7 @@ function GLDG_ClickOrphanCleanup()
 		    (not GLDG_DataChar[p].channels or GLDG_TableSize(GLDG_DataChar[p].channels)==0) and
 		    (not GLDG_DataChar[p].friends or GLDG_TableSize(GLDG_DataChar[p].friends)==0)) then
 			GLDG_DataChar[p] = nil
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemovedOrphan1.." ["..p.."] "..GLDG_TXT.cleanupRemovedOrphan2)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemovedOrphan1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.cleanupRemovedOrphan2)
 		end
 	end
 
@@ -7146,7 +7270,7 @@ function GLDG_ClickGuildlessCleanup()
 	for p in pairs(GLDG_DataChar) do
 		if (not GLDG_DataChar[p].guild) then
 			guildless_count = guildless_count + 1
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemovedGuildless1.." ["..p.."] "..GLDG_TXT.cleanupRemovedGuildless2)			
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemovedGuildless1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.cleanupRemovedGuildless2)			
 --Delete the character
 			GLDG_DataChar[p] = nil
 		end
@@ -7173,7 +7297,7 @@ function GLDG_ClickGuildlessDisplay()
 	for p in pairs(GLDG_DataChar) do
 		if (not GLDG_DataChar[p].guild) then
 			guildless_count = guildless_count + 1
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.displayRemovedGuildless1.." ["..p.."] "..GLDG_TXT.displayRemovedGuildless2)			
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.displayRemovedGuildless1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.displayRemovedGuildless2)			
 		else
 			haveguild_count = haveguild_count + 1
 		end

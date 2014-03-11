@@ -427,6 +427,10 @@ GLDG_TXT.deltaRankTo		= "zu Rang"
 GLDG_TXT.deltaDemoted2		= "degradiert"
 GLDG_TXT.deltaPromoted1		= GLDG_TXT.deltaDemoted1
 GLDG_TXT.deltaPromoted2		= "befördert"
+GLDG_TXT.deltaOnoteFrom	= "Die Offiziersnotiz von"
+GLDG_TXT.deltaOnoteInvalid	= "ist ungültig =>"
+GLDG_TXT.deltaOnoteToManyMatches	= "zu viele Treffer für"
+GLDG_TXT.deltaOnoteNotFound	= "nicht gefunden"
 
 -- Player menus
 GLDG_TXT.menu		= "GuildGreet"
