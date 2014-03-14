@@ -116,6 +116,7 @@ GLDG_InitialFriendsUpdate = nil	-- To make sure we get at least one update
 GLDG_UpdateRequest = 0		    -- If set with time, update will be performed
 GLDG_UpdateRequestFriends = 0	-- If set with time, update will be performed
 GLDG_InitComplete = nil		    -- Set in initialization is done
+GLDG_ReadNotes = 1	
 GLDG_InitCheck = 0		        -- Check for changes and display them; 0 = not started, 1 = pending guild, 2 = pending friends, 4 = pending channel, 8 = done guild, 16 = done friends, 32 = done channel
 GLDG_ChangesText = {}		    -- text for popup display
 
@@ -460,7 +461,7 @@ function GLDG_Init()
 	-- Set defaults for missing settings
 	if not GLDG_Data.RelogTime then GLDG_Data.RelogTime = 0 end
 	if not GLDG_Data.MinLevelUp then GLDG_Data.MinLevelUp = 0 end
-	if not GLDG_Data.UpdateTime then GLDG_Data.UpdateTime = GLDG_UPDATE_TIME end
+	GLDG_Data.UpdateTime = 0
 	if not GLDG_Data.ListSize then GLDG_Data.ListSize = 5 end
 	if not GLDG_Data.PlayerChatFrame then GLDG_Data.PlayerChatFrame = {} end
 	if not GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] then GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] = 0 end
@@ -507,6 +508,7 @@ function GLDG_Init()
 	if not GLDG_Data.ExtendMain	then GLDG_Data.ExtendMain = nil end
 	if not GLDG_Data.AutoAssign	then GLDG_Data.AutoAssign = nil end
 	if not GLDG_Data.AutoAssignEgp	then GLDG_Data.AutoAssignEgp = nil end
+	if not GLDG_Data.AutoAssignAlias	then GLDG_Data.AutoAssignAlias = nil end --in Arbeit ;-)
 	if not GLDG_Data.UseFriends 	then GLDG_Data.UseFriends = nil end
 	if not GLDG_Data.ListUp     	then GLDG_Data.ListUp = nil end
 	if not GLDG_Data.ListVisible	then GLDG_Data.ListVisible = nil end
@@ -819,7 +821,7 @@ function GLDG_InitFrame(frameName)
 		-- Set values for Relog and Listsize sliders
 		_G[name.."RelogSlider"]:SetValue(GLDG_Data.RelogTime)
 		_G[name.."MinLevelUpSlider"]:SetValue(GLDG_Data.MinLevelUp)
-		_G[name.."UpdateTimeSlider"]:SetValue(GLDG_Data.UpdateTime/10)
+--		_G[name.."UpdateTimeSlider"]:SetValue(GLDG_Data.UpdateTime/10)
 		_G[name.."ListsizeSlider"]:SetValue(GLDG_Data.ListSize)
 	elseif (frameName == "SettingsChat") then
 		-- List settings
@@ -1252,7 +1254,7 @@ function GLDG_RosterImport()
 				GLDG_DataChar[pl].own = true
 				--GLDG_DataChar[pl].ignore = true
 			end
-			if (GLDG_Data.AutoAssign) then
+			if (GLDG_Data.AutoAssign) and (GLDG_ReadNotes == 1) then
 				-- detect if note contains "Main[ <discardable text>]"
 				if (pn == "Main" or string.sub(pn, 1, 5)=="Main ") then
 					mains[pl] = "true"
@@ -1331,11 +1333,28 @@ function GLDG_RosterImport()
 					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteAdded.." ["..Ambiguate(pl, "guild").."]. "..GLDG_TXT.deltaIs.." ["..pn.."]")
 				end
 				GLDG_DataChar[pl].pNote = pn
+				------------- Alias-Zuordnung-------------------------------------------------------------------------
+--				if (GLDG_Data.AutoAssignAlias) == 1 and (GLDG_ReadNotes) == 1 then
+--					if not GLDG_DataChar[pl].alias then
+--						if (string.sub(pn, 1, 3)~="NN ") then
+--							local a,b,c=strfind(pn, "(%S+)"); --contiguous string of non-space characters
+--							if a then
+--								GLDG_DataChar[pl].alias = c
+--							end
+--						end
+--					end
+--				end
+				------------- Alias-Zuordnung Ende--------------------------------------------------------------------				
 			else
 				if GLDG_DataChar[pl].pNote then
 					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteRemoved.." ["..Ambiguate(pl, "guild").."]. ("..GLDG_TXT.deltaWas.." ["..GLDG_DataChar[pl].pNote.."])")
 				end
 				GLDG_DataChar[pl].pNote = nil
+				------------- wenn kein Alias, dann Name ohne Realm als Alias-------------------------------------------------------------------------
+--				if not GLDG_DataChar[pl].alias and (GLDG_ReadNotes) == 1 then
+--					GLDG_DataChar[pl].alias = Ambiguate(pl, "guild")
+--				end				
+				------------- wenn kein Alias, dann Name ohne Realm als Alias ende--------------------------------------------------------------------
 			end
 
 			if CanViewOfficerNote() then
@@ -1508,7 +1527,7 @@ function GLDG_RosterImport()
 			GLDG_DataChar[pl].guild = GLDG_unique_GuildName
 		end
 	end
-
+	GLDG_ReadNotes = 0
 	-- Parse guild notes for auto assignation
 	if (GLDG_Data.AutoAssign) then
 		for p in pairs(mains) do
@@ -1577,7 +1596,6 @@ function GLDG_findMainname(_main, _pl)
 		end
 		local cntMains = 0
 		local maxMembers = GetNumGuildMembers()
---		for i in pairs(GLDG_DataChar) do
 		for i = 1, maxMembers do
 			local player = GetGuildRosterInfo(i)
 			local len = string.len(omain)
@@ -2410,7 +2428,7 @@ function GLDG_ShowToolTip(self, buttonName)
 
 		-- If player has alias, add to name
 		if GLDG_DataChar[oDBname].alt then
-			name = name.." ["..GLDG_DataChar[oDBname].alt.."]"
+			name = name.." ["..Ambiguate(GLDG_DataChar[oDBname].alt, "guild").."]"
 			if (GLDG_DataChar[GLDG_DataChar[oDBname].alt] and GLDG_DataChar[GLDG_DataChar[oDBname].alt].alias) then
 				name = name .." ("..GLDG_DataChar[GLDG_DataChar[oDBname].alt].alias..")"
 			end
@@ -2519,7 +2537,8 @@ function GLDG_ClickName(button, name)
 	if not uRealm then
 		name = name.."-"
 		for i in pairs(GLDG_DataChar) do
-			if string.find(i, name) and GLDG_DataChar[i].guild == GLDG_unique_GuildName then
+			local len = string.len(name)
+			if  string.sub(i, 1, len)==name and GLDG_DataChar[i].guild == GLDG_unique_GuildName then
 				name = i
 			end
 		end
@@ -2795,6 +2814,8 @@ function GLDG_SendGreet(name, testing)
 		name = player.alias
 		table.insert(names, name)
 		usedAlias = true
+	else
+		name = Ambiguate(name, "guild")
 	end
 
 	-- Use name of main if alt and option is set
@@ -2804,7 +2825,7 @@ function GLDG_SendGreet(name, testing)
 		if GLDG_DataChar[player.alt].alias then
 			lalias = GLDG_DataChar[player.alt].alias
 		end
-		lname = player.alt
+		lname = Ambiguate(player.alt, "guild")
 		if (lname~="") then
 			table.insert(names, lname)
 		end
@@ -2834,14 +2855,7 @@ function GLDG_SendGreet(name, testing)
 
 	-- parse for our own %-codes
 	local message = GLDG_ParseCustomMessage(cname, name, msg)
-
-	-- still replace first and second %s to support old messages
---	local uName, uRealm = string.split("-", name)
---		if uRealm then
---			message = string.format(message, Ambiguate(name, "guild"), option)
---		else
-			message = string.format(message, name, option)
---		end
+	message = string.format(message, name, option)
 
 	-- Send greeting
 	if (testing) then

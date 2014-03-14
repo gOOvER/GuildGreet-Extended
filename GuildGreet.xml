@@ -351,14 +351,14 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<!-->update time slider text<-->
+				<!-->update time slider text
 				<FontString name="$parentUpdateTimeText" inherits="GLDG_OptionText">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
 							<Offset><AbsDimension x="0" y="-70"/></Offset>
 						</Anchor>
 					</Anchors>
-				</FontString>
+				</FontString><-->
 				<!-->Greet as main checkbox text<-->
 				<FontString name="$parentGreetAsMainText" inherits="GLDG_LOptionText" justifyH="LEFT">
 					<Anchors>
@@ -508,7 +508,7 @@
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
 			</Slider>
-			<!-->UpdateTime slider<-->
+			<!-->UpdateTime slider
 			<Slider name="$parentUpdateTimeSlider" inherits="OptionsSliderTemplate">
 				<Size><AbsDimension x="240" y="25"/></Size>
 				<Anchors>
@@ -527,7 +527,7 @@
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
-			</Slider>
+			</Slider><-->
 			<!-->Greet as main checkbox<-->
 			<CheckButton name="$parentGreetAsMainBox" inherits="OptionsCheckButtonTemplate">
 				<Size><AbsDimension x="20" y="20"/></Size>
