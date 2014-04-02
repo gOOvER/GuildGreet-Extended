@@ -2847,7 +2847,7 @@ function GLDG_SendGreet(name, testing)
 	greetSize = GLDG_TableSize(names)
 	if GLDG_Data.Randomize and (greetSize ~= 0) then
 		name = names[math.random(greetSize)]
-		local uName, uRealm = string.split("-", oName)
+		local uName, uRealm = string.split("-", name)
 		if uRealm then
 		name = Ambiguate(name, "guild")
 		end
