@@ -175,14 +175,14 @@
 	<!-->Configuration frame<-->
 	<Frame name="GuildGreetFrame" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
 	
-	<Size><AbsDimension x="800" y="550"/></Size>
+	<Size><AbsDimension x="1000" y="550"/></Size>
 		<Anchors>
 			<Anchor point="CENTER">
 				<Offset><AbsDimension x="0" y="120"/></Offset>
 			</Anchor>
 		</Anchors>
 		<TitleRegion>
-			<Size><AbsDimension x="750" y="15"/></Size>
+			<Size><AbsDimension x="950" y="15"/></Size>
 			<Anchors><Anchor point="TOP"/></Anchors>
 		</TitleRegion>
 		<Backdrop bgFile="TileSet\Generic\Black" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true"/>
@@ -2337,7 +2337,7 @@
 
 	<!-->Configuration players tab template: player action button<-->
 	<Button name="GLDG_PlayerActionTemplate" inherits="UIPanelButtonTemplate" virtual= "true">
-		<Size><AbsDimension x="130" y="20"/></Size>
+		<Size><AbsDimension x="230" y="20"/></Size>
 		<Scripts>
 			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 			<OnLeave>GameTooltip:Hide()</OnLeave>
@@ -2345,7 +2345,7 @@
 	</Button>
 
 	<!-->Configuration players tab<-->
- 	<Frame name="$parentPlayers" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
+ 	<Frame name="$parentPlayers" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true"  movable="true">
  		<Layers>
 			<Layer level="OVERLAY">
 				<!-->Player tab header<-->
@@ -2769,7 +2769,7 @@
 
 			<!-->Action button subframe<-->
 			<Frame name="$parentAction">
-				<Size><AbsDimension x="130" y="200"/></Size>
+				<Size><AbsDimension x="230" y="200"/></Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
 						<Offset><AbsDimension x="-10" y="-42"/></Offset>
@@ -2778,7 +2778,7 @@
 			</Frame>
 			<!-->Configuration subframe<-->
 			<Frame name="$parentSub">
-				<Size><AbsDimension x="130" y="200"/></Size>
+				<Size><AbsDimension x="230" y="200"/></Size>
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
 						<Offset><AbsDimension x="-10" y="0"/></Offset>
@@ -2884,6 +2884,26 @@
 					<OnClick>GLDG_ClickNote(self)</OnClick>
 				</Scripts>
 			</Button>
+			<Button name="$parentPublicNote" inherits="GLDG_PlayerActionTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentNote" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="0" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickPublicNote(self)</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentOfficerNote" inherits="GLDG_PlayerActionTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentPublicNote" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="0" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickOfficerNote(self)</OnClick>
+				</Scripts>
+			</Button>
 		</Frames>
  	 </Frame>
 
@@ -2895,7 +2915,7 @@
 				<!-->Editbox header<-->
 				<FontString name="$parentHeader" inherits="GameFontNormal">
 					<Color r="0.68" g="0.80" b="1"/>
-					<Size><AbsDimension x="110" y="40"/></Size>
+					<Size><AbsDimension x="210" y="40"/></Size>
 					<Anchors><Anchor point="TOP"/></Anchors>
 				</FontString>
 			</Layer>
@@ -2903,7 +2923,7 @@
 		<Frames>
 			<!-->Editbox<-->
 			<EditBox name="$parentEditbox" letters="30" autoFocus="true">
-				<Size><AbsDimension x="110" y="30"/></Size>
+				<Size><AbsDimension x="210" y="30"/></Size>
 				<FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT"/>
 				<Anchors>
 					<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM"/>
@@ -2914,7 +2934,7 @@
 				<Layers>
 					<Layer level="BACKGROUND">
 						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
-							<Size><AbsDimension x="108" y="32"/></Size>
+							<Size><AbsDimension x="208" y="32"/></Size>
 							<Anchors>
 								<Anchor point="LEFT">
 									<Offset><AbsDimension x="-8" y="0"/></Offset>
@@ -2922,7 +2942,7 @@
 							</Anchors>
 						</Texture>
 						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
-							<Size><AbsDimension x="108" y="32"/></Size>
+							<Size><AbsDimension x="208" y="32"/></Size>
 							<Anchors>
 								<Anchor point="RIGHT">
 									<Offset><AbsDimension x="8" y="0"/></Offset>
@@ -2939,7 +2959,7 @@
 			</EditBox>
 			<!-->Buttons<-->
 			<Button name="$parentSet" inherits="UIPanelButtonTemplate">
-				<Size><AbsDimension x="130" y="20"/></Size>
+				<Size><AbsDimension x="230" y="20"/></Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentEditbox" relativePoint="BOTTOMLEFT">
 						<Offset><AbsDimension x="-7" y="-5"/></Offset>
@@ -2952,7 +2972,7 @@
 				</Scripts>
 			</Button>
 			<Button name="$parentDel" inherits="UIPanelButtonTemplate">
-				<Size><AbsDimension x="130" y="20"/></Size>
+				<Size><AbsDimension x="230" y="20"/></Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentSet" relativePoint="BOTTOMLEFT">
 						<Offset><AbsDimension x="0" y="-5"/></Offset>
@@ -2977,7 +2997,7 @@
 				<!-->Editbox header<-->
 				<FontString name="$parentHeader" inherits="GameFontNormal">
 					<Color r="0.68" g="0.80" b="1"/>
-					<Size><AbsDimension x="110" y="40"/></Size>
+					<Size><AbsDimension x="210" y="40"/></Size>
 					<Anchors><Anchor point="TOP"/></Anchors>
 				</FontString>
 			</Layer>
@@ -2985,7 +3005,7 @@
 		<Frames>
 			<!-->Editbox<-->
 			<EditBox name="$parentEditbox" letters="30" autoFocus="true">
-				<Size><AbsDimension x="110" y="30"/></Size>
+				<Size><AbsDimension x="210" y="30"/></Size>
 				<FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT"/>
 				<Anchors>
 					<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM"/>
@@ -2996,7 +3016,7 @@
 				<Layers>
 					<Layer level="BACKGROUND">
 						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
-							<Size><AbsDimension x="108" y="32"/></Size>
+							<Size><AbsDimension x="208" y="32"/></Size>
 							<Anchors>
 								<Anchor point="LEFT">
 									<Offset><AbsDimension x="-8" y="0"/></Offset>
@@ -3004,7 +3024,7 @@
 							</Anchors>
 						</Texture>
 						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
-							<Size><AbsDimension x="108" y="32"/></Size>
+							<Size><AbsDimension x="208" y="32"/></Size>
 							<Anchors>
 								<Anchor point="RIGHT">
 									<Offset><AbsDimension x="8" y="0"/></Offset>
@@ -3021,7 +3041,7 @@
 			</EditBox>
 			<!-->Buttons<-->
 			<Button name="$parentSet" inherits="UIPanelButtonTemplate">
-				<Size><AbsDimension x="130" y="20"/></Size>
+				<Size><AbsDimension x="230" y="20"/></Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentEditbox" relativePoint="BOTTOMLEFT">
 						<Offset><AbsDimension x="-7" y="-5"/></Offset>
@@ -3034,7 +3054,7 @@
 				</Scripts>
 			</Button>
 			<Button name="$parentDel" inherits="UIPanelButtonTemplate">
-				<Size><AbsDimension x="130" y="20"/></Size>
+				<Size><AbsDimension x="230" y="20"/></Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentSet" relativePoint="BOTTOMLEFT">
 						<Offset><AbsDimension x="0" y="-5"/></Offset>
@@ -3059,7 +3079,7 @@
 				<!-->Editbox header<-->
 				<FontString name="$parentHeader" inherits="GameFontNormal">
 					<Color r="0.68" g="0.80" b="1"/>
-					<Size><AbsDimension x="110" y="40"/></Size>
+					<Size><AbsDimension x="210" y="40"/></Size>
 					<Anchors><Anchor point="TOP"/></Anchors>
 				</FontString>
 			</Layer>
@@ -3067,7 +3087,7 @@
 		<Frames>
 			<!-->Editbox<-->
 			<EditBox name="$parentEditbox" letters="30" autoFocus="true">
-				<Size><AbsDimension x="110" y="30"/></Size>
+				<Size><AbsDimension x="210" y="30"/></Size>
 				<FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT"/>
 				<Anchors>
 					<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM"/>
@@ -3078,7 +3098,7 @@
 				<Layers>
 					<Layer level="BACKGROUND">
 						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
-							<Size><AbsDimension x="108" y="32"/></Size>
+							<Size><AbsDimension x="208" y="32"/></Size>
 							<Anchors>
 								<Anchor point="LEFT">
 									<Offset><AbsDimension x="-8" y="0"/></Offset>
@@ -3086,7 +3106,7 @@
 							</Anchors>
 						</Texture>
 						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
-							<Size><AbsDimension x="108" y="32"/></Size>
+							<Size><AbsDimension x="208" y="32"/></Size>
 							<Anchors>
 								<Anchor point="RIGHT">
 									<Offset><AbsDimension x="8" y="0"/></Offset>
@@ -3103,7 +3123,7 @@
 			</EditBox>
 			<!-->Buttons<-->
 			<Button name="$parentSet" inherits="UIPanelButtonTemplate">
-				<Size><AbsDimension x="130" y="20"/></Size>
+				<Size><AbsDimension x="230" y="20"/></Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentEditbox" relativePoint="BOTTOMLEFT">
 						<Offset><AbsDimension x="-7" y="-5"/></Offset>
@@ -3116,7 +3136,7 @@
 				</Scripts>
 			</Button>
 			<Button name="$parentDel" inherits="UIPanelButtonTemplate">
-				<Size><AbsDimension x="130" y="20"/></Size>
+				<Size><AbsDimension x="230" y="20"/></Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentSet" relativePoint="BOTTOMLEFT">
 						<Offset><AbsDimension x="0" y="-5"/></Offset>
@@ -3134,9 +3154,175 @@
 		</Scripts>
  	 </Frame>
 
+ 	<!-->Configuration players tab subframe: set  public note<-->
+ 	 <Frame name="$parentPublicNote" parent="GuildGreetFramePlayersSub" hidden="true" enableMouse="true" setAllPoints="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Editbox header<-->
+				<FontString name="$parentHeader" inherits="GameFontNormal">
+					<Color r="0.68" g="0.80" b="1"/>
+					<Size><AbsDimension x="210" y="50"/></Size>
+					<Anchors><Anchor point="TOP"/></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Editbox<-->
+			<EditBox name="$parentEditbox" letters="30" autoFocus="true">
+				<Size><AbsDimension x="210" y="30"/></Size>
+				<FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT"/>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM"/>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset><AbsDimension x="7" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size><AbsDimension x="208" y="32"/></Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="-8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size><AbsDimension x="208" y="32"/></Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset><AbsDimension x="8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEscapePressed>self:SetText("")</OnEscapePressed>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</EditBox>
+			<!-->Buttons<-->
+			<Button name="$parentSet" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="230" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEditbox" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="-7" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickPublicNoteSet(getglobal(self:GetParent():GetName().."Editbox"):GetText())</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentDel" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="230" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSet" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickPublicNoteRemove()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>GLDG_ShowPublicPlayerNote(self:GetName())</OnShow>
+		</Scripts>
+ 	 </Frame>
+	 
+ 	<!-->Configuration players tab subframe: set  officernote<-->
+ 	 <Frame name="$parentOfficerNote" parent="GuildGreetFramePlayersSub" hidden="true" enableMouse="true" setAllPoints="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<!-->Editbox header<-->
+				<FontString name="$parentHeader" inherits="GameFontNormal">
+					<Color r="0.68" g="0.80" b="1"/>
+					<Size><AbsDimension x="210" y="50"/></Size>
+					<Anchors><Anchor point="TOP"/></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-->Editbox<-->
+			<EditBox name="$parentEditbox" letters="30" autoFocus="true">
+				<Size><AbsDimension x="210" y="30"/></Size>
+				<FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT"/>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentHeader" relativePoint="BOTTOM"/>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset><AbsDimension x="7" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size><AbsDimension x="208" y="32"/></Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="-8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size><AbsDimension x="208" y="32"/></Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset><AbsDimension x="8" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEscapePressed>self:SetText("")</OnEscapePressed>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</EditBox>
+			<!-->Buttons<-->
+			<Button name="$parentSet" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="230" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEditbox" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="-7" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickOfficerNoteSet(getglobal(self:GetParent():GetName().."Editbox"):GetText())</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentDel" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="230" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSet" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_ClickOfficerNoteRemove()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>GLDG_ShowOfficerNote(self:GetName())</OnShow>
+		</Scripts>
+ 	 </Frame>
+	 
+
+	 
 	<!-->Configuration players tab subframe template: main/alt line<-->
 	<Button name="GLDG_MainLineTemplate" virtual= "true">
-		<Size><AbsDimension x="110" y="15"/></Size>
+		<Size><AbsDimension x="210" y="15"/></Size>
 		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
@@ -3158,7 +3344,7 @@
 				<!-->Main/alt header<-->
 				<FontString name="$parentHeader" inherits="GameFontNormal">
 					<Color r="0.68" g="0.80" b="1"/>
-					<Size><AbsDimension x="130" y="25"/></Size>
+					<Size><AbsDimension x="230" y="25"/></Size>
 					<Anchors><Anchor point="TOP"/></Anchors>
 				</FontString>
 			</Layer>
@@ -3199,10 +3385,10 @@
 			</Button>
 			<!-->Main/alt scrollbar<-->
 			<ScrollFrame name="$parentScrollbar" inherits="FauxScrollFrameTemplate">
-				<Size><AbsDimension x="110" y="135"/></Size>
+				<Size><AbsDimension x="210" y="135"/></Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentLine1" relativePoint="TOPRIGHT">
-						<Offset><AbsDimension x="-115" y="0"/></Offset>
+						<Offset><AbsDimension x="-215" y="0"/></Offset>
 					</Anchor>
 				</Anchors>
 				<Scripts>

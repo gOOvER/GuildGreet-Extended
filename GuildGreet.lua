@@ -719,6 +719,9 @@ function GLDG_InitFrame(frameName)
 		_G[name.."ActionButtonsWho"]:SetText(GLDG_TXT.pbwho)
 		_G[name.."ActionButtonsRemove"]:SetText(GLDG_TXT.pbremove)
 		_G[name.."ActionButtonsNote"]:SetText(GLDG_TXT.pbnote)
+		_G[name.."ActionButtonsPublicNote"]:SetText(GLDG_TXT.pbpublicnote)
+		_G[name.."ActionButtonsOfficerNote"]:SetText(GLDG_TXT.pbofficernote)
+		
 		-- Set value for option checkboxes
 		GLDG_UpdatePlayerCheckboxes()
 	elseif (frameName == "Cleanup") then
@@ -1604,7 +1607,7 @@ function GLDG_findMainname(_main, _pl)
 				cntMains = cntMains+1
 				if cntMains >= 2 then
 					if CanEditOfficerNote() then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteFrom.." ["..Ambiguate(_pl, "guild").." ] "..GLDG_TXT.deltaOnoteInvalid.." "..GLDG_TXT.deltaOnoteToManyMatches.." [".._main.."]!")
+						GLDG_AddToStartupList("|cFF7F7F7F"..GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteFrom.." ["..Ambiguate(_pl, "guild").." ] "..GLDG_TXT.deltaOnoteInvalid.." "..GLDG_TXT.deltaOnoteToManyMatches.." [".._main.."]!|r")
 					end
 					--print("Die Offiziersnotiz von "..pl.." ist ungültig (zu viele Treffer):"..oDBname.."Zähler: "..cnt)
 					_main = nil
@@ -1614,7 +1617,7 @@ function GLDG_findMainname(_main, _pl)
 		end
 		if cntMains == 0 then
 			if CanEditOfficerNote() then
-				GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteFrom.." ["..Ambiguate(_pl, "guild").." ] "..GLDG_TXT.deltaOnoteInvalid.." [".._main.."] "..GLDG_TXT.deltaOnoteNotFound)
+				GLDG_AddToStartupList("|cFF7F7F7F"..GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteFrom.." ["..Ambiguate(_pl, "guild").." ] "..GLDG_TXT.deltaOnoteInvalid.." [".._main.."] "..GLDG_TXT.deltaOnoteNotFound.."|r")
 			end
 			--print("Die Offiziersnotiz von "..pl.." ist ungültig (nicht gefunden) Zähler: "..cntMains)
 		elseif cntMains == 1 then
@@ -2468,7 +2471,7 @@ function GLDG_ShowToolTip(self, buttonName)
 	GameTooltip_SetDefaultAnchor(GameTooltip, self)
 	GameTooltip:SetText(name, r, g, b, 1.0, 1)
 	GameTooltip:AddLine(tip, 1, 1, 1, 1.0, 1)
-	if (GLDG_DataChar[oDBname].alt or GLDG_DataChar[oDBname].guild or GLDG_DataChar[oDBname].lvl) then
+	if GLDG_DataChar[oDBname].alt or GLDG_DataChar[oDBname].guild or GLDG_DataChar[oDBname].lvl then
 		GameTooltip:AddLine(" ", 1, 1, 1, 1.0, 1)
 		if (GLDG_DataChar[oDBname].alt) then
 			if (GLDG_DataChar[GLDG_DataChar[oDBname].alt].alias) then
@@ -4460,6 +4463,8 @@ function GLDG_ShowPlayerButtons()
 	_G[frame.."SubGuild"]:Hide()
 	_G[frame.."SubNote"]:Hide()
 	_G[frame.."SubMainAlt"]:Hide()
+	_G[frame.."SubPublicNote"]:Hide()
+	_G[frame.."SubOfficerNote"]:Hide()
 	-- If no player is selected: hide all buttons
 	frame = frame.."ActionButtons"
 	if not GLDG_SelPlrName then
@@ -4473,6 +4478,8 @@ function GLDG_ShowPlayerButtons()
 		_G[frame.."Who"]:Hide()
 		_G[frame.."Remove"]:Hide()
 		_G[frame.."Note"]:Hide()
+		_G[frame.."PublicNote"]:Hide()
+		_G[frame.."OfficerNote"]:Hide()		
 		return
 	end
 	-- show subframe
@@ -4524,6 +4531,22 @@ function GLDG_ShowPlayerButtons()
 	else
 		button:Enable()
 	end
+	-- public Note button
+	button = _G[frame.."PublicNote"]
+	button:Show()
+	if (p.guild and p.guild == GLDG_unique_GuildName and CanEditPublicNote()) then
+		button:Enable()
+	else
+		button:Disable()
+	end	
+	-- Officernote button
+	button = _G[frame.."OfficerNote"]
+	button:Show()
+	if (p.guild and p.guild == GLDG_unique_GuildName and CanEditOfficerNote()) then
+		button:Enable()
+	else
+		button:Disable()
+	end		
 	-- Note button
 	button = _G[frame.."Note"]
 	button:Show()
@@ -4731,6 +4754,117 @@ function GLDG_ClickNoteRemove()
 	GLDG_ListPlayers()
 end
 
+----------------------------------------------------------------
+----------24.03.2014 öffentliche Notiz bearbeiten---------------
+----------------------------------------------------------------
+function GLDG_ClickPublicNote(self)
+	-- Activate note subframe
+	GLDG_ShowPlayerButtons()
+	self:Disable()
+	_G[self:GetParent():GetParent():GetParent():GetName().."SubPublicNote"]:Show()
+end
+
+
+------------------------------------------------------------
+function GLDG_ShowPublicPlayerNote(frame)
+	-- Set title
+	_G[frame.."Header"]:SetText(string.format(GLDG_TXT.PublicNotehead, GLDG_SelPlrName))
+	-- Set editbox and buttons text
+	local publicnote = nil
+	for i = 1, GetNumGuildMembers() do
+		local pl, _, _, _, _, _, pn = GetGuildRosterInfo(i) -- für ofiziersnotiz on anhängen!
+		if pl == GLDG_SelPlrName then publicnote = pn end
+	end
+
+	if publicnote then
+		_G[frame.."Set"]:SetText(GLDG_TXT.update)
+		_G[frame.."Del"]:SetText(GLDG_TXT.cancel)
+		_G[frame.."Editbox"]:SetText(publicnote)
+	else
+		_G[frame.."Set"]:SetText(GLDG_TXT.set)
+		_G[frame.."Del"]:SetText(GLDG_TXT.cancel)
+		_G[frame.."Editbox"]:SetText("") end
+end
+
+------------------------------------------------------------
+function GLDG_ClickPublicNoteSet(note)
+--	if (note == "") then return end
+--	teststring=GetGuildRosterSelection(GLDG_SelPlrName)
+--	blubb = GetGuildInfoText()
+--	print(string.len(blubb))
+--	SetGuildInfoText(blubb.."\n"..note)
+	for i = 1, GetNumGuildMembers() do
+		local pl = GetGuildRosterInfo(i)
+		if pl == GLDG_SelPlrName then GuildRosterSetPublicNote(i, note) end
+	end
+	--GuildRosterSetPublicNote(GetGuildRosterSelection(), note)
+	GLDG_ListPlayers()
+end
+
+------------------------------------------------------------
+function GLDG_ClickPublicNoteRemove()
+	GLDG_ListPlayers()
+end
+
+----------------------------------------------------------------
+----------24.03.2014 öffentliche Notiz bearbeiten Ende---------------
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+----------24.03.2014 Offiziersnotiz bearbeiten---------------
+----------------------------------------------------------------
+function GLDG_ClickOfficerNote(self)
+	-- Activate note subframe
+	GLDG_ShowPlayerButtons()
+	self:Disable()
+	_G[self:GetParent():GetParent():GetParent():GetName().."SubOfficerNote"]:Show()
+end
+
+
+------------------------------------------------------------
+function GLDG_ShowOfficerNote(frame)
+	-- Set title
+	_G[frame.."Header"]:SetText(string.format(GLDG_TXT.OfficerNotehead, GLDG_SelPlrName))
+	-- Set editbox and buttons text
+	local officernote = nil
+	for i = 1, GetNumGuildMembers() do
+		local pl, _, _, _, _, _, _, on = GetGuildRosterInfo(i) -- für ofiziersnotiz on anhängen!
+		if pl == GLDG_SelPlrName then officernote = on end
+	end
+
+	if officernote then
+		_G[frame.."Set"]:SetText(GLDG_TXT.update)
+		_G[frame.."Del"]:SetText(GLDG_TXT.cancel)
+		_G[frame.."Editbox"]:SetText(officernote)
+	else
+		_G[frame.."Set"]:SetText(GLDG_TXT.set)
+		_G[frame.."Del"]:SetText(GLDG_TXT.cancel)
+		_G[frame.."Editbox"]:SetText("") end
+end
+
+------------------------------------------------------------
+function GLDG_ClickOfficerNoteSet(note)
+--	if (note == "") then return end
+--	teststring=GetGuildRosterSelection(GLDG_SelPlrName)
+--	blubb = GetGuildInfoText()
+--	print(string.len(blubb))
+--	SetGuildInfoText(blubb.."\n"..note)
+	for i = 1, GetNumGuildMembers() do
+		local pl = GetGuildRosterInfo(i)
+		if pl == GLDG_SelPlrName then GuildRosterSetOfficerNote(i, note) end
+	end
+	--GuildRosterSetPublicNote(GetGuildRosterSelection(), note)
+	GLDG_ListPlayers()
+end
+
+------------------------------------------------------------
+function GLDG_ClickOfficerNoteRemove()
+	GLDG_ListPlayers()
+end
+
+----------------------------------------------------------------
+----------24.03.2014 Offiziersnotiz bearbeiten Ende---------------
+----------------------------------------------------------------
 
 
 ------------------------------------------------------------
