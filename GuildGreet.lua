@@ -2369,12 +2369,13 @@ function GLDG_ShowToolTip(self, buttonName)
 	local oDBname = nil
 	local _, uRealm = string.split("-", oname)
 	if not uRealm then
-		ooname = oname.."-"
+		local ooname = oname.."-"
 		for i in pairs(GLDG_DataChar) do
 			if string.find(i, ooname) and GLDG_DataChar[i].guild == GLDG_unique_GuildName then
 				oDBname = i
 			end
 		end
+		if oDBname == nil then oDBname = ooname..string.gsub(GLDG_Realm, " ", "") end
 	else
 		oDBname = oname
 	end
@@ -2471,7 +2472,7 @@ function GLDG_ShowToolTip(self, buttonName)
 	GameTooltip_SetDefaultAnchor(GameTooltip, self)
 	GameTooltip:SetText(name, r, g, b, 1.0, 1)
 	GameTooltip:AddLine(tip, 1, 1, 1, 1.0, 1)
-	if GLDG_DataChar[oDBname].alt or GLDG_DataChar[oDBname].guild or GLDG_DataChar[oDBname].lvl then
+	if (GLDG_DataChar[oDBname].alt or GLDG_DataChar[oDBname].guild or GLDG_DataChar[oDBname].lvl) then
 		GameTooltip:AddLine(" ", 1, 1, 1, 1.0, 1)
 		if (GLDG_DataChar[oDBname].alt) then
 			if (GLDG_DataChar[GLDG_DataChar[oDBname].alt].alias) then
@@ -2539,12 +2540,13 @@ function GLDG_ClickName(button, name)
 	local _, uRealm = string.split("-", name)
 	if not uRealm then
 		name = name.."-"
-		for i in pairs(GLDG_DataChar) do
-			local len = string.len(name)
+		local len = string.len(name)
+		for i in pairs(GLDG_DataChar) do	
 			if  string.sub(i, 1, len)==name and GLDG_DataChar[i].guild == GLDG_unique_GuildName then
 				name = i
 			end
 		end
+		if string.len(name) == len then name = name..string.gsub(GLDG_Realm, " ", "") end
 	end
 	-- Greet the player if left click
 	if (button == "LeftButton") then
@@ -4755,7 +4757,7 @@ function GLDG_ClickNoteRemove()
 end
 
 ----------------------------------------------------------------
-----------öffentliche Notiz bearbeiten---------------
+----------24.03.2014 öffentliche Notiz bearbeiten---------------
 ----------------------------------------------------------------
 function GLDG_ClickPublicNote(self)
 	-- Activate note subframe
@@ -4772,7 +4774,7 @@ function GLDG_ShowPublicPlayerNote(frame)
 	-- Set editbox and buttons text
 	local publicnote = nil
 	for i = 1, GetNumGuildMembers() do
-		local pl, _, _, _, _, _, pn = GetGuildRosterInfo(i)
+		local pl, _, _, _, _, _, pn = GetGuildRosterInfo(i) -- für ofiziersnotiz on anhängen!
 		if pl == GLDG_SelPlrName then publicnote = pn end
 	end
 
@@ -4788,13 +4790,16 @@ end
 
 ------------------------------------------------------------
 function GLDG_ClickPublicNoteSet(note)
+--	if (note == "") then return end
+--	teststring=GetGuildRosterSelection(GLDG_SelPlrName)
+--	blubb = GetGuildInfoText()
+--	print(string.len(blubb))
+--	SetGuildInfoText(blubb.."\n"..note)
 	for i = 1, GetNumGuildMembers() do
 		local pl = GetGuildRosterInfo(i)
-		if pl == GLDG_SelPlrName then
-			GuildRosterSetPublicNote(i, note)
-			GLDG_DataChar[GLDG_SelPlrName].pNote = note
-		end
+		if pl == GLDG_SelPlrName then GuildRosterSetPublicNote(i, note) end
 	end
+	--GuildRosterSetPublicNote(GetGuildRosterSelection(), note)
 	GLDG_ListPlayers()
 end
 
@@ -4804,11 +4809,11 @@ function GLDG_ClickPublicNoteRemove()
 end
 
 ----------------------------------------------------------------
-----------öffentliche Notiz bearbeiten Ende---------------
+----------24.03.2014 öffentliche Notiz bearbeiten Ende---------------
 ----------------------------------------------------------------
 
 ----------------------------------------------------------------
-----------Offiziersnotiz bearbeiten---------------
+----------24.03.2014 Offiziersnotiz bearbeiten---------------
 ----------------------------------------------------------------
 function GLDG_ClickOfficerNote(self)
 	-- Activate note subframe
@@ -4841,13 +4846,16 @@ end
 
 ------------------------------------------------------------
 function GLDG_ClickOfficerNoteSet(note)
+--	if (note == "") then return end
+--	teststring=GetGuildRosterSelection(GLDG_SelPlrName)
+--	blubb = GetGuildInfoText()
+--	print(string.len(blubb))
+--	SetGuildInfoText(blubb.."\n"..note)
 	for i = 1, GetNumGuildMembers() do
 		local pl = GetGuildRosterInfo(i)
-		if pl == GLDG_SelPlrName then
-			GuildRosterSetOfficerNote(i, note)
-			GLDG_DataChar[GLDG_SelPlrName].oNote = note
-		end
+		if pl == GLDG_SelPlrName then GuildRosterSetOfficerNote(i, note) end
 	end
+	--GuildRosterSetPublicNote(GetGuildRosterSelection(), note)
 	GLDG_ListPlayers()
 end
 
@@ -4857,7 +4865,7 @@ function GLDG_ClickOfficerNoteRemove()
 end
 
 ----------------------------------------------------------------
-----------Offiziersnotiz bearbeiten Ende---------------
+----------24.03.2014 Offiziersnotiz bearbeiten Ende---------------
 ----------------------------------------------------------------
 
 
@@ -5281,6 +5289,11 @@ function GLDG_FriendsUpdate()
 	for i = 1, numTotal do
 		local name, level, class, loc, connected, status, note = GetFriendInfo(i);
 		if (name) then
+			local _, uRealm = string.split("-", name)
+			if not uRealm then
+				name = name.."-"..string.gsub(GLDG_Realm, " ", "")
+			end			
+			
 			cnt = cnt + 1
 			-- mark this friend as "active" so it won't be purged below
 			purge[name] = true
