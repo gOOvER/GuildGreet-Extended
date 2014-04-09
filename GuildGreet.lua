@@ -4755,7 +4755,7 @@ function GLDG_ClickNoteRemove()
 end
 
 ----------------------------------------------------------------
-----------24.03.2014 öffentliche Notiz bearbeiten---------------
+----------öffentliche Notiz bearbeiten---------------
 ----------------------------------------------------------------
 function GLDG_ClickPublicNote(self)
 	-- Activate note subframe
@@ -4772,7 +4772,7 @@ function GLDG_ShowPublicPlayerNote(frame)
 	-- Set editbox and buttons text
 	local publicnote = nil
 	for i = 1, GetNumGuildMembers() do
-		local pl, _, _, _, _, _, pn = GetGuildRosterInfo(i) -- für ofiziersnotiz on anhängen!
+		local pl, _, _, _, _, _, pn = GetGuildRosterInfo(i)
 		if pl == GLDG_SelPlrName then publicnote = pn end
 	end
 
@@ -4788,16 +4788,13 @@ end
 
 ------------------------------------------------------------
 function GLDG_ClickPublicNoteSet(note)
---	if (note == "") then return end
---	teststring=GetGuildRosterSelection(GLDG_SelPlrName)
---	blubb = GetGuildInfoText()
---	print(string.len(blubb))
---	SetGuildInfoText(blubb.."\n"..note)
 	for i = 1, GetNumGuildMembers() do
 		local pl = GetGuildRosterInfo(i)
-		if pl == GLDG_SelPlrName then GuildRosterSetPublicNote(i, note) end
+		if pl == GLDG_SelPlrName then
+			GuildRosterSetPublicNote(i, note)
+			GLDG_DataChar[GLDG_SelPlrName].pNote = note
+		end
 	end
-	--GuildRosterSetPublicNote(GetGuildRosterSelection(), note)
 	GLDG_ListPlayers()
 end
 
@@ -4807,11 +4804,11 @@ function GLDG_ClickPublicNoteRemove()
 end
 
 ----------------------------------------------------------------
-----------24.03.2014 öffentliche Notiz bearbeiten Ende---------------
+----------öffentliche Notiz bearbeiten Ende---------------
 ----------------------------------------------------------------
 
 ----------------------------------------------------------------
-----------24.03.2014 Offiziersnotiz bearbeiten---------------
+----------Offiziersnotiz bearbeiten---------------
 ----------------------------------------------------------------
 function GLDG_ClickOfficerNote(self)
 	-- Activate note subframe
@@ -4844,16 +4841,13 @@ end
 
 ------------------------------------------------------------
 function GLDG_ClickOfficerNoteSet(note)
---	if (note == "") then return end
---	teststring=GetGuildRosterSelection(GLDG_SelPlrName)
---	blubb = GetGuildInfoText()
---	print(string.len(blubb))
---	SetGuildInfoText(blubb.."\n"..note)
 	for i = 1, GetNumGuildMembers() do
 		local pl = GetGuildRosterInfo(i)
-		if pl == GLDG_SelPlrName then GuildRosterSetOfficerNote(i, note) end
+		if pl == GLDG_SelPlrName then
+			GuildRosterSetOfficerNote(i, note)
+			GLDG_DataChar[GLDG_SelPlrName].oNote = note
+		end
 	end
-	--GuildRosterSetPublicNote(GetGuildRosterSelection(), note)
 	GLDG_ListPlayers()
 end
 
@@ -4863,7 +4857,7 @@ function GLDG_ClickOfficerNoteRemove()
 end
 
 ----------------------------------------------------------------
-----------24.03.2014 Offiziersnotiz bearbeiten Ende---------------
+----------Offiziersnotiz bearbeiten Ende---------------
 ----------------------------------------------------------------
 
 

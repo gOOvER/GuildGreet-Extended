@@ -1,19 +1,14 @@
 ## Interface: 50400
 ## Title: GuildGreet-Extended
-## Version: 5.4.8
+## Version: @project-version@
 ## Author: gOOvER & Luzisto
-## X-Date: 2014-01-15
 ## X-Category: Guild
 ## X-Website: http://wow.curse-gaming.com/downloads/details/7529/
 ## URL: http://wow.curse-gaming.com/downloads/details/7529/
 ## Description: Keeps a log of guildies waiting for your greeting
 ## Notes: Keeps a log of guildies waiting for your greeting
 ## SavedVariables: GLDG_Data
-## OptionalDeps: myAddOns
-## X-Curse-Packaged-Version: 5.4.8-3-g183da7e
-## X-Curse-Project-Name: GuildGreet Extended
-## X-Curse-Project-ID: guild-greet-extended
-## X-Curse-Repository-ID: wow/guild-greet-extended/mainline
+
 
 
 
