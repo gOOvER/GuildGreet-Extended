@@ -4999,8 +4999,7 @@ function GLDG_ClickNoteRemove()
 end
 
 ----------------------------------------------------------------
-----------24.03.2014 öffentliche Notiz bearbeiten---------------
-----------------------------------------------------------------
+
 function GLDG_ClickPublicNote(self)
 	-- Activate note subframe
 	GLDG_ShowPlayerButtons()
@@ -5032,16 +5031,10 @@ end
 
 ------------------------------------------------------------
 function GLDG_ClickPublicNoteSet(note)
---	if (note == "") then return end
---	teststring=GetGuildRosterSelection(GLDG_SelPlrName)
---	blubb = GetGuildInfoText()
---	print(string.len(blubb))
---	SetGuildInfoText(blubb.."\n"..note)
 	for i = 1, GetNumGuildMembers() do
 		local pl = GetGuildRosterInfo(i)
 		if pl == GLDG_SelPlrName then GuildRosterSetPublicNote(i, note) end
 	end
-	--GuildRosterSetPublicNote(GetGuildRosterSelection(), note)
 	GLDG_ListPlayers()
 end
 
@@ -5050,13 +5043,7 @@ function GLDG_ClickPublicNoteRemove()
 	GLDG_ListPlayers()
 end
 
-----------------------------------------------------------------
-----------24.03.2014 öffentliche Notiz bearbeiten Ende---------------
-----------------------------------------------------------------
 
-----------------------------------------------------------------
-----------24.03.2014 Offiziersnotiz bearbeiten---------------
-----------------------------------------------------------------
 function GLDG_ClickOfficerNote(self)
 	-- Activate note subframe
 	GLDG_ShowPlayerButtons()
@@ -5088,28 +5075,16 @@ end
 
 ------------------------------------------------------------
 function GLDG_ClickOfficerNoteSet(note)
---	if (note == "") then return end
---	teststring=GetGuildRosterSelection(GLDG_SelPlrName)
---	blubb = GetGuildInfoText()
---	print(string.len(blubb))
---	SetGuildInfoText(blubb.."\n"..note)
 	for i = 1, GetNumGuildMembers() do
 		local pl = GetGuildRosterInfo(i)
 		if pl == GLDG_SelPlrName then GuildRosterSetOfficerNote(i, note) end
 	end
-	--GuildRosterSetPublicNote(GetGuildRosterSelection(), note)
 	GLDG_ListPlayers()
 end
 
-------------------------------------------------------------
 function GLDG_ClickOfficerNoteRemove()
 	GLDG_ListPlayers()
 end
-
-----------------------------------------------------------------
-----------24.03.2014 Offiziersnotiz bearbeiten Ende---------------
-----------------------------------------------------------------
-
 
 ------------------------------------------------------------
 function GLDG_ClickWho()
