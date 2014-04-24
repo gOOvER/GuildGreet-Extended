@@ -260,7 +260,7 @@
 
 	<!-->Configuration frame<-->
  	<Frame name="$parentSettings" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true">
-		<Size><AbsDimension x="780" y="390"/></Size>
+		<Size><AbsDimension x="980" y="390"/></Size>
 		<Anchors>
 			<Anchor point="CENTER">
 				<Offset><AbsDimension x="0" y="10"/></Offset>
@@ -297,7 +297,7 @@
 <!--> ============================================================================================================== <-->
 	<!-->Configuration general tab template: header text<-->
 	<FontString name="GLDG_HeaderText" inherits="GameFontNormal" virtual="true">
-		<Size><AbsDimension x="760" y="25"/></Size>
+		<Size><AbsDimension x="960" y="25"/></Size>
 		<Scripts>
 			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 			<OnLeave>GameTooltip:Hide()</OnLeave>
@@ -316,7 +316,7 @@
 
 	<!-->Configuration general tab template: option text, left aligned<-->
 	<FontString name="GLDG_LOptionText" inherits="GLDG_OptionText" justifyH="LEFT" virtual="true">
-		<Size><AbsDimension x="700" y="25"/></Size>
+		<Size><AbsDimension x="900" y="25"/></Size>
 		<Scripts>
 			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 			<OnLeave>GameTooltip:Hide()</OnLeave>
@@ -335,11 +335,19 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
+				<!-->Use guild default checkbox text<-->
+				<FontString name="$parentUseGuildDefaultText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="40" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>				
 				<!-->Relog slider text<-->
 				<FontString name="$parentRelogText" inherits="GLDG_OptionText">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
-							<Offset><AbsDimension x="0" y="0"/></Offset>
+							<Offset><AbsDimension x="0" y="-35"/></Offset>
 						</Anchor>
 					</Anchors>
 				</FontString>
@@ -347,7 +355,7 @@
 				<FontString name="$parentMinLevelUpText" inherits="GLDG_OptionText">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
-							<Offset><AbsDimension x="0" y="-35"/></Offset>
+							<Offset><AbsDimension x="0" y="-70"/></Offset>
 						</Anchor>
 					</Anchors>
 				</FontString>
@@ -411,10 +419,18 @@
 				<FontString name="$parentAutoAssignEgpText" inherits="GLDG_LOptionText" justifyH="LEFT">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
-							<Offset><AbsDimension x="480" y="-185"/></Offset>
+							<Offset><AbsDimension x="450" y="-185"/></Offset>
 						</Anchor>
 					</Anchors>
 				</FontString>
+				<!-->AutoAssignAlias<-->
+				<FontString name="$parentAutoAssignAliasText" inherits="GLDG_LOptionText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="750" y="-185"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>				
 				<!-->UseFriends<-->
 				<FontString name="$parentUseFriendsText" inherits="GLDG_LOptionText" justifyH="LEFT">
 					<Anchors>
@@ -468,6 +484,34 @@
 			</Layer>
 		</Layers>
 		<Frames>
+			<!-->Use guild default checkbox<-->
+			<CheckButton name="$parentUseGuildDefaultBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentUseGuildDefaultText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.GuildSettings.UseGuildDefault = self:GetChecked(); GLDG_readConfigString_change(self:GetChecked()) </OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->WriteGuildString button<-->
+			<Button name="$parentWriteGuildString" inherits="UIPanelButtonTemplate">
+				<Size><AbsDimension x="200" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentUseGuildDefaultText" relativePoint="RIGHT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_WriteGuildString()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
 			<!-->Relog slider<-->
 			<Slider name="$parentRelogSlider" inherits="OptionsSliderTemplate">
 				<Size><AbsDimension x="240" y="25"/></Size>
@@ -537,7 +581,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.GreetAsMain = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.GreetAsMain = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -551,7 +595,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.Randomize = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.Randomize = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -565,7 +609,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.Whisper = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.Whisper = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -579,7 +623,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.WhisperLevelup = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.WhisperLevelup = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -593,7 +637,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.IncludeOwn = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.IncludeOwn = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -607,7 +651,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.AutoAssign = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.AutoAssign = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -621,7 +665,21 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.AutoAssignEgp = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.AutoAssignEgp = self:GetChecked(); GLDG_generateConfigString()</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->AutoAssign Alias<-->
+			<CheckButton name="$parentAutoAssignAliasBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentAutoAssignAliasText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>GLDG_Data.GuildSettings.AutoAssignAlias = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -635,9 +693,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>
-						GLDG_Data.UseFriends = self:GetChecked()
-					</OnClick>
+					<OnClick>GLDG_Data.UseFriends = self:GetChecked()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -872,7 +928,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.ListNames = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.ListNames = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -885,7 +941,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.ListNamesOff = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.ListNamesOff = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -898,7 +954,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.ListLevelUp = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.ListLevelUp = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -911,7 +967,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.ListLevelUpOff = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.ListLevelUpOff = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -924,7 +980,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.ListAchievments = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.ListAchievments = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -937,7 +993,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.ListQuit = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.ListQuit = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -950,7 +1006,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.ExtendChat = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.ExtendChat = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -963,7 +1019,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.ExtendIgnored = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.ExtendIgnored = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -976,7 +1032,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.ExtendMain = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.ExtendMain = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -989,7 +1045,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.ExtendAlias = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.ExtendAlias = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1002,7 +1058,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.AddPostfix = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.AddPostfix = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1015,7 +1071,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.ShowWhoSpam = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.ShowWhoSpam = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1221,7 +1277,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.SupressGreet = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.SupressGreet = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1235,7 +1291,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.SupressJoin = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.SupressJoin = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1249,7 +1305,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.SupressLevel = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.SupressLevel = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1263,7 +1319,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.SupressRank = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.SupressRank = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1277,7 +1333,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.SupressAchievment = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.SupressAchievment = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1292,7 +1348,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.NoGratsOnLogin = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.NoGratsOnLogin = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1587,7 +1643,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.AutoWho = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.AutoWho = self:GetChecked()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1601,7 +1657,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.DeltaPopup = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.DeltaPopup = self:GetChecked(); GLDG_generateConfigString()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1615,7 +1671,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.ExtendPlayerMenu = self:GetChecked();GLDG_QueryReloadUI()</OnClick>
+					<OnClick>GLDG_Data.GuildSettings.ExtendPlayerMenu = self:GetChecked();GLDG_QueryReloadUI()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1661,7 +1717,7 @@
 	</Button>
 
 	<!-->Configuration greetings tab template: message line<-->
-	<Button name="GLDG_MessageLineTemplate" virtual= "true">
+	<Button name="GLDG_MessageLineTemplate" virtual= "true" enableMouse="true">
 		<Size><AbsDimension x="700" y="15"/></Size>
 		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
