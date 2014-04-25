@@ -1643,7 +1643,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.GuildSettings.AutoWho = self:GetChecked()</OnClick>
+					<OnClick>GLDG_Data.AutoWho = self:GetChecked()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -1671,7 +1671,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_Data.GuildSettings.ExtendPlayerMenu = self:GetChecked();GLDG_QueryReloadUI()</OnClick>
+					<OnClick>GLDG_Data.ExtendPlayerMenu = self:GetChecked();GLDG_QueryReloadUI()</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
