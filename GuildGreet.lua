@@ -45,7 +45,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 500408			-- Number code for this version
+GDLG_VNMBR	= 500409			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -1265,8 +1265,8 @@ function GLDG_RosterImport()
 				GLDG_Data[i] = nil
 			end
 		end
-	GLDG_Data.Version = GDLG_VNMBR	
 	end
+	GLDG_Data.Version = GDLG_VNMBR
 	GLDG_SetActiveColourSet("guild")
 
 	-- Update guildrank names
@@ -1313,12 +1313,19 @@ function GLDG_RosterImport()
 --				------------- Alias-Zuordnung anfang--------------------------
 				if (GLDG_Data.GuildSettings.AutoAssignAlias) == 1 then
 					local aliasmatch = nil
-					local aliasmatchpn = string.find(pn, "@",1)
-					local aliasmatchon = string.find(on, "@",1)
-					if aliasmatchpn ~= nil then aliasmatch = aliasmatchpn+1 end
-					if aliasmatchon ~= nil then aliasmatch = aliasmatchon+1 end
+					local aliasmatch = string.find(pn, "@",1)
 					if (aliasmatch ~= nil) then
-						local a,b,c = strfind(on, "(%S+)", aliasmatch)
+						local a,b,c = strfind(pn, "(%S+)", aliasmatch+1)
+						if a then
+							GLDG_DataChar[pl].alias = c
+						end
+					end
+				end
+				if (GLDG_Data.GuildSettings.AutoAssignAlias) == 1 then
+					local aliasmatch = nil
+					local aliasmatch = string.find(on, "@",1)
+					if (aliasmatch ~= nil) then
+						local a,b,c = strfind(on, "(%S+)", aliasmatch+1)
 						if a then
 							GLDG_DataChar[pl].alias = c
 						end
@@ -3339,6 +3346,8 @@ function GLDG_SlashHandler(msg)
 				GLDG_Convert_Plausibility_Fix()
 			elseif (wordsLower[0]=="unnew") then
 				GLDG_Convert_Unnew()
+			elseif (wordsLower[0]=="aliasreset") then
+				GLDG_Reset_Aliases()				
 			elseif (wordsLower[0]=="alert") then
 				GLDG_Data.CheckedGuildAlert = nil	-- force check if called from command line
 				GLDG_CheckForGuildAlert()
@@ -5238,6 +5247,7 @@ function GLDG_Help()
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg clear", true)
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg check", true)
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg alert", true)
+	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg aliasreset", true)	
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg greet "..GLDG_Data.colours.help.."| |rbye "..GLDG_Data.colours.help.."| |rlater "..GLDG_Data.colours.help.."[|r guild "..GLDG_Data.colours.help.."| |rchannel "..GLDG_Data.colours.help.."| |rall "..GLDG_Data.colours.help.."| <|rname"..GLDG_Data.colours.help.."> ]|r", true)
 	GLDG_Print(" - "..GLDG_Data.colours.help.."guild/all [show]:|r "..GLDG_TXT.help_all, true);
 	GLDG_Print(" - "..GLDG_Data.colours.help.."guild/all all:|r "..GLDG_TXT.help_online, true);
@@ -7397,6 +7407,16 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 	return fixNeeded
 end
 
+------------------------------------------------------------
+function GLDG_Reset_Aliases()
+	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Remove all saved aliases")
+	for p in pairs(GLDG_DataChar) do
+		if (GLDG_DataChar[p].alias) then
+			GLDG_DataChar[p].alias = nil
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Alias from ["..Ambiguate(p, "guild").."] deleted")
+		end
+	end
+end
 ------------------------------------------------------------
 function GLDG_Convert_Unnew()
 	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.unnew1)
