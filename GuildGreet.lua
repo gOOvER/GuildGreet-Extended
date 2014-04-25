@@ -7916,7 +7916,6 @@ function GLDG_readConfigString()
 		GLDG_Data[GLDG_unique_GuildName].RelogTime = GLDG_Data.GuildSettings.RelogTime
 		GLDG_Data[GLDG_unique_GuildName].MinLevelUp = GLDG_Data.GuildSettings.MinLevelUp
 		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = 1
-		--GLDG_Data[GLDG_unique_GuildName] = GLDG_Data.GuildSettings
 		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Configstring found. GuildGreet using default settings from "..Ambiguate(GLDG_GuildLeader, "guild").."!")
 		--GLDG_Init()
 	else
