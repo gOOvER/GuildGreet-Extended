@@ -39,6 +39,17 @@ _34_ interface options
 _35_ startup popup handling
 
 ]]----------------------------------------------------------
+--local GLDG = LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+
+-- Binding names
+BINDING_HEADER_GUILDGREET = L["GuildGreet"]
+BINDING_NAME_GUILDGREETCONFIG = L["Open config window"]
+BINDING_NAME_GUILDGREETCLEAR = L["Clear greet list"]
+BINDING_NAME_GUILDGREETTESTL = L["Test trigger"]
+BINDING_NAME_GUILDGREETGREETGUILD = L["Greet Guild and Channel"]
+BINDING_NAME_GUILDGREETBYEGUILD = L["Say goodbye to guild and channel"]
+BINDING_NAME_GUILDGREETLATERGUILD = L["Say see you later to guild and channel"]
 
 -- Addon constants
 GLDG_NAME 	= "GuildGreet"
@@ -647,7 +658,7 @@ function GLDG_Init()
 		local tab = _G[GLDG_GUI.."Tab"..tabNum]
 		local frameName = GLDG_Tab2Frame["Tab"..tabNum]
 		if frameName then
-			local label = GLDG_TXT["Tab"..frameName]
+			local label = L["Tab"..frameName]
 			if label then
 				-- tab has label: initialize frame
 				tab:SetText(label)
@@ -668,7 +679,7 @@ function GLDG_Init()
 		local subFrame = GLDG_SubTab2Frame["Tab"..tabNum]
 		local frameName = "Settings"..subFrame
 		if frameName then
-			local label = GLDG_TXT["SubTab"..subFrame]
+			local label = L["SubTab"..subFrame]
 			if label then
 				-- tab has label: initialize frame
 				tab:SetText(label)
@@ -679,7 +690,7 @@ function GLDG_Init()
 	end
 
 	-- initialize the option frame
-	_G["GuildGreetOptionsHeader"]:SetText(GLDG_TXT.optionHeader)
+	_G["GuildGreetOptionsHeader"]:SetText(L["optionHeader"])
 
 	GLDG_InitComplete = true
 
@@ -842,7 +853,7 @@ function GLDG_InitFrame(frameName)
 		_G[name.."IncludeOwnText"]:SetText(GLDG_TXT.includeOwn)
 		_G[name.."AutoAssignText"]:SetText(GLDG_TXT.autoAssign)
 		_G[name.."AutoAssignEgpText"]:SetText(GLDG_TXT.autoAssignEgp)
-		_G[name.."AutoAssignAliasText"]:SetText(GLDG_TXT.autoAssignAlias)
+		_G[name.."AutoAssignAliasText"]:SetText(L["(Automatically assign Alias)"].."*")
 		_G[name.."UseFriendsText"]:SetText(GLDG_TXT.useFriends)
 		_G[name.."ChannelNameText"]:SetText(GLDG_TXT.channelName)
 		-- Queued greetings list texts
@@ -1525,9 +1536,9 @@ function GLDG_RosterImport()
 					if (not GLDG_DataChar[pl].own) then
 						if GLDG_Data.GuildSettings.ListLevelUp then
 							if (mainName) then
-								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(pl, "guild")..": "..cl.."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[pl].oldlvl.." "..GLDG_TXT.lvlIncrease2.." "..lv.." "..GLDG_TXT.lvlIncrease3);
+								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(pl, "guild")..": "..cl.."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[pl].oldlvl, lv));
 							else
-								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(pl, "guild")..": "..cl.."] "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[pl].oldlvl.." "..GLDG_TXT.lvlIncrease2.." "..lv.." "..GLDG_TXT.lvlIncrease3);
+								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(pl, "guild")..": "..cl.."] "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[pl].oldlvl, lv));
 							end
 						end
 						if ( (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[pl], GLDG_DataGreet.NewLevel)) > 0) and (not GLDG_Data.GuildSettings.SupressLevel) and (not GLDG_DataChar[pl].ignore) and (lv > GLDG_Data.GuildSettings.MinLevelUp)) then
@@ -1557,9 +1568,9 @@ function GLDG_RosterImport()
 							GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[pl].lvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(lv).." "..GLDG_TXT.deltaIncrease3)
 							if GLDG_Data.GuildSettings.ListLevelUpOff then
 								if (mainName) then
-									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":"..GLDG_GOES_OFFLINE_COLOUR.." ["..Ambiguate(pl, "guild").."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[pl].lvl.." "..GLDG_TXT.lvlIncrease2.." "..lv.." "..GLDG_TXT.lvlIncrease3.." (off)");
+									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":"..GLDG_GOES_OFFLINE_COLOUR.." ["..Ambiguate(pl, "guild").."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[pl].lvl, lv).." (off)");
 								else
-									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":"..GLDG_GOES_OFFLINE_COLOUR.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[pl].lvl.." "..GLDG_TXT.lvlIncrease2.." "..lv.." "..GLDG_TXT.lvlIncrease3.." (off)");
+									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":"..GLDG_GOES_OFFLINE_COLOUR.." ["..Ambiguate(pl, "guild").."] "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[pl].lvl, lv)..L[" (off)"]);
 								end
 							end
 
@@ -1707,9 +1718,9 @@ function GLDG_RosterPurge()
 			if GLDG_Data.GuildSettings.ListQuit then
 				if (GLDG_DataChar[p] and GLDG_DataChar[p].alt) then
 					local main = GLDG_DataChar[p].alt;
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(p, "guild").."] "..GLDG_TXT.leftguild.." {"..Ambiguate(main, "guild").."}");
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(p, "guild").."] "..L["has left the guild"].." {"..Ambiguate(main, "guild").."}");
 				else
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(p, "guild").."] "..GLDG_TXT.leftguild);
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(p, "guild").."] "..L["has left the guild"]);
 				end
 			end
 			-- do not remove char, but remove guild tag
@@ -1976,7 +1987,7 @@ function GLDG_ListForPlayer(playerName, allDetails, onList, print, guildOnly)
 					result = result..GLDG_findAlias(playerName, 2);
 				end
 			else
-				result = result..GLDG_TXT.noCharsFound
+				result = result..L["No characters found"]
 			end
 		else
 			result = playerName.." "..GLDG_TXT.notinguild;
@@ -2362,16 +2373,16 @@ function GLDG_ShowQueue()
 		if (GLDG_DataChar[queue[cnt]]) then
 			if GLDG_DataChar[queue[cnt]].new then
 				colorName = "new"
-				_G[line.."Text2"]:SetText(GLDG_TXT.new..postfix)
+				_G[line.."Text2"]:SetText(L["NEW"]..postfix)
 			elseif GLDG_DataChar[queue[cnt]].achievment then
 				colorName = "achievment"
-				_G[line.."Text2"]:SetText(GLDG_TXT.achv..postfix)
+				_G[line.."Text2"]:SetText(L["ACHV"]..postfix)
 			elseif GLDG_DataChar[queue[cnt]].newlvl then
 				colorName = "lvl"
-				_G[line.."Text2"]:SetText(GLDG_TXT.lvl..postfix)
+				_G[line.."Text2"]:SetText(L["LEVEL"]..postfix)
 			elseif GLDG_DataChar[queue[cnt]].newrank then
 				colorName = "rank"
-				_G[line.."Text2"]:SetText(GLDG_TXT.rank..postfix)
+				_G[line.."Text2"]:SetText(L["RANK"]..postfix)
 			elseif GLDG_Offline[queue[cnt]] then
 				colorName = "relog"
 			end
@@ -2383,13 +2394,13 @@ function GLDG_ShowQueue()
 				_G[line.."Text2"]:SetText("{t}")
 				colorName = "list"
 			elseif (number == "2") then
-				_G[line.."Text2"]:SetText(GLDG_TXT.new.." {t}")
+				_G[line.."Text2"]:SetText(L["NEW"].." {t}")
 				colorName = "new"
 			elseif (number == "3") then
-				_G[line.."Text2"]:SetText(GLDG_TXT.lvl.." {t}")
+				_G[line.."Text2"]:SetText(L["LEVEL"].." {t}")
 				colorName = "lvl"
 			elseif (number == "4") then
-				_G[line.."Text2"]:SetText(GLDG_TXT.rank.." {t}")
+				_G[line.."Text2"]:SetText(L["RANK"].." {t}")
 				colorName = "rank"
 			elseif (number == "5") then
 				_G[line.."Text2"]:SetText("{t}")
@@ -2440,30 +2451,30 @@ function GLDG_ShowToolTip(self, buttonName)
 	local logtime = string.sub(_G[buttonName.."Text"]:GetText(), 2, 6)
 	local r, g, b = _G[buttonName.."Text"]:GetTextColor()
 	-- Construct tip
-	local tip = string.format(GLDG_TXT.tipdef, logtime)
+	local tip = string.format(L["At %s, this character came online for the first time during this session."], logtime)
 	if GLDG_DataChar[oDBname] then
 		if GLDG_DataChar[oDBname].new then
 			if (logtime == "??:??") then
-				tip = GLDG_TXT.tipnew2
+				tip = L["Player joined the guild before you logged on."]
 			else
-				tip = string.format(GLDG_TXT.tipnew, logtime)
+				tip = string.format(L["At %s, this player joined the guild"], logtime)
 			end
 
 		elseif GLDG_DataChar[oDBname].achievment then
-			tip = string.format(GLDG_TXT.tipachv, GLDG_DataChar[oDBname].achievment)
+			tip = string.format(L["Player has achieved %s."], GLDG_DataChar[oDBname].achievment)
 
 		elseif GLDG_DataChar[oDBname].newlvl then
-			tip = string.format(GLDG_TXT.tiplvl, GLDG_DataChar[oDBname].lvl)
+			tip = string.format(L["Character reached level %s."], GLDG_DataChar[oDBname].lvl)
 
 		elseif GLDG_DataChar[oDBname].newrank then
 			if GLDG_DataChar[oDBname].promoter then
 				 if (logtime == "??:??") then
-				 	tip = string.format(GLDG_TXT.tiprank, Ambiguate(GLDG_DataChar[oDBname].promoter, "guild"), GLDG_DataChar[oDBname].rankname)
+				 	tip = string.format(L["%s promoted the player to rank %s earlier."], Ambiguate(GLDG_DataChar[oDBname].promoter, "guild"), GLDG_DataChar[oDBname].rankname)
 				 else
-				 	tip = string.format(GLDG_TXT.tiprank2, logtime, Ambiguate(GLDG_DataChar[oDBname].promoter, "guild"), GLDG_DataChar[oDBname].rankname)
+				 	tip = string.format(L["At %s, %s promoted this player to rank %s."], logtime, Ambiguate(GLDG_DataChar[oDBname].promoter, "guild"), GLDG_DataChar[oDBname].rankname)
 				 end
 			else
-				tip = string.format(GLDG_TXT.tiprank3, GLDG_DataChar[oDBname].rankname)
+				tip = string.format(L["Player was promoted to rank %s before you logged on."], GLDG_DataChar[oDBname].rankname)
 			end
 
 		elseif GLDG_Offline[name] then
@@ -2471,21 +2482,21 @@ function GLDG_ShowToolTip(self, buttonName)
 			local hrsoff = math.floor(minoff / 60)
 			minoff = math.fmod(minoff, 60)
 			local timestr = ""
-			if (hrsoff > 0) then timestr = string.format(GLDG_TXT.hour, hrsoff) end
-			if (minoff > 0) then timestr = timestr..string.format(GLDG_TXT.minute, minoff) end
-			tip = string.format(GLDG_TXT.tiprelog, logtime, timestr) end
+			if (hrsoff > 0) then timestr = string.format(L["%d hour "], hrsoff) end
+			if (minoff > 0) then timestr = timestr..string.format(L["%d min"], minoff) end
+			tip = string.format(L["At %s, this character came back online after being offline for %s."], logtime, timestr) end
 
 		-- If this is a main, add last used character to tip
 		if GLDG_DataChar[oDBname].main and GLDG_DataChar[oDBname].last then
-			tip = tip..string.format(GLDG_TXT.tiprelogalt, Ambiguate(GLDG_DataChar[oDBname].last, "guild"))
+			tip = tip..string.format(L[" Character used by player previously was %s."], Ambiguate(GLDG_DataChar[oDBname].last, "guild"))
 
 		-- If this is not the main, add last used character and main information to tip
 		elseif GLDG_DataChar[oDBname].alt then
 			local main = GLDG_DataChar[oDBname].alt
 			if GLDG_DataChar[main] and GLDG_DataChar[main].last then
-				tip = tip..string.format(GLDG_TXT.tiprelogalt, Ambiguate(GLDG_DataChar[main].last, "guild"))
+				tip = tip..string.format(L[" Character used by player previously was %s."], Ambiguate(GLDG_DataChar[main].last, "guild"))
 			end
-			tip = tip..string.format(GLDG_TXT.tipalt, Ambiguate(GLDG_DataChar[oDBname].alt, "guild"))
+			tip = tip..string.format(L[" Main character for this player is %s."], Ambiguate(GLDG_DataChar[oDBname].alt, "guild"))
 		end
 
 		-- If player has alias, add to name
@@ -2513,15 +2524,15 @@ function GLDG_ShowToolTip(self, buttonName)
 	elseif (string.sub(name, 1, 6)=="Tester") then
 		local number = string.sub(name, 7)
 		if (number == "1") then
-			tip = string.format(GLDG_TXT.tipdef, logtime)
+			tip = string.format(L["At %s, this character came online for the first time during this session."], logtime)
 		elseif (number == "2") then
-			tip = string.format(GLDG_TXT.tipnew, logtime)
+			tip = string.format(L["At %s, this player joined the guild"], logtime)
 		elseif (number == "3") then
-			tip = string.format(GLDG_TXT.tiplvl, math.random(70))
+			tip = string.format(L["Character reached level %s."], math.random(70))
 		elseif (number == "4") then
-			tip = string.format(GLDG_TXT.tiprank2, logtime, "Supertester", "Gopher-Tester")
+			tip = string.format(L["At %s, %s promoted this player to rank %s."], logtime, "Supertester", "Gopher-Tester")
 		elseif (number == "5") then
-			tip = string.format(GLDG_TXT.tiprelog, logtime, "some time")
+			tip = string.format(L["At %s, this character came back online after being offline for %s."], logtime, "some time")
 		end
 		name = name.." {t}"
 	end
@@ -2547,13 +2558,13 @@ function GLDG_ShowToolTip(self, buttonName)
 			end
 		end
 		if GLDG_DataChar[oDBname].rank and GLDG_DataChar[oDBname].rankname then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, GLDG_DataChar[oDBname].rankname.." ("..tostring(GLDG_DataChar[oDBname].rank)..")", 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["%s promoted the player to rank %s earlier."], GLDG_DataChar[oDBname].rankname.." ("..tostring(GLDG_DataChar[oDBname].rank)..")", 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif GLDG_DataChar[oDBname].rank then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, tostring(GLDG_DataChar[oDBname].rank), 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["%s promoted the player to rank %s earlier."], tostring(GLDG_DataChar[oDBname].rank), 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif GLDG_DataChar[oDBname].rankname then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, GLDG_DataChar[oDBname].rankname, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["%s promoted the player to rank %s earlier."], GLDG_DataChar[oDBname].rankname, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if GLDG_DataChar[oDBname].pNote then
@@ -3418,8 +3429,8 @@ function GLDG_UpdateRelog(self)
 	GLDG_Data.GuildSettings.RelogTime = self:GetValue()
 	-- Update display
 	local text = _G[self:GetParent():GetName().."RelogText"]
-	if (GLDG_Data.GuildSettings.RelogTime == 0) then text:SetText(GLDG_TXT.relogalways)
-	else text:SetText(string.format(GLDG_TXT.reloglimit, GLDG_Data.GuildSettings.RelogTime)) end
+	if (GLDG_Data.GuildSettings.RelogTime == 0) then text:SetText(L["Always show relogs"].."*")
+	else text:SetText(string.format(L["Only show relogs after more then %d min"], GLDG_Data.GuildSettings.RelogTime)) end
 	if GLDG_unique_GuildName then GLDG_generateConfigString() end
 end
 
@@ -4503,17 +4514,17 @@ function GLDG_ShowPlayerToolTip(element)
 			end
 			added = true
 			if p.new then
-				GameTooltip:AddDoubleLine(" ", GLDG_TXT.tipNew, 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(" ", L["At %s, this player joined the guild"], 1, 1, 0, 1, 1, 1)
 			end
 		end
 		if p.rank and p.rankname then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, p.rankname.." ("..tostring(p.rank)..")", 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["%s promoted the player to rank %s earlier."], p.rankname.." ("..tostring(p.rank)..")", 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif p.rank then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, tostring(p.rank), 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["%s promoted the player to rank %s earlier."], tostring(p.rank), 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif p.rankname then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, p.rankname, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["%s promoted the player to rank %s earlier."], p.rankname, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if (p.rank or p.rankname) and p.newrank then
@@ -5503,9 +5514,9 @@ function GLDG_FriendsUpdate()
 							end
 
 							if (mainName) then
-								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(name, "guild").."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[name].lvl.." "..GLDG_TXT.lvlIncrease2.." "..level.." "..GLDG_TXT.lvlIncrease3);
+								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(name, "guild").."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[name].lvl, level));
 							else
-								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(name, "guild").."] "..GLDG_TXT.lvlIncrease1.." "..GLDG_DataChar[name].lvl.." "..GLDG_TXT.lvlIncrease2.." "..level.." "..GLDG_TXT.lvlIncrease3);
+								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(name, "guild").."] "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[name].lvl, level));
 							end
 						end
 						if (GLDG_TableSize(GLDG_DataGreet.NewLevel) > 0) and (not GLDG_Data.GuildSettings.SupressLevel) and (not GLDG_DataChar[name].ignore) and (level > GLDG_Data.GuildSettings.MinLevelUp) then
@@ -5605,7 +5616,7 @@ function GLDG_TreatAchievment(achievmentLink, name)
 
 		if (main) then
 			if (GLDG_Data.GuildSettings.ListAchievments) then
-				GLDG_Print(name..GLDG_Data.colours.help.." {"..Ambiguate(main, "guild").."}|r "..GLDG_TXT.achieved.." "..tostring(achievment))
+				GLDG_Print(name..GLDG_Data.colours.help.." {"..Ambiguate(main, "guild").."}|r "..L["has earned"].." "..tostring(achievment))
 			end
 		end
 

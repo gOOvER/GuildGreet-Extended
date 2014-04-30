@@ -11,61 +11,61 @@ if (not GLDG_TXT) then
 end
 
 -- Binding names
-BINDING_HEADER_GUILDGREET		= "GuildGreet";
-BINDING_NAME_GUILDGREETCONFIG		= "Konfigurationsfenster öffnen";
-BINDING_NAME_GUILDGREETCLEAR		= "Grussliste leeren"
-BINDING_NAME_GUILDGREETTEST		= "Test trigger";
-BINDING_NAME_GUILDGREETGREETGUILD	= "Gilde und Channel begrüssen";
-BINDING_NAME_GUILDGREETBYEGUILD		= "Gilde und Channel verabschieden";
-BINDING_NAME_GUILDGREETLATERGUILD	= "Gilde und Channel vorübergehend verabschieden"
+--BINDING_HEADER_GUILDGREET		= "GuildGreet";
+--BINDING_NAME_GUILDGREETCONFIG		= "Konfigurationsfenster öffnen";
+--BINDING_NAME_GUILDGREETCLEAR		= "Grussliste leeren"
+--BINDING_NAME_GUILDGREETTEST		= "Test trigger";
+--BINDING_NAME_GUILDGREETGREETGUILD	= "Gilde und Channel begrüssen";
+--BINDING_NAME_GUILDGREETBYEGUILD		= "Gilde und Channel verabschieden";
+--BINDING_NAME_GUILDGREETLATERGUILD	= "Gilde und Channel vorübergehend verabschieden"
 
 -- Names for the tabs
-GLDG_TXT.TabSettings	= "Einstellungen"
-GLDG_TXT.TabGreetings	= "Grüsse"
-GLDG_TXT.TabPlayers	= "Charaktere"
-GLDG_TXT.TabCleanup	= "Aufräumen"
-GLDG_TXT.TabColour	= "Farben"
-GLDG_TXT.TabTodo	= "Information"
-GLDG_TXT.SubTabGeneral  = "Allgemein"
-GLDG_TXT.SubTabChat	= "Chat"
-GLDG_TXT.SubTabGreeting	= "Grüssen"
-GLDG_TXT.SubTabDebug	= "Debug"
-GLDG_TXT.SubTabOther	= "Anderes"
+--GLDG_TXT.TabSettings	= "Einstellungen"
+--GLDG_TXT.TabGreetings	= "Grüsse"
+--GLDG_TXT.TabPlayers	= "Charaktere"
+--GLDG_TXT.TabCleanup	= "Aufräumen"
+--GLDG_TXT.TabColour	= "Farben"
+--GLDG_TXT.TabTodo	= "Information"
+--GLDG_TXT.SubTabGeneral  = "Allgemein"
+--GLDG_TXT.SubTabChat	= "Chat"
+--GLDG_TXT.SubTabGreeting	= "Grüssen"
+--GLDG_TXT.SubTabDebug	= "Debug"
+--GLDG_TXT.SubTabOther	= "Anderes"
 
 -- option frame
-GLDG_TXT.optionHeader	= "GuildGreet unterstützt den Optionen-Dialog nicht.\r\nTippe |cFFFFFF7F/gg|r um das Konfigurationsfenster zu öffnen."
+--GLDG_TXT.optionHeader	= "GuildGreet unterstützt den Optionen-Dialog nicht.\r\nTippe |cFFFFFF7F/gg|r um das Konfigurationsfenster zu öffnen."
 
 -- Queue list
-GLDG_TXT.new		= "NEU"
-GLDG_TXT.lvl		= "LEVEL"
-GLDG_TXT.rank		= "RANG"
-GLDG_TXT.achv		= "ERF"
+--GLDG_TXT.new		= "NEU"
+--GLDG_TXT.lvl		= "LEVEL"
+--GLDG_TXT.rank		= "RANG"
+--GLDG_TXT.achv		= "ERF"
 
 -- Queue list tooltips
-GLDG_TXT.tipdef		= "Um %s kam der Charakter erstmals diese Sitzung online."
-GLDG_TXT.tiprelog	= "Um %s kam der Charakter wieder online, nachdem es %s offline war."
-GLDG_TXT.tiprelogalt	= " Charakter des Spielers war vorher %s."
-GLDG_TXT.tipnew		= "Um %s ist dieser Spieler der Gilde beigetreten."
-GLDG_TXT.tipnew2	= "Spieler ist der Gilde beigetreten bevor Du eingeloggt hast."
-GLDG_TXT.tiplvl		= "Charakter hat Level %s erreicht."
-GLDG_TXT.tiprank	= "Spieler wurde von %s zum Rang %s befördert."
-GLDG_TXT.tiprank2	= "Um %s wurde Spieler von %s zum Rang %s befördert."
-GLDG_TXT.tiprank3	= "Der Spieler wurde zum Rang %s befördert, bevor Du eingeloggt hast."
-GLDG_TXT.tipachv	= "Der Spieler hat %s erreicht."
-GLDG_TXT.tipalt		= " Main dieses Spielers ist %s."
-GLDG_TXT.hour		= "%d Stunde "
-GLDG_TXT.minute		= "%d Minute"
-GLDG_TXT.lvlIncrease1	= "hat seinen Level von"
-GLDG_TXT.lvlIncrease2	= "nach"
-GLDG_TXT.lvlIncrease3	= "erhöht"
-GLDG_TXT.leftguild	= "hat die Gilde verlassen"
-GLDG_TXT.achieved       = "erreicht"
-GLDG_TXT.noCharsFound	= "Es wurden keine Charaktere gefunden"
+--GLDG_TXT.tipdef		= "Um %s kam der Charakter erstmals diese Sitzung online."
+--GLDG_TXT.tiprelog	= "Um %s kam der Charakter wieder online, nachdem es %s offline war."
+--GLDG_TXT.tiprelogalt	= " Charakter des Spielers war vorher %s."
+--GLDG_TXT.tipnew		= "Um %s ist dieser Spieler der Gilde beigetreten."
+--GLDG_TXT.tipnew2	= "Spieler ist der Gilde beigetreten bevor Du eingeloggt hast."
+--GLDG_TXT.tiplvl		= "Charakter hat Level %s erreicht."
+--GLDG_TXT.tiprank	= "Spieler wurde von %s zum Rang %s befördert."
+--GLDG_TXT.tiprank2	= "Um %s wurde Spieler von %s zum Rang %s befördert."
+--GLDG_TXT.tiprank3	= "Der Spieler wurde zum Rang %s befördert, bevor Du eingeloggt hast."
+--GLDG_TXT.tipachv	= "Der Spieler hat %s erreicht."
+--GLDG_TXT.tipalt		= " Main dieses Spielers ist %s."
+--GLDG_TXT.hour		= "%d Stunde "
+--GLDG_TXT.minute		= "%d Minute"
+--GLDG_TXT.lvlIncrease1	= "hat seinen Level von"
+--GLDG_TXT.lvlIncrease2	= "nach"
+--GLDG_TXT.lvlIncrease3	= "erhöht"
+--GLDG_TXT.leftguild	= "hat die Gilde verlassen"
+--GLDG_TXT.achieved       = "erreicht"
+--GLDG_TXT.noCharsFound	= "Es wurden keine Charaktere gefunden"
 
 -- Settings tab: greeting options
 GLDG_TXT.optheader	= "Konfigurationsoptionen wen, wann, wie zu grü\195\159en"
-GLDG_TXT.relogalways	= "Relogs immer zeigen *"
-GLDG_TXT.reloglimit	= "Zeige Relogs nur nach mehr als %d Minuten *"
+--GLDG_TXT.relogalways	= "Relogs immer zeigen *"
+--GLDG_TXT.reloglimit	= "Zeige Relogs nur nach mehr als %d Minuten *"
 GLDG_TXT.greetasmain	= "Standardmässig Alts mit dem Namen des Main grü\195\159en *"
 GLDG_TXT.randomize	= "Zufällig Namen und Alias von Main und Alt verwenden *"
 GLDG_TXT.whisper	= "Spieler anflüstern *"

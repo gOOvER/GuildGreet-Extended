@@ -6,61 +6,61 @@ if (not GLDG_TXT) then
 end
 
 -- Binding names
-BINDING_HEADER_GUILDGREET		= "GuildGreet";
-BINDING_NAME_GUILDGREETCONFIG		= "Open config window";
-BINDING_NAME_GUILDGREETCLEAR		= "Clear greet list"
-BINDING_NAME_GUILDGREETTEST		= "Test trigger";
-BINDING_NAME_GUILDGREETGREETGUILD	= "Greet Guild and Channel";
-BINDING_NAME_GUILDGREETBYEGUILD		= "Say goodbye to guild and channel";
-BINDING_NAME_GUILDGREETLATERGUILD	= "Say see you later to guild and channel"
+--BINDING_HEADER_GUILDGREET		= "GuildGreet";
+--BINDING_NAME_GUILDGREETCONFIG		= "Open config window";
+--BINDING_NAME_GUILDGREETCLEAR		= "Clear greet list"
+--BINDING_NAME_GUILDGREETTEST		= "Test trigger";
+--BINDING_NAME_GUILDGREETGREETGUILD	= "Greet Guild and Channel";
+--BINDING_NAME_GUILDGREETBYEGUILD		= "Say goodbye to guild and channel";
+--BINDING_NAME_GUILDGREETLATERGUILD	= "Say see you later to guild and channel"
 
 -- Names for the tabs
-GLDG_TXT.TabSettings	= "Settings"
-GLDG_TXT.TabGreetings	= "Greetings"
-GLDG_TXT.TabPlayers	= "Characters"
-GLDG_TXT.TabCleanup	= "Cleanup"
-GLDG_TXT.TabColour	= "Colours"
-GLDG_TXT.TabTodo	= "Information"
-GLDG_TXT.SubTabGeneral  = "General"
-GLDG_TXT.SubTabChat	= "Chat"
-GLDG_TXT.SubTabGreeting	= "Greeting"
-GLDG_TXT.SubTabDebug	= "Debug"
-GLDG_TXT.SubTabOther	= "Other"
+--GLDG_TXT.TabSettings	= "Settings"
+--GLDG_TXT.TabGreetings	= "Greetings"
+--GLDG_TXT.TabPlayers	= "Characters"
+--GLDG_TXT.TabCleanup	= "Cleanup"
+--GLDG_TXT.TabColour	= "Colours"
+--GLDG_TXT.TabTodo	= "Information"
+--GLDG_TXT.SubTabGeneral  = "General"
+--GLDG_TXT.SubTabChat	= "Chat"
+--GLDG_TXT.SubTabGreeting	= "Greeting"
+--GLDG_TXT.SubTabDebug	= "Debug"
+--GLDG_TXT.SubTabOther	= "Other"
 
 -- option frame
-GLDG_TXT.optionHeader	= "GuildGreet does not support the option frame.\r\nType |cFFFFFF7F/gg|r to open its configuration dialog."
+--GLDG_TXT.optionHeader	= "GuildGreet does not support the option frame.\r\nType |cFFFFFF7F/gg|r to open its configuration dialog."
 
 -- Queue list
-GLDG_TXT.new		= "NEW"
-GLDG_TXT.lvl		= "LEVEL"
-GLDG_TXT.rank		= "RANK"
-GLDG_TXT.achv		= "ACHV"
+--GLDG_TXT.new		= "NEW"
+--GLDG_TXT.lvl		= "LEVEL"
+--GLDG_TXT.rank		= "RANK"
+--GLDG_TXT.achv		= "ACHV"
 
 -- Queue list tooltips
-GLDG_TXT.tipdef		= "At %s, this character came online for the first time during this session."
-GLDG_TXT.tiprelog	= "At %s, this character came back online after being offline for %s."
-GLDG_TXT.tiprelogalt	= " Character used by player previously was %s."
-GLDG_TXT.tipnew		= "At %s, this player joined the guild"
-GLDG_TXT.tipnew2	= "Player joined the guild before you logged on."
-GLDG_TXT.tiplvl		= "Character reached level %s."
-GLDG_TXT.tiprank	= "%s promoted the player to rank %s earlier."
-GLDG_TXT.tiprank2	= "At %s, %s promoted this player to rank %s."
-GLDG_TXT.tiprank3	= "Player was promoted to rank %s before you logged on."
-GLDG_TXT.tipachv	= "Player has achieved %s."
-GLDG_TXT.tipalt		= " Main character for this player is %s."
-GLDG_TXT.hour		= "%d hour "
-GLDG_TXT.minute		= "%d min"
-GLDG_TXT.lvlIncrease1	= "has increased his level from"
-GLDG_TXT.lvlIncrease2	= "to"
-GLDG_TXT.lvlIncrease3	= ""
-GLDG_TXT.leftguild	= "has left the guild"
-GLDG_TXT.achieved       = "has earned"
-GLDG_TXT.noCharsFound	= "No characters found"
+--GLDG_TXT.tipdef		= "At %s, this character came online for the first time during this session."
+--GLDG_TXT.tiprelog	= "At %s, this character came back online after being offline for %s."
+--GLDG_TXT.tiprelogalt	= " Character used by player previously was %s."
+--GLDG_TXT.tipnew		= "At %s, this player joined the guild"
+--GLDG_TXT.tipnew2	= "Player joined the guild before you logged on."
+--GLDG_TXT.tiplvl		= "Character reached level %s."
+--GLDG_TXT.tiprank	= "%s promoted the player to rank %s earlier."
+--GLDG_TXT.tiprank2	= "At %s, %s promoted this player to rank %s."
+--GLDG_TXT.tiprank3	= "Player was promoted to rank %s before you logged on."
+--GLDG_TXT.tipachv	= "Player has achieved %s."
+--GLDG_TXT.tipalt		= " Main character for this player is %s."
+--GLDG_TXT.hour		= "%d hour "
+--GLDG_TXT.minute		= "%d min"
+--GLDG_TXT.lvlIncrease1	= "has increased his level from"
+--GLDG_TXT.lvlIncrease2	= "to"
+--GLDG_TXT.lvlIncrease3	= ""
+--GLDG_TXT.leftguild	= "has left the guild"
+--GLDG_TXT.achieved       = "has earned"
+--GLDG_TXT.noCharsFound	= "No characters found"
 
 -- Settings tab: greeting options
 GLDG_TXT.optheader	= "Configuration options to determine who, when and how to greet"
-GLDG_TXT.relogalways	= "Always show relogs *"
-GLDG_TXT.reloglimit	= "Only show relogs after more then %d min *"
+--GLDG_TXT.relogalways	= "Always show relogs *"
+--GLDG_TXT.reloglimit	= "Only show relogs after more then %d min *"
 GLDG_TXT.useguilddefault	= "Read the guildsettings from the guild info |cFFFF0000You must reload your interface after change this manually!"
 GLDG_TXT.writeguildstring = "Write the config string"
 GLDG_TXT.greetasmain	= "Greet alts with the same name as main by default *"
@@ -70,7 +70,7 @@ GLDG_TXT.whisperLevelup	= "Whisper level up messages *"
 GLDG_TXT.useFriends	= "Manage friend's list"
 GLDG_TXT.autoAssign	= "Automatically assign main/alt based on guild note *"
 GLDG_TXT.autoAssignEgp	= "(include EGP officer notes) *"
-GLDG_TXT.autoAssignAlias	= "(Automatically assign Alias) *"
+--GLDG_TXT.autoAssignAlias	= "(Automatically assign Alias) *"
 GLDG_TXT.channelName	= "Channel name to monitor"
 GLDG_TXT.includeOwn	= "Display your own characters *"
 GLDG_TXT.minlevelupalways = "Always show level-up *"
