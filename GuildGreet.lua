@@ -6936,7 +6936,7 @@ function GLDG_Convert()
 
 	-- find channels, guilds and friends for all realms
 	for p in pairs(GLDG_Data) do
-		--GLDG_Print("Iterator "..tostring(i)..": ["..tostring(p).."] - ["..tostring(GLDG_Data[p]).."]")
+		-- GLDG_Print("Iterator "..tostring(i)..": ["..tostring(p).."] - ["..tostring(GLDG_Data[p]).."]")
 		i = i + 1
 
 		local _, _, realm, channel = string.find(tostring(p), "(.*)%s%-%schannel%s%-%s(.*)")
