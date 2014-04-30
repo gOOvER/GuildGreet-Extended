@@ -1,6 +1,8 @@
-﻿local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
-local L = AceLocale:NewLocale("GuildGreet", "deDE")
+﻿local L = LibStub("AceLocale-3.0"):NewLocale("GuildGreet", "deDE")
 if not L then return end
+
+--@localization(locale="deDE", format="lua_additive_table")@
+
 
 -- Binding names
 L["GuildGreet"] = "GuildGreet"
