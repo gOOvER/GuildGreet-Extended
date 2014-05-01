@@ -842,20 +842,20 @@ function GLDG_InitFrame(frameName)
 		_G[name.."ChannelAchievmentColour"]:Hide()
 	elseif (frameName == "SettingsGeneral") then
 		-- Greeting options texts
-		_G[name.."Header"]:SetText(GLDG_TXT.optheader)
-		_G[name.."UseGuildDefaultText"]:SetText(GLDG_TXT.useguilddefault)
-		_G[name.."WriteGuildStringText"]:SetText(GLDG_TXT.writeguildstring)
+		_G[name.."Header"]:SetText(L["Configuration options to determine who, when and how to greet"])
+		_G[name.."UseGuildDefaultText"]:SetText(L["Read the guildsettings from the guild info |cFFFF0000You must reload your interface after change this manually!"])
+		_G[name.."WriteGuildStringText"]:SetText(L["Write the config string"])
 		_G[name.."WriteGuildString"]:Disable()
-		_G[name.."GreetAsMainText"]:SetText(GLDG_TXT.greetasmain)
-		_G[name.."RandomizeText"]:SetText(GLDG_TXT.randomize)
-		_G[name.."WhisperText"]:SetText(GLDG_TXT.whisper)
-		_G[name.."WhisperLevelupText"]:SetText(GLDG_TXT.whisperLevelup)
-		_G[name.."IncludeOwnText"]:SetText(GLDG_TXT.includeOwn)
-		_G[name.."AutoAssignText"]:SetText(GLDG_TXT.autoAssign)
-		_G[name.."AutoAssignEgpText"]:SetText(GLDG_TXT.autoAssignEgp)
+		_G[name.."GreetAsMainText"]:SetText(L["Greet alts with the same name as main by default"].."*")
+		_G[name.."RandomizeText"]:SetText(L["Randomly use alias and or main and alt names"].."*")
+		_G[name.."WhisperText"]:SetText(L["Whisper greetings and grats to players"].."*")
+		_G[name.."WhisperLevelupText"]:SetText(L["Whisper level up messages"].."*")
+		_G[name.."IncludeOwnText"]:SetText(L["Display your own characters"].."*")
+		_G[name.."AutoAssignText"]:SetText(L["Automatically assign main/alt based on guild note"].."*")
+		_G[name.."AutoAssignEgpText"]:SetText(L["(include EGP officer notes)"].."*")
 		_G[name.."AutoAssignAliasText"]:SetText(L["(Automatically assign Alias)"].."*")
-		_G[name.."UseFriendsText"]:SetText(GLDG_TXT.useFriends)
-		_G[name.."ChannelNameText"]:SetText(GLDG_TXT.channelName)
+		_G[name.."UseFriendsText"]:SetText(L["Manage friend's list"])
+		_G[name.."ChannelNameText"]:SetText(L["Channel name to monitor"])
 		-- Queued greetings list texts
 		_G[name.."ListHeader"]:SetText(GLDG_TXT.listheader)
 		_G[name.."ListdirectText"]:SetText(GLDG_TXT.listdirect)
@@ -880,7 +880,7 @@ function GLDG_InitFrame(frameName)
 		_G[name.."ListsizeSlider"]:SetValue(GLDG_Data.ListSize)
 	elseif (frameName == "SettingsChat") then
 		-- List settings
-		_G[name.."Header"]:SetText(GLDG_TXT.chatheader)
+		_G[name.."Header"]:SetText(L["Printing information to chat"])
 		_G[name.."ChatFrameSlider"]:SetValue(GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm])
 		_G[name.."ListNamesBox"]:SetChecked(GLDG_Data.GuildSettings.ListNames)
 		_G[name.."ListNamesOffBox"]:SetChecked(GLDG_Data.GuildSettings.ListNamesOff)
@@ -891,45 +891,45 @@ function GLDG_InitFrame(frameName)
 		_G[name.."ExtendIgnoredBox"]:SetChecked(GLDG_Data.GuildSettings.ExtendIgnored)
 		_G[name.."ExtendAliasBox"]:SetChecked(GLDG_Data.GuildSettings.ExtendAlias)
 		_G[name.."ExtendMainBox"]:SetChecked(GLDG_Data.GuildSettings.ExtendMain)
-		_G[name.."ListNamesText"]:SetText(GLDG_TXT.listNames)
-		_G[name.."ListNamesOffText"]:SetText(GLDG_TXT.listNamesOff)
-		_G[name.."ListLevelUpText"]:SetText(GLDG_TXT.listLevelUp)
-		_G[name.."ListLevelUpOffText"]:SetText(GLDG_TXT.listLevelUpOff)
-		_G[name.."ListQuitText"]:SetText(GLDG_TXT.listQuit)
-		_G[name.."ExtendChatText"]:SetText(GLDG_TXT.extendChat)
-		_G[name.."ExtendIgnoredText"]:SetText(GLDG_TXT.extendIgnored)
-		_G[name.."ExtendAliasText"]:SetText(GLDG_TXT.extendAlias)
-		_G[name.."ExtendMainText"]:SetText(GLDG_TXT.extendMain)
-		_G[name.."AddPostfixText"]:SetText(GLDG_TXT.addPostfix)
+		_G[name.."ListNamesText"]:SetText(L["List alt and main names when player logs in"].."*")
+		_G[name.."ListNamesOffText"]:SetText(L["List alt and main names when player logs off"].."*")
+		_G[name.."ListLevelUpText"]:SetText(L["List to chat when a player levels up (online only)"].."*")
+		_G[name.."ListLevelUpOffText"]:SetText(L["List to chat when a player levels up (offline players, printed when you log in)"].."*")
+		_G[name.."ListQuitText"]:SetText(L["List to chat when a player leaves the guild"].."*")
+		_G[name.."ExtendChatText"]:SetText(L["Add main name to chat when an alt sends a message"].."*")
+		_G[name.."ExtendIgnoredText"]:SetText(L["Add main name to chat when an alt sends a message, even if alt is ignored"].."*")
+		_G[name.."ExtendAliasText"]:SetText(L["Add main's alias to chat (if it exists and the above option is enabled)"].."*")
+		_G[name.."ExtendMainText"]:SetText(L["Even re-add main name for main char (if the above option is enabled)"].."*")
+		_G[name.."AddPostfixText"]:SetText(L["Show source of character info in curly braces when printing names to chat"].."*")
 		_G[name.."AddPostfixBox"]:SetChecked(GLDG_Data.GuildSettings.AddPostfix)
-		_G[name.."ShowWhoSpamText"]:SetText(GLDG_TXT.showWhoSpam)
+		_G[name.."ShowWhoSpamText"]:SetText(L["Show /who request and response text in chat"].."*")
 		_G[name.."ShowWhoSpamBox"]:SetChecked(GLDG_Data.GuildSettings.ShowWhoSpam)
-		_G[name.."ListAchievmentsText"]:SetText(GLDG_TXT.listAchievments)
+		_G[name.."ListAchievmentsText"]:SetText(L["Show achievments of guild members with main/alt in chat"].."*")
 		_G[name.."ListAchievmentsBox"]:SetChecked(GLDG_Data.GuildSettings.ListAchievments)
 	elseif (frameName == "SettingsGreeting") then
 		-- header
-		_G[name.."Header"]:SetText(GLDG_TXT.greetingheader)
-		_G[name.."SubHeader"]:SetText(GLDG_TXT.greetingsubheader)
+		_G[name.."Header"]:SetText(L["Greeting the guild and channel (per character setting)"])
+		_G[name.."SubHeader"]:SetText(L["Temporarily suppress greeting players"])
 		-- greet options
 		_G[name.."GreetGuildBox"]:SetChecked(GLDG_Data.GreetGuild[GLDG_Realm.." - "..GLDG_Player])
 		_G[name.."GreetChannelBox"]:SetChecked(GLDG_Data.GreetChannel[GLDG_Realm.." - "..GLDG_Player])
 		_G[name.."AutoGreetBox"]:SetChecked(GLDG_Data.AutoGreet[GLDG_Realm.." - "..GLDG_Player])
-		_G[name.."GreetGuildText"]:SetText(GLDG_TXT.greetGuild)
-		_G[name.."GreetChannelText"]:SetText(GLDG_TXT.greetChannel)
-		_G[name.."AutoGreetText"]:SetText(GLDG_TXT.autoGreet)
+		_G[name.."GreetGuildText"]:SetText(L["Greet guild when 'Greet Key' is pressed (also applies to saying bye)"])
+		_G[name.."GreetChannelText"]:SetText(L["Greet channel when 'Greet Key' is pressed (also applies to saying bye)"])
+		_G[name.."AutoGreetText"]:SetText(L["Automatically greet guild and/or channel when logging in (depends on settings above). |cFFFF0000Use carefully (see tooltip)."])
 		-- suppress options
 		GLDG_UpdateSupressed()
-		_G[name.."SupressAll"]:SetText(GLDG_TXT.supressAll)
-		_G[name.."SupressNone"]:SetText(GLDG_TXT.supressNone)
+		_G[name.."SupressAll"]:SetText(L["Supress all"])
+		_G[name.."SupressNone"]:SetText(L["Supress none"])
 
-		_G[name.."SupressGreetText"]:SetText(GLDG_TXT.supressGreet)
-		_G[name.."SupressJoinText"]:SetText(GLDG_TXT.supressJoin)
-		_G[name.."SupressLevelText"]:SetText(GLDG_TXT.supressLevel)
-		_G[name.."SupressRankText"]:SetText(GLDG_TXT.supressRank)
-		_G[name.."SupressAchievmentText"]:SetText(GLDG_TXT.supressAchievment)
+		_G[name.."SupressGreetText"]:SetText(L["Don't put players coming online on the greet list"].."*")
+		_G[name.."SupressJoinText"]:SetText(L["Don't put players joining the guild on the greet list"].."*")
+		_G[name.."SupressLevelText"]:SetText(L["Don't put players that level up on the greet list"].."*")
+		_G[name.."SupressRankText"]:SetText(L["Don't put players that get promoted on the greet list"].."*")
+		_G[name.."SupressAchievmentText"]:SetText(L["Don't put players that get achievments on the greet list"].."*")
 
 		_G[name.."NoGratsOnLoginBox"]:SetChecked(GLDG_Data.GuildSettings.NoGratsOnLogin)
-		_G[name.."NoGratsOnLoginText"]:SetText(GLDG_TXT.noGratsOnLogin)
+		_G[name.."NoGratsOnLoginText"]:SetText(L["Don't congratulate players that just logged in"].."*")
 		-- guild alias
 		_G[name.."GuildAliasSet"]:SetText(GLDG_TXT.set)
 		_G[name.."GuildAliasClear"]:SetText(GLDG_TXT.clear)
@@ -1065,7 +1065,7 @@ function GLDG_InitRoster()
 	local name = GLDG_GUI.."SettingsGreeting"
 	if (GLDG_unique_GuildName~="") then
 	
-		_G[name.."GuildAliasHeader"]:SetText(GLDG_TXT.guildAlias.."|cFFFFFF7F"..GLDG_unique_GuildName.."|r")
+		_G[name.."GuildAliasHeader"]:SetText(L["Guild alias for:"].." |cFFFFFF7F"..GLDG_unique_GuildName.."|r")
 		if (GLDG_GuildAlias ~= GLDG_unique_GuildName) then
 			_G[name.."GuildAliasEditbox"]:SetText(GLDG_GuildAlias)
 		else
@@ -1077,8 +1077,8 @@ function GLDG_InitRoster()
 		_G[name.."GuildAliasSet"]:Enable("")
 		_G[name.."GuildAliasClear"]:Enable("")
 	else
-		_G[name.."GuildAliasHeader"]:SetText(GLDG_TXT.guildAlias.."|cFFFFFF7F"..GLDG_unique_GuildName.."|r")
-		_G[name.."GuildAliasWarning"]:SetText(GLDG_TXT.guildNoAlias)
+		_G[name.."GuildAliasHeader"]:SetText(L["Guild alias for:"].." |cFFFFFF7F"..GLDG_unique_GuildName.."|r")
+		_G[name.."GuildAliasWarning"]:SetText(L["Can't set guild alias while unguilded"])
 		_G[name.."GuildAliasEditbox"]:SetText("")
 
 		_G[name.."GuildAliasEditbox"]:Hide()
@@ -2558,13 +2558,13 @@ function GLDG_ShowToolTip(self, buttonName)
 			end
 		end
 		if GLDG_DataChar[oDBname].rank and GLDG_DataChar[oDBname].rankname then
-			GameTooltip:AddDoubleLine(L["%s promoted the player to rank %s earlier."], GLDG_DataChar[oDBname].rankname.." ("..tostring(GLDG_DataChar[oDBname].rank)..")", 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipNewRank, GLDG_DataChar[oDBname].rankname.." ("..tostring(GLDG_DataChar[oDBname].rank)..")", 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif GLDG_DataChar[oDBname].rank then
-			GameTooltip:AddDoubleLine(L["%s promoted the player to rank %s earlier."], tostring(GLDG_DataChar[oDBname].rank), 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipNewRank, tostring(GLDG_DataChar[oDBname].rank), 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif GLDG_DataChar[oDBname].rankname then
-			GameTooltip:AddDoubleLine(L["%s promoted the player to rank %s earlier."], GLDG_DataChar[oDBname].rankname, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipNewRank, GLDG_DataChar[oDBname].rankname, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if GLDG_DataChar[oDBname].pNote then
@@ -3440,8 +3440,8 @@ function GLDG_UpdateMinLevelUp(self)
 	GLDG_Data.GuildSettings.MinLevelUp = self:GetValue()
 	-- Update display
 	local text = _G[self:GetParent():GetName().."MinLevelUpText"]
-	if (GLDG_Data.GuildSettings.MinLevelUp == 0) then text:SetText(GLDG_TXT.minlevelupalways)
-	else text:SetText(string.format(GLDG_TXT.minlevelup, GLDG_Data.GuildSettings.MinLevelUp)) end
+	if (GLDG_Data.GuildSettings.MinLevelUp == 0) then text:SetText(L["Always show level-up"].."*")
+	else text:SetText(string.format(L["Only show level-up for levels above %d"], GLDG_Data.GuildSettings.MinLevelUp).."*") end
 	if GLDG_unique_GuildName then GLDG_generateConfigString() end
 end
 
@@ -3452,9 +3452,9 @@ function GLDG_UpdateUpdateTime(self)
 	-- Update display
 	local text = _G[self:GetParent():GetName().."UpdateTimeText"]
 	if (GLDG_Data.UpdateTime == 0) then
-		text:SetText(GLDG_TXT.eventonly)
+		text:SetText(L["Only update guild roster on events"])
 	else
-		text:SetText(string.format(GLDG_TXT.updatetime, GLDG_Data.UpdateTime))
+		text:SetText(string.format(L["Update guild roster every %d seconds"], GLDG_Data.UpdateTime))
 	end
 
 	if GLDG_InitialGuildUpdate then
@@ -3630,21 +3630,21 @@ function GLDG_UpdateChatFrame(self)
 		-- Update display
 		--local text = _G[self:GetParent():GetName().."ChatFrameText"]
 		if (GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] == 0) then
-			text:SetText(GLDG_TXT.defaultChatFrame)
+			text:SetText(L["Using default chat frame"])
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Now using default chat frame")
 		else
 			local name, fontSize, r, g, b, alpha, shown, locked, docked = GetChatWindowInfo(GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm])
-			text:SetText(string.format(GLDG_TXT.chatFrame, GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm], name))
+			text:SetText(string.format(L["Using chat frame %d (%s)"], GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm], name))
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Now using chat frame "..GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm].." ("..Ambiguate(name, "guild")..")")
 		end
 
 		GLDG_updatingChatFrame = nil
 	else
 		if (GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] == 0) then
-			text:SetText(GLDG_TXT.defaultChatFrame)
+			text:SetText(L["Using default chat frame"])
 		else
 			local name, fontSize, r, g, b, alpha, shown, locked, docked = GetChatWindowInfo(GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm])
-			text:SetText(string.format(GLDG_TXT.chatFrame, GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm], name))
+			text:SetText(string.format(L["Using chat frame %d (%s)"], GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm], name))
 		end
 	end
 end
@@ -3692,7 +3692,7 @@ function GLDG_DropDown_Initialize()
 		local id, name = GetChannelName(i)
 		if (i==0 or id>0 and name) then
 			if (i==0) then
-				name = GLDG_TXT.none
+				name = L["<none>"]
 			end
 
 			info.checked = nil
@@ -3700,7 +3700,7 @@ function GLDG_DropDown_Initialize()
 			UIDropDownMenu_AddButton(info);
 			GLDG_dropDownData[j] = string.lower(name)
 			if (string.lower(name) == GLDG_ChannelName) or
-			   (name == GLDG_TXT.none and GLDG_ChannelName=="") then
+			   (name == L["<none>"] and GLDG_ChannelName=="") then
 				UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."SettingsGeneral".."ChannelNameDropboxButton"], j);
 			end
 			j = j + 1
@@ -3715,7 +3715,7 @@ function GLDG_DropDown_OnClick(self)
 	local i = self:GetID();
 	local name = GLDG_dropDownData[i]
 	if not name then name = "" end
-	if name == GLDG_TXT.none then name = "" end
+	if name == L["<none>"] then name = "" end
 	name = string.lower(name)
 
 	local oldChannelName = GLDG_ChannelName
@@ -4514,17 +4514,17 @@ function GLDG_ShowPlayerToolTip(element)
 			end
 			added = true
 			if p.new then
-				GameTooltip:AddDoubleLine(" ", L["At %s, this player joined the guild"], 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(" ", GLDG_TXT.tipNew, 1, 1, 0, 1, 1, 1)
 			end
 		end
 		if p.rank and p.rankname then
-			GameTooltip:AddDoubleLine(L["%s promoted the player to rank %s earlier."], p.rankname.." ("..tostring(p.rank)..")", 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, p.rankname.." ("..tostring(p.rank)..")", 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif p.rank then
-			GameTooltip:AddDoubleLine(L["%s promoted the player to rank %s earlier."], tostring(p.rank), 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, tostring(p.rank), 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif p.rankname then
-			GameTooltip:AddDoubleLine(L["%s promoted the player to rank %s earlier."], p.rankname, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, p.rankname, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if (p.rank or p.rankname) and p.newrank then
@@ -6709,113 +6709,113 @@ end
 --------------------------
 
 ------------------------------------------------------------
-function GLDG_Dump(msg)
-	if not msg then return end
-	if not GLDGD_Dump then return end
+--function GLDG_Dump(msg)
+--	if not msg then return end
+--	if not GLDGD_Dump then return end
 
-	if GLDGD_InitComplete then
-		if GLDG_Backlog_Index and (GLDG_Backlog_Index > 0) then
-			GLDGD_DumpMsg("--- Starting to log backlog ---")
-				for index in pairs(GLDG_Backlog) do
-					GLDGD_DumpMsg("{"..GLDG_Backlog[index].."}")
-				end
-			GLDGD_DumpMsg("--- Done with logging backlog ---")
-			GLDG_Backlog = nil
-			GLDG_Backlog_Index = nil
-		end
-		GLDGD_DumpMsg(msg)
-	else
-		if not GLDG_Backlog then
-			GLDG_Backlog = {}
-			GLDG_Backlog_Index = 0
-		end
-		GLDG_Backlog_Index = GLDG_Backlog_Index + 1
-		GLDG_Backlog[GLDG_Backlog_Index] = msg
-	end
-end
-
-------------------------------------------------------------
-function GLDG_ShowDump()
-	if GLDGD_InitComplete and GLDGD_Dump then
-		_G[GLDG_GUI.."SettingsDebug".."EnableDumpText"]:SetText(GLDG_TXT.enableDump)
-		_G[GLDG_GUI.."SettingsDebug".."VerboseDumpText"]:SetText(GLDG_TXT.verboseDump)
-		_G[GLDG_GUI.."SettingsDebug".."DumpSetText"]:SetText(string.format(GLDG_TXT.dumpSet, GLDGD_Dump.CurrentDumpSet, option))
-		_G[GLDG_GUI.."SettingsDebug".."CurrentIndexText"]:SetText(string.format(GLDG_TXT.currentIndex, GLDGD_Dump.CurrentSetIndex-1, GLDGD_Dump.CurrentDumpSet, option))
-		_G[GLDG_GUI.."SettingsDebug".."ClearButton"]:SetText(string.format(GLDG_TXT.btnClear, GLDGD_Dump.CurrentDumpSet, option))
-		_G[GLDG_GUI.."SettingsDebug".."ClearAllButton"]:SetText(GLDG_TXT.btnClearAll)
-		_G[GLDG_GUI.."SettingsDebug".."NewButton"]:SetText(GLDG_TXT.btnNew)
-
-		_G[GLDG_GUI.."SettingsDebug".."EnableDumpBox"]:SetChecked(GLDGD_Dump.Enabled)
-		_G[GLDG_GUI.."SettingsDebug".."VerboseDumpBox"]:SetChecked(GLDGD_Dump.Verbose)
-		_G[GLDG_GUI.."SettingsDebug".."EnableDumpBox"]:Enable()
-		_G[GLDG_GUI.."SettingsDebug".."VerboseDumpBox"]:Enable()
-		_G[GLDG_GUI.."SettingsDebug".."ClearButton"]:Enable()
-		_G[GLDG_GUI.."SettingsDebug".."ClearAllButton"]:Enable()
-		_G[GLDG_GUI.."SettingsDebug".."NewButton"]:Enable()
-	else
-		_G[GLDG_GUI.."SettingsDebug".."EnableDumpText"]:SetText(GLDG_TXT.noDumping)
-		_G[GLDG_GUI.."SettingsDebug".."VerboseDumpText"]:SetText(GLDG_TXT.noDumping)
-		_G[GLDG_GUI.."SettingsDebug".."DumpSetText"]:SetText(GLDG_TXT.noDumpingShort)
-		_G[GLDG_GUI.."SettingsDebug".."CurrentIndexText"]:SetText(GLDG_TXT.noDumpingShort)
-		_G[GLDG_GUI.."SettingsDebug".."ClearButton"]:SetText(GLDG_TXT.noDumpingShort)
-		_G[GLDG_GUI.."SettingsDebug".."ClearAllButton"]:SetText(GLDG_TXT.noDumpingShort)
-		_G[GLDG_GUI.."SettingsDebug".."NewButton"]:SetText(GLDG_TXT.noDumpingShort)
-
-		_G[GLDG_GUI.."SettingsDebug".."EnableDumpBox"]:SetChecked(false)
-		_G[GLDG_GUI.."SettingsDebug".."VerboseDumpBox"]:SetChecked(false)
-		_G[GLDG_GUI.."SettingsDebug".."EnableDumpBox"]:Disable()
-		_G[GLDG_GUI.."SettingsDebug".."VerboseDumpBox"]:Disable()
-		_G[GLDG_GUI.."SettingsDebug".."ClearButton"]:Disable()
-		_G[GLDG_GUI.."SettingsDebug".."ClearAllButton"]:Disable()
-		_G[GLDG_GUI.."SettingsDebug".."NewButton"]:Disable()
-	end
-end
+--	if GLDGD_InitComplete then
+--		if GLDG_Backlog_Index and (GLDG_Backlog_Index > 0) then
+--			GLDGD_DumpMsg("--- Starting to log backlog ---")
+--				for index in pairs(GLDG_Backlog) do
+--					GLDGD_DumpMsg("{"..GLDG_Backlog[index].."}")
+--				end
+--			GLDGD_DumpMsg("--- Done with logging backlog ---")
+--			GLDG_Backlog = nil
+--			GLDG_Backlog_Index = nil
+--		end
+--		GLDGD_DumpMsg(msg)
+--	else
+--		if not GLDG_Backlog then
+--			GLDG_Backlog = {}
+--			GLDG_Backlog_Index = 0
+--		end
+--		GLDG_Backlog_Index = GLDG_Backlog_Index + 1
+--		GLDG_Backlog[GLDG_Backlog_Index] = msg
+--	end
+--end
 
 ------------------------------------------------------------
-function GLDG_ClickDumpEnable(checked)
-	if GLDGD_InitComplete and GLDGD_Dump then
-		GLDGD_Dump.Enabled = checked
+--function GLDG_ShowDump()
+--	if GLDGD_InitComplete and GLDGD_Dump then
+--		_G[GLDG_GUI.."SettingsDebug".."EnableDumpText"]:SetText(GLDG_TXT.enableDump)
+--		_G[GLDG_GUI.."SettingsDebug".."VerboseDumpText"]:SetText(GLDG_TXT.verboseDump)
+--		_G[GLDG_GUI.."SettingsDebug".."DumpSetText"]:SetText(string.format(GLDG_TXT.dumpSet, GLDGD_Dump.CurrentDumpSet, option))
+--		_G[GLDG_GUI.."SettingsDebug".."CurrentIndexText"]:SetText(string.format(GLDG_TXT.currentIndex, GLDGD_Dump.CurrentSetIndex-1, GLDGD_Dump.CurrentDumpSet, option))
+--		_G[GLDG_GUI.."SettingsDebug".."ClearButton"]:SetText(string.format(GLDG_TXT.btnClear, GLDGD_Dump.CurrentDumpSet, option))
+--		_G[GLDG_GUI.."SettingsDebug".."ClearAllButton"]:SetText(GLDG_TXT.btnClearAll)
+--		_G[GLDG_GUI.."SettingsDebug".."NewButton"]:SetText(GLDG_TXT.btnNew)
+--
+--		_G[GLDG_GUI.."SettingsDebug".."EnableDumpBox"]:SetChecked(GLDGD_Dump.Enabled)
+--		_G[GLDG_GUI.."SettingsDebug".."VerboseDumpBox"]:SetChecked(GLDGD_Dump.Verbose)
+--		_G[GLDG_GUI.."SettingsDebug".."EnableDumpBox"]:Enable()
+--		_G[GLDG_GUI.."SettingsDebug".."VerboseDumpBox"]:Enable()
+--		_G[GLDG_GUI.."SettingsDebug".."ClearButton"]:Enable()
+--		_G[GLDG_GUI.."SettingsDebug".."ClearAllButton"]:Enable()
+--		_G[GLDG_GUI.."SettingsDebug".."NewButton"]:Enable()
+--	else
+--		_G[GLDG_GUI.."SettingsDebug".."EnableDumpText"]:SetText(GLDG_TXT.noDumping)
+--		_G[GLDG_GUI.."SettingsDebug".."VerboseDumpText"]:SetText(GLDG_TXT.noDumping)
+--		_G[GLDG_GUI.."SettingsDebug".."DumpSetText"]:SetText(GLDG_TXT.noDumpingShort)
+--		_G[GLDG_GUI.."SettingsDebug".."CurrentIndexText"]:SetText(GLDG_TXT.noDumpingShort)
+--		_G[GLDG_GUI.."SettingsDebug".."ClearButton"]:SetText(GLDG_TXT.noDumpingShort)
+--		_G[GLDG_GUI.."SettingsDebug".."ClearAllButton"]:SetText(GLDG_TXT.noDumpingShort)
+--		_G[GLDG_GUI.."SettingsDebug".."NewButton"]:SetText(GLDG_TXT.noDumpingShort)
 
-		if GLDGD_Status() then
-			GLDGD_Status()
-		end
-	end
-end
+--		_G[GLDG_GUI.."SettingsDebug".."EnableDumpBox"]:SetChecked(false)
+--		_G[GLDG_GUI.."SettingsDebug".."VerboseDumpBox"]:SetChecked(false)
+--		_G[GLDG_GUI.."SettingsDebug".."EnableDumpBox"]:Disable()
+--		_G[GLDG_GUI.."SettingsDebug".."VerboseDumpBox"]:Disable()
+--		_G[GLDG_GUI.."SettingsDebug".."ClearButton"]:Disable()
+--		_G[GLDG_GUI.."SettingsDebug".."ClearAllButton"]:Disable()
+--		_G[GLDG_GUI.."SettingsDebug".."NewButton"]:Disable()
+--	end
+--end
 
 ------------------------------------------------------------
-function GLDG_ClickDumpVerbose(checked)
-	if GLDGD_InitComplete and GLDGD_Dump then
-		GLDGD_Dump.Verbose = checked
+--function GLDG_ClickDumpEnable(checked)
+--	if GLDGD_InitComplete and GLDGD_Dump then
+--		GLDGD_Dump.Enabled = checked
 
-		if GLDGD_Status() then
-			GLDGD_Status()
-		end
-	end
-end
-
-------------------------------------------------------------
-function GLDG_ClickDumpClear()
-	if GLDGD_InitComplete and GLDGD_Clear() then
-		GLDGD_Clear()
-	end
-	GLDG_ShowDump()
-end
+--		if GLDGD_Status() then
+--			GLDGD_Status()
+--		end
+--	end
+--end
 
 ------------------------------------------------------------
-function GLDG_ClickDumpClearAll()
-	if GLDGD_InitComplete and GLDGD_ClearAll() then
-		GLDGD_ClearAll()
-	end
-	GLDG_ShowDump()
-end
+--function GLDG_ClickDumpVerbose(checked)
+--	if GLDGD_InitComplete and GLDGD_Dump then
+--		GLDGD_Dump.Verbose = checked
+
+--		if GLDGD_Status() then
+--			GLDGD_Status()
+--		end
+--	end
+--end
 
 ------------------------------------------------------------
-function GLDG_ClickDumpNew()
-	if GLDGD_InitComplete and GLDGD_New() then
-		GLDGD_New()
-	end
-	GLDG_ShowDump()
-end
+--function GLDG_ClickDumpClear()
+--	if GLDGD_InitComplete and GLDGD_Clear() then
+--		GLDGD_Clear()
+--	end
+--	GLDG_ShowDump()
+--end
+
+------------------------------------------------------------
+--function GLDG_ClickDumpClearAll()
+--	if GLDGD_InitComplete and GLDGD_ClearAll() then
+--		GLDGD_ClearAll()
+--	end
+--	GLDG_ShowDump()
+--end
+
+------------------------------------------------------------
+--function GLDG_ClickDumpNew()
+--	if GLDGD_InitComplete and GLDGD_New() then
+--		GLDGD_New()
+--	end
+--	GLDG_ShowDump()
+--end
 
 --------------------------
 -- _28_ Interface reloading (currently unused but left in code for future use)

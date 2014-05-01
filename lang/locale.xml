@@ -4,6 +4,7 @@
 	<Include file="deDE.lua" />
 	<Include file="frFR.lua" />
 	<Include file="esES.lua" />
+	<Include file="esMX.lua" />
 	<Include file="koKR.lua" />
 	<Include file="zhTW.lua" />
 	<Include file="ruRU.lua" />
