@@ -18,3 +18,6 @@ externals:
 		libs/LibChatAnims: svn://svn.wowace.com/wow/libchatanims/mainline/trunk/LibChatAnims
 		libs/LibSharedMedia-3.0: svn://svn.wowace.com/wow/libsharedmedia-3-0/mainline/trunk/LibSharedMedia-3.0
 		libs/LibStub: svn://svn.wowace.com/wow/libstub/mainline/trunk
+		
+enable-nolib-creation: no
+license-output: LICENSE.txt
