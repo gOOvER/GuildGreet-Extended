@@ -13,6 +13,5 @@
 embeds.xml
 lang\locale.xml
 
-
 Locale\locale.xml
 GuildGreet.xml
