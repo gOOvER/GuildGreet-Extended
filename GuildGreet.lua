@@ -6707,7 +6707,6 @@ end
 --------------------------
 -- _27_ Debug dumping
 --------------------------
-
 ------------------------------------------------------------
 --function GLDG_Dump(msg)
 --	if not msg then return end
@@ -6816,7 +6815,6 @@ end
 --	end
 --	GLDG_ShowDump()
 --end
-
 --------------------------
 -- _28_ Interface reloading (currently unused but left in code for future use)
 --------------------------
