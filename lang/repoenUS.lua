@@ -1,8 +1,8 @@
 ﻿-- English localization file for enUS and enGB.
 local debug = false
---@debug@
+--[===[@debug@
 debug = true
---@end-debug@
+--@end-debug@]===]
 
 local L = LibStub("AceLocale-3.0"):NewLocale("GuildGreet", "enUS", true, debug)
 
@@ -113,3 +113,81 @@ L["Don't put players that get achievments on the greet list"] = "Don't put playe
 L["Don't congratulate players that just logged in"]	= "Don't congratulate players that just logged in"
 L["Guild alias for:"]	= "Guild alias for: "
 L["Can't set guild alias while unguilded"]	= "Can't set guild alias while unguilded"
+
+-- Settings tab: other options
+L["Various settings"]	= "Various settings"
+L["Use local time instead of server time"]	= "Use local time instead of server time"
+L["Show if newer versions of addons are available"] = "Show if newer versions of addons are available"
+L["Automatically start /who request when channel member with lacking info logs on"]	= "Automatically start /who request when channel member with lacking info logs on"
+L["Show popup box summarising offline changes at login"]	= "Show popup box summarising offline changes at login"
+L["Enable player context menu (may cause taint issues in raid frame, see tooltip)"] = "Enable player context menu (may cause taint issues in raid frame, see tooltip)"
+
+-- Settings tab: player list settings
+L["Configuration options for displaying the players waiting for a greeting"]	= "Configuration options for displaying the players waiting for a greeting"
+L["List grows upwards instead of downwards"]	= "List grows upwards instead of downwards"
+L["List header is always visible"]	= "List header is always visible"
+L["Display a maximum of %d queued players"]	= "Display a maximum of %d queued players"
+
+-- Greetings tab
+L["Manage the messages you want to use for greeting"]	= "Manage the messages you want to use for greeting"
+L["Custom collections"]	= "Custom collections"
+L["Create new collection"]		= "Create new collection"
+L["Remove selection"]		= "Remove selection"
+L["Set realm collection"]	= "Set realm collection"
+L["Set guild collection"]	= "Set guild collection"
+L["Set character collection"]	= "Set character collection"
+L["Current value"]	= "Current value"
+L["not defined"]		= "not defined"
+L["Selected collection"]	= "Selected collection"
+
+-- Greetins tab: selection header and buttons
+L["Global defaults"]	= "Global defaults"
+L["Collection %q"]	= "Collection %q"
+L["%s : select the greeting category you want to edit"]	= "%s : select the greeting category you want to edit"
+L["coming online"]	= "coming online"
+L["relogging"]		= "relogging"
+L["joining guild"]	= "joining guild"
+L["promotion"]	= "promotion"
+L["leveling"]	= "leveling"
+L["bye char"]		= "bye char"
+L["night char"]		= "night char"
+L["greet guild"]		= "greet guild"
+L["greet channel"]	= "greet channel"
+L["bye guild"]	= "bye guild"
+L["night guild"]	= "night guild"
+L["bye channel"]	= "bye channel"
+L["night channel"]	= "night channel"
+L["later guildl"]	= "later guild"
+L["later channel"]	= "later channel"
+L["achievment"]	= "achievment"
+
+-- Greetings tab: greetings editbox
+L["Editbox/Achievment"] = "Edit achievment congratulations: first %s is player, second %s is achievment"
+L["Editbox/Bye"] = "Edit leaving message (day) for players: first use of %s is replaced by player name"
+L["Editbox/ByeChannel"] = "Edit message to say good bye to channel"
+L["Editbox/ByeGuild"] = "Edit message to say good bye to guild: first use of %s is guild alias"
+L["Editbox/Channel"] = "Edit message to greet channel: first use of %s is guild alias"
+L["Editbox/Greet"] = "Edit default greeting message: first use of %s is replaced by player name"
+L["Editbox/GreetBack"] = "Edit relog greeting message: first use of %s is replaced by player name"
+L["Editbox/Guild"] = "Edit message to great guild: first use of %s is guild alias"
+L["Editbox/LaterChannel"] = "Edit message to say see you later to channel"
+L["Editbox/LaterGuild"] = "Edit message to say see you later to guild: first use of %s is guild alias"
+L["Editbox/NewLevel"] = "Edit new level congratulations: first %s is player, second %s is new level"
+L["Editbox/NewRank"] = "Edit promotion congratulations: first %s is player, second %s is new rank"
+L["Editbox/Night"] = "Edit leaving message (night) for players: first use of %s is replaced by player name"
+L["Editbox/NightChannel"] = "Edit message to say good night to channel"
+L["Editbox/NightGuild"] = "Edit message to say good night to guild: first use of %s is guild alias"
+L["Editbox/Welcome"] = "Edit welcome greeting message: first use of %s is replaced by player name"
+
+L["ChatMsg/The guild info is too long..."] = "The guild info is too long, delete at least %d characters and try again!"
+L["ChatMsg/Guild info written successfully!"] = "Guild info written successfully!"
+L["ChatMsg/GuildGreet using your own Settings(But a config string is in the guild info available)."] = "GuildGreet using your own Settings(But a config string is in the guild info available)."
+L["ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please inform %s!"] = "GuildGreet using your own Settings. But the config string seems to be corrupted. Please inform %s!"
+L["ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please generating a new one."] = "GuildGreet using your own Settings. But the config string seems to be corrupted. Please generating a new one."
+L["ChatMsg/Do be kind to your fellow guild members and write the config string in the guild info.\r\nTo set the config string use the command /gg, make the settings for your members and press the <Whrite the config string>-button."] = "Do be kind to your fellow guild members and write the config string in the guild info.\r\nTo set the config string use the command /gg, make the settings for your members and press the <Whrite the config string>-button." 
+L["ChatMsg/GuildGreet using your own settings!"] = "GuildGreet using your own settings!"
+L["ChatMsg/The config string seems to be corrupted. Please inform %s! \r\nGuildGreet using default settings!"] = "The config string seems to be corrupted. Please inform %s! \r\nGuildGreet using default settings!"
+L["ChatMsg/The config string seems to be corrupted. Please generating a new one. \r\nGuildGreet using default settings!"] = "The config string seems to be corrupted. Please generating a new one. \r\nGuildGreet using default settings!"
+L["ChatMsg/Do be kind to your fellow guild members and write the config string in the guild info.\r\nTo set the config string use the command /gg, uncheck the <Read the guildsettings from the guildinfo>-checkbox, make a reload, make the settings for your members and press the <Whrite the config string>-button."] = "Do be kind to your fellow guild members and write the config string in the guild info.\r\nTo set the config string use the command /gg, uncheck the <Read the guildsettings from the guildinfo>-checkbox, make a reload, make the settings for your members and press the <Whrite the config string>-button."
+L["ChatMsg/Configstring not found. GuildGreet using default settings!"] = "Configstring not found. GuildGreet using default settings!"
+L["ChatMsg/Configstring found. GuildGreet using default settings from %s!"] = "Configstring found. GuildGreet using default settings from %s!"

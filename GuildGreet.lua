@@ -707,35 +707,35 @@ function GLDG_InitFrame(frameName)
 	if (frameName == "Settings") then
 		-- nothing to set
 	elseif (frameName == "Greetings") then
-		_G[name.."Header"]:SetText(GLDG_TXT.greetheader)
-		_G[name.."CollectHeader"]:SetText(GLDG_TXT.collectheader)
-		_G[name.."ColRealm"]:SetText(GLDG_TXT.cbrealm)
-		_G[name.."ColGuild"]:SetText(GLDG_TXT.cbguild)
-		_G[name.."ColPlayer"]:SetText(GLDG_TXT.cbplayer)
-		_G[name.."SubCustomHeader"]:SetText(GLDG_TXT.custheader)
-		_G[name.."SubNewHeader"]:SetText(GLDG_TXT.cbnew)
+		_G[name.."Header"]:SetText(L["Manage the messages you want to use for greeting"])
+		_G[name.."CollectHeader"]:SetText(L["Custom collections"])
+		_G[name.."ColRealm"]:SetText(L["Set realm collection"])
+		_G[name.."ColGuild"]:SetText(L["Set guild collection"])
+		_G[name.."ColPlayer"]:SetText(L["Set character collection"])
+		_G[name.."SubCustomHeader"]:SetText(L["Current value"])
+		_G[name.."SubNewHeader"]:SetText(L["Create new collection"])
 		_G[name.."SubNewAdd"]:SetText(GLDG_TXT.add)
 		_G[name.."SubNewCancel"]:SetText(GLDG_TXT.cancel)
-		_G[name.."SubChangeSelection"]:SetText(GLDG_TXT.selection)
-		_G[name.."SubChangeGlobal"]:SetText(GLDG_TXT.colglobal)
-		_G[name.."SubChangeClear"]:SetText(GLDG_TXT.nodef)
+		_G[name.."SubChangeSelection"]:SetText(L["Selected collection"])
+		_G[name.."SubChangeGlobal"]:SetText(L["Global defaults"])
+		_G[name.."SubChangeClear"]:SetText(L["not defined"])
 		_G[name.."SubChangeCancel"]:SetText(GLDG_TXT.cancel)
-		_G[name.."SelDefault"]:SetText(GLDG_TXT.default)
-		_G[name.."SelRelog"]:SetText(GLDG_TXT.relog)
-		_G[name.."SelJoin"]:SetText(GLDG_TXT.joining)
-		_G[name.."SelRank"]:SetText(GLDG_TXT.newrank)
-		_G[name.."SelLevel"]:SetText(GLDG_TXT.newlevel)
-		_G[name.."SelBye"]:SetText(GLDG_TXT.bye)
-		_G[name.."SelNight"]:SetText(GLDG_TXT.night)
-		_G[name.."SelGuild"]:SetText(GLDG_TXT.guild)
-		_G[name.."SelChannel"]:SetText(GLDG_TXT.channel)
-		_G[name.."SelByeGuild"]:SetText(GLDG_TXT.byeGuild)
-		_G[name.."SelNightGuild"]:SetText(GLDG_TXT.nightGuild)
-		_G[name.."SelByeChannel"]:SetText(GLDG_TXT.byeChannel)
-		_G[name.."SelNightChannel"]:SetText(GLDG_TXT.nightChannel)
-		_G[name.."SelLaterGuild"]:SetText(GLDG_TXT.laterGuild)
-		_G[name.."SelLaterChannel"]:SetText(GLDG_TXT.laterChannel)
-		_G[name.."SelAchievment"]:SetText(GLDG_TXT.achievment)
+		_G[name.."SelDefault"]:SetText(L["coming online"])
+		_G[name.."SelRelog"]:SetText(L["relogging"])
+		_G[name.."SelJoin"]:SetText(L["joining guild"])
+		_G[name.."SelRank"]:SetText(L["promotion"])
+		_G[name.."SelLevel"]:SetText(L["leveling"])
+		_G[name.."SelBye"]:SetText(L["bye char"])
+		_G[name.."SelNight"]:SetText(L["night char"])
+		_G[name.."SelGuild"]:SetText(L["greet guild"])
+		_G[name.."SelChannel"]:SetText(L["greet channel"])
+		_G[name.."SelByeGuild"]:SetText(L["bye guild"])
+		_G[name.."SelNightGuild"]:SetText(L["night guild"])
+		_G[name.."SelByeChannel"]:SetText(L["bye channel"])
+		_G[name.."SelNightChannel"]:SetText(L["night channel"])
+		_G[name.."SelLaterGuild"]:SetText(L["later guildl"])
+		_G[name.."SelLaterChannel"]:SetText(L["later channel"])
+		_G[name.."SelAchievment"]:SetText(L["achievment"])
 	elseif (frameName == "Players") then
 		-- Header and option texts
 		_G[name.."Header"]:SetText(GLDG_TXT.playersheader)
@@ -857,9 +857,9 @@ function GLDG_InitFrame(frameName)
 		_G[name.."UseFriendsText"]:SetText(L["Manage friend's list"])
 		_G[name.."ChannelNameText"]:SetText(L["Channel name to monitor"])
 		-- Queued greetings list texts
-		_G[name.."ListHeader"]:SetText(GLDG_TXT.listheader)
-		_G[name.."ListdirectText"]:SetText(GLDG_TXT.listdirect)
-		_G[name.."ListheaderText"]:SetText(GLDG_TXT.listvisible)
+		_G[name.."ListHeader"]:SetText(L["Configuration options for displaying the players waiting for a greeting"])
+		_G[name.."ListdirectText"]:SetText(L["List grows upwards instead of downwards"])
+		_G[name.."ListheaderText"]:SetText(L["List header is always visible"])
 		-- Set value for checkboxes
 		_G[name.."UseGuildDefaultBox"]:SetChecked(GLDG_Data.GuildSettings.UseGuildDefault)
 		_G[name.."GreetAsMainBox"]:SetChecked(GLDG_Data.GuildSettings.GreetAsMain)
@@ -934,16 +934,16 @@ function GLDG_InitFrame(frameName)
 		_G[name.."GuildAliasSet"]:SetText(GLDG_TXT.set)
 		_G[name.."GuildAliasClear"]:SetText(GLDG_TXT.clear)
 	elseif (frameName == "SettingsOther") then
-		_G[name.."Header"]:SetText(GLDG_TXT.otherheader)
+		_G[name.."Header"]:SetText(L["Various settings"])
 		_G[name.."UseLocalTimeBox"]:SetChecked(GLDG_Data.UseLocalTime)
-		_G[name.."UseLocalTimeText"]:SetText(GLDG_TXT.useLocalTime)
+		_G[name.."UseLocalTimeText"]:SetText(L["Use local time instead of server time"])
 		_G[name.."ShowNewerVersionsBox"]:SetChecked(GLDG_Data.ShowNewerVersions)
-		_G[name.."ShowNewerVersionsText"]:SetText(GLDG_TXT.showNewerVersions)
-		_G[name.."AutoWhoText"]:SetText(GLDG_TXT.autoWho)
+		_G[name.."ShowNewerVersionsText"]:SetText(L["Show if newer versions of addons are available"])
+		_G[name.."AutoWhoText"]:SetText(L["Automatically start /who request when channel member with lacking info logs on"])
 		_G[name.."AutoWhoBox"]:SetChecked(GLDG_Data.AutoWho)
-		_G[name.."DeltaPopupText"]:SetText(GLDG_TXT.deltaPopup)
+		_G[name.."DeltaPopupText"]:SetText(L["Show popup box summarising offline changes at login"].."*")
 		_G[name.."DeltaPopupBox"]:SetChecked(GLDG_Data.GuildSettings.DeltaPopup)
-		_G[name.."ExtendPlayerMenuText"]:SetText(GLDG_TXT.extendPlayerMenu)
+		_G[name.."ExtendPlayerMenuText"]:SetText(L["Enable player context menu (may cause taint issues in raid frame, see tooltip)"])
 		_G[name.."ExtendPlayerMenuBox"]:SetChecked(GLDG_Data.ExtendPlayerMenu)
 	end
 	GLDG_SetCheckboxes()
@@ -3606,7 +3606,7 @@ function GLDG_UpdateListsize(self)
 	GLDG_Data.ListSize = self:GetValue()
 	-- Update display
 	local text = _G[self:GetParent():GetName().."ListsizeText"]
-	text:SetText(string.format(GLDG_TXT.listsize, GLDG_Data.ListSize))
+	text:SetText(string.format(L["Display a maximum of %d queued players"], GLDG_Data.ListSize))
 	-- Update queue
 	GLDG_ShowQueue()
 end
@@ -3810,12 +3810,12 @@ function GLDG_ShowCollections(frame)
 		else	_G[frame.."Collect"..i.."Text"]:SetText("")
 			_G[frame.."Collect"..i]:Disable() end end
 	-- Set buttons and text depending the selected collection
-	local colhead = GLDG_TXT.colglobal
+	local colhead = L["Global defaults"]
 	if GLDG_SelColName then
-		_G[frame.."ColNewDel"]:SetText(GLDG_TXT.cbdel)
-		colhead = string.format(GLDG_TXT.colcustom, GLDG_SelColName)
-	else 	_G[frame.."ColNewDel"]:SetText(GLDG_TXT.cbnew) end
-	_G[frame.."GreetHeader"]:SetText(string.format(GLDG_TXT.msgheader, colhead))
+		_G[frame.."ColNewDel"]:SetText(L["Remove selection"])
+		colhead = string.format(L["Collection %q"], GLDG_SelColName)
+	else 	_G[frame.."ColNewDel"]:SetText(L["Create new collection"]) end
+	_G[frame.."GreetHeader"]:SetText(string.format(L["%s : select the greeting category you want to edit"], colhead))
 end
 
 ------------------------------------------------------------
@@ -3864,8 +3864,8 @@ function GLDG_ShowCustom(frame)
 		GLDG_Data.Custom[GLDG_Realm] = nil
 		d = nil end
 	local f = _G[frame.."SubCustomRealm"]
-	if not d then f:SetText(GLDG_TXT.nodef)
-	elseif (d == "") then f:SetText(GLDG_TXT.colglobal)
+	if not d then f:SetText(L["not defined"])
+	elseif (d == "") then f:SetText(L["Global defaults"])
 	else f:SetText(d) end
 	d = GLDG_Data.Custom[GLDG_unique_GuildName]
 	if d and (d ~= "") and not GLDG_Data.Collections[d] then
@@ -3873,8 +3873,8 @@ function GLDG_ShowCustom(frame)
 		GLDG_Data.Custom[GLDG_unique_GuildName] = nil
 		d = nil end
 	f = _G[frame.."SubCustomGuild"]
-	if not d then f:SetText(GLDG_TXT.nodef)
-	elseif (d == "") then f:SetText(GLDG_TXT.colglobal)
+	if not d then f:SetText(L["not defined"])
+	elseif (d == "") then f:SetText(L["Global defaults"])
 	else f:SetText(d) end
 	d = GLDG_Data.Custom[GLDG_Realm.."-"..UnitName("player")]
 	if d and (d ~= "") and not GLDG_Data.Collections[d] then
@@ -3882,8 +3882,8 @@ function GLDG_ShowCustom(frame)
 		GLDG_Data.Custom[GLDG_Realm.."-"..UnitName("player")] = nil
 		d = nil end
 	f = _G[frame.."SubCustomChar"]
-	if not d then f:SetText(GLDG_TXT.nodef)
-	elseif (d == "") then f:SetText(GLDG_TXT.colglobal)
+	if not d then f:SetText(L["not defined"])
+	elseif (d == "") then f:SetText(L["Global defaults"])
 	else f:SetText(d) end
 	-- Set greetings section pointer at is possibly changed
 	if GLDG_InitGreet(GLDG_Realm.."-"..UnitName("player")) and
@@ -3942,12 +3942,12 @@ function GLDG_ClickChangeCustom(self, setting, frame)
 	-- Set the value to be updated
 	GLDG_ChangeName = GLDG_Realm
 	if (setting == "guild") then
-		_G[frame.."SubChangeHeader"]:SetText(GLDG_TXT.cbguild)
+		_G[frame.."SubChangeHeader"]:SetText(L["Set guild collection"])
 		GLDG_ChangeName = GLDG_unique_GuildName
 	elseif (setting == "char") then
-		_G[frame.."SubChangeHeader"]:SetText(GLDG_TXT.cbplayer)
+		_G[frame.."SubChangeHeader"]:SetText(L["Set character collection"])
 		GLDG_ChangeName = GLDG_ChangeName.."-"..UnitName("player")
-	else	_G[frame.."SubChangeHeader"]:SetText(GLDG_TXT.cbrealm) end
+	else	_G[frame.."SubChangeHeader"]:SetText(L["Set realm collection"]) end
 	-- Disable this button and show the subframe
 	GLDG_ColButtonPressed(frame)
 	self:Disable()
@@ -4041,7 +4041,7 @@ function GLDG_ClickGreetButton(self, id)
 	if (GLDG_Selection == "LaterChannel") then _G[frame.."SelLaterChannel"]:Disable() else _G[frame.."SelLaterChannel"]:Enable() end
 	if (GLDG_Selection == "Achievment") then _G[frame.."SelAchievment"]:Disable() else _G[frame.."SelAchievment"]:Enable() end
 	-- Update editbox header
-	_G[frame.."EditboxHeader"]:SetText(GLDG_TXT[GLDG_Selection])
+	_G[frame.."EditboxHeader"]:SetText(L["Editbox/"..GLDG_Selection]) -- generate L["Editbox/Achievment"] - L["Editbox/Bye"] etc.
 	-- Refresh scrollbar
 	GLDG_ClickGreetScrollBar(self, _G[frame.."Scrollbar"])
 end
@@ -7927,7 +7927,7 @@ function GLDG_readConfigString()
 		GLDG_Data[GLDG_unique_GuildName].RelogTime = GLDG_Data.GuildSettings.RelogTime
 		GLDG_Data[GLDG_unique_GuildName].MinLevelUp = GLDG_Data.GuildSettings.MinLevelUp
 		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = 1
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Configstring found. GuildGreet using default settings from "..Ambiguate(GLDG_GuildLeader, "guild").."!")
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/Configstring found. GuildGreet using default settings from %s!"],Ambiguate(GLDG_GuildLeader, "guild")))
 		--GLDG_Init()
 	else
 		if GLDG_Data.GuildSettings.UseGuildDefault==1 and GLDG_unique_GuildName then
@@ -7962,16 +7962,16 @@ function GLDG_readConfigString()
 			GLDG_Data.GuildSettings.MinLevelUp= 20
 			GLDG_Data[GLDG_unique_GuildName] = GLDG_Data.GuildSettings
 			if GLDG_config_from_guild == "not found" then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Configstring not found. GuildGreet using default settings!")
+				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Configstring not found. GuildGreet using default settings!"])
 				if IsGuildLeader() then
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Do be kind to your fellow guild members and write the config string in the guild info.\r\nTo set the config string use the command /gg, uncheck the <Read the guildsettings from the guildinfo>-checkbox, make a reload, make the settings for your members and press the <Whrite the config string>-button.")
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Do be kind to your fellow guild members and write the config string in the guild info.\r\nTo set the config string use the command /gg, uncheck the <Read the guildsettings from the guildinfo>-checkbox, make a reload, make the settings for your members and press the <Whrite the config string>-button."])
 				end
 			end
 			if GLDG_config_from_guild == "corrupted" then
 				if IsGuildLeader() then
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r The config string seems to be corrupted. Please generating a new one. \r\nGuildGreet using default settings!")
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/The config string seems to be corrupted. Please generating a new one. \r\nGuildGreet using default settings!"])
 				else
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r The config string seems to be corrupted. Please inform "..Ambiguate(GLDG_GuildLeader, "guild").."! \r\nGuildGreet using default settings!")
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/The config string seems to be corrupted. Please inform %s! \r\nGuildGreet using default settings!"],Ambiguate(GLDG_GuildLeader, "guild")))
 				end
 			end			
 		end
@@ -7979,20 +7979,20 @@ function GLDG_readConfigString()
 	if (GLDG_Data.GuildSettings.UseGuildDefault==nil) then
 		if GLDG_config_from_guild then
 			if GLDG_config_from_guild == "not found" then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r GuildGreet using your own settings!")
+				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/GuildGreet using your own settings!"])
 				if IsGuildLeader() then
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Do be kind to your fellow guild members and write the config string in the guild info.\r\nTo set the config string use the command /gg, make the settings for your members and press the <Whrite the config string>-button.")
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Do be kind to your fellow guild members and write the config string in the guild info.\r\nTo set the config string use the command /gg, make the settings for your members and press the <Whrite the config string>-button."])
 				end
 			end
 			if GLDG_config_from_guild == "corrupted" then
 				if IsGuildLeader() then
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r GuildGreet using your own Settings. But the config string seems to be corrupted. Please generating a new one.")
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please generating a new one."])
 				else
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r GuildGreet using your own Settings. But the config string seems to be corrupted. Please inform "..Ambiguate(GLDG_GuildLeader, "guild").."!")
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please inform %s!"],Ambiguate(GLDG_GuildLeader, "guild")))
 				end
 			end
 			if (GLDG_config_from_guild ~= "corrupted") and (GLDG_config_from_guild ~= "not found") then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r GuildGreet using your own Settings(But a config string is in the guild info available).")
+				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/GuildGreet using your own Settings(But a config string is in the guild info available)."])
 			end
 		end	
 	end	
@@ -8020,12 +8020,12 @@ function GLDG_WriteGuildString()
 		GLDG_corrupted_config_from_guild = nil
 		SetGuildInfoText(new_ginfotxt)
 		_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Disable()
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Guild info written successfully!")
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Guild info written successfully!"])
 		GLDG_ginfotxt = nil
 		new_ginfotxt = nil
 	else
 		local tolong = strlen(new_ginfotxt)-499
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r The guild info is too long, delete at least "..tolong.." characters and try again!")
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/The guild info is too long..."],tolong))
 		GLDG_ginfotxt = nil
 		new_ginfotxt = nil
 	end
