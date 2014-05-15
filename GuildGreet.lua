@@ -7925,7 +7925,7 @@ function GLDG_readConfigString()
 		GLDG_Data[GLDG_unique_GuildName].RelogTime = GLDG_Data.GuildSettings.RelogTime
 		GLDG_Data[GLDG_unique_GuildName].MinLevelUp = GLDG_Data.GuildSettings.MinLevelUp
 		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = 1
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/Configstring found. GuildGreet using default settings from %s!"],Ambiguate(GLDG_GuildLeader, "guild")))
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/Config string found. GuildGreet using default settings from %s!"],Ambiguate(GLDG_GuildLeader, "guild")))
 		--GLDG_Init()
 	else
 		if GLDG_Data.GuildSettings.UseGuildDefault==1 and GLDG_unique_GuildName then
@@ -7960,16 +7960,16 @@ function GLDG_readConfigString()
 			GLDG_Data.GuildSettings.MinLevelUp= 20
 			GLDG_Data[GLDG_unique_GuildName] = GLDG_Data.GuildSettings
 			if GLDG_config_from_guild == "not found" then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Configstring not found. GuildGreet using default settings!"])
+				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Config string not found."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
 				if IsGuildLeader() then
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Do be kind to your fellow guild members and write the config string in the guild info.\r\nTo set the config string use the command /gg, uncheck the <Read the guildsettings from the guildinfo>-checkbox, make a reload, make the settings for your members and press the <Whrite the config string>-button."])
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Note to the guild master to create the config string"].." \r\n"..L["ChatMsg/To set the config string ..."])
 				end
 			end
 			if GLDG_config_from_guild == "corrupted" then
 				if IsGuildLeader() then
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/The config string seems to be corrupted. Please generating a new one. \r\nGuildGreet using default settings!"])
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/The config string seems to be corrupted. Please generating a new one."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
 				else
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/The config string seems to be corrupted. Please inform %s! \r\nGuildGreet using default settings!"],Ambiguate(GLDG_GuildLeader, "guild")))
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/The config string seems to be corrupted. Please inform %s!"],Ambiguate(GLDG_GuildLeader, "guild")).." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
 				end
 			end			
 		end
@@ -7979,7 +7979,7 @@ function GLDG_readConfigString()
 			if GLDG_config_from_guild == "not found" then
 				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/GuildGreet using your own settings!"])
 				if IsGuildLeader() then
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Do be kind to your fellow guild members and write the config string in the guild info.\r\nTo set the config string use the command /gg, make the settings for your members and press the <Whrite the config string>-button."])
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Note to the guild master to create the config string"].." \r\n"..L["ChatMsg/To set the config string ..."])
 				end
 			end
 			if GLDG_config_from_guild == "corrupted" then
@@ -7990,7 +7990,7 @@ function GLDG_readConfigString()
 				end
 			end
 			if (GLDG_config_from_guild ~= "corrupted") and (GLDG_config_from_guild ~= "not found") then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/GuildGreet using your own Settings(But a config string is in the guild info available)."])
+				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/GuildGreet using your own settings (But a config string is in the guild info available)."])
 			end
 		end	
 	end	
