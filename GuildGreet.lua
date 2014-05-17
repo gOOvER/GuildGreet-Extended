@@ -308,7 +308,7 @@ function GLDG_OnEvent(self, event, ...)
 				if (GLDG_ginfotxt) and (GLDG_ginfotxt ~= GetGuildInfoText()) then GLDG_ginfotxt = GetGuildInfoText(); GLDG_config_from_guild = nil end
 				if GLDG_Data.GuildSettings.UseGuildDefault==1 and GLDG_config_from_guild == nil then
 					GLDG_ginfotxt = GetGuildInfoText()
-					if GLDG_ginfotxt >=" " then
+					if GLDG_ginfotxt >= " " then
 						GLDG_Data[GLDG_unique_GuildName]={}
 						GLDG_Data.GuildSettings={}
 						GLDG_Data.GuildSettings.UseGuildDefault=1
@@ -318,7 +318,7 @@ function GLDG_OnEvent(self, event, ...)
 				end
 				if GLDG_Data.GuildSettings.UseGuildDefault == nil and GLDG_config_from_guild == nil then
 					GLDG_ginfotxt = GetGuildInfoText()
-					if GLDG_ginfotxt >=" " then
+					if GLDG_ginfotxt >= " " then
 						GLDG_readConfigString()
 					end
 				end
@@ -7835,7 +7835,7 @@ end
 
 function GLDG_readConfigString()
 	GLDG_ginfotxt = GetGuildInfoText()
-	if (GLDG_CONFIG_STRING ~= GLDG_config_from_guild) and IsGuildLeader() then
+	if (GLDG_CONFIG_STRING ~= nil) and (GLDG_CONFIG_STRING ~= GLDG_config_from_guild) and IsGuildLeader() then
 		_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Enable()
 	else
 		_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Disable()
@@ -7998,8 +7998,13 @@ end
 
 function GLDG_WriteGuildString()
 	GLDG_ginfotxt = GetGuildInfoText()
+	
 	if not GLDG_CONFIG_STRING then GLDG_generateConfigString() end
 	local new_ginfotxt = nil
+
+	if GLDG_config_from_guild == nil then GLDG_readConfigString() end
+	
+	if GLDG_ginfotxt == nil then GLDG_ginfotxt = " " end
 	
 	if GLDG_config_from_guild ~= nil and GLDG_config_from_guild =="not found" then
 		new_ginfotxt = GLDG_ginfotxt.."\r"..GLDG_CONFIG_STRING
