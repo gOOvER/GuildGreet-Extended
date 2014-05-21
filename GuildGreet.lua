@@ -7925,7 +7925,12 @@ function GLDG_readConfigString()
 		GLDG_Data[GLDG_unique_GuildName].RelogTime = GLDG_Data.GuildSettings.RelogTime
 		GLDG_Data[GLDG_unique_GuildName].MinLevelUp = GLDG_Data.GuildSettings.MinLevelUp
 		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = 1
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/Config string found. GuildGreet using default settings from %s!"],Ambiguate(GLDG_GuildLeader, "guild")))
+		
+		if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 1) then
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/Config string found. GuildGreet using default settings from %s!"],Ambiguate(GLDG_GuildLeader, "guild")))
+			GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+			GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 1
+		end
 		--GLDG_Init()
 	else
 		if GLDG_Data.GuildSettings.UseGuildDefault==1 and GLDG_unique_GuildName then
@@ -7959,17 +7964,36 @@ function GLDG_readConfigString()
 			GLDG_Data.GuildSettings.RelogTime = 2
 			GLDG_Data.GuildSettings.MinLevelUp= 20
 			GLDG_Data[GLDG_unique_GuildName] = GLDG_Data.GuildSettings
+
 			if GLDG_config_from_guild == "not found" then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Config string not found."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
 				if IsGuildLeader() then
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Note to the guild master to create the config string"].." \r\n"..L["ChatMsg/To set the config string ..."])
+					if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 3) then
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Config string not found."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Note to the guild master to create the config string"].." \r\n"..L["ChatMsg/To set the config string ..."])
+						GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+						GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 3
+					end
+				else
+					if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 2) then
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Config string not found."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
+						GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+						GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 2
+					end				
 				end
 			end
 			if GLDG_config_from_guild == "corrupted" then
 				if IsGuildLeader() then
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/The config string seems to be corrupted. Please generating a new one."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
+					--if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 4) then
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/The config string seems to be corrupted. Please generating a new one."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
+					--	GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+					--	GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 4
+					--end
 				else
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/The config string seems to be corrupted. Please inform %s!"],Ambiguate(GLDG_GuildLeader, "guild")).." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
+					if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 5) then
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/The config string seems to be corrupted. Please inform %s!"],Ambiguate(GLDG_GuildLeader, "guild")).." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
+						GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+						GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 5
+					end
 				end
 			end			
 		end
@@ -7977,20 +8001,40 @@ function GLDG_readConfigString()
 	if (GLDG_Data.GuildSettings.UseGuildDefault==nil) then
 		if GLDG_config_from_guild then
 			if GLDG_config_from_guild == "not found" then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/GuildGreet using your own settings!"])
+				if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 6) then
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/GuildGreet using your own settings!"])
+					GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+					GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 6
+				end
 				if IsGuildLeader() then
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Note to the guild master to create the config string"].." \r\n"..L["ChatMsg/To set the config string ..."])
+					if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 7) then
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Note to the guild master to create the config string"].." \r\n"..L["ChatMsg/To set the config string ..."])
+						GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+						GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 7
+					end
 				end
 			end
 			if GLDG_config_from_guild == "corrupted" then
 				if IsGuildLeader() then
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please generating a new one."])
+					--if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 8) then
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please generating a new one."])
+					--	GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+					--	GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 8
+					--end
 				else
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please inform %s!"],Ambiguate(GLDG_GuildLeader, "guild")))
+					if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 9) then
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please inform %s!"],Ambiguate(GLDG_GuildLeader, "guild")))
+						GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+						GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 9
+					end
 				end
 			end
 			if (GLDG_config_from_guild ~= "corrupted") and (GLDG_config_from_guild ~= "not found") then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/GuildGreet using your own settings (But a config string is in the guild info available)."])
+				if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 10) then
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/GuildGreet using your own settings (But a config string is in the guild info available)."])
+					GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+					GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 10
+				end
 			end
 		end	
 	end	
@@ -8003,7 +8047,7 @@ function GLDG_WriteGuildString()
 	local new_ginfotxt = nil
 
 	if GLDG_config_from_guild == nil then GLDG_readConfigString() end
-	
+
 	if GLDG_ginfotxt == nil then GLDG_ginfotxt = " " end
 	
 	if GLDG_config_from_guild ~= nil and GLDG_config_from_guild =="not found" then
