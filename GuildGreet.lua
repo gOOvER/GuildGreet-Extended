@@ -56,7 +56,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 500410			-- Number code for this version
+GDLG_VNMBR	= 500413			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -309,8 +309,8 @@ function GLDG_OnEvent(self, event, ...)
 				if GLDG_Data.GuildSettings.UseGuildDefault==1 and GLDG_config_from_guild == nil then
 					GLDG_ginfotxt = GetGuildInfoText()
 					if GLDG_ginfotxt >= " " then
-						GLDG_Data[GLDG_unique_GuildName]={}
-						GLDG_Data.GuildSettings={}
+						if not GLDG_Data[GLDG_unique_GuildName] then GLDG_Data[GLDG_unique_GuildName] = {} end
+						if not GLDG_Data.GuildSettings then GLDG_Data.GuildSettings = {} end
 						GLDG_Data.GuildSettings.UseGuildDefault=1
 						GLDG_readConfigString()
 						GLDG_SetCheckboxes()
