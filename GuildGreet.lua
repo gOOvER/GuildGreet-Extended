@@ -56,7 +56,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 500413			-- Number code for this version
+GDLG_VNMBR	= 500414			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -500,10 +500,46 @@ function GLDG_Init()
 			GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = 1
 		end
 	end
+	
 	if not GLDG_Data.GuildSettings then GLDG_Data.GuildSettings = {} end
-	if GLDG_Data.GuildSettings.UseGuildDefault==nil and GLDG_Data[GLDG_unique_GuildName] then
-		GLDG_Data.GuildSettings = GLDG_Data[GLDG_unique_GuildName]
-	end	
+	
+	if GLDG_Data[GLDG_unique_GuildName] then
+		GLDG_Data.GuildSettings.GreetAsMain = GLDG_Data[GLDG_unique_GuildName].GreetAsMain
+		GLDG_Data.GuildSettings.Randomize = GLDG_Data[GLDG_unique_GuildName].Randomize
+		GLDG_Data.GuildSettings.Whisper = GLDG_Data[GLDG_unique_GuildName].Whisper
+		GLDG_Data.GuildSettings.WhisperLevelup = GLDG_Data[GLDG_unique_GuildName].WhisperLevelup
+		GLDG_Data.GuildSettings.IncludeOwn = GLDG_Data[GLDG_unique_GuildName].IncludeOwn
+		GLDG_Data.GuildSettings.AutoAssign = GLDG_Data[GLDG_unique_GuildName].AutoAssign
+		GLDG_Data.GuildSettings.AutoAssignEgp = GLDG_Data[GLDG_unique_GuildName].AutoAssignEgp
+		GLDG_Data.GuildSettings.AutoAssignAlias = GLDG_Data[GLDG_unique_GuildName].AutoAssignAlias
+		GLDG_Data.GuildSettings.ListNames = GLDG_Data[GLDG_unique_GuildName].ListNames
+		GLDG_Data.GuildSettings.ListNamesOff = GLDG_Data[GLDG_unique_GuildName].ListNamesOff
+		GLDG_Data.GuildSettings.ListLevelUp = GLDG_Data[GLDG_unique_GuildName].ListLevelUp
+		GLDG_Data.GuildSettings.ListLevelUpOff = GLDG_Data[GLDG_unique_GuildName].ListLevelUpOff
+		GLDG_Data.GuildSettings.ListAchievments = GLDG_Data[GLDG_unique_GuildName].ListAchievments
+		GLDG_Data.GuildSettings.ListQuit = GLDG_Data[GLDG_unique_GuildName].ListQuit
+		GLDG_Data.GuildSettings.ExtendChat = GLDG_Data[GLDG_unique_GuildName].ExtendChat
+		GLDG_Data.GuildSettings.ExtendIgnored = GLDG_Data[GLDG_unique_GuildName].ExtendIgnored
+		GLDG_Data.GuildSettings.ExtendMain = GLDG_Data[GLDG_unique_GuildName].ExtendMain
+		GLDG_Data.GuildSettings.ExtendAlias = GLDG_Data[GLDG_unique_GuildName].ExtendAlias
+		GLDG_Data.GuildSettings.AddPostfix = GLDG_Data[GLDG_unique_GuildName].AddPostfix
+		GLDG_Data.GuildSettings.ShowWhoSpam = GLDG_Data[GLDG_unique_GuildName].ShowWhoSpam
+		GLDG_Data.GuildSettings.SupressGreet = GLDG_Data[GLDG_unique_GuildName].SupressGreet
+		GLDG_Data.GuildSettings.SupressJoin = GLDG_Data[GLDG_unique_GuildName].SupressJoin
+		GLDG_Data.GuildSettings.SupressLevel = GLDG_Data[GLDG_unique_GuildName].SupressLevel
+		GLDG_Data.GuildSettings.SupressRank = GLDG_Data[GLDG_unique_GuildName].SupressRank
+		GLDG_Data.GuildSettings.SupressAchievment = GLDG_Data[GLDG_unique_GuildName].SupressAchievment
+		GLDG_Data.GuildSettings.NoGratsOnLogin = GLDG_Data[GLDG_unique_GuildName].NoGratsOnLogin
+		GLDG_Data.GuildSettings.DeltaPopup = GLDG_Data[GLDG_unique_GuildName].DeltaPopup
+		GLDG_Data.GuildSettings.RelogTime = GLDG_Data[GLDG_unique_GuildName].RelogTime
+		GLDG_Data.GuildSettings.MinLevelUp = GLDG_Data[GLDG_unique_GuildName].MinLevelUp
+		GLDG_Data.GuildSettings.UseGuildDefault = GLDG_Data[GLDG_unique_GuildName].UseGuildDefault	
+	end
+	
+
+--	if GLDG_Data.GuildSettings.UseGuildDefault==nil and GLDG_Data[GLDG_unique_GuildName] then
+--		GLDG_Data.GuildSettings = GLDG_Data[GLDG_unique_GuildName]
+--	end	
 	if not GLDG_Data.GuildSettings.RelogTime then GLDG_Data.GuildSettings.RelogTime = 2 end
 	if not GLDG_Data.GuildSettings.MinLevelUp then GLDG_Data.GuildSettings.MinLevelUp = 0 end
 	GLDG_Data.UpdateTime = 0
