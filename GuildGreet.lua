@@ -73,7 +73,6 @@ GLDG_SubTab2Frame.Tab3 = "Greeting"
 --GLDG_SubTab2Frame.Tab4 = "Debug"
 GLDG_SubTab2Frame.Tab4 = "Other"
 
-
 -- Strings we look for
 GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(ERR_FRIEND_ONLINE_SS, 20)
 GLDG_OFFLINE		= string.format(ERR_FRIEND_OFFLINE_S, "(.+)")
