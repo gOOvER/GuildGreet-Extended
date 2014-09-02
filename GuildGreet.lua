@@ -56,7 +56,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 500414			-- Number code for this version
+GDLG_VNMBR	= 500415			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -72,6 +72,7 @@ GLDG_SubTab2Frame.Tab2 = "Chat"
 GLDG_SubTab2Frame.Tab3 = "Greeting"
 --GLDG_SubTab2Frame.Tab4 = "Debug"
 GLDG_SubTab2Frame.Tab4 = "Other"
+
 
 -- Strings we look for
 GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(ERR_FRIEND_ONLINE_SS, 20)
@@ -1341,7 +1342,7 @@ function GLDG_RosterImport()
 				end
 				GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaNewMember.." ["..Ambiguate(pl, "guild").."]")
 			end
-			if (pl == UnitName("player")) then
+			if (pl == UnitName("player").."-"..string.gsub(GLDG_Realm, " ", "")) then
 				-- This player is our own: ignore completely
 				GLDG_DataChar[pl].own = true
 				--GLDG_DataChar[pl].ignore = true
@@ -1521,7 +1522,7 @@ function GLDG_RosterImport()
 				GLDG_DataChar[pl].rankname = rn
 			end
 			-- don't congratulate own chars for new ranks
-			if (pl == UnitName("player")) then
+			if (pl == UnitName("player").."-"..string.gsub(GLDG_Realm, " ", "")) then
 				GLDG_DataChar[pl].newrank = nil
 			end
 
