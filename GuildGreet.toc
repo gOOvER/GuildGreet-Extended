@@ -1,6 +1,6 @@
-## Interface: 50400
+## Interface: 60000
 ## Title: GuildGreet-Extended
-## Version: @project-version@
+## Version: 6.0.0-beta
 ## Author: gOOvER & Luzisto
 ## X-Category: Guild
 ## X-Website: http://wow.curse-gaming.com/downloads/details/7529/
@@ -9,6 +9,10 @@
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, LibDBIcon-1.0, LibChatAnims, LibStub
 ## Notes: Keeps a log of guildies waiting for your greeting
 ## SavedVariables: GLDG_Data
+## X-Curse-Packaged-Version: 6.0.0-beta
+## X-Curse-Project-Name: GuildGreet Extended
+## X-Curse-Project-ID: guild-greet-extended
+## X-Curse-Repository-ID: wow/guild-greet-extended/mainline
 
 embeds.xml
 lang\locale.xml

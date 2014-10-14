@@ -70,7 +70,7 @@ GLDG_SubTab2Frame = {}
 GLDG_SubTab2Frame.Tab1 = "General"
 GLDG_SubTab2Frame.Tab2 = "Chat"
 GLDG_SubTab2Frame.Tab3 = "Greeting"
---GLDG_SubTab2Frame.Tab4 = "Debug"
+GLDG_SubTab2Frame.Tab4 = "Debug"
 GLDG_SubTab2Frame.Tab4 = "Other"
 
 
@@ -101,7 +101,7 @@ GLDG_IS_OFFLINE_COLOUR		= GLDG_DEFAULT_IS_OFFLINE_COLOUR
 GLDG_GOES_OFFLINE_COLOUR	= GLDG_DEFAULT_GOES_OFFLINE_COLOUR
 GLDG_ALIAS_COLOUR					= GLDG_DEFAULT_ALIAS_COLOUR
 
-GLDG_LEVEL_CAP = 90
+GLDG_LEVEL_CAP = 100
 
 GLDG_CONFIG_STRING = nil
 GLDG_CONFIG_STRING_A = nil
@@ -140,7 +140,7 @@ GLDG_InitCheck = 0		        -- Check for changes and display them; 0 = not start
 GLDG_ChangesText = {}		    -- text for popup display
 
 -- Various
-GLDG_Debug = false		-- Show debugging
+GLDG_Debug = true		-- Show debugging
 
 -- Core variables
 GLDG_Online = {}		-- Time of player going online
