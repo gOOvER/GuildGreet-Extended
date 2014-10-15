@@ -1131,6 +1131,7 @@ function GLDG_InitRoster()
 
 	if not (GLDG_Realm and GLDG_Player) then return end
 
+	
 	-- create character store
 --	if (GLDG_Realm) then
 --		if (not GLDG_Data["Realm: "..GLDG_Realm]) then
