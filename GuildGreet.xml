@@ -1,6 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Script file="todo.lua"/>
+	<Script file="history.lua"/>
 	<Script file="help.lua"/>
 	<Script file="GuildGreet.lua"/>
 	<Frame name="GuildGreet">
@@ -541,8 +543,8 @@
 				<Scripts>
 					<OnLoad>
 						getglobal(self:GetName().."Low"):SetText("0")
-						getglobal(self:GetName().."High"):SetText("90")
-						self:SetMinMaxValues(0,90)
+						getglobal(self:GetName().."High"):SetText("100")
+						self:SetMinMaxValues(0,100)
 						self:SetValueStep(1)
 					</OnLoad>
 					<OnValueChanged>GLDG_UpdateMinLevelUp(self)</OnValueChanged>

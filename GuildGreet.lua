@@ -56,7 +56,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 500416			-- Number code for this version
+GDLG_VNMBR	= 600000			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -70,7 +70,7 @@ GLDG_SubTab2Frame = {}
 GLDG_SubTab2Frame.Tab1 = "General"
 GLDG_SubTab2Frame.Tab2 = "Chat"
 GLDG_SubTab2Frame.Tab3 = "Greeting"
-GLDG_SubTab2Frame.Tab4 = "Debug"
+--GLDG_SubTab2Frame.Tab4 = "Debug"
 GLDG_SubTab2Frame.Tab4 = "Other"
 
 
@@ -140,7 +140,7 @@ GLDG_InitCheck = 0		        -- Check for changes and display them; 0 = not start
 GLDG_ChangesText = {}		    -- text for popup display
 
 -- Various
-GLDG_Debug = true		-- Show debugging
+GLDG_Debug = false		-- Show debugging
 
 -- Core variables
 GLDG_Online = {}		-- Time of player going online
@@ -257,7 +257,7 @@ function GLDG_OnEvent(self, event, ...)
 		GLDG_autoConsistencyCheckReady = true
 
 		-- add menu to player frame and chat menu
-		if (GLDG_Data.ExtendPlayerMenu) then
+		if (GLDG_Data.ExtendPlayerMenu==true) then
 			GLDG_AddPopUpButtons();
 		end
 
@@ -306,17 +306,17 @@ function GLDG_OnEvent(self, event, ...)
 			if (GLDG_unique_GuildName and GLDG_Realm and GLDG_unique_GuildName~="") then
 				-- guild name known -> treat guild info
 				if (GLDG_ginfotxt) and (GLDG_ginfotxt ~= GetGuildInfoText()) then GLDG_ginfotxt = GetGuildInfoText(); GLDG_config_from_guild = nil end
-				if GLDG_Data.GuildSettings.UseGuildDefault==1 and GLDG_config_from_guild == nil then
+				if GLDG_Data.GuildSettings.UseGuildDefault==true and GLDG_config_from_guild == nil then
 					GLDG_ginfotxt = GetGuildInfoText()
 					if GLDG_ginfotxt >= " " then
 						if not GLDG_Data[GLDG_unique_GuildName] then GLDG_Data[GLDG_unique_GuildName] = {} end
 						if not GLDG_Data.GuildSettings then GLDG_Data.GuildSettings = {} end
-						GLDG_Data.GuildSettings.UseGuildDefault=1
+						GLDG_Data.GuildSettings.UseGuildDefault=true
 						GLDG_readConfigString()
 						GLDG_SetCheckboxes()
 					end
 				end
-				if GLDG_Data.GuildSettings.UseGuildDefault == nil and GLDG_config_from_guild == nil then
+				if GLDG_Data.GuildSettings.UseGuildDefault == false and GLDG_config_from_guild == nil then
 					GLDG_ginfotxt = GetGuildInfoText()
 					if GLDG_ginfotxt >= " " then
 						GLDG_readConfigString()
@@ -388,7 +388,7 @@ function GLDG_OnEvent(self, event, ...)
 			--GLDG_Print("--> "..event..": "..arg1.." ["..arg2.."] - "..arg3..": "..arg4)
 
 			if (string.sub(arg2, 1, 4)=="VER:") then
-				if (GLDG_Data.ShowNewerVersions) then
+				if (GLDG_Data.ShowNewerVersions==true) then
 					local myVersion	= GetAddOnMetadata("GuildGreet", "Version")
 					local hisVersion = string.sub(arg2, 5)
 
@@ -497,13 +497,45 @@ function GLDG_Init()
 	if GLDG_unique_GuildName then
 		if not GLDG_Data[GLDG_unique_GuildName] then
 			GLDG_Data[GLDG_unique_GuildName] = {}
-			GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = 1
+			GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = true
 		end
 	end
 	
 	if not GLDG_Data.GuildSettings then GLDG_Data.GuildSettings = {} end
 	
 	if GLDG_Data[GLDG_unique_GuildName] then
+	-- convert for API 6.0.2 begin
+		if GLDG_Data[GLDG_unique_GuildName].GreetAsMain==1 then GLDG_Data[GLDG_unique_GuildName].GreetAsMain=true end
+		if GLDG_Data[GLDG_unique_GuildName].Randomize==1 then GLDG_Data[GLDG_unique_GuildName].Randomize=true end
+		if GLDG_Data[GLDG_unique_GuildName].Whisper==1 then GLDG_Data[GLDG_unique_GuildName].Whisper=true end
+		if GLDG_Data[GLDG_unique_GuildName].WhisperLevelup==1 then GLDG_Data[GLDG_unique_GuildName].WhisperLevelup=true end
+		if GLDG_Data[GLDG_unique_GuildName].IncludeOwn==1 then GLDG_Data[GLDG_unique_GuildName].IncludeOwn=true end
+		if GLDG_Data[GLDG_unique_GuildName].AutoAssign==1 then GLDG_Data[GLDG_unique_GuildName].AutoAssign=true end
+		if GLDG_Data[GLDG_unique_GuildName].AutoAssignEgp==1 then GLDG_Data[GLDG_unique_GuildName].AutoAssignEgp=true end
+		if GLDG_Data[GLDG_unique_GuildName].AutoAssignAlias==1 then GLDG_Data[GLDG_unique_GuildName].AutoAssignAlias=true end
+		if GLDG_Data[GLDG_unique_GuildName].ListNames==1 then GLDG_Data[GLDG_unique_GuildName].ListNames=true end
+		if GLDG_Data[GLDG_unique_GuildName].ListNamesOff==1 then GLDG_Data[GLDG_unique_GuildName].ListNamesOff=true end
+		if GLDG_Data[GLDG_unique_GuildName].ListLevelUp==1 then GLDG_Data[GLDG_unique_GuildName].ListLevelUp=true end
+		if GLDG_Data[GLDG_unique_GuildName].ListLevelUpOff==1 then GLDG_Data[GLDG_unique_GuildName].ListLevelUpOff=true end
+		if GLDG_Data[GLDG_unique_GuildName].ListAchievments==1 then GLDG_Data[GLDG_unique_GuildName].ListAchievments=true end
+		if GLDG_Data[GLDG_unique_GuildName].ListQuit==1 then GLDG_Data[GLDG_unique_GuildName].ListQuit=true end
+		if GLDG_Data[GLDG_unique_GuildName].ExtendChat==1 then GLDG_Data[GLDG_unique_GuildName].ExtendChat=true end
+		if GLDG_Data[GLDG_unique_GuildName].ExtendIgnored==1 then GLDG_Data[GLDG_unique_GuildName].ExtendIgnored=true end
+		if GLDG_Data[GLDG_unique_GuildName].ExtendMain==1 then GLDG_Data[GLDG_unique_GuildName].ExtendMain=true end
+		if GLDG_Data[GLDG_unique_GuildName].ExtendAlias==1 then GLDG_Data[GLDG_unique_GuildName].ExtendAlias=true end
+		if GLDG_Data[GLDG_unique_GuildName].AddPostfix==1 then GLDG_Data[GLDG_unique_GuildName].AddPostfix=true end
+		if GLDG_Data[GLDG_unique_GuildName].ShowWhoSpam==1 then GLDG_Data[GLDG_unique_GuildName].ShowWhoSpam=true end
+		if GLDG_Data[GLDG_unique_GuildName].SupressGreet==1 then GLDG_Data[GLDG_unique_GuildName].SupressGreet=true end
+		if GLDG_Data[GLDG_unique_GuildName].SupressJoin==1 then GLDG_Data[GLDG_unique_GuildName].SupressJoin=true end
+		if GLDG_Data[GLDG_unique_GuildName].SupressLevel==1 then GLDG_Data[GLDG_unique_GuildName].SupressLevel=true end
+		if GLDG_Data[GLDG_unique_GuildName].SupressRank==1 then GLDG_Data[GLDG_unique_GuildName].SupressRank=true end
+		if GLDG_Data[GLDG_unique_GuildName].SupressAchievment==1 then GLDG_Data[GLDG_unique_GuildName].SupressAchievment=true end
+		if GLDG_Data[GLDG_unique_GuildName].NoGratsOnLogin==1 then GLDG_Data[GLDG_unique_GuildName].NoGratsOnLogin=true end
+		if GLDG_Data[GLDG_unique_GuildName].DeltaPopup==1 then GLDG_Data[GLDG_unique_GuildName].DeltaPopup=true end
+		if GLDG_Data[GLDG_unique_GuildName].RelogTime==1 then GLDG_Data[GLDG_unique_GuildName].RelogTime=true end
+		if GLDG_Data[GLDG_unique_GuildName].MinLevelUp==1 then GLDG_Data[GLDG_unique_GuildName].MinLevelUp=true end
+		if GLDG_Data[GLDG_unique_GuildName].UseGuildDefault==1 then	GLDG_Data[GLDG_unique_GuildName].UseGuildDefault=true end	
+	-- convert for API 6.0.2 end
 		GLDG_Data.GuildSettings.GreetAsMain = GLDG_Data[GLDG_unique_GuildName].GreetAsMain
 		GLDG_Data.GuildSettings.Randomize = GLDG_Data[GLDG_unique_GuildName].Randomize
 		GLDG_Data.GuildSettings.Whisper = GLDG_Data[GLDG_unique_GuildName].Whisper
@@ -543,7 +575,7 @@ function GLDG_Init()
 	if not GLDG_Data.GuildSettings.RelogTime then GLDG_Data.GuildSettings.RelogTime = 2 end
 	if not GLDG_Data.GuildSettings.MinLevelUp then GLDG_Data.GuildSettings.MinLevelUp = 0 end
 	GLDG_Data.UpdateTime = 0
-	if not GLDG_Data.GuildSettings.UseGuildDefault then GLDG_Data.GuildSettings.UseGuildDefault = nil end
+	if not GLDG_Data.GuildSettings.UseGuildDefault then GLDG_Data.GuildSettings.UseGuildDefault = false end
 	if not GLDG_Data.ListSize then GLDG_Data.ListSize = 5 end
 	if not GLDG_Data.PlayerChatFrame then GLDG_Data.PlayerChatFrame = {} end
 	if not GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] then GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] = 0 end
@@ -572,48 +604,94 @@ function GLDG_Init()
 	if not GLDG_Data.ChannelNames then GLDG_Data.ChannelNames = {} end
 	if not GLDG_Data.GuildAlias then GLDG_Data.GuildAlias = {} end
 
-	if not GLDG_Data.CheckedGuildAlert then GLDG_Data.CheckedGuildAlert = nil end
+	if not GLDG_Data.CheckedGuildAlert then GLDG_Data.CheckedGuildAlert = false end
 
-	if not GLDG_Data.GuildSettings.GreetAsMain	then GLDG_Data.GuildSettings.GreetAsMain = nil end
-	if not GLDG_Data.GuildSettings.Randomize	then GLDG_Data.GuildSettings.Randomize = nil end
-	if not GLDG_Data.GuildSettings.Whisper    	then GLDG_Data.GuildSettings.Whisper = nil end
-	if not GLDG_Data.GuildSettings.WhisperLevelup then GLDG_Data.GuildSettings.WhisperLevelup = nil end
-	if not GLDG_Data.GuildSettings.IncludeOwn 	then GLDG_Data.GuildSettings.IncludeOwn = nil end
-	if not GLDG_Data.GuildSettings.ListNames  	then GLDG_Data.GuildSettings.ListNames = nil end
-	if not GLDG_Data.GuildSettings.ListNamesOff	then GLDG_Data.GuildSettings.ListNamesOff = nil end
-	if not GLDG_Data.GuildSettings.ListLevelUp	then GLDG_Data.GuildSettings.ListLevelUp = nil end
-	if not GLDG_Data.GuildSettings.ListLevelUpOff	then GLDG_Data.GuildSettings.ListLevelUpOff = nil end
-	if not GLDG_Data.GuildSettings.ListQuit	then GLDG_Data.GuildSettings.ListQuit = nil end
-	if not GLDG_Data.GuildSettings.ExtendChat	then GLDG_Data.GuildSettings.ExtendChat = nil end
-	if not GLDG_Data.GuildSettings.ExtendIgnored	then GLDG_Data.GuildSettings.ExtendIgnored = nil end
-	if not GLDG_Data.GuildSettings.ExtendAlias	then GLDG_Data.GuildSettings.ExtendAlias = nil end
-	if not GLDG_Data.GuildSettings.ExtendMain	then GLDG_Data.GuildSettings.ExtendMain = nil end
-	if not GLDG_Data.GuildSettings.AutoAssign	then GLDG_Data.GuildSettings.AutoAssign = nil end
-	if not GLDG_Data.GuildSettings.AutoAssignEgp	then GLDG_Data.GuildSettings.AutoAssignEgp = nil end
-	if not GLDG_Data.GuildSettings.AutoAssignAlias	then GLDG_Data.GuildSettings.AutoAssignAlias = nil end
-	if not GLDG_Data.UseFriends 	then GLDG_Data.UseFriends = nil end
-	if not GLDG_Data.ListUp     	then GLDG_Data.ListUp = nil end
-	if not GLDG_Data.ListVisible	then GLDG_Data.ListVisible = nil end
-	if not GLDG_Data.GuildSettings.AddPostfix	then GLDG_Data.GuildSettings.AddPostfix = nil end
-	if not GLDG_Data.GuildSettings.ShowWhoSpam	then GLDG_Data.GuildSettings.ShowWhoSpam = nil end
-	if not GLDG_Data.GuildSettings.ListAchievments then GLDG_Data.GuildSettings.ListAchievments = nil end
-
+	if not GLDG_Data.GuildSettings.GreetAsMain	then GLDG_Data.GuildSettings.GreetAsMain = false end
+	if not GLDG_Data.GuildSettings.Randomize	then GLDG_Data.GuildSettings.Randomize = false end
+	if not GLDG_Data.GuildSettings.Whisper    	then GLDG_Data.GuildSettings.Whisper = false end
+	if not GLDG_Data.GuildSettings.WhisperLevelup then GLDG_Data.GuildSettings.WhisperLevelup = false end
+	if not GLDG_Data.GuildSettings.IncludeOwn 	then GLDG_Data.GuildSettings.IncludeOwn = false end
+	if not GLDG_Data.GuildSettings.ListNames  	then GLDG_Data.GuildSettings.ListNames = false end
+	if not GLDG_Data.GuildSettings.ListNamesOff	then GLDG_Data.GuildSettings.ListNamesOff = false end
+	if not GLDG_Data.GuildSettings.ListLevelUp	then GLDG_Data.GuildSettings.ListLevelUp = false end
+	if not GLDG_Data.GuildSettings.ListLevelUpOff	then GLDG_Data.GuildSettings.ListLevelUpOff = false end
+	if not GLDG_Data.GuildSettings.ListQuit	then GLDG_Data.GuildSettings.ListQuit = false end
+	if not GLDG_Data.GuildSettings.ExtendChat	then GLDG_Data.GuildSettings.ExtendChat = false end
+	if not GLDG_Data.GuildSettings.ExtendIgnored	then GLDG_Data.GuildSettings.ExtendIgnored = false end
+	if not GLDG_Data.GuildSettings.ExtendAlias	then GLDG_Data.GuildSettings.ExtendAlias = false end
+	if not GLDG_Data.GuildSettings.ExtendMain	then GLDG_Data.GuildSettings.ExtendMain = false end
+	if not GLDG_Data.GuildSettings.AutoAssign	then GLDG_Data.GuildSettings.AutoAssign = false end
+	if not GLDG_Data.GuildSettings.AutoAssignEgp	then GLDG_Data.GuildSettings.AutoAssignEgp = false end
+	if not GLDG_Data.GuildSettings.AutoAssignAlias	then GLDG_Data.GuildSettings.AutoAssignAlias = false end
+	if not GLDG_Data.UseFriends 	then GLDG_Data.UseFriends = false end
+	if not GLDG_Data.ListUp     	then GLDG_Data.ListUp = false end
+	if not GLDG_Data.ListVisible	then GLDG_Data.ListVisible = false end
+	if not GLDG_Data.GuildSettings.AddPostfix	then GLDG_Data.GuildSettings.AddPostfix = false end
+	if not GLDG_Data.GuildSettings.ShowWhoSpam	then GLDG_Data.GuildSettings.ShowWhoSpam = false end
+	if not GLDG_Data.GuildSettings.ListAchievments then GLDG_Data.GuildSettings.ListAchievments = false end
+	-- convert for API 6.0.2 begin
+		if GLDG_Data.GuildSettings.GreetAsMain==1 then GLDG_Data.GuildSettings.GreetAsMain=true end
+		if GLDG_Data.GuildSettings.Randomize==1 then GLDG_Data.GuildSettings.Randomize=true end
+		if GLDG_Data.GuildSettings.Whisper==1 then GLDG_Data.GuildSettings.Whisper=true end
+		if GLDG_Data.GuildSettings.WhisperLevelup==1 then GLDG_Data.GuildSettings.WhisperLevelup=true end
+		if GLDG_Data.GuildSettings.IncludeOwn==1 then GLDG_Data.GuildSettings.IncludeOwn=true end
+		if GLDG_Data.GuildSettings.AutoAssign==1 then GLDG_Data.GuildSettings.AutoAssign=true end
+		if GLDG_Data.GuildSettings.AutoAssignEgp==1 then GLDG_Data.GuildSettings.AutoAssignEgp=true end
+		if GLDG_Data.GuildSettings.AutoAssignAlias==1 then GLDG_Data.GuildSettings.AutoAssignAlias=true end
+		if GLDG_Data.GuildSettings.ListNames==1 then GLDG_Data.GuildSettings.ListNames=true end
+		if GLDG_Data.GuildSettings.ListNamesOff==1 then GLDG_Data.GuildSettings.ListNamesOff=true end
+		if GLDG_Data.GuildSettings.ListLevelUp==1 then GLDG_Data.GuildSettings.ListLevelUp=true end
+		if GLDG_Data.GuildSettings.ListLevelUpOff==1 then GLDG_Data.GuildSettings.ListLevelUpOff=true end
+		if GLDG_Data.GuildSettings.ListAchievments==1 then GLDG_Data.GuildSettings.ListAchievments=true end
+		if GLDG_Data.GuildSettings.ListQuit==1 then GLDG_Data.GuildSettings.ListQuit=true end
+		if GLDG_Data.GuildSettings.ExtendChat==1 then GLDG_Data.GuildSettings.ExtendChat=true end
+		if GLDG_Data.GuildSettings.ExtendIgnored==1 then GLDG_Data.GuildSettings.ExtendIgnored=true end
+		if GLDG_Data.GuildSettings.ExtendMain==1 then GLDG_Data.GuildSettings.ExtendMain=true end
+		if GLDG_Data.GuildSettings.ExtendAlias==1 then GLDG_Data.GuildSettings.ExtendAlias=true end
+		if GLDG_Data.GuildSettings.AddPostfix==1 then GLDG_Data.GuildSettings.AddPostfix=true end
+		if GLDG_Data.GuildSettings.ShowWhoSpam==1 then GLDG_Data.GuildSettings.ShowWhoSpam=true end
+		if GLDG_Data.GuildSettings.SupressGreet==1 then GLDG_Data.GuildSettings.SupressGreet=true end
+		if GLDG_Data.GuildSettings.SupressJoin==1 then GLDG_Data.GuildSettings.SupressJoin=true end
+		if GLDG_Data.GuildSettings.SupressLevel==1 then GLDG_Data.GuildSettings.SupressLevel=true end
+		if GLDG_Data.GuildSettings.SupressRank==1 then GLDG_Data.GuildSettings.SupressRank=true end
+		if GLDG_Data.GuildSettings.SupressAchievment==1 then GLDG_Data.GuildSettings.SupressAchievment=true end
+		if GLDG_Data.GuildSettings.NoGratsOnLogin==1 then GLDG_Data.GuildSettings.NoGratsOnLogin=true end
+		if GLDG_Data.GuildSettings.DeltaPopup==1 then GLDG_Data.GuildSettings.DeltaPopup=true end
+		if GLDG_Data.GuildSettings.RelogTime==1 then GLDG_Data.GuildSettings.RelogTime=true end
+		if GLDG_Data.GuildSettings.MinLevelUp==1 then GLDG_Data.GuildSettings.MinLevelUp=true end
+		if GLDG_Data.GuildSettings.UseGuildDefault==1 then	GLDG_Data.GuildSettings.UseGuildDefault=true end	
+	-- convert for API 6.0.2 end	
+	
 	if not GLDG_Data.GreetGuild	then GLDG_Data.GreetGuild = {} end
 	if not GLDG_Data.GreetChannel	then GLDG_Data.GreetChannel = {} end
 	if not GLDG_Data.AutoGreet	then GLDG_Data.AutoGreet = {} end
 
-	if not GLDG_Data.GuildSettings.SupressGreet		then GLDG_Data.GuildSettings.SupressGreet = nil end
-	if not GLDG_Data.GuildSettings.SupressJoin		then GLDG_Data.GuildSettings.SupressJoin = nil end
-	if not GLDG_Data.GuildSettings.SupressLevel		then GLDG_Data.GuildSettings.SupressLevel = nil end
-	if not GLDG_Data.GuildSettings.SupressRank		then GLDG_Data.GuildSettings.SupressRank = nil end
-	if not GLDG_Data.GuildSettings.SupressAchievment	then GLDG_Data.GuildSettings.SupressAchievment = nil end
-	if not GLDG_Data.GuildSettings.NoGratsOnLogin		then GLDG_Data.GuildSettings.NoGratsOnLogin = nil end
+	if not GLDG_Data.GuildSettings.SupressGreet		then GLDG_Data.GuildSettings.SupressGreet = false end
+	if not GLDG_Data.GuildSettings.SupressJoin		then GLDG_Data.GuildSettings.SupressJoin = false end
+	if not GLDG_Data.GuildSettings.SupressLevel		then GLDG_Data.GuildSettings.SupressLevel = false end
+	if not GLDG_Data.GuildSettings.SupressRank		then GLDG_Data.GuildSettings.SupressRank = false end
+	if not GLDG_Data.GuildSettings.SupressAchievment	then GLDG_Data.GuildSettings.SupressAchievment = false end
+	if not GLDG_Data.GuildSettings.NoGratsOnLogin		then GLDG_Data.GuildSettings.NoGratsOnLogin = false end
 
-	if not GLDG_Data.UseLocalTime		then GLDG_Data.UseLocalTime = nil end
-	if not GLDG_Data.ShowNewerVersions	then GLDG_Data.ShowNewerVersions = nil end
-	if not GLDG_Data.AutoWho		then GLDG_Data.AutoWho = nil end
-	if not GLDG_Data.GuildSettings.DeltaPopup		then GLDG_Data.GuildSettings.DeltaPopup = nil end
-	if not GLDG_Data.ExtendPlayerMenu then GLDG_Data.ExtendPlayerMenu = nil end
+	if not GLDG_Data.UseLocalTime		then GLDG_Data.UseLocalTime = false end
+	if not GLDG_Data.ShowNewerVersions	then GLDG_Data.ShowNewerVersions = false end
+	if not GLDG_Data.AutoWho		then GLDG_Data.AutoWho = false end
+	if not GLDG_Data.GuildSettings.DeltaPopup		then GLDG_Data.GuildSettings.DeltaPopup = false end
+	if not GLDG_Data.ExtendPlayerMenu then GLDG_Data.ExtendPlayerMenu = false end
+	-- convert for API 6.0.2 begin
+	if GLDG_Data.GuildSettings.SupressGreet==1		then GLDG_Data.GuildSettings.SupressGreet = true end
+	if GLDG_Data.GuildSettings.SupressJoin==1		then GLDG_Data.GuildSettings.SupressJoin = true end
+	if GLDG_Data.GuildSettings.SupressLevel==1		then GLDG_Data.GuildSettings.SupressLevel = true end
+	if GLDG_Data.GuildSettings.SupressRank==1		then GLDG_Data.GuildSettings.SupressRank = true end
+	if GLDG_Data.GuildSettings.SupressAchievment==1	then GLDG_Data.GuildSettings.SupressAchievment = true end
+	if GLDG_Data.GuildSettings.NoGratsOnLogin==1		then GLDG_Data.GuildSettings.NoGratsOnLogin = true end
+
+	if GLDG_Data.UseLocalTime==1		then GLDG_Data.UseLocalTime = true end
+	if GLDG_Data.ShowNewerVersions==1	then GLDG_Data.ShowNewerVersions = true end
+	if GLDG_Data.AutoWho==1		then GLDG_Data.AutoWho = true end
+	if GLDG_Data.GuildSettings.DeltaPopup==1		then GLDG_Data.GuildSettings.DeltaPopup = true end
+	if GLDG_Data.ExtendPlayerMenu==1 then GLDG_Data.ExtendPlayerMenu = true end
+	-- convert for API 6.0.2 end
 
 	if not GLDG_Data.colours		then GLDG_Data.colours = {} end
 	if not GLDG_Data.colours.guild		then GLDG_Data.colours.guild = {} end
@@ -1000,7 +1078,7 @@ function GLDG_UpdatePlayerCheckboxes()
 	_G[name.."WithChannelBox"]:SetChecked(GLDG_Data.FilterWithChannel)
 	_G[name.."GuildSortBox"]:SetChecked(GLDG_Data.GuildSort)
 
-	if (GLDG_Data.FilterOnline or GLDG_Data.GuildSort) then
+	if (GLDG_Data.FilterOnline==true or GLDG_Data.GuildSort==true) then
 		_G[name.."Alt2Box"]:Disable()
 	else
 		_G[name.."Alt2Box"]:Enable()
@@ -1151,7 +1229,7 @@ function GLDG_InitRoster()
 	-- Launch request for friends info
 	ShowFriends()
 	if not GLDG_InitialFriendsUpdate then
-		if GLDG_Data.UseFriends and (GetNumFriends() > 0) and bit.band(GLDG_InitCheck, 2)~=2 then
+		if GLDG_Data.UseFriends==true and (GetNumFriends() > 0) and bit.band(GLDG_InitCheck, 2)~=2 then
 			GLDG_InitCheck = bit.bor(GLDG_InitCheck, 2)	-- friends started
 			--GLDG_Print("InitCheck is ["..tostring(GLDG_InitCheck).."] - friends started")
 		end
@@ -1233,7 +1311,7 @@ function GLDG_OnUpdate(self, elapsed)
 
 	-- are we interested in friend updates (i.e. are we in phase 1)?
 	if (GLDG_UpdateRequestFriends) then
-		if (GLDG_Data.UseFriends) then
+		if (GLDG_Data.UseFriends==true) then
 			-- is it time, yet?
 			if (GetTime() >= GLDG_UpdateRequestFriends) then
 
@@ -1337,7 +1415,7 @@ function GLDG_RosterImport()
 			if not GLDG_DataChar[pl] then
 				-- New player
 				GLDG_DataChar[pl] = {}
-				if (not GLDG_NewGuild) and (not GLDG_Data.GuildSettings.SupressJoin) and (GLDG_TableSize(GLDG_DataGreet.Welcome) > 0) then
+				if (not GLDG_NewGuild) and (GLDG_Data.GuildSettings.SupressJoin==false) and (GLDG_TableSize(GLDG_DataGreet.Welcome) > 0) then
 					GLDG_DataChar[pl].new = true
 				end
 				GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaNewMember.." ["..Ambiguate(pl, "guild").."]")
@@ -1347,18 +1425,18 @@ function GLDG_RosterImport()
 				GLDG_DataChar[pl].own = true
 				--GLDG_DataChar[pl].ignore = true
 			end
-			if (GLDG_Data.GuildSettings.AutoAssign) and (GLDG_ReadNotes == 1) then
+			if (GLDG_Data.GuildSettings.AutoAssign==true) and (GLDG_ReadNotes == 1) then
 				-- detect if note contains "Main[ <discardable text>]"
 				if (pn == "Main" or string.sub(pn, 1, 5)=="Main ") then
 					mains[pl] = "true"
 				elseif (on and (on == "Main" or string.sub(on, 1, 5)=="Main ")) then
 					mains[pl] = "true"
 				-- detect if note contains EGP style information
-				elseif (GLDG_Data.GuildSettings.AutoAssignEgp and (on and tonumber(string.sub(on,1,1)))) then
+				elseif (GLDG_Data.GuildSettings.AutoAssignEgp==true and (on and tonumber(string.sub(on,1,1)))) then
 					mains[pl] = "true"
 				end
 --				------------- Alias-Zuordnung anfang--------------------------
-				if (GLDG_Data.GuildSettings.AutoAssignAlias) == 1 then
+				if (GLDG_Data.GuildSettings.AutoAssignAlias == true) then
 					local aliasmatch = nil
 					local aliasmatch = string.find(pn, "@",1)
 					if (aliasmatch ~= nil) then
@@ -1368,7 +1446,7 @@ function GLDG_RosterImport()
 						end
 					end
 				end
-				if (GLDG_Data.GuildSettings.AutoAssignAlias) == 1 then
+				if (GLDG_Data.GuildSettings.AutoAssignAlias == true) then
 					local aliasmatch = nil
 					local aliasmatch = string.find(on, "@",1)
 					if (aliasmatch ~= nil) then
@@ -1425,7 +1503,7 @@ function GLDG_RosterImport()
 					end
 					alts[pl] = main
 				-- detect if note contains EGP style information
-				elseif (GLDG_Data.GuildSettings.AutoAssignEgp and (on and tonumber(string.sub(on, 1, 1))==nil)) then
+				elseif (GLDG_Data.GuildSettings.AutoAssignEgp==true and (on and tonumber(string.sub(on, 1, 1))==nil)) then
 					local main = on
 					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
 					if a then
@@ -1536,14 +1614,14 @@ function GLDG_RosterImport()
 			if (GLDG_DataChar[pl] and not GLDG_DataChar[pl].ignore) then
 				if GLDG_DataChar[pl].alt then
 					mainName = GLDG_DataChar[pl].alt;
-					if GLDG_Data.GuildSettings.ExtendAlias then
+					if GLDG_Data.GuildSettings.ExtendAlias==true then
 						if GLDG_DataChar[mainName] and GLDG_DataChar[mainName].alias then
 							mainName = GLDG_DataChar[mainName].alias
 						end
 					end
-				elseif GLDG_Data.GuildSettings.ExtendMain and GLDG_DataChar[pl].main then
+				elseif GLDG_Data.GuildSettings.ExtendMain==true and GLDG_DataChar[pl].main then
 					mainName = name
-					if GLDG_Data.GuildSettings.ExtendAlias then
+					if GLDG_Data.GuildSettings.ExtendAlias==true then
 						if GLDG_DataChar[mainName] and GLDG_DataChar[mainName].alias then
 							mainName = GLDG_DataChar[mainName].alias
 						end
@@ -1553,7 +1631,7 @@ function GLDG_RosterImport()
 
 			if ol then
 				-- Remove rank info if we're not interested in it
-				if GLDG_DataChar[pl].newrank and (GLDG_Data.GuildSettings.SupressRank or (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[pl], GLDG_DataGreet.NewRank)) == 0) or GLDG_DataChar[pl].ignore) then
+				if GLDG_DataChar[pl].newrank and (GLDG_Data.GuildSettings.SupressRank==true or (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[pl], GLDG_DataGreet.NewRank)) == 0) or GLDG_DataChar[pl].ignore) then
 					GLDG_DataChar[pl].promotor = nil
 					GLDG_DataChar[pl].newrank = nil
 				end
@@ -1570,15 +1648,15 @@ function GLDG_RosterImport()
 				if (GLDG_DataChar[pl].lvl > GLDG_DataChar[pl].oldlvl) then
 					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[pl].oldlvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(lv).." "..GLDG_TXT.deltaIncrease3)
 					if (not GLDG_DataChar[pl].own) then
-						if GLDG_Data.GuildSettings.ListLevelUp then
+						if GLDG_Data.GuildSettings.ListLevelUp==true then
 							if (mainName) then
 								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(pl, "guild")..": "..cl.."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[pl].oldlvl, lv));
 							else
 								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(pl, "guild")..": "..cl.."] "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[pl].oldlvl, lv));
 							end
 						end
-						if ( (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[pl], GLDG_DataGreet.NewLevel)) > 0) and (not GLDG_Data.GuildSettings.SupressLevel) and (not GLDG_DataChar[pl].ignore) and (lv > GLDG_Data.GuildSettings.MinLevelUp)) then
-							if (GLDG_Online[pl] or not GLDG_Data.GuildSettings.NoGratsOnLogin) then
+						if ( (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[pl], GLDG_DataGreet.NewLevel)) > 0) and (GLDG_Data.GuildSettings.SupressLevel==false) and (not GLDG_DataChar[pl].ignore) and (lv > GLDG_Data.GuildSettings.MinLevelUp)) then
+							if (GLDG_Online[pl] or GLDG_Data.GuildSettings.NoGratsOnLogin==false) then
 								GLDG_DataChar[pl].newlvl = true
 							end
 						end
@@ -1602,7 +1680,7 @@ function GLDG_RosterImport()
 					if (lv > GLDG_DataChar[pl].lvl) then
 						if ((GLDG_DataChar[pl].storedLvl == nil) or (lv > GLDG_DataChar[pl].storedLvl)) then
 							GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[pl].lvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(lv).." "..GLDG_TXT.deltaIncrease3)
-							if GLDG_Data.GuildSettings.ListLevelUpOff then
+							if GLDG_Data.GuildSettings.ListLevelUpOff==true then
 								if (mainName) then
 									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":"..GLDG_GOES_OFFLINE_COLOUR.." ["..Ambiguate(pl, "guild").."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[pl].lvl, lv).." (off)");
 								else
@@ -1626,7 +1704,7 @@ function GLDG_RosterImport()
 	end
 	GLDG_ReadNotes = 0
 	-- Parse guild notes for auto assignation
-	if (GLDG_Data.GuildSettings.AutoAssign) then
+	if (GLDG_Data.GuildSettings.AutoAssign==true) then
 		for p in pairs(mains) do
 			if (GLDG_DataChar[p] and GLDG_DataChar[p].alt==nil and GLDG_DataChar[p].main==nil) then
 				GLDG_DataChar[p].main = true
@@ -1751,7 +1829,7 @@ function GLDG_RosterPurge()
 	for p in pairs(purge) do
 		if (GLDG_DataChar[p].guild and GLDG_DataChar[p].guild==GLDG_unique_GuildName) then
 			GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..Ambiguate(p, "guild").."] "..GLDG_TXT.deltaLeftGuild)
-			if GLDG_Data.GuildSettings.ListQuit then
+			if GLDG_Data.GuildSettings.ListQuit==true then
 				if (GLDG_DataChar[p] and GLDG_DataChar[p].alt) then
 					local main = GLDG_DataChar[p].alt;
 					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(p, "guild").."] "..L["has left the guild"].." {"..Ambiguate(main, "guild").."}");
@@ -1789,7 +1867,7 @@ function GLDG_FindAlts(mainName, playerName, colourise)
 		end
 
 		local postfix = ""
-		if (GLDG_Data.GuildSettings.AddPostfix) then
+		if (GLDG_Data.GuildSettings.AddPostfix==true) then
 			if (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_unique_GuildName) then
 				-- no postfix for guild members
 			elseif (GLDG_DataChar[player].channels and GLDG_DataChar[player].channels[GLDG_ChannelName]) then
@@ -1904,7 +1982,7 @@ function GLDG_findAlias(playerName, colourise)
 			else
 				alias = playerName;
 			end
-			if (GLDG_Data[GLDG_unique_GuildName].GreetAsMain and GLDG_DataChar[playerName].alt) then
+			if (GLDG_Data[GLDG_unique_GuildName].GreetAsMain == true and GLDG_DataChar[playerName].alt) then
 				if (GLDG_DataChar[GLDG_DataChar[playerName].alt].alias) then
 					alias = GLDG_DataChar[GLDG_DataChar[playerName].alt].alias;
 				else
@@ -1976,7 +2054,7 @@ function GLDG_ListForPlayer(playerName, allDetails, onList, print, guildOnly)
 					end
 
 					local postfix = ""
-					if (GLDG_Data.GuildSettings.AddPostfix) then
+					if (GLDG_Data.GuildSettings.AddPostfix==true) then
 						if (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_unique_GuildName) then
 							-- no postfix for guild members
 						elseif (GLDG_DataChar[player].channels and GLDG_DataChar[player].channels[GLDG_ChannelName]) then
@@ -2027,7 +2105,7 @@ function GLDG_ListForPlayer(playerName, allDetails, onList, print, guildOnly)
 			end
 		else
 			result = playerName.." "..GLDG_TXT.notinguild;
-			if GLDG_Data.UseFriends then
+			if GLDG_Data.UseFriends==true then
 				result = result.." "..GLDG_TXT.notfriend;
 			end
 			if GLDG_inChannel then
@@ -2111,7 +2189,6 @@ function GLDG_SystemMsg(msg)
 
 	-- Receiving system message
 	GLDG_DebugPrint("incoming system message: "..msg)
-
 	-- Check players coming online
 	local _, _, player = string.find(msg, GLDG_ONLINE)
 	if player then
@@ -2120,7 +2197,7 @@ function GLDG_SystemMsg(msg)
 		
 		if (GLDG_DataChar[player] and not GLDG_DataChar[player].ignore) then
 
-			if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_unique_GuildName) and GLDG_DataChar[player].friends and GLDG_DataChar[player].friends[GLDG_Player] and not GLDG_Data.UseFriends then
+			if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_unique_GuildName) and GLDG_DataChar[player].friends and GLDG_DataChar[player].friends[GLDG_Player] and GLDG_Data.UseFriends==false then
 				--GLDG_Print("Player ["..Ambiguate(player, "guild").."] seems to be a friends but friend support has been disabled")
 				-- this is "only" a friend but friend support has been disabled, stop treating player
 				return
@@ -2134,7 +2211,7 @@ function GLDG_SystemMsg(msg)
 			GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is a member of our guild")
 			GLDG_Online[player] = GetTime()
 
-			if GLDG_Data.GuildSettings.ListNames then
+			if GLDG_Data.GuildSettings.ListNames==true then
 				if GLDG_DataChar[player].alt then
 					--
 					-- Alt von Main
@@ -2168,9 +2245,9 @@ function GLDG_SystemMsg(msg)
 
 			if ((GLDG_DataChar[player].storedLvl ~= nil) and (GLDG_DataChar[player].storedLvl > GLDG_DataChar[player].lvl)) then
 				if (not GLDG_DataChar[player].own) then
-					if ( (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.NewLevel)) > 0) and (not GLDG_Data.GuildSettings.SupressLevel) and (not GLDG_DataChar[player].ignore) and (GLDG_DataChar[player].storedLvl > GLDG_Data.GuildSettings.MinLevelUp)) then
+					if ( (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.NewLevel)) > 0) and (GLDG_Data.GuildSettings.SupressLevel==false) and (not GLDG_DataChar[player].ignore) and (GLDG_DataChar[player].storedLvl > GLDG_Data.GuildSettings.MinLevelUp)) then
 
-						if (not GLDG_Data.GuildSettings.NoGratsOnLogin) then
+						if (GLDG_Data.GuildSettings.NoGratsOnLogin==false) then
 							GLDG_DataChar[player].newlvl = true
 						end
 					end
@@ -2186,11 +2263,11 @@ function GLDG_SystemMsg(msg)
 				return
 			end
 			GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is not been online in the last "..GLDG_Data.GuildSettings.RelogTime.." minutes.")
-			if GLDG_Offline[player] and ((GLDG_TableSize(GLDG_DataGreet.GreetBack) == 0) or (GLDG_Data.GuildSettings.SupressGreet)) then
+			if GLDG_Offline[player] and ((GLDG_TableSize(GLDG_DataGreet.GreetBack) == 0) or (GLDG_Data.GuildSettings.SupressGreet==true)) then
 				return
 			end
 			GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is not been online before")
-			if not (GLDG_Offline[player] or GLDG_DataChar[player].new or GLDG_DataChar[player].newlvl or GLDG_DataChar[player].newrank) and (GLDG_Data.GuildSettings.SupressGreet or (GLDG_TableSize(GLDG_DataGreet.Greet) == 0)) then
+			if not (GLDG_Offline[player] or GLDG_DataChar[player].new or GLDG_DataChar[player].newlvl or GLDG_DataChar[player].newrank) and (GLDG_Data.GuildSettings.SupressGreet==true or (GLDG_TableSize(GLDG_DataGreet.Greet) == 0)) then
 				return
 			end
 			GLDG_DebugPrint("player "..Ambiguate(player, "guild").." should be greeted")
@@ -2224,7 +2301,7 @@ function GLDG_SystemMsg(msg)
 				GLDG_Queue[player] = nil
 				GLDG_ShowQueue() end
 
-			if GLDG_Data.GuildSettings.ListNamesOff then
+			if GLDG_Data.GuildSettings.ListNamesOff==true then
 				if GLDG_DataChar[player].alt then
 					--
 					-- Alt von Main
@@ -2276,7 +2353,7 @@ function GLDG_SystemMsg(msg)
 		GLDG_Offline[player] = false
 		GLDG_Queue[player] = GLDG_GetLogtime(player)
 		SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
-		if (not GLDG_Data.GuildSettings.SupressJoin) and (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.Welcome)) > 0) then
+		if (GLDG_Data.GuildSettings.SupressJoin==false) and (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.Welcome)) > 0) then
 			GLDG_DataChar[player].new = true
 			GLDG_ShowQueue()
 		end
@@ -2290,7 +2367,7 @@ function GLDG_SystemMsg(msg)
 		if not realm then player = GLDG_shortName.."-"..string.gsub(GLDG_Realm, " ", "") end
 	end
 	if GLDG_DataChar[player] then
-		if player and (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.NewRank)) > 0) and (not GLDG_Data.GuildSettings.SupressRank) and (not GLDG_DataChar[player].ignore) then
+		if player and (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.NewRank)) > 0) and (GLDG_Data.GuildSettings.SupressRank==false) and (not GLDG_DataChar[player].ignore) then
 			--print("detected player getting promotion: "..Ambiguate(player, "guild").." -> "..rank)
 			GLDG_DataChar[player].promoter = promo
 			GLDG_DataChar[player].rankname = rank
@@ -2338,7 +2415,7 @@ end
 function GLDG_GetTime()
 	local hour, minute
 
-	if GLDG_Data.UseLocalTime then
+	if GLDG_Data.UseLocalTime==true then
 		local t = date('*t')		-- returns local time
 		hour = t.hour
 		minute = t.min
@@ -2361,8 +2438,11 @@ function GLDG_ShowQueue()
 	for p in pairs(GLDG_Queue) do
 		-- Look for the position in the list we need
 		local loc = 1
-		while queue[loc] and (GLDG_Online[queue[loc]] <= GLDG_Online[p]) do
-			loc = loc + 1
+		--if GLDG_Online[queue[loc]] and GLDG_Online[p] and type(GLDG_Online[queue[loc]])~="boolean" and type(GLDG_Online[p])~="boolean" then
+		if type(GLDG_Online[queue[loc]])=="number" and type(GLDG_Online[p])=="number" then
+			while queue[loc] and (GLDG_Online[queue[loc]] <= GLDG_Online[p]) do	
+				loc = loc + 1
+			end
 		end
 		-- We found the position: move everything beyond it
 		for cnt = total, loc, -1 do
@@ -2373,18 +2453,18 @@ function GLDG_ShowQueue()
 		queue[loc] = p
 	end
 	-- Display the list as needed
-	if (total == 0) and not (GLDG_Debug or GLDG_Data.ListVisible) then
+	if (total == 0) and not (GLDG_Debug or GLDG_Data.ListVisible==true) then
 		-- No lines and not debugging: hide main window
 		_G[GLDG_LIST]:Hide()
 		return end
 	-- Hide the unused direction
 	local dir = "ULine"
-	if GLDG_Data.ListUp then dir = "Line" end
+	if GLDG_Data.ListUp==true then dir = "Line" end
 	cnt = 1
 	while _G[GLDG_LIST..dir..cnt] do
 		_G[GLDG_LIST..dir..cnt]:Hide()
 		cnt = cnt + 1 end
-	if GLDG_Data.ListUp then dir = "ULine" else dir = "Line" end
+	if GLDG_Data.ListUp==true then dir = "ULine" else dir = "Line" end
 	-- Show the used direction
 	if not GLDG_Data.ListSize then GLDG_Data.ListSize = 5 end
 	for cnt = 1, math.min(total, GLDG_Data.ListSize) do
@@ -2910,7 +2990,7 @@ function GLDG_SendGreet(name, testing)
 	elseif player.newlvl then
 		list = GLDG_DataGreet.NewLevel
 		option = player.lvl
-		if (GLDG_Data.GuildSettings.WhisperLevelup) then
+		if (GLDG_Data.GuildSettings.WhisperLevelup==true) then
 			whisper = true
 		end
 	elseif GLDG_Offline[name] then
@@ -2943,7 +3023,7 @@ function GLDG_SendGreet(name, testing)
 			table.insert(names, lalias)
 			lname = lalias
 		end
-		if (not usedAlias and GLDG_Data[GLDG_unique_GuildName].GreetAsMain and lname and lname~="") then
+		if (usedAlias==false and GLDG_Data[GLDG_unique_GuildName].GreetAsMain == true and lname and lname~="") then
 			name = lname;
 		end
 	end
@@ -2955,7 +3035,7 @@ function GLDG_SendGreet(name, testing)
 
 	-- Select a random name
 	greetSize = GLDG_TableSize(names)
-	if GLDG_Data.GuildSettings.Randomize and (greetSize ~= 0) then
+	if GLDG_Data.GuildSettings.Randomize==true and (greetSize ~= 0) then
 		name = names[math.random(greetSize)]
 		local uName, uRealm = string.split("-", name)
 		if uRealm then
@@ -2971,7 +3051,7 @@ function GLDG_SendGreet(name, testing)
 	if (testing) then
 		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..message.."]")
 	else
-		if whisper then
+		if whisper==true then
 			-- manual whisper setting overrides all
 			SendChatMessage(message, "WHISPER", nil, cname)
 
@@ -3045,7 +3125,7 @@ function GLDG_SendBye(name, testing)
 			table.insert(names, lalias)
 			lname = lalias
 		end
-		if (not usedAlias and GLDG_Data[GLDG_unique_GuildName].GreetAsMain and lname~="") then
+		if (usedAlias==false and GLDG_Data[GLDG_unique_GuildName].GreetAsMain == true and lname~="") then
 			name = lname;
 		end
 	end
@@ -3057,7 +3137,7 @@ function GLDG_SendBye(name, testing)
 
 	-- Select a random name
 	greetSize = GLDG_TableSize(names)
-	if GLDG_Data.GuildSettings.Randomize and (greetSize ~= 0) then
+	if GLDG_Data.GuildSettings.Randomize==true and (greetSize ~= 0) then
 		name = names[math.random(greetSize)]
 	end
 
@@ -3072,7 +3152,7 @@ function GLDG_SendBye(name, testing)
 	if (testing) then
 		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..message.."]")
 	else
-		if GLDG_Data.GuildSettings.Whisper then
+		if GLDG_Data.GuildSettings.Whisper==true then
 			SendChatMessage(message, "WHISPER", nil, cname)
 
 		elseif (player.guild and player.guild == GLDG_unique_GuildName) then
@@ -3396,7 +3476,7 @@ function GLDG_SlashHandler(msg)
 			elseif (wordsLower[0]=="aliasreset") then
 				GLDG_Reset_Aliases()				
 			elseif (wordsLower[0]=="alert") then
-				GLDG_Data.CheckedGuildAlert = nil	-- force check if called from command line
+				GLDG_Data.CheckedGuildAlert = false	-- force check if called from command line
 				GLDG_CheckForGuildAlert()
 			elseif (wordsLower[0]=="test") then
 				GLDG_Test(true)
@@ -3515,7 +3595,7 @@ function GLDG_SetCheckboxes()
 	local name2 = GLDG_GUI.."SettingsChat"
 	local name3 = GLDG_GUI.."SettingsGreeting"
 	local name4 = GLDG_GUI.."SettingsOther"
-		if GLDG_Data.GuildSettings.UseGuildDefault==1 then
+		if GLDG_Data.GuildSettings.UseGuildDefault==true then
 			_G[name1.."GreetAsMainBox"]:Disable()
 			_G[name1.."GreetAsMainText"]:SetAlpha(0.5)
 			_G[name1.."RandomizeBox"]:Disable()
@@ -3784,22 +3864,22 @@ end
 
 ------------------------------------------------------------
 function GLDG_SupressAll()
-	GLDG_Data.GuildSettings.SupressGreet = 1
-	GLDG_Data.GuildSettings.SupressJoin = 1
-	GLDG_Data.GuildSettings.SupressLevel = 1
-	GLDG_Data.GuildSettings.SupressRank = 1
-	GLDG_Data.GuildSettings.SupressAchievment = 1
+	GLDG_Data.GuildSettings.SupressGreet = true
+	GLDG_Data.GuildSettings.SupressJoin = true
+	GLDG_Data.GuildSettings.SupressLevel = true
+	GLDG_Data.GuildSettings.SupressRank = true
+	GLDG_Data.GuildSettings.SupressAchievment = true
 
 	GLDG_UpdateSupressed()
 end
 
 ------------------------------------------------------------
 function GLDG_SupressNone()
-	GLDG_Data.GuildSettings.SupressGreet = nil
-	GLDG_Data.GuildSettings.SupressJoin = nil
-	GLDG_Data.GuildSettings.SupressLevel = nil
-	GLDG_Data.GuildSettings.SupressRank = nil
-	GLDG_Data.GuildSettings.SupressAchievment = nil
+	GLDG_Data.GuildSettings.SupressGreet = false
+	GLDG_Data.GuildSettings.SupressJoin = false
+	GLDG_Data.GuildSettings.SupressLevel = false
+	GLDG_Data.GuildSettings.SupressRank = false
+	GLDG_Data.GuildSettings.SupressAchievment = false
 
 	GLDG_UpdateSupressed()
 end
@@ -4149,13 +4229,13 @@ end
 function GLDG_SortString(player)
 	-- Helper function: returns string that should be used for sorting
 	local result = player
-	if GLDG_Data.GuildSort then
+	if GLDG_Data.GuildSort==true then
 		if GLDG_DataChar[player].guild then
 			result = GLDG_DataChar[player].guild..player
 		else
 			result = "@"..player
 		end
-	elseif (GLDG_DataChar[player].alt and GLDG_Data.GroupAlt and not GLDG_Data.FilterOnline) then
+	elseif (GLDG_DataChar[player].alt and GLDG_Data.GroupAlt==true and GLDG_Data.FilterOnline==false) then
 		result = GLDG_DataChar[player].alt..player
 	end
 	return string.lower(result)
@@ -4168,7 +4248,7 @@ function GLDG_ListPlayers()
 	-- Check if there is a reason to clear the selected player
 	if GLDG_SelPlrName then
 		if (not GLDG_DataChar[GLDG_SelPlrName]) or
-		   (GLDG_DataChar[GLDG_SelPlrName].ignore and not GLDG_Data.ShowIgnore) then
+		   (GLDG_DataChar[GLDG_SelPlrName].ignore and GLDG_Data.ShowIgnore==false) then
 			GLDG_SelPlrName = nil end end
 	-- Prepare for list creation
 	GLDG_SortedList = {}
@@ -4180,7 +4260,7 @@ function GLDG_ListPlayers()
 	-- Create the list of players to display
 	for player in pairs(GLDG_DataChar) do
 		local p = GLDG_DataChar[player]
-		if ((not p.own) or GLDG_Data.GuildSettings.IncludeOwn) then
+		if ((not p.own) or GLDG_Data.GuildSettings.IncludeOwn==true) then
 			-- Update counters for main and alt
 			if p.main then GLDG_NumMain = GLDG_NumMain + 1 end
 			if p.alt and (p.alt == GLDG_SelPlrName) then GLDG_NumAlts = GLDG_NumAlts + 1 end
@@ -4393,10 +4473,10 @@ function GLDG_ShowPlayers()
 		if p.alias then
 			textAlias:SetText(p.alias)
 			textMain:SetText("")
-		elseif (GLDG_Data.GuildSort or not GLDG_Data.GroupAlt or GLDG_Data.FilterOnline) and p.alt and GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].alias then
+		elseif (GLDG_Data.GuildSort==true or GLDG_Data.GroupAlt==false or GLDG_Data.FilterOnline==true) and p.alt and GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].alias then
 			textAlias:SetText("")
 			textMain:SetText(GLDG_DataChar[p.alt].alias)
-		elseif (GLDG_Data.GuildSort or not GLDG_Data.GroupAlt or GLDG_Data.FilterOnline) and p.alt then
+		elseif (GLDG_Data.GuildSort==true or GLDG_Data.GroupAlt==false or GLDG_Data.FilterOnline==true) and p.alt then
 			textAlias:SetText("")
 			textMain:SetText(p.alt)
 		else
@@ -4673,7 +4753,7 @@ function GLDG_ClickPlayer(playerName)
 	local p = {}
 	if GLDG_SelPlrName then p = GLDG_DataChar[GLDG_SelPlrName] end
 	local old = nil
-	if (not GLDG_Data.ShowAlt) and (p.main or p.alt) then old = GLDG_GetPlayerOffset(playerName) end
+	if (GLDG_Data.ShowAlt==false) and (p.main or p.alt) then old = GLDG_GetPlayerOffset(playerName) end
 	-- Set new selected player
 	if (playerName == GLDG_SelPlrName) then GLDG_SelPlrName = nil
 	else GLDG_SelPlrName = playerName end
@@ -4892,7 +4972,7 @@ function GLDG_ClickAlt(self)
 	local p = {}
 	if GLDG_SelPlrName then p = GLDG_DataChar[GLDG_SelPlrName] end
 	local old = nil
-	if GLDG_Data.GroupAlt then old = GLDG_GetPlayerOffset(GLDG_SelPlrName) end
+	if GLDG_Data.GroupAlt==true then old = GLDG_GetPlayerOffset(GLDG_SelPlrName) end
 	-- Toggle alt status for selected character
 	local p = GLDG_DataChar[GLDG_SelPlrName]
 	if p.alt then p.alt = nil
@@ -5090,7 +5170,7 @@ end
 ------------------------------------------------------------
 function GLDG_SendWho(name)
 	if name then
-		if (GLDG_Data.GuildSettings.ShowWhoSpam) then
+		if (GLDG_Data.GuildSettings.ShowWhoSpam==true) then
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.request.." ["..Ambiguate(name, "guild").."]")
 		end
 		SendWho('n-"'..Ambiguate(name, "guild")..'"')
@@ -5130,7 +5210,7 @@ function GLDG_TreatWhoInfo(charname, guildname, level, class)
 			GLDG_DataChar[charname].class = class
 			result = result..", "..tostring(class)
 		end
-		if (GLDG_Data.GuildSettings.ShowWhoSpam) then
+		if (GLDG_Data.GuildSettings.ShowWhoSpam==true) then
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..result)
 		end
 	end
@@ -5482,7 +5562,7 @@ end
 ---------------------
 
 function GLDG_FriendsUpdate()
-	if (not GLDG_Data.UseFriends) then
+	if (GLDG_Data.UseFriends==false) then
 		return
 	end
 
@@ -5523,25 +5603,25 @@ function GLDG_FriendsUpdate()
 				GLDG_DataChar[name].lvl = level
 			end
 
-			if (GLDG_Data.UseFriends) then
+			if (GLDG_Data.UseFriends==true) then
 				if (connected) then
 					-- Update player level
 					if (level > GLDG_DataChar[name].lvl) then
 						GLDG_AddToStartupList(GLDG_TXT.deltaFriends..": ["..Ambiguate(name, "guild").."]"..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[name].lvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(level).." "..GLDG_TXT.deltaIncrease3)
-						if GLDG_Data.GuildSettings.ListLevelUp then
+						if GLDG_Data.GuildSettings.ListLevelUp==true then
 
 							local mainName = nil
 							if (GLDG_DataChar[name] and not GLDG_DataChar[name].ignore) then
 								if GLDG_DataChar[name].alt then
 									mainName = GLDG_DataChar[name].alt;
-									if GLDG_Data.GuildSettings.ExtendAlias then
+									if GLDG_Data.GuildSettings.ExtendAlias==true then
 										if GLDG_DataChar[mainName] and GLDG_DataChar[mainName].alias then
 											mainName = GLDG_DataChar[mainName].alias
 										end
 									end
-								elseif GLDG_Data.GuildSettings.ExtendMain and GLDG_DataChar[name].main then
+								elseif GLDG_Data.GuildSettings.ExtendMain==true and GLDG_DataChar[name].main then
 									mainName = name
-									if GLDG_Data.GuildSettings.ExtendAlias then
+									if GLDG_Data.GuildSettings.ExtendAlias==true then
 										if GLDG_DataChar[mainName] and GLDG_DataChar[mainName].alias then
 											mainName = GLDG_DataChar[mainName].alias
 										end
@@ -5555,8 +5635,8 @@ function GLDG_FriendsUpdate()
 								GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r ["..Ambiguate(name, "guild").."] "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[name].lvl, level));
 							end
 						end
-						if (GLDG_TableSize(GLDG_DataGreet.NewLevel) > 0) and (not GLDG_Data.GuildSettings.SupressLevel) and (not GLDG_DataChar[name].ignore) and (level > GLDG_Data.GuildSettings.MinLevelUp) then
-							if (GLDG_Online[pl] or not GLDG_Data.GuildSettings.NoGratsOnLogin) then
+						if (GLDG_TableSize(GLDG_DataGreet.NewLevel) > 0) and (GLDG_Data.GuildSettings.SupressLevel==false) and (not GLDG_DataChar[name].ignore) and (level > GLDG_Data.GuildSettings.MinLevelUp) then
+							if (GLDG_Online[pl] or GLDG_Data.GuildSettings.NoGratsOnLogin==false) then
 								GLDG_DataChar[name].newlvl = true
 							end
 						end
@@ -5635,14 +5715,14 @@ function GLDG_TreatAchievment(achievmentLink, name)
 		if (GLDG_DataChar[name] and not GLDG_DataChar[name].ignore) then
 			if GLDG_DataChar[name].alt then
 				main = GLDG_DataChar[name].alt;
-				if GLDG_Data.GuildSettings.ExtendAlias then
+				if GLDG_Data.GuildSettings.ExtendAlias==true then
 					if GLDG_DataChar[main] and GLDG_DataChar[main].alias then
 						main = GLDG_DataChar[main].alias
 					end
 				end
-			elseif GLDG_Data.GuildSettings.ExtendMain and GLDG_DataChar[name].main then
+			elseif GLDG_Data.GuildSettings.ExtendMain==true and GLDG_DataChar[name].main then
 				main = name
-				if GLDG_Data.GuildSettings.ExtendAlias then
+				if GLDG_Data.GuildSettings.ExtendAlias==true then
 					if GLDG_DataChar[main] and GLDG_DataChar[main].alias then
 						main = GLDG_DataChar[main].alias
 					end
@@ -5651,12 +5731,11 @@ function GLDG_TreatAchievment(achievmentLink, name)
 		end
 
 		if (main) then
-			if (GLDG_Data.GuildSettings.ListAchievments) then
+			if (GLDG_Data.GuildSettings.ListAchievments==true) then
 				GLDG_Print(name..GLDG_Data.colours.help.." {"..Ambiguate(main, "guild").."}|r "..L["has earned"].." "..tostring(achievment))
 			end
 		end
-
-		if (GLDG_DataChar[name] and (not GLDG_Data.GuildSettings.SupressAchievment) and (GLDG_TableSize(GLDG_DataGreet.Achievment) > 0)) then
+		if (GLDG_DataChar[name] and (GLDG_Data.GuildSettings.SupressAchievment==false) and (GLDG_TableSize(GLDG_DataGreet.Achievment) > 0)) then
 			if (not GLDG_DataChar[name].own) then
 				GLDG_DataChar[name].achievment = achievment
 				GLDG_Queue[name] = GLDG_GetLogtime(player)
@@ -5785,7 +5864,7 @@ function GLDG_UpdateChannel(joined, player)
 				-- listed him above, otherwise, list him now
 				if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_unique_GuildName) and
 				   (not GLDG_DataChar[player].friends or not GLDG_DataChar[player].friends[GLDG_Player]) then
-					if GLDG_Data.GuildSettings.ListNames then
+					if GLDG_Data.GuildSettings.ListNames==true then
 						if GLDG_DataChar[player].alt then
 							--
 							-- Alt von Main
@@ -5820,9 +5899,9 @@ function GLDG_UpdateChannel(joined, player)
 					if GLDG_DataChar[player].alt then GLDG_Offline[player] = GLDG_Offline[GLDG_DataChar[player].alt] end
 					if GLDG_Offline[player] and (GLDG_Online[player] - GLDG_Offline[player] < GLDG_Data.GuildSettings.RelogTime * 60) then return end
 					GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is not been online in the last "..GLDG_Data.GuildSettings.RelogTime.." minutes.")
-					if GLDG_Offline[player] and (GLDG_Data.GuildSettings.SupressGreet or (GLDG_TableSize(GLDG_DataGreet.GreetBack) == 0)) then return end
+					if GLDG_Offline[player] and (GLDG_Data.GuildSettings.SupressGreet==true or (GLDG_TableSize(GLDG_DataGreet.GreetBack) == 0)) then return end
 					GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is not been online before")
-					if not GLDG_Offline[player] and (GLDG_Data.GuildSettings.SupressGreet or (GLDG_TableSize(GLDG_DataGreet.Greet) == 0)) then return end
+					if not GLDG_Offline[player] and (GLDG_Data.GuildSettings.SupressGreet==true or (GLDG_TableSize(GLDG_DataGreet.Greet) == 0)) then return end
 					GLDG_DebugPrint("player "..Ambiguate(player, "guild").." should be greeted")
 					GLDG_Queue[player] = GLDG_GetLogtime(player)
 					GLDG_ShowQueue()
@@ -5830,7 +5909,7 @@ function GLDG_UpdateChannel(joined, player)
 
 				-- if no class info is available, this player has never been /who queried before -> do it now
 				-- todo: queue these so they don't get lost if there are too many close together
-				if ((not GLDG_DataChar[player].guild) or (GLDG_DataChar[player].guild ~= GLDG_unique_GuildName)) and (not GLDG_DataChar[player].class or not GLDG_DataChar[player].lvl or (GLDG_DataChar[player].lvl < GLDG_LEVEL_CAP)) and GLDG_Data.AutoWho then
+				if ((not GLDG_DataChar[player].guild) or (GLDG_DataChar[player].guild ~= GLDG_unique_GuildName)) and (not GLDG_DataChar[player].class or not GLDG_DataChar[player].lvl or (GLDG_DataChar[player].lvl < GLDG_LEVEL_CAP)) and GLDG_Data.AutoWho==true then
 					GLDG_SendWho(player)
 				end
 			end
@@ -5860,7 +5939,7 @@ function GLDG_UpdateChannel(joined, player)
 						GLDG_ShowQueue()
 					end
 
-					if GLDG_Data.GuildSettings.ListNamesOff then
+					if GLDG_Data.GuildSettings.ListNamesOff==true then
 						if GLDG_DataChar[player].alt then
 							--
 							-- Alt von Main
@@ -6687,7 +6766,7 @@ function GLDG_ChatFilter(chatFrame, event, ...) -- chatFrame = self
 
 	--GLDG_Print("CHAT: event ["..tostring(event).."] - msg ["..tostring(msg).."] - arg2 ["..tostring(arg2).."] - arg3 ["..tostring(arg3).."]");
 
-	if GLDG_Data.GuildSettings.ExtendChat then
+	if GLDG_Data.GuildSettings.ExtendChat==true then
 		local main = ""
 		local class = ""
 		local treated = nil
@@ -6700,17 +6779,17 @@ function GLDG_ChatFilter(chatFrame, event, ...) -- chatFrame = self
 			    ((event == "CHAT_MSG_WHISPER") and arg2)) then
 				--GLDG_Print("Event ["..event.."] from player ["..arg2.."]")
 				treated = true
-				if (GLDG_DataChar[arg2] and (not GLDG_DataChar[arg2].ignore or GLDG_Data.GuildSettings.ExtendIgnored)) then
+				if (GLDG_DataChar[arg2] and (not GLDG_DataChar[arg2].ignore or GLDG_Data.GuildSettings.ExtendIgnored==true)) then
 					if GLDG_DataChar[arg2].alt then
 						main = GLDG_DataChar[arg2].alt;
-						if GLDG_Data.GuildSettings.ExtendAlias then
+						if GLDG_Data.GuildSettings.ExtendAlias==true then
 							if GLDG_DataChar[main] and GLDG_DataChar[main].alias then
 								main = GLDG_DataChar[main].alias
 							end
 						end
-					elseif GLDG_Data.GuildSettings.ExtendMain and GLDG_DataChar[arg2].main then
+					elseif GLDG_Data.GuildSettings.ExtendMain==true and GLDG_DataChar[arg2].main then
 						main = arg2
-						if GLDG_Data.GuildSettings.ExtendAlias then
+						if GLDG_Data.GuildSettings.ExtendAlias==true then
 							if GLDG_DataChar[main] and GLDG_DataChar[main].alias then
 								main = GLDG_DataChar[main].alias
 							end
@@ -7477,7 +7556,7 @@ end
 -- _32_ "guild alert" check
 --------------------------
 function GLDG_CheckForGuildAlert()
-	if not GLDG_Data.CheckedGuildAlert then
+	if GLDG_Data.CheckedGuildAlert==false then
 		if (GetCVar("guildMemberNotify") ~= "1") then
 			StaticPopup_Show("GLDG_GUILD_ALERT");
 		else
@@ -7786,7 +7865,7 @@ function GLDG_StartupCheck()
 		-- nothing pending and at least one complete -> assume we're done
 		--GLDG_Print("All done")
 
-		if (GLDG_TableSize(GLDG_ChangesText)>0 and GLDG_Data.GuildSettings.DeltaPopup) then
+		if (GLDG_TableSize(GLDG_ChangesText)>0 and GLDG_Data.GuildSettings.DeltaPopup==true) then
 			-- display text
 			GLDG_list = GLDG_ChangesText
 			GLDG_PasteList.List:Show();
@@ -7811,33 +7890,33 @@ end
 
 function GLDG_generateConfigString()
 	local a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,az = nil
-	if GLDG_Data.GuildSettings.GreetAsMain then a = 1 else a=0 end
-	if GLDG_Data.GuildSettings.Randomize then b = 2 else b=0 end
-	if GLDG_Data.GuildSettings.Whisper then c = 2^2 else c=0 end
-	if GLDG_Data.GuildSettings.WhisperLevelup then d = 2^3 else d=0 end
-	if GLDG_Data.GuildSettings.IncludeOwn then e = 2^4 else e=0 end
-	if GLDG_Data.GuildSettings.AutoAssign then f = 2^5 else f=0 end
-	if GLDG_Data.GuildSettings.AutoAssignEgp then g = 2^6 else g=0 end
-	if GLDG_Data.GuildSettings.AutoAssignAlias then h = 2^7 else h=0 end
-	if GLDG_Data.GuildSettings.ListNames then i = 2^8 else i=0 end
-	if GLDG_Data.GuildSettings.ListNamesOff then j = 2^9 else j=0 end
-	if GLDG_Data.GuildSettings.ListLevelUp then k = 2^10 else k=0 end
-	if GLDG_Data.GuildSettings.ListLevelUpOff then l = 2^11 else l=0 end
-	if GLDG_Data.GuildSettings.ListAchievments then m = 2^12 else m=0 end
-	if GLDG_Data.GuildSettings.ListQuit then n = 2^13 else n=0 end
-	if GLDG_Data.GuildSettings.ExtendChat then o = 2^14 else o=0 end
-	if GLDG_Data.GuildSettings.ExtendIgnored then p = 2^15 else p=0 end
-	if GLDG_Data.GuildSettings.ExtendMain then q = 2^16 else q=0 end
-	if GLDG_Data.GuildSettings.ExtendAlias then r = 2^17 else r=0 end
-	if GLDG_Data.GuildSettings.AddPostfix then s = 2^18 else s=0 end
-	if GLDG_Data.GuildSettings.ShowWhoSpam then t = 2^19 else t=0 end
-	if GLDG_Data.GuildSettings.SupressGreet then u = 2^20 else u=0 end
-	if GLDG_Data.GuildSettings.SupressJoin then v = 2^21 else v=0 end
-	if GLDG_Data.GuildSettings.SupressLevel then w = 2^22 else w=0 end
-	if GLDG_Data.GuildSettings.SupressRank then x = 2^23 else x=0 end
-	if GLDG_Data.GuildSettings.SupressAchievment then y = 2^24 else y=0 end
-	if GLDG_Data.GuildSettings.NoGratsOnLogin then z = 2^25 else z=0 end
-	if GLDG_Data.GuildSettings.DeltaPopup then az = 2^26 else az=0 end
+	if GLDG_Data.GuildSettings.GreetAsMain==true then a = 1 else a=0 end
+	if GLDG_Data.GuildSettings.Randomize==true then b = 2 else b=0 end
+	if GLDG_Data.GuildSettings.Whisper==true then c = 2^2 else c=0 end
+	if GLDG_Data.GuildSettings.WhisperLevelup==true then d = 2^3 else d=0 end
+	if GLDG_Data.GuildSettings.IncludeOwn==true then e = 2^4 else e=0 end
+	if GLDG_Data.GuildSettings.AutoAssign==true then f = 2^5 else f=0 end
+	if GLDG_Data.GuildSettings.AutoAssignEgp==true then g = 2^6 else g=0 end
+	if GLDG_Data.GuildSettings.AutoAssignAlias==true then h = 2^7 else h=0 end
+	if GLDG_Data.GuildSettings.ListNames==true then i = 2^8 else i=0 end
+	if GLDG_Data.GuildSettings.ListNamesOff==true then j = 2^9 else j=0 end
+	if GLDG_Data.GuildSettings.ListLevelUp==true then k = 2^10 else k=0 end
+	if GLDG_Data.GuildSettings.ListLevelUpOff==true then l = 2^11 else l=0 end
+	if GLDG_Data.GuildSettings.ListAchievments==true then m = 2^12 else m=0 end
+	if GLDG_Data.GuildSettings.ListQuit==true then n = 2^13 else n=0 end
+	if GLDG_Data.GuildSettings.ExtendChat==true then o = 2^14 else o=0 end
+	if GLDG_Data.GuildSettings.ExtendIgnored==true then p = 2^15 else p=0 end
+	if GLDG_Data.GuildSettings.ExtendMain==true then q = 2^16 else q=0 end
+	if GLDG_Data.GuildSettings.ExtendAlias==true then r = 2^17 else r=0 end
+	if GLDG_Data.GuildSettings.AddPostfix==true then s = 2^18 else s=0 end
+	if GLDG_Data.GuildSettings.ShowWhoSpam==true then t = 2^19 else t=0 end
+	if GLDG_Data.GuildSettings.SupressGreet==true then u = 2^20 else u=0 end
+	if GLDG_Data.GuildSettings.SupressJoin==true then v = 2^21 else v=0 end
+	if GLDG_Data.GuildSettings.SupressLeve==truel then w = 2^22 else w=0 end
+	if GLDG_Data.GuildSettings.SupressRank==true then x = 2^23 else x=0 end
+	if GLDG_Data.GuildSettings.SupressAchievment==true then y = 2^24 else y=0 end
+	if GLDG_Data.GuildSettings.NoGratsOnLogin==true then z = 2^25 else z=0 end
+	if GLDG_Data.GuildSettings.DeltaPopup == true then az = 2^26 else az=0 end
 	if GLDG_Data.GuildSettings.RelogTime then GLDG_CONFIG_STRING_B = string.format("%x",math.floor(GLDG_Data.GuildSettings.RelogTime)) end
 	if GLDG_Data.GuildSettings.MinLevelUp then GLDG_CONFIG_STRING_C = string.format("%x",math.floor(GLDG_Data.GuildSettings.MinLevelUp)) end
 	GLDG_CONFIG_STRING_A = string.format("%x",a+b+c+d+e+f+g+h+i+j+k+l+m+n+o+p+q+r+s+t+u+v+w+x+y+z+az)
@@ -7855,14 +7934,14 @@ function GLDG_generateConfigString()
 end
 
 function GLDG_readConfigString_change(value)
-	if value==1 then
-		GLDG_Data.GuildSettings.UseGuildDefault=1
-		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault=1
+	if value==true then
+		GLDG_Data.GuildSettings.UseGuildDefault=true
+		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault=true
 		GLDG_SetCheckboxes()
 		GLDG_QueryReloadUI()
 	else
-		GLDG_Data.GuildSettings.UseGuildDefault=nil
-		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault=nil
+		GLDG_Data.GuildSettings.UseGuildDefault=false
+		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault=false
 		GLDG_SetCheckboxes()
 		GLDG_QueryReloadUI()
 	end
@@ -7900,34 +7979,34 @@ function GLDG_readConfigString()
 		GLDG_config_from_guild = "not found"
 		GLDG_InitRoster()
 	end
-	if (GLDG_Data.GuildSettings.UseGuildDefault==1) and (GLDG_config_from_guild ~= "not found") and (GLDG_config_from_guild ~= "corrupted") then
-		if bit.band("0x"..gstring1, 1) >0 then GLDG_Data.GuildSettings.GreetAsMain=1 else GLDG_Data.GuildSettings.GreetAsMain=nil end
-		if bit.band("0x"..gstring1, 2) >0 then GLDG_Data.GuildSettings.Randomize=1 else GLDG_Data.GuildSettings.Randomize=nil end
-		if bit.band("0x"..gstring1, 2^2) >0 then GLDG_Data.GuildSettings.Whisper=1 else GLDG_Data.GuildSettings.Whisper=nil end
-		if bit.band("0x"..gstring1, 2^3) >0 then GLDG_Data.GuildSettings.WhisperLevelup=1 else GLDG_Data.GuildSettings.WhisperLevelup=nil end
-		if bit.band("0x"..gstring1, 2^4) >0 then GLDG_Data.GuildSettings.IncludeOwn=1 else GLDG_Data.GuildSettings.IncludeOwn=nil end
-		if bit.band("0x"..gstring1, 2^5) >0 then GLDG_Data.GuildSettings.AutoAssign=1 else GLDG_Data.GuildSettings.AutoAssign=nil end
-		if bit.band("0x"..gstring1, 2^6) >0 then GLDG_Data.GuildSettings.AutoAssignEgp=1 else GLDG_Data.GuildSettings.AutoAssignEgp=nil end
-		if bit.band("0x"..gstring1, 2^7) >0 then GLDG_Data.GuildSettings.AutoAssignAlias=1 else GLDG_Data.GuildSettings.AutoAssignAlias=nil end
-		if bit.band("0x"..gstring1, 2^8) >0 then GLDG_Data.GuildSettings.ListNames=1 else GLDG_Data.GuildSettings.ListNames=nil end
-		if bit.band("0x"..gstring1, 2^9) >0 then GLDG_Data.GuildSettings.ListNamesOff=1 else GLDG_Data.GuildSettings.ListNamesOff=nil end
-		if bit.band("0x"..gstring1, 2^10) >0 then GLDG_Data.GuildSettings.ListLevelUp=1 else GLDG_Data.GuildSettings.ListLevelUp=nil end
-		if bit.band("0x"..gstring1, 2^11) >0 then GLDG_Data.GuildSettings.ListLevelUpOff=1 else GLDG_Data.GuildSettings.ListLevelUpOff=nil end
-		if bit.band("0x"..gstring1, 2^12) >0 then GLDG_Data.GuildSettings.ListAchievments=1 else GLDG_Data.GuildSettings.ListAchievments=nil end
-		if bit.band("0x"..gstring1, 2^13) >0 then GLDG_Data.GuildSettings.ListQuit=1 else GLDG_Data.GuildSettings.ListQuit=nil end
-		if bit.band("0x"..gstring1, 2^14) >0 then GLDG_Data.GuildSettings.ExtendChat=1 else GLDG_Data.GuildSettings.ExtendChat=nil end
-		if bit.band("0x"..gstring1, 2^15) >0 then GLDG_Data.GuildSettings.ExtendIgnored=1 else GLDG_Data.GuildSettings.ExtendIgnored=nil end
-		if bit.band("0x"..gstring1, 2^16) >0 then GLDG_Data.GuildSettings.ExtendMain=1 else GLDG_Data.GuildSettings.ExtendMain=nil end
-		if bit.band("0x"..gstring1, 2^17) >0 then GLDG_Data.GuildSettings.ExtendAlias=1 else GLDG_Data.GuildSettings.ExtendAlias=nil end
-		if bit.band("0x"..gstring1, 2^18) >0 then GLDG_Data.GuildSettings.AddPostfix=1 else GLDG_Data.GuildSettings.AddPostfix=nil end
-		if bit.band("0x"..gstring1, 2^19) >0 then GLDG_Data.GuildSettings.ShowWhoSpam=1 else GLDG_Data.GuildSettings.ShowWhoSpam=nil end
-		if bit.band("0x"..gstring1, 2^20) >0 then GLDG_Data.GuildSettings.SupressGreet=1 else GLDG_Data.GuildSettings.SupressGreet=nil end
-		if bit.band("0x"..gstring1, 2^21) >0 then GLDG_Data.GuildSettings.SupressJoin=1 else GLDG_Data.GuildSettings.SupressJoin=nil end
-		if bit.band("0x"..gstring1, 2^22) >0 then GLDG_Data.GuildSettings.SupressLevel=1 else GLDG_Data.GuildSettings.SupressLevel=nil end
-		if bit.band("0x"..gstring1, 2^23) >0 then GLDG_Data.GuildSettings.SupressRank=1 else GLDG_Data.GuildSettings.SupressRank=nil end
-		if bit.band("0x"..gstring1, 2^24) >0 then GLDG_Data.GuildSettings.SupressAchievment=1 else GLDG_Data.GuildSettings.SupressAchievment=nil end
-		if bit.band("0x"..gstring1, 2^25) >0 then GLDG_Data.GuildSettings.NoGratsOnLogin=1 else GLDG_Data.GuildSettings.NoGratsOnLogin=nil end
-		if bit.band("0x"..gstring1, 2^26) >0 then GLDG_Data.GuildSettings.DeltaPopup=1 else GLDG_Data.GuildSettings.DeltaPopup=nil end
+	if (GLDG_Data.GuildSettings.UseGuildDefault==true) and (GLDG_config_from_guild ~= "not found") and (GLDG_config_from_guild ~= "corrupted") then
+		if bit.band("0x"..gstring1, 1) >0 then GLDG_Data.GuildSettings.GreetAsMain=true else GLDG_Data.GuildSettings.GreetAsMain=false end
+		if bit.band("0x"..gstring1, 2) >0 then GLDG_Data.GuildSettings.Randomize=true else GLDG_Data.GuildSettings.Randomize=false end
+		if bit.band("0x"..gstring1, 2^2) >0 then GLDG_Data.GuildSettings.Whisper=true else GLDG_Data.GuildSettings.Whisper=false end
+		if bit.band("0x"..gstring1, 2^3) >0 then GLDG_Data.GuildSettings.WhisperLevelup=true else GLDG_Data.GuildSettings.WhisperLevelup=false end
+		if bit.band("0x"..gstring1, 2^4) >0 then GLDG_Data.GuildSettings.IncludeOwn=true else GLDG_Data.GuildSettings.IncludeOwn=false end
+		if bit.band("0x"..gstring1, 2^5) >0 then GLDG_Data.GuildSettings.AutoAssign=true else GLDG_Data.GuildSettings.AutoAssign=false end
+		if bit.band("0x"..gstring1, 2^6) >0 then GLDG_Data.GuildSettings.AutoAssignEgp=true else GLDG_Data.GuildSettings.AutoAssignEgp=false end
+		if bit.band("0x"..gstring1, 2^7) >0 then GLDG_Data.GuildSettings.AutoAssignAlias=true else GLDG_Data.GuildSettings.AutoAssignAlias=false end
+		if bit.band("0x"..gstring1, 2^8) >0 then GLDG_Data.GuildSettings.ListNames=true else GLDG_Data.GuildSettings.ListNames=false end
+		if bit.band("0x"..gstring1, 2^9) >0 then GLDG_Data.GuildSettings.ListNamesOff=true else GLDG_Data.GuildSettings.ListNamesOff=false end
+		if bit.band("0x"..gstring1, 2^10) >0 then GLDG_Data.GuildSettings.ListLevelUp=true else GLDG_Data.GuildSettings.ListLevelUp=false end
+		if bit.band("0x"..gstring1, 2^11) >0 then GLDG_Data.GuildSettings.ListLevelUpOff=true else GLDG_Data.GuildSettings.ListLevelUpOff=false end
+		if bit.band("0x"..gstring1, 2^12) >0 then GLDG_Data.GuildSettings.ListAchievments=true else GLDG_Data.GuildSettings.ListAchievments=false end
+		if bit.band("0x"..gstring1, 2^13) >0 then GLDG_Data.GuildSettings.ListQuit=true else GLDG_Data.GuildSettings.ListQuit=false end
+		if bit.band("0x"..gstring1, 2^14) >0 then GLDG_Data.GuildSettings.ExtendChat=true else GLDG_Data.GuildSettings.ExtendChat=false end
+		if bit.band("0x"..gstring1, 2^15) >0 then GLDG_Data.GuildSettings.ExtendIgnored=true else GLDG_Data.GuildSettings.ExtendIgnored=false end
+		if bit.band("0x"..gstring1, 2^16) >0 then GLDG_Data.GuildSettings.ExtendMain=true else GLDG_Data.GuildSettings.ExtendMain=false end
+		if bit.band("0x"..gstring1, 2^17) >0 then GLDG_Data.GuildSettings.ExtendAlias=true else GLDG_Data.GuildSettings.ExtendAlias=false end
+		if bit.band("0x"..gstring1, 2^18) >0 then GLDG_Data.GuildSettings.AddPostfix=true else GLDG_Data.GuildSettings.AddPostfix=false end
+		if bit.band("0x"..gstring1, 2^19) >0 then GLDG_Data.GuildSettings.ShowWhoSpam=true else GLDG_Data.GuildSettings.ShowWhoSpam=false end
+		if bit.band("0x"..gstring1, 2^20) >0 then GLDG_Data.GuildSettings.SupressGreet=true else GLDG_Data.GuildSettings.SupressGreet=false end
+		if bit.band("0x"..gstring1, 2^21) >0 then GLDG_Data.GuildSettings.SupressJoin=true else GLDG_Data.GuildSettings.SupressJoin=false end
+		if bit.band("0x"..gstring1, 2^22) >0 then GLDG_Data.GuildSettings.SupressLevel=true else GLDG_Data.GuildSettings.SupressLevel=false end
+		if bit.band("0x"..gstring1, 2^23) >0 then GLDG_Data.GuildSettings.SupressRank=true else GLDG_Data.GuildSettings.SupressRank=false end
+		if bit.band("0x"..gstring1, 2^24) >0 then GLDG_Data.GuildSettings.SupressAchievment=true else GLDG_Data.GuildSettings.SupressAchievment=false end
+		if bit.band("0x"..gstring1, 2^25) >0 then GLDG_Data.GuildSettings.NoGratsOnLogin=true else GLDG_Data.GuildSettings.NoGratsOnLogin=false end
+		if bit.band("0x"..gstring1, 2^26) >0 then GLDG_Data.GuildSettings.DeltaPopup=true else GLDG_Data.GuildSettings.DeltaPopup=false end
 		GLDG_Data.GuildSettings.RelogTime = tonumber(gstring2, 16)
 		GLDG_Data.GuildSettings.MinLevelUp= tonumber(gstring3, 16)
 
@@ -7960,7 +8039,7 @@ function GLDG_readConfigString()
 		GLDG_Data[GLDG_unique_GuildName].DeltaPopup = GLDG_Data.GuildSettings.DeltaPopup
 		GLDG_Data[GLDG_unique_GuildName].RelogTime = GLDG_Data.GuildSettings.RelogTime
 		GLDG_Data[GLDG_unique_GuildName].MinLevelUp = GLDG_Data.GuildSettings.MinLevelUp
-		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = 1
+		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = true
 		
 		if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 1) then
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/Config string found. GuildGreet using default settings from %s!"],Ambiguate(GLDG_GuildLeader, "guild")))
@@ -7969,34 +8048,34 @@ function GLDG_readConfigString()
 		end
 		--GLDG_Init()
 	else
-		if GLDG_Data.GuildSettings.UseGuildDefault==1 and GLDG_unique_GuildName then
-			GLDG_Data.GuildSettings.GreetAsMain=nil
-			GLDG_Data.GuildSettings.Randomize=nil
-			GLDG_Data.GuildSettings.Whisper=nil
-			GLDG_Data.GuildSettings.WhisperLevelup=nil
-			GLDG_Data.GuildSettings.IncludeOwn=1
-			GLDG_Data.GuildSettings.AutoAssign=nil
-			GLDG_Data.GuildSettings.AutoAssignEgp=nil
-			GLDG_Data.GuildSettings.AutoAssignAlias=nil
-			GLDG_Data.GuildSettings.ListNames=1
-			GLDG_Data.GuildSettings.ListNamesOff=1
-			GLDG_Data.GuildSettings.ListLevelUp=1
-			GLDG_Data.GuildSettings.ListLevelUpOff=1
-			GLDG_Data.GuildSettings.ListAchievments=1
-			GLDG_Data.GuildSettings.ListQuit=1
-			GLDG_Data.GuildSettings.ExtendChat=1
-			GLDG_Data.GuildSettings.ExtendIgnored=1
-			GLDG_Data.GuildSettings.ExtendMain=1
-			GLDG_Data.GuildSettings.ExtendAlias=1
-			GLDG_Data.GuildSettings.AddPostfix=1
-			GLDG_Data.GuildSettings.ShowWhoSpam=nil
-			GLDG_Data.GuildSettings.SupressGreet=nil
-			GLDG_Data.GuildSettings.SupressJoin=nil
-			GLDG_Data.GuildSettings.SupressLevel=nil
-			GLDG_Data.GuildSettings.SupressRank=nil
-			GLDG_Data.GuildSettings.SupressAchievment=nil
-			GLDG_Data.GuildSettings.NoGratsOnLogin=1
-			GLDG_Data.GuildSettings.DeltaPopup=1
+		if GLDG_Data.GuildSettings.UseGuildDefault==true and GLDG_unique_GuildName then
+			GLDG_Data.GuildSettings.GreetAsMain=false
+			GLDG_Data.GuildSettings.Randomize=false
+			GLDG_Data.GuildSettings.Whisper=false
+			GLDG_Data.GuildSettings.WhisperLevelup=false
+			GLDG_Data.GuildSettings.IncludeOwn=true
+			GLDG_Data.GuildSettings.AutoAssign=false
+			GLDG_Data.GuildSettings.AutoAssignEgp=false
+			GLDG_Data.GuildSettings.AutoAssignAlias=false
+			GLDG_Data.GuildSettings.ListNames=true
+			GLDG_Data.GuildSettings.ListNamesOff=true
+			GLDG_Data.GuildSettings.ListLevelUp=true
+			GLDG_Data.GuildSettings.ListLevelUpOff=true
+			GLDG_Data.GuildSettings.ListAchievments=true
+			GLDG_Data.GuildSettings.ListQuit=true
+			GLDG_Data.GuildSettings.ExtendChat=true
+			GLDG_Data.GuildSettings.ExtendIgnored=true
+			GLDG_Data.GuildSettings.ExtendMain=true
+			GLDG_Data.GuildSettings.ExtendAlias=true
+			GLDG_Data.GuildSettings.AddPostfix=true
+			GLDG_Data.GuildSettings.ShowWhoSpam=false
+			GLDG_Data.GuildSettings.SupressGreet=false
+			GLDG_Data.GuildSettings.SupressJoin=false
+			GLDG_Data.GuildSettings.SupressLevel=false
+			GLDG_Data.GuildSettings.SupressRank=false
+			GLDG_Data.GuildSettings.SupressAchievment=false
+			GLDG_Data.GuildSettings.NoGratsOnLogin=true
+			GLDG_Data.GuildSettings.DeltaPopup=true
 			GLDG_Data.GuildSettings.RelogTime = 2
 			GLDG_Data.GuildSettings.MinLevelUp= 20
 			GLDG_Data[GLDG_unique_GuildName] = GLDG_Data.GuildSettings
