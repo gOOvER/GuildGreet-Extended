@@ -2439,7 +2439,6 @@ function GLDG_ShowQueue()
 	for p in pairs(GLDG_Queue) do
 		-- Look for the position in the list we need
 		local loc = 1
-		--if GLDG_Online[queue[loc]] and GLDG_Online[p] and type(GLDG_Online[queue[loc]])~="boolean" and type(GLDG_Online[p])~="boolean" then
 		if type(GLDG_Online[queue[loc]])=="number" and type(GLDG_Online[p])=="number" then
 			while queue[loc] and (GLDG_Online[queue[loc]] <= GLDG_Online[p]) do	
 				loc = loc + 1
@@ -5995,8 +5994,7 @@ end
 function GLDG_SecToTimeString(secs)
 	--local result = tostring(secs).." seconds: "
 	local result = ""
-
-	if secs ~= nil then
+	if type(secs) == "number"  then
 		secs = time() - secs
 
 		--result = result.."diff "..tostring(secs)..": "
@@ -6047,7 +6045,7 @@ function GLDG_Test(showAll)
 		local numToons
 		local hasFocus, toonName, client, realmName, faction, race, class, guild, zoneName, level, gameText
 		for i = 1, num do
-			presenceID, givenName, surname, toonName, toonID, client, isOnline, lastOnline, isAFK, isDND, broadcastText, noteText, isFriend, broadcastTime = BNGetFriendInfo(i)
+			presenceID, givenName, surname, isBattleTagPresence, toonName, toonID, client, isOnline, lastOnline, isAFK, isDND, broadcastText, noteText, isFriend, broadcastTime = BNGetFriendInfo(i)
 			--GLDG_Print("  BN friend "..tostring(i)..": presenceId ["..tostring(presenceId).."] givenName ["..tostring(givenName).."] surname ["..tostring(surname).."] toonName ["..tostring(toonName).."] toonID ["..tostring(toonId).."] client ["..tostring(client).."] isOnline ["..tostring(isOnline).."] lastOnline ["..tostring(GLDG_SecToTimeString(lastOnline)).."] isAFK ["..tostring(isAFK).."] isDND ["..tostring(isDND).."] broadcastText ["..tostring(broadcastText).."] noteText ["..tostring(noteText).."] isFriend ["..tostring(isFriend).."] broadcastTime ["..tostring(GLDG_SecToTimeString(broadCastTime)).."]");
 			if (isOnline or showAll) then
 				if isOnline then isOnline = "online" else isOnline = "offline" end
@@ -6057,7 +6055,7 @@ function GLDG_Test(showAll)
 				if ( numToons > 0 ) then
 					GLDG_Print("  Has "..tostring(numToons).." toons")
 					for j = 1, numToons do
-						hasFocus, toonName, client, realmName, faction, race, class, guild, zoneName, level, gameText = BNGetFriendToonInfo(i, j)
+						hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText = BNGetFriendToonInfo(i, j)
 						--GLDG_Print("     Toon "..tostring(j)..": hasFocus ["..tostring(hasFocus).."] toonName ["..tostring(toonName).."] client ["..tostring(client).."] realmName ["..tostring(realmName).."] faction ["..tostring(faction).."] race ["..tostring(race).."] class ["..tostring(class).."] guild ["..tostring(guild).."] zoneName ["..tostring(zoneName).."] level ["..tostring(level).."] gameText ["..tostring(gameText).."]")
 						GLDG_Print("     Toon "..tostring(j)..": ["..tostring(toonName).."] on ["..tostring(realmName).."] ["..tostring(faction).."] is ["..tostring(race).."] ["..tostring(class).."] in guild ["..tostring(guild).."] currently in ["..tostring(zoneName).."] - level ["..tostring(level).."]")
 					end
