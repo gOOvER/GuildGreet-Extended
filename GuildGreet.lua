@@ -135,7 +135,8 @@ GLDG_InitialFriendsUpdate = nil	-- To make sure we get at least one update
 GLDG_UpdateRequest = 0		    -- If set with time, update will be performed
 GLDG_UpdateRequestFriends = 0	-- If set with time, update will be performed
 GLDG_InitComplete = nil		    -- Set in initialization is done
-GLDG_ReadNotes = 1	
+GLDG_ReadNotes = 1
+GLDG_RosterImportRunning = 0
 GLDG_InitCheck = 0		        -- Check for changes and display them; 0 = not started, 1 = pending guild, 2 = pending friends, 4 = pending channel, 8 = done guild, 16 = done friends, 32 = done channel
 GLDG_ChangesText = {}		    -- text for popup display
 
@@ -322,7 +323,9 @@ function GLDG_OnEvent(self, event, ...)
 						GLDG_readConfigString()
 					end
 				end
-				GLDG_RosterImport()
+				if GLDG_RosterImportRunning==0 then
+					GLDG_RosterImport()
+				end
 			else
 				-- guild name not yet known -> try reinitialisation
 				GLDG_InitRoster()
@@ -1346,6 +1349,7 @@ end
 ------------------------------
 
 function GLDG_RosterImport()
+	GLDG_RosterImportRunning=1
 	if (not GLDG_unique_GuildName or GLDG_unique_GuildName == "") then
 		return
 	end
@@ -1767,6 +1771,7 @@ function GLDG_RosterImport()
 			GLDG_autoGreeted = 1
 		end
 	end
+	GLDG_RosterImportRunning=0
 end
 
 ------------------------------------------------------------
