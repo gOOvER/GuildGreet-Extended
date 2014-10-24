@@ -199,7 +199,6 @@ function GLDG_OnLoad(self)
 	SLASH_GLDG3 = "/greet"
 	SlashCmdList.GLDG = GLDG_SlashHandler
 end
-
 ------------------------------------------------------------
 --function GLDG_myAddons()
 --	-- Register addon with myAddons
