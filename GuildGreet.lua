@@ -191,6 +191,7 @@ function GLDG_OnLoad(self)
 	self:RegisterEvent("ADDON_LOADED")
 	self:RegisterEvent("VARIABLES_LOADED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("SAVED_VARIABLES_TOO_LARGE")
 
 	-- Slash commands for CLI
 	SLASH_GLDG1 = "/guildgreet"
@@ -200,37 +201,37 @@ function GLDG_OnLoad(self)
 end
 
 ------------------------------------------------------------
-function GLDG_myAddons()
-	-- Register addon with myAddons
-	if not (myAddOnsFrame_Register) then return end
-	local version = GetAddOnMetadata("GuildGreet", "Version");
-	local date = GetAddOnMetadata("GuildGreet", "X-Date");
-	local author = GetAddOnMetadata("GuildGreet", "Author");
-	local web = GetAddOnMetadata("GuildGreet", "X-Website");
-	if (version == nil) then
-		version = "unknown";
-	end
-	if (date == nil) then
-		date = "unknown";
-	end
-	if (author == nil) then
-		author = "unknown";
-	end
-	if (web == nil) then
-		web = "unknown";
-	end
+--function GLDG_myAddons()
+--	-- Register addon with myAddons
+--	if not (myAddOnsFrame_Register) then return end
+--	local version = GetAddOnMetadata("GuildGreet", "Version");
+--	local date = GetAddOnMetadata("GuildGreet", "X-Date");
+--	local author = GetAddOnMetadata("GuildGreet", "Author");
+--	local web = GetAddOnMetadata("GuildGreet", "X-Website");
+--	if (version == nil) then
+--		version = "unknown";
+--	end
+--	if (date == nil) then
+--		date = "unknown";
+--	end
+--	if (author == nil) then
+--		author = "unknown";
+--	end
+--	if (web == nil) then
+--		web = "unknown";
+--	end
 
-	myAddOnsFrame_Register({
-		name = GLDG_NAME,
-		version = version,
-		releaseDate = date,
-		author = author,
-		email = "none",
-		website = web,
-		category = MYADDONS_CATEGORY_GUILD,
-		optionsframe = GLDG_GUI,
-	})
-end
+--	myAddOnsFrame_Register({
+--		name = GLDG_NAME,
+--		version = version,
+--		releaseDate = date,
+--		author = author,
+--		email = "none",
+--		website = web,
+--		category = MYADDONS_CATEGORY_GUILD,
+--		optionsframe = GLDG_GUI,
+--	})
+--end
 
 
 ------------------------
@@ -242,18 +243,18 @@ function GLDG_OnEvent(self, event, ...)
 	-- Distribute events to appropriate functions
 	if (event == "ADDON_LOADED") and (arg1 == GLDG_NAME) then
 		GLDG_Main:UnregisterEvent("ADDON_LOADED")
-		if not GLDG_InitComplete then
-			GLDG_myAddons()
+		if GLDG_InitComplete==nil then
+--			GLDG_myAddons()
 			GLDG_Init()
-			GLDG_RegisterUrbinAddon(GLDG_NAME, GLDG_About)
+			--GLDG_RegisterUrbinAddon(GLDG_NAME, GLDG_About)
 		end
 	elseif (event == "VARIABLES_LOADED") then
 		GLDG_Main:UnregisterEvent("VARIABLES_LOADED")
 
-		if not GLDG_InitComplete then
-			GLDG_myAddons()
+		if GLDG_InitComplete==nil then
+--			GLDG_myAddons()
 			GLDG_Init()
-			GLDG_RegisterUrbinAddon(GLDG_NAME, GLDG_About)
+			--GLDG_RegisterUrbinAddon(GLDG_NAME, GLDG_About)
 		end				
 		GLDG_autoConsistencyCheckReady = true
 
@@ -263,7 +264,7 @@ function GLDG_OnEvent(self, event, ...)
 		end
 
 	elseif (event == "PLAYER_ENTERING_WORLD") then
-		if not GLDG_InitComplete then
+		if GLDG_InitComplete==nil then
 			GLDG_Init()
 		end
 		GLDG_CheckForGuildAlert()
@@ -277,8 +278,7 @@ function GLDG_OnEvent(self, event, ...)
 		GLDG_Main:RegisterEvent("CHAT_MSG_CHANNEL_NOTICE")
 		--GLDG_Main:RegisterEvent("CHAT_MSG_CHANNEL_LIST")
 		GLDG_Main:RegisterEvent("CHAT_MSG_ADDON")
-		GLDG_Main:RegisterEvent("PARTY_MEMBERS_CHANGED")
-		GLDG_Main:RegisterEvent("RAID_ROSTER_UPDATE")
+		GLDG_Main:RegisterEvent("GROUP_ROSTER_UPDATE")
 		GLDG_Main:RegisterEvent("CHAT_MSG_GUILD_ACHIEVEMENT")
 		GLDG_Main:RegisterEvent("WHO_LIST_UPDATE")
 
@@ -429,10 +429,10 @@ function GLDG_OnEvent(self, event, ...)
 			elseif (string.sub(arg2, 1, 6)=="QUERY:") then
 				SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
 				local inInstance, instanceType = IsInInstance()
-				if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumPartyMembers() > 0) then
+				if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumSubgroupMembers() > 0) then
 					SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "PARTY")
 				end
-				if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumRaidMembers() > 0) then
+				if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumGroupMembers() > 0) then
 					SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "RAID")
 				end
 				if (instanceType == "pvp") then
@@ -443,17 +443,12 @@ function GLDG_OnEvent(self, event, ...)
 
 	-- catching people leaving or entering party/raid
 	-- it seems that GetNumParty/RaidMembers() returns >0 when in BGs but PARTY and RAID are unavailable in these settings
-	elseif (event == "PARTY_MEMBERS_CHANGED") then
+	elseif (event == "GROUP_ROSTER_UPDATE") then
 		local inInstance, instanceType = IsInInstance()
-		if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumPartyMembers() > 0) then
+		if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumSubgroupMembers() > 0 ) then
 			SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "PARTY")
 		end
-		if (instanceType == "pvp") then
-			SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "BATTLEGROUND")
-		end
-	elseif (event == "RAID_ROSTER_UPDATE") then
-		local inInstance, instanceType = IsInInstance()
-		if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumRaidMembers() > 0) then
+		if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumGroupMembers() > 0) then
 			SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "RAID")
 		end
 		if (instanceType == "pvp") then
@@ -1217,7 +1212,7 @@ function GLDG_InitRoster()
 		GuildRoster()  -- ?
 		if not offline then SetGuildRosterShowOffline(false) end
 
-		if (not GLDG_InitialGuildUpdate) then
+		if (GLDG_InitialGuildUpdate == nil) then
 			if IsInGuild() and bit.band(GLDG_InitCheck, 1)~=1 then
 				GLDG_InitCheck = bit.bor(GLDG_InitCheck, 1)	-- guild started
 				--GLDG_Print("InitCheck is ["..tostring(GLDG_InitCheck).."] - guild started")
@@ -1741,7 +1736,7 @@ function GLDG_RosterImport()
 
 	-- If we got our info, switch to the next phase
 	if (cnt > 0) then
-		if (complete and not GLDG_InitialGuildUpdate) then
+		if (complete and GLDG_InitialGuildUpdate == nil) then
 			GLDG_InitialGuildUpdate = true
 			GLDG_NewGuild = false
 
@@ -1762,7 +1757,7 @@ function GLDG_RosterImport()
 
 			GLDG_Main:RegisterEvent("CHAT_MSG_SYSTEM")
 		end
-		if (update) then
+		if (update==true) then
 			GLDG_ShowQueue()
 		end
 
@@ -5375,7 +5370,7 @@ function GLDG_Help()
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg char "..GLDG_Data.colours.help.."[|rshow"..GLDG_Data.colours.help.."] | |rchar all "..GLDG_Data.colours.help.."| |rchar list", true)
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg "..GLDG_Data.colours.help.."[|rshow"..GLDG_Data.colours.help.."] <|r"..GLDG_TXT.name..GLDG_Data.colours.help.."> | |rfull "..GLDG_Data.colours.help.."<|r"..GLDG_TXT.name..GLDG_Data.colours.help.."> | |rdetail "..GLDG_Data.colours.help.."<|r"..GLDG_TXT.name..GLDG_Data.colours.help..">|r", true)
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg help "..GLDG_Data.colours.help.."| |rabout "..GLDG_Data.colours.help.."| |rconfig "..GLDG_Data.colours.help.."| |rtest", true)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg urbin", true);
+--	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg urbin", true);
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg clear", true)
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg check", true)
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg alert", true)
@@ -5396,31 +5391,31 @@ function GLDG_Help()
 end
 
 ------------------------------------------------------------
-function GLDG_About(urbin)
-	local ver = GetAddOnMetadata("GuildGreet", "Version");
-	local date = GetAddOnMetadata("GuildGreet", "X-Date");
-	local author = GetAddOnMetadata("GuildGreet", "Author");
-	local web = GetAddOnMetadata("GuildGreet", "X-Website");
+--function GLDG_About(urbin)
+--	local ver = GetAddOnMetadata("GuildGreet", "Version");
+--	local date = GetAddOnMetadata("GuildGreet", "X-Date");
+--	local author = GetAddOnMetadata("GuildGreet", "Author");
+--	local web = GetAddOnMetadata("GuildGreet", "X-Website");
+--
+--	if (author ~= nil) then
+--		GLDG_Print(GLDG_NAME.." "..GLDG_TXT.by.." "..GLDG_Data.colours.help..author.."|r", true);
+--	end
+--	if (ver ~= nil) then
+--		GLDG_Print("  "..GLDG_TXT.version..": "..GLDG_Data.colours.help..ver.."|r", true);
+--	end
+--	if (date ~= nil) then
+--		GLDG_Print("  "..GLDG_TXT.date..": "..GLDG_Data.colours.help..date.."|r", true);
+--	end
+--	if (web ~= nil) then
+--		GLDG_Print("  "..GLDG_TXT.web..": "..GLDG_Data.colours.help..web.."|r", true);
+--	end
 
-	if (author ~= nil) then
-		GLDG_Print(GLDG_NAME.." "..GLDG_TXT.by.." "..GLDG_Data.colours.help..author.."|r", true);
-	end
-	if (ver ~= nil) then
-		GLDG_Print("  "..GLDG_TXT.version..": "..GLDG_Data.colours.help..ver.."|r", true);
-	end
-	if (date ~= nil) then
-		GLDG_Print("  "..GLDG_TXT.date..": "..GLDG_Data.colours.help..date.."|r", true);
-	end
-	if (web ~= nil) then
-		GLDG_Print("  "..GLDG_TXT.web..": "..GLDG_Data.colours.help..web.."|r", true);
-	end
-
-	if (urbin) then
-		GLDG_Print("  "..GLDG_TXT.slash..": "..GLDG_Data.colours.help..SLASH_GLDG2.."|r", true);
-	else
-		GLDG_ListUrbinAddons(GLDG_NAME)
-	end
-end
+--	if (urbin) then
+--		GLDG_Print("  "..GLDG_TXT.slash..": "..GLDG_Data.colours.help..SLASH_GLDG2.."|r", true);
+--	else
+--		GLDG_ListUrbinAddons(GLDG_NAME)
+--	end
+--end
 
 
 ---------------------
@@ -6963,37 +6958,37 @@ end
 --------------------------
 -- _29_ urbin addon listing
 --------------------------
-function GLDG_RegisterUrbinAddon(name, about)
-	if (not name) then return end
-	if (not URBIN_AddonList) then
-		URBIN_AddonList = {}
-	end
-	URBIN_AddonList[name] = {}
-	URBIN_AddonList[name].name = name
-	URBIN_AddonList[name].about = about
-end
+--function GLDG_RegisterUrbinAddon(name, about)
+--	if (not name) then return end
+--	if (not URBIN_AddonList) then
+--		URBIN_AddonList = {}
+--	end
+--	URBIN_AddonList[name] = {}
+--	URBIN_AddonList[name].name = name
+--	URBIN_AddonList[name].about = about
+--end
 
 ------------------------------------------------------------
-function GLDG_ListUrbinAddons(name)
-	if (not URBIN_AddonList) then
-		return
-	end
-
-	local addons = ""
-	for p in pairs(URBIN_AddonList) do
-		if (URBIN_AddonList[p].name ~= name) then
-			if (addons ~= "") then
-				addons = addons..", "
-			end
-			addons = addons..URBIN_AddonList[p].name
-		end
-	end
-
-	if (addons ~= "") then
-		GLDG_Print(" ", true);
-		GLDG_Print("  "..GLDG_TXT.urbin..": "..GLDG_Data.colours.help..addons.."|r", true);
-	end
-end
+--function GLDG_ListUrbinAddons(name)
+--	if (not URBIN_AddonList) then
+--		return
+--	end
+--
+--	local addons = ""
+--	for p in pairs(URBIN_AddonList) do
+--		if (URBIN_AddonList[p].name ~= name) then
+--			if (addons ~= "") then
+--				addons = addons..", "
+--			end
+--			addons = addons..URBIN_AddonList[p].name
+--		end
+--	end
+--
+--	if (addons ~= "") then
+--		GLDG_Print(" ", true);
+--		GLDG_Print("  "..GLDG_TXT.urbin..": "..GLDG_Data.colours.help..addons.."|r", true);
+--	end
+--end
 
 ------------------------------------------------------------
 function GLDG_ListUrbinAddonDetails()
