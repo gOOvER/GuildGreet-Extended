@@ -77,7 +77,7 @@ GLDG_SubTab2Frame.Tab4 = "Other"
 -- Strings we look for
 
 --GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(ERR_FRIEND_ONLINE_SS, 20)
-GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(string.gsub(ERR_FRIEND_ONLINE_SS, "|cff00ff00online|r", ""), 20) -- fix for RealUI 8 users
+GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(string.gsub(ERR_FRIEND_ONLINE_SS, "|cff00ff00online|r", "online"), 20) -- fix for RealUI 8 users
 GLDG_OFFLINE		= string.format(ERR_FRIEND_OFFLINE_S, "(.+)")
 GLDG_JOINED			= string.format(ERR_GUILD_JOIN_S, "(.+)")
 GLDG_PROMO			= string.format(ERR_GUILD_PROMOTE_SSS, "(.+)", "(.+)", "(.+)")
