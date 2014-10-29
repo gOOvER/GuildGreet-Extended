@@ -75,8 +75,7 @@ GLDG_SubTab2Frame.Tab4 = "Other"
 
 
 -- Strings we look for
-
---GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(ERR_FRIEND_ONLINE_SS, 20)
+GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(ERR_FRIEND_ONLINE_SS, 20)
 GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(string.gsub(ERR_FRIEND_ONLINE_SS, "|cff00ff00online|r", "online"), 20) -- fix for RealUI 8 users
 GLDG_OFFLINE		= string.format(ERR_FRIEND_OFFLINE_S, "(.+)")
 GLDG_JOINED			= string.format(ERR_GUILD_JOIN_S, "(.+)")
@@ -731,7 +730,6 @@ function GLDG_Init()
 	if not GLDG_Data.colours.channel.rank	then GLDG_Data.colours.channel.rank = GLDG_DEFAULT_RANK_COLOUR end
 	if not GLDG_Data.colours.channel.relog	then GLDG_Data.colours.channel.relog = GLDG_DEFAULT_RELOG_COLOUR end
 	if not GLDG_Data.colours.channel.achievment then GLDG_Data.colours.channel.achievment = GLDG_DEFAULT_ACHIEVMENT_COLOUR end
-
 
 	-- Set initial pointers to avoid errors (hack!)
 	GLDG_DataChar = {}
@@ -2188,7 +2186,12 @@ end
 
 function GLDG_SystemMsg(msg)
 	if msg == nil then return end
-
+	GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(ERR_FRIEND_ONLINE_SS, 20)
+	GLDG_OFFLINE		= string.format(ERR_FRIEND_OFFLINE_S, "(.+)")
+	GLDG_JOINED			= string.format(ERR_GUILD_JOIN_S, "(.+)")
+	GLDG_PROMO			= string.format(ERR_GUILD_PROMOTE_SSS, "(.+)", "(.+)", "(.+)")
+	GLDG_DEMOTE			= string.format(ERR_GUILD_DEMOTE_SSS, ".+", "(.+)", "(.+)")
+	GLDG_ACHIEVE    = string.format(ACHIEVEMENT_BROADCAST, "(.+)", "(.+)")
 	-- Receiving system message
 	GLDG_DebugPrint("incoming system message: "..msg)
 	-- Check players coming online
@@ -2441,7 +2444,7 @@ function GLDG_ShowQueue()
 		-- Look for the position in the list we need
 		local loc = 1
 		if type(GLDG_Online[queue[loc]])=="number" and type(GLDG_Online[p])=="number" then
-			while queue[loc] and (GLDG_Online[queue[loc]] <= GLDG_Online[p]) do	
+			while queue[loc] and (GLDG_Online[queue[loc]] <= GLDG_Online[p]) do
 				loc = loc + 1
 			end
 		end
@@ -5468,9 +5471,9 @@ end
 ------------------------------------------------------------
 -- Create our list frame
 ------------------------------------------------------------
-GLDG_PasteList.List = CreateFrame("Frame", "", UIParent)
+GLDG_PasteList.List = CreateFrame("Frame", nil, UIParent)
 GLDG_PasteList.List:Hide()
-GLDG_PasteList.List:SetPoint("CENTER", "UIParent", "CENTER")
+GLDG_PasteList.List:SetPoint("CENTER", UIParent, "CENTER")
 GLDG_PasteList.List:SetFrameStrata("DIALOG")
 GLDG_PasteList.List:SetHeight(560)
 GLDG_PasteList.List:SetWidth(500)
