@@ -7,8 +7,9 @@
 	<Include file="esMX.lua" />
 	<Include file="koKR.lua" />
 	<Include file="zhTW.lua" />
+	<Include file="zhCN.lua" />
 	<Include file="ruRU.lua" />
 	<Include file="itIT.lua" />
-	<Include file="ptPB.lua" />
+	<Include file="ptBR.lua" />
 
 </Ui>

@@ -1,9 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-	<Script file="todo.lua"/>
+<!-->	<Script file="todo.lua"/>
 	<Script file="history.lua"/>
-	<Script file="help.lua"/>
+	<Script file="help.lua"/><-->
 	<Script file="GuildGreet.lua"/>
 	<Frame name="GuildGreet">
 		<Scripts>
@@ -42,7 +42,7 @@
 			<Anchors><Anchor point="TOP"/></Anchors>
 		</TitleRegion>
 		<Frames>
-			<Frame name="$parentTitle" inherits="UIParent">
+			<Frame name="$parentTitle">
 				<Size><AbsDimension x="210" y="15"/></Size>
 				<Anchors><Anchor point="TOP"/></Anchors>
 				<Layers>
@@ -4370,7 +4370,7 @@
 		</Scripts>
 	</EditBox>
 
-	<ColorSelect name="GLDG_ColorPickerFrame" toplevel="true" parent="UIParent" movable="true" enableMouse="true" enableKeyboard="true" hidden="true">
+	<ColorSelect name="GLDG_ColorPickerFrame" toplevel="true" movable="true" enableMouse="true" enableKeyboard="true" hidden="true">
 		<Size>
 			<AbsDimension x="365" y="275"/>
 		</Size>
