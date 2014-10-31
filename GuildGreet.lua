@@ -66,6 +66,7 @@ GLDG_Tab2Frame.Tab3 = "Players"
 GLDG_Tab2Frame.Tab4 = "Cleanup"
 GLDG_Tab2Frame.Tab5 = "Colour"
 
+
 GLDG_SubTab2Frame = {}
 GLDG_SubTab2Frame.Tab1 = "General"
 GLDG_SubTab2Frame.Tab2 = "Chat"
@@ -866,6 +867,9 @@ function GLDG_InitFrame(frameName)
 		_G[name.."HeaderLineType"]:SetText(GLDG_TXT.headerType)
 		_G[name.."HeaderLineAlias"]:SetText(GLDG_TXT.headerAlias)
 		_G[name.."HeaderLineGuild"]:SetText(GLDG_TXT.headerGuild)
+		_G[name.."HeaderLineRankname"]:SetText(GLDG_TXT.headerRankname)
+		_G[name.."HeaderLinePnote"]:SetText(GLDG_TXT.headerPnote)
+		_G[name.."HeaderLineOnote"]:SetText(GLDG_TXT.headerOnote)
 		_G[name.."HeaderLineChannel"]:SetText(GLDG_TXT.headerChannel)
 		_G[name.."HeaderLineFriend"]:SetText(GLDG_TXT.headerFriend)
 		_G[name.."HeaderLineNumFriends"]:SetText(GLDG_TXT.headerNumFriends)
@@ -4447,6 +4451,9 @@ function GLDG_ShowPlayers()
 		local textAlias = _G[line..cnt.."Alias"]
 		local textMain = _G[line..cnt.."Main"]
 		local textGuild = _G[line..cnt.."Guild"]
+		local textRankname = _G[line..cnt.."Rankname"]
+		local textPnote = _G[line..cnt.."Pnote"]
+		local textOnote = _G[line..cnt.."Onote"]
 		local textChannel = _G[line..cnt.."Channel"]
 		local textFriend = _G[line..cnt.."Friend"]
 		local textNumFriends = _G[line..cnt.."NumFriends"]
@@ -4492,6 +4499,21 @@ function GLDG_ShowPlayers()
 		else
 			textGuild:SetText("---")
 		end
+		if p.rankname then
+			textRankname:SetText(p.rankname)
+		else
+			textRankname:SetText("---")
+		end
+		if p.pNote then
+			textPnote:SetText(p.pNote)
+		else
+			textPnote:SetText("")
+		end
+		if p.oNote then
+			textOnote:SetText(p.oNote)
+		else
+			textOnote:SetText("")
+		end
 		if p.channels and p.channels[GLDG_ChannelName] then
 			textChannel:SetText("{c}")
 		else
@@ -4513,6 +4535,9 @@ function GLDG_ShowPlayers()
 		textAlias:SetTextColor(textName:GetTextColor())
 		textMain:SetTextColor(textName:GetTextColor())
 		textGuild:SetTextColor(textName:GetTextColor())
+		textRankname:SetTextColor(textName:GetTextColor())
+		textPnote:SetTextColor(textName:GetTextColor())
+		textOnote:SetTextColor(textName:GetTextColor())
 		textChannel:SetTextColor(textName:GetTextColor())
 		textFriend:SetTextColor(textName:GetTextColor())
 		textNumFriends:SetTextColor(textName:GetTextColor())
@@ -4525,6 +4550,9 @@ function GLDG_ShowPlayers()
 		_G[line..cnt2.."Alias"]:SetText("")
 		_G[line..cnt2.."Main"]:SetText("")
 		_G[line..cnt2.."Guild"]:SetText("")
+		_G[line..cnt2.."Rankname"]:SetText("")
+		_G[line..cnt2.."Pnote"]:SetText("")
+		_G[line..cnt2.."Onote"]:SetText("")
 		_G[line..cnt2.."Channel"]:SetText("")
 		_G[line..cnt2.."Friend"]:SetText("")
 		_G[line..cnt2.."NumFriends"]:SetText("")

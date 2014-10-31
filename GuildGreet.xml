@@ -176,14 +176,14 @@
 	<!-->Configuration frame<-->
 	<Frame name="GuildGreetFrame" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
 	
-	<Size><AbsDimension x="1000" y="550"/></Size>
+	<Size><AbsDimension x="1420" y="550"/></Size>
 		<Anchors>
 			<Anchor point="CENTER">
 				<Offset><AbsDimension x="0" y="120"/></Offset>
 			</Anchor>
 		</Anchors>
 		<TitleRegion>
-			<Size><AbsDimension x="950" y="15"/></Size>
+			<Size><AbsDimension x="1370" y="15"/></Size>
 			<Anchors><Anchor point="TOP"/></Anchors>
 		</TitleRegion>
 		<Backdrop bgFile="TileSet\Generic\Black" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true"/>
@@ -191,7 +191,7 @@
 			<Layer level="ARTWORK">
 				<!-->Title box<-->
 				<Texture file="Interface\DialogFrame\UI-DialogBox-Header">
-					<Size><AbsDimension x="300" y="64"/></Size>
+					<Size><AbsDimension x="400" y="64"/></Size>
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset><AbsDimension x="0" y="12"/></Offset>
@@ -1611,7 +1611,15 @@
 
 	<!-->Configuration greetings tab<-->
  	<Frame name="$parentGreetings" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
- 		<Layers>
+		<Size x="1420" y="528"/>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-22" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+	<Layers>
 			<Layer level="OVERLAY">
 				<!-->Greetings tab header<-->
 				<FontString name="$parentHeader" inherits="GLDG_HeaderText">
@@ -2127,7 +2135,7 @@
 <!--> ============================================================================================================== <-->
 	<!-->Configuration players tab template: player line<-->
 	<Button name="GLDG_PlayerHeaderTemplate" virtual= "true">
-		<Size><AbsDimension x="620" y="15"/></Size>
+		<Size><AbsDimension x="1130" y="15"/></Size>
 		<!--
 		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
@@ -2173,10 +2181,40 @@
 						<OnLeave>GameTooltip:Hide()</OnLeave>
 					</Scripts>
 				</FontString>
+				<!-- rankname -->
+				<FontString name="$parentRankname" inherits="GLDG_HeaderText" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="100" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentGuild" relativePoint="RIGHT"/></Anchors>
+					<Scripts>
+						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
+						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+						<OnLeave>GameTooltip:Hide()</OnLeave>
+					</Scripts>
+				</FontString>
+				<!-- pnote -->
+				<FontString name="$parentPnote" inherits="GLDG_HeaderText" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="220" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentRankname" relativePoint="RIGHT"/></Anchors>
+					<Scripts>
+						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
+						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+						<OnLeave>GameTooltip:Hide()</OnLeave>
+					</Scripts>
+				</FontString>
+				<!-- onote -->
+				<FontString name="$parentOnote" inherits="GLDG_HeaderText" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="220" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentPnote" relativePoint="RIGHT"/></Anchors>
+					<Scripts>
+						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
+						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+						<OnLeave>GameTooltip:Hide()</OnLeave>
+					</Scripts>
+				</FontString>
 				<!-- channel -->
 				<FontString name="$parentChannel" inherits="GLDG_HeaderText" justifyH="LEFT" wordwrap="false">
 					<Size><AbsDimension x="20" /></Size>
-					<Anchors><Anchor point = "LEFT" relativeTo="$parentGuild" relativePoint="RIGHT"/></Anchors>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentOnote" relativePoint="RIGHT"/></Anchors>
 					<Scripts>
 						<OnClick>GLDG_OnClick_Header(self:GetName())</OnClick>
 						<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
@@ -2212,7 +2250,7 @@
 	</Button>
 
 	<Button name="GLDG_PlayerLineTemplate" virtual= "true">
-		<Size><AbsDimension x="620" y="15"/></Size>
+		<Size><AbsDimension x="1130" y="15"/></Size>
 		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
@@ -2241,10 +2279,25 @@
 					<Size><AbsDimension x="220" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentAlias" relativePoint="RIGHT"/></Anchors>
 				</FontString>
+				<!-- rankname -->
+				<FontString name="$parentRankname" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="100" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentGuild" relativePoint="RIGHT"/></Anchors>
+				</FontString>				
+				<!-- pnote -->
+				<FontString name="$parentPnote" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="220" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentRankname" relativePoint="RIGHT"/></Anchors>
+				</FontString>
+				<!-- onote -->
+				<FontString name="$parentOnote" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
+					<Size><AbsDimension x="220" /></Size>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentPnote" relativePoint="RIGHT"/></Anchors>
+				</FontString>								
 				<!-- channel -->
 				<FontString name="$parentChannel" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
 					<Size><AbsDimension x="20" /></Size>
-					<Anchors><Anchor point = "LEFT" relativeTo="$parentGuild" relativePoint="RIGHT"/></Anchors>
+					<Anchors><Anchor point = "LEFT" relativeTo="$parentOnote" relativePoint="RIGHT"/></Anchors>
 				</FontString>
 				<!-- friend -->
 				<FontString name="$parentFriend" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
@@ -2278,8 +2331,16 @@
 
 	<!-->Configuration players tab<-->
  	<Frame name="$parentPlayers" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true"  movable="true">
- 		<Layers>
-			<Layer level="OVERLAY">
+		<Size x="1420" y="528"/>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-22" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+	<Layers>
+			<Layer level="BACKGROUND">
 				<!-->Player tab header<-->
 				<FontString name="$parentHeader" inherits="GLDG_HeaderText" wordwrap="false">
 					<Anchors>
@@ -2456,10 +2517,10 @@
 			</Button>
 			<!-->Players scrollbar<-->
 			<ScrollFrame name="$parentPlayerbar" inherits="FauxScrollFrameTemplate" enableMouse="true">
-				<Size><AbsDimension x="420" y="300"/></Size>
+				<Size><AbsDimension x="1130" y="300"/></Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentLine1" relativePoint="TOPRIGHT">
-						<Offset><AbsDimension x="-425" y="0"/></Offset>
+						<Offset><AbsDimension x="-1125" y="0"/></Offset>
 					</Anchor>
 				</Anchors>
 				<Scripts>
@@ -3339,7 +3400,15 @@
 <!--> ============================================================================================================== <-->
 	<!-->Configuration cleanup tab<-->
  	<Frame name="$parentCleanup" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
- 		<Layers>
+		<Size x="1420" y="540"/>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-10" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+	<Layers>
 			<Layer level="OVERLAY">
 				<!-->Cleanup tab header<-->
 				<FontString name="$parentHeader" inherits="GLDG_HeaderText">
@@ -3689,7 +3758,15 @@
 
 	<!-->Configuration colour tab<-->
  	<Frame name="$parentColour" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
- 		<Layers>
+		<Size x="1420" y="528"/>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-22" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+	<Layers>
 			<Layer level="OVERLAY">
 				<!-->Category headers and options<-->
 				<FontString name="$parentHeaderChat" inherits="GLDG_ColourHeaderTextTemplate">
