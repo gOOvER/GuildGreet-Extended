@@ -601,6 +601,7 @@ function GLDG_Init()
 	if not GLDG_Data.Ranks then GLDG_Data.Ranks = {} end
 
 	if not GLDG_Data.ChannelNames then GLDG_Data.ChannelNames = {} end
+	if not GLDG_Data.Frameopts then GLDG_Data.Frameopts = {} end
 	if not GLDG_Data.GuildAlias then GLDG_Data.GuildAlias = {} end
 
 	if not GLDG_Data.CheckedGuildAlert then GLDG_Data.CheckedGuildAlert = false end
@@ -1156,7 +1157,15 @@ function GLDG_InitRoster()
 		end
 		-- set channel name pointer
 		GLDG_ChannelName = GLDG_Data.ChannelNames[GLDG_Realm.." - "..GLDG_Player]
-
+		if not GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player] then
+			GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player] = {}
+			GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].anchorFrom = "CENTER"
+			GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].anchorTo = "CENTER"
+			GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].offsetx = 0
+			GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].offsety = 0
+			GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].Width = 500
+			GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].Height = 560
+		end
 	else
 		GLDG_ChannelName = ""
 	end
@@ -5499,12 +5508,61 @@ end
 ------------------------------------------------------------
 -- Create our list frame
 ------------------------------------------------------------
+function GLDG_CreatePasteListFrame()
 GLDG_PasteList.List = CreateFrame("Frame", nil, UIParent)
+GLDG_PasteList.List:SetMovable(true)
+GLDG_PasteList.List:SetResizable(true)
+GLDG_PasteList.List:EnableMouse(true)
+GLDG_PasteList.List:SetMinResize(320,120)
+GLDG_PasteList.List:RegisterForDrag("LeftButton","RightButton")
+GLDG_PasteList.List:SetScript("OnMouseDown",
+	function(self, button)
+		if button == "LeftButton" then
+			self:StartMoving()
+			self.isMoving = true
+			self.hasMoved = false
+		elseif button == "RightButton" then
+			self:StartSizing()
+			self.isSizing = true
+			self.hasSized = false
+		end
+	end)
+
+GLDG_PasteList.List:SetScript("OnMouseUp",
+	function(self, button)
+		if button == "LeftButton" then
+			self:StopMovingOrSizing()
+
+			local opts = GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player]
+			local from, _, to, x, y = self:GetPoint()
+
+			opts.anchorFrom = from
+			opts.anchorTo = to
+			if self.is_expanded then
+				if opts.anchorFrom == "TOPLEFT" or opts.anchorFrom == "LEFT" or opts.anchorFrom == "BOTTOMLEFT" then
+					opts.offsetx = x
+				elseif opts.anchorFrom == "TOP" or opts.anchorFrom == "CENTER" or opts.anchorFrom == "BOTTOM" then
+					opts.offsetx = x - 151/2
+				elseif opts.anchorFrom == "TOPRIGHT" or opts.anchorFrom == "RIGHT" or opts.anchorFrom == "BOTTOMRIGHT" then
+					opts.offsetx = x - 151
+				end
+			else
+				opts.offsetx = x
+			end
+			opts.offsety = y
+		elseif button == "RightButton" then
+			self:StopMovingOrSizing()
+			GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].Width = self:GetWidth()
+			GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].Height = self:GetHeight()
+			GLDG_PasteList.List.Box:SetWidth(GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].Width - 40)
+		end
+	end)
 GLDG_PasteList.List:Hide()
-GLDG_PasteList.List:SetPoint("CENTER", UIParent, "CENTER")
+GLDG_PasteList.List:SetPoint(GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].anchorFrom, UIParent, GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].anchorTo, GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].offsetx, GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].offsety)
+GLDG_PasteList.List:SetUserPlaced(true)
 GLDG_PasteList.List:SetFrameStrata("DIALOG")
-GLDG_PasteList.List:SetHeight(560)
-GLDG_PasteList.List:SetWidth(500)
+GLDG_PasteList.List:SetHeight(GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].Height)
+GLDG_PasteList.List:SetWidth(GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].Width)
 GLDG_PasteList.List:SetBackdrop({
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -5525,7 +5583,7 @@ GLDG_PasteList.List.Scroll:SetPoint("RIGHT", GLDG_PasteList.List, "RIGHT", -30, 
 GLDG_PasteList.List.Scroll:SetPoint("BOTTOM", GLDG_PasteList.List.Done, "TOP", 0, 10)
 
 GLDG_PasteList.List.Box = CreateFrame("EditBox", "GLDG_PasteListEditBox", GLDG_PasteList.List.Scroll)
-GLDG_PasteList.List.Box:SetWidth(460)
+GLDG_PasteList.List.Box:SetWidth(GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].Width - 40)
 GLDG_PasteList.List.Box:SetHeight(85)
 GLDG_PasteList.List.Box:SetMultiLine(true)
 GLDG_PasteList.List.Box:SetAutoFocus(false)
@@ -5534,6 +5592,7 @@ GLDG_PasteList.List.Box:SetScript("OnEscapePressed", GLDG_PasteList.Done)
 GLDG_PasteList.List.Box:SetScript("OnTextChanged", GLDG_PasteList.Update)
 
 GLDG_PasteList.List.Scroll:SetScrollChild(GLDG_PasteList.List.Box)
+end
 ------------------------------------------------------------
 
 
@@ -7899,6 +7958,7 @@ function GLDG_StartupCheck()
 		if (GLDG_TableSize(GLDG_ChangesText)>0 and GLDG_Data.GuildSettings.DeltaPopup==true) then
 			-- display text
 			GLDG_list = GLDG_ChangesText
+			GLDG_CreatePasteListFrame()
 			GLDG_PasteList.List:Show();
 		end
 		GLDG_ChangesText = nil
