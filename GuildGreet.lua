@@ -856,13 +856,13 @@ function GLDG_InitFrame(frameName)
 		_G[name.."AltText"]:SetText(GLDG_TXT.showalt)
 		_G[name.."Alt2Text"]:SetText(GLDG_TXT.groupalt)
 		_G[name.."UnassignedText"]:SetText(GLDG_TXT.filterUnassigned)
-		_G[name.."GuildText"]:SetText(GLDG_TXT.filterGuild)
+		--_G[name.."GuildText"]:SetText(GLDG_TXT.filterGuild)
 		_G[name.."OnlineText"]:SetText(GLDG_TXT.filterOnline)
 		_G[name.."MyFriendsText"]:SetText(GLDG_TXT.filterMyFriends)
 		_G[name.."WithFriendsText"]:SetText(GLDG_TXT.filterWithFriends)
 		_G[name.."CurrentChannelText"]:SetText(GLDG_TXT.filterCurrentChannel)
 		_G[name.."WithChannelText"]:SetText(GLDG_TXT.filterWithChannel)
-		_G[name.."GuildSortText"]:SetText(GLDG_TXT.guildSort)
+		--_G[name.."GuildSortText"]:SetText(GLDG_TXT.guildSort)
 		-- list header
 		_G[name.."HeaderLineName"]:SetText(GLDG_TXT.headerName)
 		_G[name.."HeaderLineType"]:SetText(GLDG_TXT.headerType)
@@ -1072,14 +1072,14 @@ function GLDG_UpdatePlayerCheckboxes()
 	_G[name.."AltBox"]:SetChecked(GLDG_Data.ShowAlt)
 	_G[name.."Alt2Box"]:SetChecked(GLDG_Data.GroupAlt)
 	_G[name.."UnassignedBox"]:SetChecked(GLDG_Data.FilterUnassigned)
-	_G[name.."GuildBox"]:SetChecked(GLDG_Data.FilterGuild)
+--	_G[name.."GuildBox"]:SetChecked(GLDG_Data.FilterGuild)
 	_G[name.."OnlineBox"]:SetChecked(GLDG_Data.FilterOnline)
 	_G[name.."MyFriendsBox"]:SetChecked(GLDG_Data.FilterMyFriends)
 	_G[name.."WithFriendsBox"]:SetChecked(GLDG_Data.FilterWithFriends)
 	_G[name.."CurrentChannelBox"]:SetChecked(GLDG_Data.FilterCurrentChannel)
 	_G[name.."WithChannelBox"]:SetChecked(GLDG_Data.FilterWithChannel)
-	_G[name.."GuildSortBox"]:SetChecked(GLDG_Data.GuildSort)
-
+	--_G[name.."GuildSortBox"]:SetChecked(GLDG_Data.GuildSort)
+	
 	if (GLDG_Data.FilterOnline==true or GLDG_Data.GuildSort==true) then
 		_G[name.."Alt2Box"]:Disable()
 	else
@@ -4246,6 +4246,7 @@ end
 function GLDG_SortString(player)
 	-- Helper function: returns string that should be used for sorting
 	local result = player
+	GLDG_Data.GuildSort=false --vorläufig abgeschaltet weil jetzt gefiltert wird 
 	if GLDG_Data.GuildSort==true then
 		if GLDG_DataChar[player].guild then
 			result = GLDG_DataChar[player].guild..player
@@ -4285,7 +4286,9 @@ function GLDG_ListPlayers()
 			local show = GLDG_Data.ShowIgnore or not p.ignore
 			show = show and ((p.alt == GLDG_SelPlrName) or (p.alt == s.alt) or not p.alt or GLDG_Data.ShowAlt)
 			show = show and (((not p.alt) and (not p.main)) or not GLDG_Data.FilterUnassigned)
-			show = show and ((p.guild and p.guild == GLDG_unique_GuildName) or not GLDG_Data.FilterGuild)
+			show = show and ((p.guild and p.guild == GLDG_Data.GuildFilter) or GLDG_Data.GuildFilter=="")
+			show = show and ((p.rankname and p.rankname == GLDG_Data.RankFilter) or GLDG_Data.RankFilter=="")
+			show = show and ((p.enClass and p.enClass == GLDG_Data.ClassFilter) or GLDG_Data.ClassFilter=="")
 			show = show and (GLDG_Online[player] or not GLDG_Data.FilterOnline)
 			show = show and ((p.friends and p.friends[GLDG_Player]) or not GLDG_Data.FilterMyFriends)
 			show = show and (p.friends or not GLDG_Data.FilterWithFriends)
@@ -4436,9 +4439,13 @@ function GLDG_GuildFilterDropDown_OnClick(self, list)
 	if GLDG_Data.GuildFilter == GLDG_TXT.noGuildFilter then GLDG_Data.GuildFilter = "" end
 
 	if (GLDG_Data.GuildFilter == "") then
+		UIDropDownMenu_SetText(_G[GLDG_GUI.."Players".."RankFilterDropboxButton"], GLDG_TXT.noRankFilter)
+		GLDG_Data.RankFilter = "";
 		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."GuildFilterDropboxButton"], 1);
 	else
 		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."GuildFilterDropboxButton"], i);
+		UIDropDownMenu_SetText(_G[GLDG_GUI.."Players".."RankFilterDropboxButton"], GLDG_TXT.noRankFilter)
+		GLDG_Data.RankFilter = "";
 	end
 
 	--GLDG_Print("Chose ["..tostring(GLDG_Data.GuildFilter).."] from ["..tostring(name).."]["..tostring(n).."]["..tostring(i).."]")
@@ -4447,6 +4454,231 @@ function GLDG_GuildFilterDropDown_OnClick(self, list)
 	GLDG_ListPlayers()
 end
 
+------------------------------------------------------------
+function GLDG_RankFilterDropDownTemplate_OnLoad(self)
+	UIDropDownMenu_Initialize(self, GLDG_RankFilterDropDown_Initialize);
+	UIDropDownMenu_SetWidth(self, 160);
+	UIDropDownMenu_JustifyText(self, "LEFT")
+end
+
+------------------------------------------------------------
+function GLDG_RankFilterDropDownTemplate_OnShow(self)
+	UIDropDownMenu_Initialize(self, GLDG_RankFilterDropDown_Initialize);
+end
+
+------------------------------------------------------------
+function GLDG_RankFilterDropDown_Initialize(frame, level)
+
+	GLDG_rankFilterDropDownData = {}
+
+	if (not GLDG_DataChar) then return end
+
+	local count = 1
+	GLDG_rankFilterDropDownData[count] = GLDG_TXT.noRankFilter
+	count = count + 1
+	GLDG_rankFilterDropDownData[count] = " " -- separator
+	for p in pairs(GLDG_DataChar) do
+		if (GLDG_DataChar[p].rankname and GLDG_DataChar[p].rankname ~= "") and (GLDG_DataChar[p].guild and GLDG_DataChar[p].guild == GLDG_Data.GuildFilter) then
+			local loc = 3
+			while GLDG_rankFilterDropDownData[loc] and (GLDG_rankFilterDropDownData[loc] < GLDG_DataChar[p].rankname) do
+				loc = loc + 1
+			end
+			if (GLDG_rankFilterDropDownData[loc] ~= GLDG_DataChar[p].rankname) then
+				for cnt = count, loc, -1 do
+					GLDG_rankFilterDropDownData[cnt + 1] = GLDG_rankFilterDropDownData[cnt]
+				end
+				count = count + 1
+				GLDG_rankFilterDropDownData[loc] = GLDG_DataChar[p].rankname
+				--GLDG_Print("Added guild ["..GLDG_DataChar[p].guild.."] at position ["..tostring(loc).."] - count is ["..tostring(count).."]")
+			end
+		end
+	end
+
+	local info
+
+	found = false
+	local level = 1
+	count = 0
+	for q in pairs(GLDG_rankFilterDropDownData) do
+		info = UIDropDownMenu_CreateInfo();
+		info.func = GLDG_RankFilterDropDown_OnClick
+		info.notCheckable = nil
+		info.notClickable = nil
+		info.checked = nil
+		info.text = GLDG_rankFilterDropDownData[q]
+		if (GLDG_Data.RankFilter and GLDG_rankFilterDropDownData[q] == GLDG_Data.RankFilter) then
+			found = true
+			info.checked = true
+			--GLDG_Print("Match on entry ["..tostring(q).."] - count "..tostring(count).." - level "..tostring(level))
+		end
+		if (info.text == " ") then
+			info.notCheckable = true
+			info.notClickable = true
+			--GLDG_Print("Making unclickable")
+		end
+		UIDropDownMenu_AddButton(info, level)
+		if (GLDG_Data.RankFilter and GLDG_rankFilterDropDownData[q] == GLDG_Data.RankFilter) then
+			UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."RankFilterDropboxButton"], q);
+			--GLDG_Print("Selecting entry ["..tostring(q).."] - frame ["..GLDG_GUI.."Players".."GuildFilterDropboxButton]")
+		end
+
+		count = count + 1
+		if (count == 20) then
+			info = UIDropDownMenu_CreateInfo();
+			info.func = GLDG_RankFilterDropDown_OnClick
+			info.checked = nil
+			info.notCheckable = nil
+			info.notClickable = nil
+			info.hasArrow = true
+			info.text = "More"
+			UIDropDownMenu_AddButton(info, level)
+			info.hasArrow = false
+
+			count = 0
+			level = level + 1
+			--GLDG_Print("Increased level to ["..tostring(level).."]")
+		end
+	end
+	if not found then
+		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."RankFilterDropboxButton"], 1);
+	end
+end
+
+------------------------------------------------------------
+function GLDG_RankFilterDropDown_OnClick(self, list)
+
+	if not GLDG_rankFilterDropDownData then GLDG_rankFilterDropDownData = {} end
+	local i = self:GetID();
+	local n = self:GetParent():GetID()
+	local name = self:GetName()
+	GLDG_Data.RankFilter = GLDG_rankFilterDropDownData[(n-1)*20 + i]
+	if not GLDG_Data.RankFilter then GLDG_Data.RankFilter = "" end
+	if GLDG_Data.RankFilter == GLDG_TXT.noRankFilter then GLDG_Data.RankFilter = "" end
+
+	if (GLDG_Data.RankFilter == "") then
+		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."RankFilterDropboxButton"], 1);
+	else
+		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."RankFilterDropboxButton"], i);
+	end
+
+	--GLDG_Print("Chose ["..tostring(GLDG_Data.GuildFilter).."] from ["..tostring(name).."]["..tostring(n).."]["..tostring(i).."]")
+
+	-- list players
+	GLDG_ListPlayers()
+end
+
+------------------------------------------------------------
+function GLDG_ClassFilterDropDownTemplate_OnLoad(self)
+	UIDropDownMenu_Initialize(self, GLDG_ClassFilterDropDown_Initialize);
+	UIDropDownMenu_SetWidth(self, 160);
+	UIDropDownMenu_JustifyText(self, "LEFT")
+end
+
+------------------------------------------------------------
+function GLDG_ClassFilterDropDownTemplate_OnShow(self)
+	UIDropDownMenu_Initialize(self, GLDG_ClassFilterDropDown_Initialize);
+end
+
+------------------------------------------------------------
+function GLDG_ClassFilterDropDown_Initialize(frame, level)
+
+	GLDG_classFilterDropDownData = {}
+
+	if (not GLDG_DataChar) then return end
+
+	local count = 1
+	GLDG_classFilterDropDownData[count] = GLDG_TXT.noClassFilter
+	count = count + 1
+	GLDG_classFilterDropDownData[count] = " " -- separator
+	for p in pairs(GLDG_DataChar) do
+		if (GLDG_DataChar[p].enClass and GLDG_DataChar[p].enClass ~= "") then
+			local loc = 3
+			while GLDG_classFilterDropDownData[loc] and (GLDG_classFilterDropDownData[loc] < GLDG_DataChar[p].enClass) do
+				loc = loc + 1
+			end
+			if (GLDG_classFilterDropDownData[loc] ~= GLDG_DataChar[p].enClass) then
+				for cnt = count, loc, -1 do
+					GLDG_classFilterDropDownData[cnt + 1] = GLDG_classFilterDropDownData[cnt]
+				end
+				count = count + 1
+				GLDG_classFilterDropDownData[loc] = GLDG_DataChar[p].enClass
+				--GLDG_Print("Added guild ["..GLDG_DataChar[p].guild.."] at position ["..tostring(loc).."] - count is ["..tostring(count).."]")
+			end
+		end
+	end
+
+	local info
+
+	found = false
+	local level = 1
+	count = 0
+	for q in pairs(GLDG_classFilterDropDownData) do
+		info = UIDropDownMenu_CreateInfo();
+		info.func = GLDG_ClassFilterDropDown_OnClick
+		info.notCheckable = nil
+		info.notClickable = nil
+		info.checked = nil
+		info.text = GLDG_classFilterDropDownData[q]
+		if (GLDG_Data.ClassFilter and GLDG_classFilterDropDownData[q] == GLDG_Data.ClassFilter) then
+			found = true
+			info.checked = true
+			--GLDG_Print("Match on entry ["..tostring(q).."] - count "..tostring(count).." - level "..tostring(level))
+		end
+		if (info.text == " ") then
+			info.notCheckable = true
+			info.notClickable = true
+			--GLDG_Print("Making unclickable")
+		end
+		UIDropDownMenu_AddButton(info, level)
+		if (GLDG_Data.ClassFilter and GLDG_classFilterDropDownData[q] == GLDG_Data.ClassFilter) then
+			UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."ClassFilterDropboxButton"], q);
+			--GLDG_Print("Selecting entry ["..tostring(q).."] - frame ["..GLDG_GUI.."Players".."GuildFilterDropboxButton]")
+		end
+
+		count = count + 1
+		if (count == 20) then
+			info = UIDropDownMenu_CreateInfo();
+			info.func = GLDG_ClassFilterDropDown_OnClick
+			info.checked = nil
+			info.notCheckable = nil
+			info.notClickable = nil
+			info.hasArrow = true
+			info.text = "More"
+			UIDropDownMenu_AddButton(info, level)
+			info.hasArrow = false
+
+			count = 0
+			level = level + 1
+			--GLDG_Print("Increased level to ["..tostring(level).."]")
+		end
+	end
+	if not found then
+		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."ClassFilterDropboxButton"], 1);
+	end
+end
+
+------------------------------------------------------------
+function GLDG_ClassFilterDropDown_OnClick(self, list)
+
+	if not GLDG_classFilterDropDownData then GLDG_classFilterDropDownData = {} end
+	local i = self:GetID();
+	local n = self:GetParent():GetID()
+	local name = self:GetName()
+	GLDG_Data.ClassFilter = GLDG_classFilterDropDownData[(n-1)*20 + i]
+	if not GLDG_Data.ClassFilter then GLDG_Data.ClassFilter = "" end
+	if GLDG_Data.ClassFilter == GLDG_TXT.noClassFilter then GLDG_Data.ClassFilter = "" end
+
+	if (GLDG_Data.ClassFilter == "") then
+		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."ClassFilterDropboxButton"], 1);
+	else
+		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."ClassFilterDropboxButton"], i);
+	end
+
+	--GLDG_Print("Chose ["..tostring(GLDG_Data.GuildFilter).."] from ["..tostring(name).."]["..tostring(n).."]["..tostring(i).."]")
+
+	-- list players
+	GLDG_ListPlayers()
+end
 
 
 ------------------------------------------------------------

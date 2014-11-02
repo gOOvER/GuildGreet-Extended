@@ -2381,6 +2381,7 @@
 					</Anchors>
 				</FontString>
 				<!-->Filter guild members text<-->
+				<!--
 				<FontString name="$parentGuildText" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentUnassignedText" relativePoint="TOPLEFT">
@@ -2388,10 +2389,11 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
+				-->
 				<!-->Filter online text<-->
 				<FontString name="$parentOnlineText" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="$parentGuildText" relativePoint="TOPLEFT">
+						<Anchor point="TOPLEFT" relativeTo="$parentUnassignedText" relativePoint="TOPLEFT">
 							<Offset><AbsDimension x="0" y="-15"/></Offset>
 						</Anchor>
 					</Anchors>
@@ -2429,6 +2431,7 @@
 					</Anchors>
 				</FontString>
 				<!-->GuildSort text<-->
+				<!--
 				<FontString name="$parentGuildSortText" inherits="GLDG_LOptionText" wordwrap="false" >
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentAltText" relativePoint="TOPLEFT">
@@ -2436,6 +2439,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
+				-->
 			</Layer>
 		</Layers>
 		<Frames>
@@ -2601,6 +2605,7 @@
 			</CheckButton>
 
 			<!-->Guild Box<-->
+			<!--
 			<CheckButton name="$parentGuildBox" inherits="OptionsCheckButtonTemplate">
 				<Size><AbsDimension x="20" y="20"/></Size>
 				<Anchors>
@@ -2618,6 +2623,7 @@
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
 			</CheckButton>
+			-->
 			<!-->Online Box<-->
 			<CheckButton name="$parentOnlineBox" inherits="OptionsCheckButtonTemplate">
 				<Size><AbsDimension x="20" y="20"/></Size>
@@ -2713,6 +2719,7 @@
 				</Scripts>
 			</CheckButton>
 			<!-->GuildSort Box<-->
+			<!--
 			<CheckButton name="$parentGuildSortBox" inherits="OptionsCheckButtonTemplate">
 				<Size><AbsDimension x="20" y="20"/></Size>
 				<Anchors>
@@ -2730,9 +2737,9 @@
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
 			</CheckButton>
-
+			-->
 			<!-->GuildFilter<-->
-			<!--
+
 			<Button name="$parentGuildFilterDropboxButton" inherits="UIDropDownMenuTemplate">
 				<Size>
 					<AbsDimension x="160" y="16"/>
@@ -2751,13 +2758,68 @@
 					</OnShow>
 					<OnClick>
 						ToggleDropDownMenu(1, nil, self);
+						GLDG_UpdatePlayerCheckboxes();
 						GLDG_ListPlayers()
 					</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
 			</Button>
-			-->
+
+			<!-->RankFilter<-->
+
+			<Button name="$parentRankFilterDropboxButton" inherits="UIDropDownMenuTemplate">
+				<Size>
+					<AbsDimension x="160" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentGuildFilterDropboxButton" relativePoint="TOPRIGHT">
+						<Offset><AbsDimension x="0" y="-20"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						GLDG_RankFilterDropDownTemplate_OnLoad(self);
+					</OnLoad>
+					<OnShow>
+						GLDG_RankFilterDropDownTemplate_OnShow(self);
+					</OnShow>
+					<OnClick>
+						ToggleDropDownMenu(1, nil, self);
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+
+			<!-->ClassFilter<-->
+
+			<Button name="$parentClassFilterDropboxButton" inherits="UIDropDownMenuTemplate">
+				<Size>
+					<AbsDimension x="160" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentRankFilterDropboxButton" relativePoint="TOPRIGHT">
+						<Offset><AbsDimension x="0" y="-20"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						GLDG_ClassFilterDropDownTemplate_OnLoad(self);
+					</OnLoad>
+					<OnShow>
+						GLDG_ClassFilterDropDownTemplate_OnShow(self);
+					</OnShow>
+					<OnClick>
+						ToggleDropDownMenu(1, nil, self);
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</Button>
+
 
 
 			<!-->Action button subframe<-->
