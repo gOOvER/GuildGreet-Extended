@@ -693,6 +693,12 @@ function GLDG_Init()
 	if GLDG_Data.ExtendPlayerMenu==1 then GLDG_Data.ExtendPlayerMenu = true end
 	-- convert for API 6.0.2 end
 
+	if not GLDG_Data.GuildFilter	then GLDG_Data.GuildFilter = "" end
+	if not GLDG_Data.RankFilter	then GLDG_Data.RankFilter = "" end
+	if not GLDG_Data.ClassFilter	then GLDG_Data.ClassFilter = "" end
+	GLDG_Data.FilterGuild = nil
+	GLDG_Data.GuildSort = nil
+	
 	if not GLDG_Data.colours		then GLDG_Data.colours = {} end
 	if not GLDG_Data.colours.guild		then GLDG_Data.colours.guild = {} end
 	if not GLDG_Data.colours.friends	then GLDG_Data.colours.friends = {} end
