@@ -695,9 +695,38 @@ function GLDG_Init()
 
 	if not GLDG_Data.GuildFilter or GLDG_Data.GuildFilter==nil or GLDG_Data.GuildFilter==1 or GLDG_Data.GuildFilter==true then GLDG_Data.GuildFilter = "" end
 	if not GLDG_Data.RankFilter	then GLDG_Data.RankFilter = "" end
-	if not GLDG_Data.ClassFilter	then GLDG_Data.ClassFilter = "" end
 	GLDG_Data.FilterGuild = false
 	GLDG_Data.GuildSort = false
+	if not GLDG_Data.ShowIgnore then GLDG_Data.ShowIgnore = false end
+	if not GLDG_Data.ShowAlt then GLDG_Data.ShowAlt = false end
+	if not GLDG_Data.GroupAlt then GLDG_Data.GroupAlt = false end
+	if not GLDG_Data.FilterUnassigned then GLDG_Data.FilterUnassigned = false end
+	if not GLDG_Data.FilterOnline then GLDG_Data.FilterOnline = false end
+	if not GLDG_Data.FilterMyFriends then GLDG_Data.FilterMyFriends = false end
+	if not GLDG_Data.FilterWithFriends then GLDG_Data.FilterWithFriends = false end
+	if not GLDG_Data.FilterCurrentChannel then GLDG_Data.FilterCurrentChannel = false end
+	if not GLDG_Data.FilterWithChannel then GLDG_Data.FilterWithChannel = false end
+	if GLDG_Data.WARRIORFilter == nil then GLDG_Data.WARRIORFilter = true end
+	if GLDG_Data.DEATHKNIGHTFilter == nil then GLDG_Data.DEATHKNIGHTFilter = true end
+	if GLDG_Data.DRUIDFilter == nil then GLDG_Data.DRUIDFilter = true end
+	if GLDG_Data.HUNTERFilter == nil then GLDG_Data.HUNTERFilter = true end
+	if GLDG_Data.MAGEFilter == nil then GLDG_Data.MAGEFilter = true end
+	if GLDG_Data.PALADINFilter == nil then GLDG_Data.PALADINFilter = true end
+	if GLDG_Data.PRIESTFilter == nil then GLDG_Data.PRIESTFilter = true end
+	if GLDG_Data.ROGUEFilter == nil then GLDG_Data.ROGUEFilter = true end
+	if GLDG_Data.SHAMANFilter == nil then GLDG_Data.SHAMANFilter = true end
+	if GLDG_Data.WARLOCKFilter == nil then GLDG_Data.WARLOCKFilter = true end
+
+	if GLDG_Data.ShowIgnore == 1 then GLDG_Data.ShowIgnore = true end
+	if GLDG_Data.ShowAlt == 1 then GLDG_Data.ShowAlt = true end
+	if GLDG_Data.GroupAlt == 1 then GLDG_Data.GroupAlt = true end
+	if GLDG_Data.FilterUnassigned == 1 then GLDG_Data.FilterUnassigned = true end
+	if GLDG_Data.FilterOnline == 1 then GLDG_Data.FilterOnline = true end
+	if GLDG_Data.FilterMyFriends == 1 then GLDG_Data.FilterMyFriends = true end
+	if GLDG_Data.FilterWithFriends == 1 then GLDG_Data.FilterWithFriends = true end
+	if GLDG_Data.FilterCurrentChannel == 1 then GLDG_Data.FilterCurrentChannel = true end
+	if GLDG_Data.FilterWithChannel == 1 then GLDG_Data.FilterWithChannel = true end	
+	
 	
 	if not GLDG_Data.colours		then GLDG_Data.colours = {} end
 	if not GLDG_Data.colours.guild		then GLDG_Data.colours.guild = {} end
@@ -738,7 +767,8 @@ function GLDG_Init()
 	if not GLDG_Data.colours.channel.rank	then GLDG_Data.colours.channel.rank = GLDG_DEFAULT_RANK_COLOUR end
 	if not GLDG_Data.colours.channel.relog	then GLDG_Data.colours.channel.relog = GLDG_DEFAULT_RELOG_COLOUR end
 	if not GLDG_Data.colours.channel.achievment then GLDG_Data.colours.channel.achievment = GLDG_DEFAULT_ACHIEVMENT_COLOUR end
-
+	
+	
 	-- Set initial pointers to avoid errors (hack!)
 	GLDG_DataChar = {}
 	GLDG_DataGreet = {}
@@ -868,6 +898,16 @@ function GLDG_InitFrame(frameName)
 		_G[name.."WithFriendsText"]:SetText(GLDG_TXT.filterWithFriends)
 		_G[name.."CurrentChannelText"]:SetText(GLDG_TXT.filterCurrentChannel)
 		_G[name.."WithChannelText"]:SetText(GLDG_TXT.filterWithChannel)
+		_G[name.."WARRIORFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["WARRIOR"])
+		_G[name.."DEATHKNIGHTFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["DEATHKNIGHT"])
+		_G[name.."DRUIDFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["DRUID"])
+		_G[name.."HUNTERFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["HUNTER"])
+		_G[name.."MAGEFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["MAGE"])
+		_G[name.."PALADINFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["PALADIN"])
+		_G[name.."PRIESTFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["PRIEST"])
+		_G[name.."ROGUEFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["ROGUE"])
+		_G[name.."SHAMANFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["SHAMAN"])
+		_G[name.."WARLOCKFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["WARLOCK"])
 		--_G[name.."GuildSortText"]:SetText(GLDG_TXT.guildSort)
 		-- list header
 		_G[name.."HeaderLineName"]:SetText(GLDG_TXT.headerName)
@@ -1084,6 +1124,16 @@ function GLDG_UpdatePlayerCheckboxes()
 	_G[name.."WithFriendsBox"]:SetChecked(GLDG_Data.FilterWithFriends)
 	_G[name.."CurrentChannelBox"]:SetChecked(GLDG_Data.FilterCurrentChannel)
 	_G[name.."WithChannelBox"]:SetChecked(GLDG_Data.FilterWithChannel)
+	_G[name.."WARRIORFilterBox"]:SetChecked(GLDG_Data.WARRIORFilter)
+	_G[name.."DEATHKNIGHTFilterBox"]:SetChecked(GLDG_Data.DEATHKNIGHTFilter)
+	_G[name.."DRUIDFilterBox"]:SetChecked(GLDG_Data.DRUIDFilter)
+	_G[name.."HUNTERFilterBox"]:SetChecked(GLDG_Data.HUNTERFilter)
+	_G[name.."MAGEFilterBox"]:SetChecked(GLDG_Data.MAGEFilter)
+	_G[name.."PALADINFilterBox"]:SetChecked(GLDG_Data.PALADINFilter)
+	_G[name.."PRIESTFilterBox"]:SetChecked(GLDG_Data.PRIESTFilter)
+	_G[name.."ROGUEFilterBox"]:SetChecked(GLDG_Data.ROGUEFilter)
+	_G[name.."SHAMANFilterBox"]:SetChecked(GLDG_Data.SHAMANFilter)
+	_G[name.."WARLOCKFilterBox"]:SetChecked(GLDG_Data.WARLOCKFilter)
 	--_G[name.."GuildSortBox"]:SetChecked(GLDG_Data.GuildSort)
 	
 	if (GLDG_Data.FilterOnline==true or GLDG_Data.GuildSort==true) then
@@ -4294,7 +4344,7 @@ function GLDG_ListPlayers()
 			show = show and (((not p.alt) and (not p.main)) or not GLDG_Data.FilterUnassigned)
 			show = show and ((p.guild and p.guild == GLDG_Data.GuildFilter) or GLDG_Data.GuildFilter=="")
 			show = show and ((p.rankname and p.rankname == GLDG_Data.RankFilter) or GLDG_Data.RankFilter=="")
-			show = show and ((p.enClass and p.enClass == GLDG_Data.ClassFilter) or GLDG_Data.ClassFilter=="")
+			show = show and (p.enClass and GLDG_Data[p.enClass.."Filter"] == true)
 			show = show and (GLDG_Online[player] or not GLDG_Data.FilterOnline)
 			show = show and ((p.friends and p.friends[GLDG_Player]) or not GLDG_Data.FilterMyFriends)
 			show = show and (p.friends or not GLDG_Data.FilterWithFriends)
@@ -4573,119 +4623,6 @@ function GLDG_RankFilterDropDown_OnClick(self, list)
 	GLDG_ListPlayers()
 end
 
-------------------------------------------------------------
-function GLDG_ClassFilterDropDownTemplate_OnLoad(self)
-	UIDropDownMenu_Initialize(self, GLDG_ClassFilterDropDown_Initialize);
-	UIDropDownMenu_SetWidth(self, 160);
-	UIDropDownMenu_JustifyText(self, "LEFT")
-end
-
-------------------------------------------------------------
-function GLDG_ClassFilterDropDownTemplate_OnShow(self)
-	UIDropDownMenu_Initialize(self, GLDG_ClassFilterDropDown_Initialize);
-end
-
-------------------------------------------------------------
-function GLDG_ClassFilterDropDown_Initialize(frame, level)
-
-	GLDG_classFilterDropDownData = {}
-
-	if (not GLDG_DataChar) then return end
-
-	local count = 1
-	GLDG_classFilterDropDownData[count] = GLDG_TXT.noClassFilter
-	count = count + 1
-	GLDG_classFilterDropDownData[count] = " " -- separator
-	for p in pairs(GLDG_DataChar) do
-		if (GLDG_DataChar[p].enClass and GLDG_DataChar[p].enClass ~= "") then
-			local loc = 3
-			while GLDG_classFilterDropDownData[loc] and (GLDG_classFilterDropDownData[loc] < GLDG_DataChar[p].enClass) do
-				loc = loc + 1
-			end
-			if (GLDG_classFilterDropDownData[loc] ~= GLDG_DataChar[p].enClass) then
-				for cnt = count, loc, -1 do
-					GLDG_classFilterDropDownData[cnt + 1] = GLDG_classFilterDropDownData[cnt]
-				end
-				count = count + 1
-				GLDG_classFilterDropDownData[loc] = GLDG_DataChar[p].enClass
-				--GLDG_Print("Added guild ["..GLDG_DataChar[p].guild.."] at position ["..tostring(loc).."] - count is ["..tostring(count).."]")
-			end
-		end
-	end
-
-	local info
-
-	found = false
-	local level = 1
-	count = 0
-	for q in pairs(GLDG_classFilterDropDownData) do
-		info = UIDropDownMenu_CreateInfo();
-		info.func = GLDG_ClassFilterDropDown_OnClick
-		info.notCheckable = nil
-		info.notClickable = nil
-		info.checked = nil
-		info.text = GLDG_classFilterDropDownData[q]
-		if (GLDG_Data.ClassFilter and GLDG_classFilterDropDownData[q] == GLDG_Data.ClassFilter) then
-			found = true
-			info.checked = true
-			--GLDG_Print("Match on entry ["..tostring(q).."] - count "..tostring(count).." - level "..tostring(level))
-		end
-		if (info.text == " ") then
-			info.notCheckable = true
-			info.notClickable = true
-			--GLDG_Print("Making unclickable")
-		end
-		UIDropDownMenu_AddButton(info, level)
-		if (GLDG_Data.ClassFilter and GLDG_classFilterDropDownData[q] == GLDG_Data.ClassFilter) then
-			UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."ClassFilterDropboxButton"], q);
-			--GLDG_Print("Selecting entry ["..tostring(q).."] - frame ["..GLDG_GUI.."Players".."GuildFilterDropboxButton]")
-		end
-
-		count = count + 1
-		if (count == 20) then
-			info = UIDropDownMenu_CreateInfo();
-			info.func = GLDG_ClassFilterDropDown_OnClick
-			info.checked = nil
-			info.notCheckable = nil
-			info.notClickable = nil
-			info.hasArrow = true
-			info.text = "More"
-			UIDropDownMenu_AddButton(info, level)
-			info.hasArrow = false
-
-			count = 0
-			level = level + 1
-			--GLDG_Print("Increased level to ["..tostring(level).."]")
-		end
-	end
-	if not found then
-		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."ClassFilterDropboxButton"], 1);
-	end
-end
-
-------------------------------------------------------------
-function GLDG_ClassFilterDropDown_OnClick(self, list)
-
-	if not GLDG_classFilterDropDownData then GLDG_classFilterDropDownData = {} end
-	local i = self:GetID();
-	local n = self:GetParent():GetID()
-	local name = self:GetName()
-	GLDG_Data.ClassFilter = GLDG_classFilterDropDownData[(n-1)*20 + i]
-	if not GLDG_Data.ClassFilter then GLDG_Data.ClassFilter = "" end
-	if GLDG_Data.ClassFilter == GLDG_TXT.noClassFilter then GLDG_Data.ClassFilter = "" end
-
-	if (GLDG_Data.ClassFilter == "") then
-		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."ClassFilterDropboxButton"], 1);
-	else
-		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."ClassFilterDropboxButton"], i);
-	end
-
-	--GLDG_Print("Chose ["..tostring(GLDG_Data.GuildFilter).."] from ["..tostring(name).."]["..tostring(n).."]["..tostring(i).."]")
-
-	-- list players
-	GLDG_ListPlayers()
-end
-
 
 ------------------------------------------------------------
 function GLDG_ShowPlayers()
@@ -4713,21 +4650,23 @@ function GLDG_ShowPlayers()
 		end
 		textType:SetText("")
 		if p.ignore then
-			textName:SetTextColor(1, 0.25, 0.25)
+			textGuild:SetTextColor(1, 0.25, 0.25)
 			textType:SetText(GLDG_TXT.markIGN)
 		elseif p.main then
-			textName:SetTextColor(0.25, 1, 0.25)
+			textGuild:SetTextColor(0.25, 1, 0.25)
 			textType:SetText(GLDG_TXT.markMAIN)
 		elseif p.alt then
 			--textName:SetTextColor(0.25, 0.25, 1)
-			textName:SetTextColor(0.25, 1, 1)
+			textGuild:SetTextColor(0.25, 1, 1)
 			textType:SetText(GLDG_TXT.markALT)
 		elseif p.alias then
-			textName:SetTextColor(0.68, 0.8, 1)
+			textGuild:SetTextColor(0.68, 0.8, 1)
 		else
 			textName:SetTextColor(1, 1, 1)
 		end
-
+		if p.enClass then
+			textName:SetTextColor(RAID_CLASS_COLORS[p.enClass].r, RAID_CLASS_COLORS[p.enClass].g, RAID_CLASS_COLORS[p.enClass].b)
+		end
 		if p.alias then
 			textAlias:SetText(p.alias)
 			textMain:SetText("")
@@ -4778,16 +4717,16 @@ function GLDG_ShowPlayers()
  			textFriend:SetText("---")
 		end
 
-		textType:SetTextColor(textName:GetTextColor())
-		textAlias:SetTextColor(textName:GetTextColor())
-		textMain:SetTextColor(textName:GetTextColor())
-		textGuild:SetTextColor(textName:GetTextColor())
-		textRankname:SetTextColor(textName:GetTextColor())
-		textPnote:SetTextColor(textName:GetTextColor())
-		textOnote:SetTextColor(textName:GetTextColor())
-		textChannel:SetTextColor(textName:GetTextColor())
-		textFriend:SetTextColor(textName:GetTextColor())
-		textNumFriends:SetTextColor(textName:GetTextColor())
+		textType:SetTextColor(textGuild:GetTextColor())
+		textAlias:SetTextColor(textGuild:GetTextColor())
+		textMain:SetTextColor(textGuild:GetTextColor())
+		--textGuild:SetTextColor(textName:GetTextColor())
+		textRankname:SetTextColor(textGuild:GetTextColor())
+		textPnote:SetTextColor(textGuild:GetTextColor())
+		textOnote:SetTextColor(textGuild:GetTextColor())
+		textChannel:SetTextColor(textGuild:GetTextColor())
+		textFriend:SetTextColor(textGuild:GetTextColor())
+		textNumFriends:SetTextColor(textGuild:GetTextColor())
 		_G[line..cnt]:Enable()
 		cnt = cnt +1 end
 	-- Disable any rows left unused

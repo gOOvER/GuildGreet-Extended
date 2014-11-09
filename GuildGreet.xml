@@ -2353,7 +2353,7 @@
 				<FontString name="$parentIgnoreText" inherits="GLDG_LOptionText" wordwrap="false">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentHeader" relativePoint="BOTTOM">
-							<Offset><AbsDimension x="-250" y="-315"/></Offset>
+							<Offset><AbsDimension x="-350" y="-315"/></Offset>
 						</Anchor>
 					</Anchors>
 				</FontString>
@@ -2440,6 +2440,86 @@
 					</Anchors>
 				</FontString>
 				-->
+				<!-->WARRIORFilter text<-->
+				<FontString name="$parentWARRIORFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentIgnoreText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="520" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->DEATHKNIGHTFilterFilter text<-->
+				<FontString name="$parentDEATHKNIGHTFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentWARRIORFilterText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->DRUIDFilterFilter text<-->
+				<FontString name="$parentDRUIDFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentDEATHKNIGHTFilterText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->HUNTERFilterFilter text<-->
+				<FontString name="$parentHUNTERFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentDRUIDFilterText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->MAGEFilterFilter text<-->
+				<FontString name="$parentMAGEFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHUNTERFilterText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->PALADINFilterFilter text<-->
+				<FontString name="$parentPALADINFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentMAGEFilterText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->PRIESTFilterFilter text<-->
+				<FontString name="$parentPRIESTFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentPALADINFilterText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->ROGUEFilterFilter text<-->
+				<FontString name="$parentROGUEFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentPRIESTFilterText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->SHAMANFilterFilter text<-->
+				<FontString name="$parentSHAMANFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentROGUEFilterText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-->WARLOCKFilterFilter text<-->
+				<FontString name="$parentWARLOCKFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentSHAMANFilterText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
 			</Layer>
 		</Layers>
 		<Frames>
@@ -2738,6 +2818,187 @@
 				</Scripts>
 			</CheckButton>
 			-->
+			<!-->WARRIORFilter Box<-->
+			<CheckButton name="$parentWARRIORFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentWARRIORFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.WARRIORFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->DEATHKNIGHTFilter Box<-->
+			<CheckButton name="$parentDEATHKNIGHTFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentDEATHKNIGHTFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.DEATHKNIGHTFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->DRUIDFilter Box<-->
+			<CheckButton name="$parentDRUIDFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentDRUIDFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.DRUIDFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->HUNTERFilter Box<-->
+			<CheckButton name="$parentHUNTERFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentHUNTERFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.HUNTERFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->MAGEFilter Box<-->
+			<CheckButton name="$parentMAGEFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentMAGEFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.MAGEFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->PALADINFilter Box<-->
+			<CheckButton name="$parentPALADINFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentPALADINFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.PALADINFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->PRIESTFilter Box<-->
+			<CheckButton name="$parentPRIESTFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentPRIESTFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.PRIESTFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->ROGUEFilter Box<-->
+			<CheckButton name="$parentROGUEFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentROGUEFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.ROGUEFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->SHAMANFilter Box<-->
+			<CheckButton name="$parentSHAMANFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentSHAMANFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.SHAMANFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->WARLOCKFilter Box<-->
+			<CheckButton name="$parentWARLOCKFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentWARLOCKFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.WARLOCKFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			
 			<!-->GuildFilter<-->
 
 			<Button name="$parentGuildFilterDropboxButton" inherits="UIDropDownMenuTemplate">
@@ -2794,7 +3055,7 @@
 			</Button>
 
 			<!-->ClassFilter<-->
-
+<!--
 			<Button name="$parentClassFilterDropboxButton" inherits="UIDropDownMenuTemplate">
 				<Size>
 					<AbsDimension x="160" y="16"/>
@@ -2820,7 +3081,7 @@
 				</Scripts>
 			</Button>
 
-
+-->
 
 			<!-->Action button subframe<-->
 			<Frame name="$parentAction">
