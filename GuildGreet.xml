@@ -176,7 +176,7 @@
 	<!-->Configuration frame<-->
 	<Frame name="GuildGreetFrame" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
 	
-	<Size><AbsDimension x="1420" y="550"/></Size>
+	<Size><AbsDimension x="1420" y="580"/></Size>
 		<Anchors>
 			<Anchor point="CENTER">
 				<Offset><AbsDimension x="0" y="120"/></Offset>
@@ -2520,6 +2520,14 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
+				<!-->MONKFilterFilter text<-->
+				<FontString name="$parentMONKFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentWARLOCKFilterText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
 			</Layer>
 		</Layers>
 		<Frames>
@@ -2991,6 +2999,24 @@
 				<Scripts>
 					<OnClick>
 						GLDG_Data.WARLOCKFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->MONKFilter Box<-->
+			<CheckButton name="$parentMONKFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentMONKFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.MONKFilter = self:GetChecked()
 						GLDG_UpdatePlayerCheckboxes()
 						GLDG_ListPlayers()
 					</OnClick>

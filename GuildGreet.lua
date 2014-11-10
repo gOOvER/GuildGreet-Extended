@@ -716,6 +716,7 @@ function GLDG_Init()
 	if GLDG_Data.ROGUEFilter == nil then GLDG_Data.ROGUEFilter = true end
 	if GLDG_Data.SHAMANFilter == nil then GLDG_Data.SHAMANFilter = true end
 	if GLDG_Data.WARLOCKFilter == nil then GLDG_Data.WARLOCKFilter = true end
+	if GLDG_Data.MONKFilter == nil then GLDG_Data.MONKFilter = true end
 
 	if GLDG_Data.ShowIgnore == 1 then GLDG_Data.ShowIgnore = true end
 	if GLDG_Data.ShowAlt == 1 then GLDG_Data.ShowAlt = true end
@@ -908,6 +909,7 @@ function GLDG_InitFrame(frameName)
 		_G[name.."ROGUEFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["ROGUE"])
 		_G[name.."SHAMANFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["SHAMAN"])
 		_G[name.."WARLOCKFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["WARLOCK"])
+		_G[name.."MONKFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["MONK"])
 		--_G[name.."GuildSortText"]:SetText(GLDG_TXT.guildSort)
 		-- list header
 		_G[name.."HeaderLineName"]:SetText(GLDG_TXT.headerName)
@@ -1134,6 +1136,7 @@ function GLDG_UpdatePlayerCheckboxes()
 	_G[name.."ROGUEFilterBox"]:SetChecked(GLDG_Data.ROGUEFilter)
 	_G[name.."SHAMANFilterBox"]:SetChecked(GLDG_Data.SHAMANFilter)
 	_G[name.."WARLOCKFilterBox"]:SetChecked(GLDG_Data.WARLOCKFilter)
+	_G[name.."MONKFilterBox"]:SetChecked(GLDG_Data.MONKFilter)
 	--_G[name.."GuildSortBox"]:SetChecked(GLDG_Data.GuildSort)
 	
 	if (GLDG_Data.FilterOnline==true or GLDG_Data.GuildSort==true) then
