@@ -4764,12 +4764,19 @@ function GLDG_ShowPlayerToolTip(element)
 	if (string.sub(name, 1, 1)=="*") then
 		name = string.sub(name, 2)
 	end
-
+	local color_s = ""
+	local color_p = ""
 	if (name and GLDG_DataChar[name]) then
+		color_s = ""
+		color_p = ""
+		if GLDG_DataChar[name].enClass then
+			color_s = "|c"..RAID_CLASS_COLORS[GLDG_DataChar[name].enClass].colorStr
+			color_p = "|r"
+		end
 		local p = GLDG_DataChar[name]
-		local head = name
+		local head = color_s..name..color_p
 		if p.alias then
-			head = head.." ("..p.alias..")"
+			head = head..GLDG_ALIAS_COLOUR.." ("..p.alias..")|r"
 		end
 
 		GameTooltip:SetOwner(_G[element], "ANCHOR_CURSOR")
@@ -4791,7 +4798,7 @@ function GLDG_ShowPlayerToolTip(element)
 		local added = false
 
 		if p.alias then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipAlias, p.alias, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipAlias, GLDG_ALIAS_COLOUR..p.alias.."|r", 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 
@@ -4800,11 +4807,17 @@ function GLDG_ShowPlayerToolTip(element)
 			local first = true
 			for q in pairs(GLDG_DataChar) do
 				if GLDG_DataChar[q].alt and GLDG_DataChar[q].alt == name then
+					color_s = ""
+					color_p = ""
+					if GLDG_DataChar[q].enClass then
+						color_s = "|c"..RAID_CLASS_COLORS[GLDG_DataChar[q].enClass].colorStr
+						color_p = "|r"
+					end
 					if first then
 						first = false
-						GameTooltip:AddDoubleLine(GLDG_TXT.tipAlts, Ambiguate(q, "guild"), 1, 1, 0, 1, 1, 1)
+						GameTooltip:AddDoubleLine(GLDG_TXT.tipAlts, color_s..Ambiguate(q, "guild")..color_p, 1, 1, 0, 1, 1, 1)
 					else
-						GameTooltip:AddDoubleLine(" ", Ambiguate(q, "guild"), 1, 1, 0, 1, 1, 1)
+						GameTooltip:AddDoubleLine(" ", color_s..Ambiguate(q, "guild")..color_p, 1, 1, 0, 1, 1, 1)
 					end
 					added = true
 					hasAlts = true
@@ -4814,20 +4827,32 @@ function GLDG_ShowPlayerToolTip(element)
 				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, GLDG_TXT.tipMainYes, 1, 1, 0, 1, 1, 1)
 			end
 		elseif p.alt then
+			color_s = ""
+			color_p = ""
+			if GLDG_DataChar[p.alt].enClass then
+				color_s = "|c"..RAID_CLASS_COLORS[GLDG_DataChar[p.alt].enClass].colorStr
+				color_p = "|r"
+			end
 			if (GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].alias) then
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, Ambiguate(p.alt, "guild").." ("..GLDG_DataChar[p.alt].alias..")", 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, color_s..Ambiguate(p.alt, "guild")..color_p.." "..GLDG_ALIAS_COLOUR.."("..GLDG_DataChar[p.alt].alias..")|r", 1, 1, 0, 1, 1, 1)
 			else
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, Ambiguate(p.alt, "guild"), 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, color_s..Ambiguate(p.alt, "guild")..color_p, 1, 1, 0, 1, 1, 1)
 			end
 			local first = true
 			for q in pairs(GLDG_DataChar) do
 				if GLDG_DataChar[q].alt and GLDG_DataChar[q].alt == p.alt and q ~= name then
+					color_s = ""
+					color_p = ""
+					if GLDG_DataChar[q].enClass then
+						color_s = "|c"..RAID_CLASS_COLORS[GLDG_DataChar[q].enClass].colorStr
+						color_p = "|r"
+					end
 					if first then
 						first = false
-						GameTooltip:AddDoubleLine(GLDG_TXT.tipAlts, Ambiguate(q, "guild"), 1, 1, 0, 1, 1, 1)
+						GameTooltip:AddDoubleLine(GLDG_TXT.tipAlts, color_s..Ambiguate(q, "guild")..color_p, 1, 1, 0, 1, 1, 1)
 						added = true
 					else
-						GameTooltip:AddDoubleLine(" ", Ambiguate(q, "guild"), 1, 1, 0, 1, 1, 1)
+						GameTooltip:AddDoubleLine(" ", color_s..Ambiguate(q, "guild")..color_p, 1, 1, 0, 1, 1, 1)
 						added = true
 					end
 				end
@@ -4925,10 +4950,22 @@ function GLDG_ShowPlayerToolTip(element)
 		end
 
 		if p.last then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipLast, Ambiguate(p.last, "guild"), 1, 1, 0, 1, 1, 1)
+			color_s = ""
+			color_p = ""
+			if GLDG_DataChar[p.last].enClass then
+				color_s = "|c"..RAID_CLASS_COLORS[GLDG_DataChar[p.last].enClass].colorStr
+				color_p = "|r"
+			end		
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipLast, color_s..Ambiguate(p.last, "guild")..color_p, 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif p.alt and GLDG_DataChar[p.alt].last then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipLast, Ambiguate(GLDG_DataChar[p.alt].last, "guild"), 1, 1, 0, 1, 1, 1)
+			color_s = ""
+			color_p = ""
+			if GLDG_DataChar[p.alt].enClass then
+				color_s = "|c"..RAID_CLASS_COLORS[GLDG_DataChar[GLDG_DataChar[p.alt].last].enClass].colorStr
+				color_p = "|r"
+			end	
+			GameTooltip:AddDoubleLine(GLDG_TXT.tipLast, color_s..Ambiguate(GLDG_DataChar[p.alt].last..color_p, "guild"), 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 
