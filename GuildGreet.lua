@@ -4649,6 +4649,11 @@ function GLDG_ShowPlayers()
 			textName:SetText(GLDG_SortedList[cnt + GLDG_PlayerOffset])
 		end
 		textType:SetText("")
+		if p.guild then
+			textGuild:SetText(p.guild)
+		else
+			textGuild:SetText("---")
+		end
 		if p.ignore then
 			textGuild:SetTextColor(1, 0.25, 0.25)
 			textType:SetText(GLDG_TXT.markIGN)
@@ -4662,7 +4667,7 @@ function GLDG_ShowPlayers()
 		elseif p.alias then
 			textGuild:SetTextColor(0.68, 0.8, 1)
 		else
-			textName:SetTextColor(1, 1, 1)
+			textGuild:SetTextColor(1, 1, 1)
 		end
 		if p.enClass then
 			textName:SetTextColor(RAID_CLASS_COLORS[p.enClass].r, RAID_CLASS_COLORS[p.enClass].g, RAID_CLASS_COLORS[p.enClass].b)
@@ -4679,11 +4684,6 @@ function GLDG_ShowPlayers()
 		else
 			textAlias:SetText("---")
 			textMain:SetText("")
-		end
-		if p.guild then
-			textGuild:SetText(p.guild)
-		else
-			textGuild:SetText("---")
 		end
 		if p.rankname then
 			textRankname:SetText(p.rankname)
@@ -4720,7 +4720,6 @@ function GLDG_ShowPlayers()
 		textType:SetTextColor(textGuild:GetTextColor())
 		textAlias:SetTextColor(textGuild:GetTextColor())
 		textMain:SetTextColor(textGuild:GetTextColor())
-		--textGuild:SetTextColor(textName:GetTextColor())
 		textRankname:SetTextColor(textGuild:GetTextColor())
 		textPnote:SetTextColor(textGuild:GetTextColor())
 		textOnote:SetTextColor(textGuild:GetTextColor())
