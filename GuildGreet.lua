@@ -8219,7 +8219,7 @@ function GLDG_generateConfigString()
 	if GLDG_Data.GuildSettings.ShowWhoSpam==true then t = 2^19 else t=0 end
 	if GLDG_Data.GuildSettings.SupressGreet==true then u = 2^20 else u=0 end
 	if GLDG_Data.GuildSettings.SupressJoin==true then v = 2^21 else v=0 end
-	if GLDG_Data.GuildSettings.SupressLeve==truel then w = 2^22 else w=0 end
+	if GLDG_Data.GuildSettings.SupressLevel==true then w = 2^22 else w=0 end
 	if GLDG_Data.GuildSettings.SupressRank==true then x = 2^23 else x=0 end
 	if GLDG_Data.GuildSettings.SupressAchievment==true then y = 2^24 else y=0 end
 	if GLDG_Data.GuildSettings.NoGratsOnLogin==true then z = 2^25 else z=0 end
