@@ -2516,7 +2516,7 @@ function GLDG_ShowQueue()
 		-- Look for the position in the list we need
 		local loc = 1
 		if type(GLDG_Online[queue[loc]])=="number" and type(GLDG_Online[p])=="number" then
-			while queue[loc] and (GLDG_Online[queue[loc]] <= GLDG_Online[p]) do
+			while queue[loc] and GLDG_Online[queue[loc]] do
 				loc = loc + 1
 			end
 		end
