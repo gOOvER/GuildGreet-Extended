@@ -144,7 +144,7 @@ In your greet/congratulation messages you can use flexible codes
   %l = level if available, empty else
   %C = class if available, empty else
   %r = rankname if available, rank number else if available, empty else
-  %v = achievment if available, empty else
+  %v = achievement if available, empty else
   %g = guild alias if available, else guild if available, else empty
   %G = guild name if available, else empty
   (suggested by Sentinelum, Keith, AcmeHeroesInc and lebanoncyberspace)
