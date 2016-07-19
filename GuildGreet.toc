@@ -1,7 +1,7 @@
 ## Interface: 70000
 ## Title: GuildGreet-Extended
-## Version: 7.0.0
-## Author: gOOvER
+## Version: @project-version@
+## Author: gOOvER & Chemeria - Malorne-EU
 ## X-Category: Guild
 ## X-Website: http://wow.curse-gaming.com/downloads/details/7529/
 ## URL: http://wow.curse-gaming.com/downloads/details/7529/
@@ -11,10 +11,12 @@
 ## SavedVariables: GLDG_Data
 
 
+#@no-lib-strip@
 embeds.xml
-lang\locale.xml
+#@end-no-lib-strip@
 
-Locale\locale.xml
+lang\locale.xml
+#Locale\locale.xml
 GuildGreet.xml
 
 
