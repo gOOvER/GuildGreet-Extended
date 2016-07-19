@@ -71,7 +71,7 @@ GLDG_SubTab2Frame = {}
 GLDG_SubTab2Frame.Tab1 = "General"
 GLDG_SubTab2Frame.Tab2 = "Chat"
 GLDG_SubTab2Frame.Tab3 = "Greeting"
-GLDG_SubTab2Frame.Tab4 = "Debug"
+--GLDG_SubTab2Frame.Tab4 = "Debug"
 GLDG_SubTab2Frame.Tab4 = "Other"
 
 
@@ -82,20 +82,20 @@ GLDG_OFFLINE		= string.format(ERR_FRIEND_OFFLINE_S, "(.+)")
 GLDG_JOINED			= string.format(ERR_GUILD_JOIN_S, "(.+)")
 GLDG_PROMO			= string.format(ERR_GUILD_PROMOTE_SSS, "(.+)", "(.+)", "(.+)")
 GLDG_DEMOTE			= string.format(ERR_GUILD_DEMOTE_SSS, ".+", "(.+)", "(.+)")
-GLDG_ACHIEVE    = string.format(ACHIEVEMENT_BROADCAST, "(.+)", "(.+)")
+GLDG_ACHIEVE    	= string.format(ACHIEVEMENT_BROADCAST, "(.+)", "(.+)")
 
-GLDG_DEFAULT_ONLINE_COLOUR				= "|cFFA0FFA0"
+GLDG_DEFAULT_ONLINE_COLOUR			= "|cFFA0FFA0"
 GLDG_DEFAULT_IS_OFFLINE_COLOUR		= "|cFFFFFFFF"
 GLDG_DEFAULT_GOES_OFFLINE_COLOUR	= "|cFF7F7F7F"
-GLDG_DEFAULT_HELP_COLOUR					= "|cFFFFFF7F"
-GLDG_DEFAULT_ALIAS_COLOUR					= "|cFFFFA0A0"
-GLDG_DEFAULT_HEADER_COLOUR				= "|c7FFF0000"
+GLDG_DEFAULT_HELP_COLOUR			= "|cFFFFFF7F"
+GLDG_DEFAULT_ALIAS_COLOUR			= "|cFFFFA0A0"
+GLDG_DEFAULT_HEADER_COLOUR			= "|c7FFF0000"
 
-GLDG_DEFAULT_LIST_COLOUR					= "|cFFFF7F00"
-GLDG_DEFAULT_NEW_COLOUR						= "|cFFFF3F3F"
-GLDG_DEFAULT_LVL_COLOUR						= "|cFF7F7F7F"
-GLDG_DEFAULT_RANK_COLOUR					= "|cFFCC00CC"
-GLDG_DEFAULT_RELOG_COLOUR					= "|cFF3FFF3F"
+GLDG_DEFAULT_LIST_COLOUR			= "|cFFFF7F00"
+GLDG_DEFAULT_NEW_COLOUR				= "|cFFFF3F3F"
+GLDG_DEFAULT_LVL_COLOUR				= "|cFF7F7F7F"
+GLDG_DEFAULT_RANK_COLOUR			= "|cFFCC00CC"
+GLDG_DEFAULT_RELOG_COLOUR			= "|cFF3FFF3F"
 GLDG_DEFAULT_ACHIEVMENT_COLOUR		= "|cFF001FFF"
 
 GLDG_ONLINE_COLOUR				= GLDG_DEFAULT_ONLINE_COLOUR
@@ -2612,7 +2612,7 @@ function GLDG_ShowQueue()
 	local a,r,g,b = GLDG_ColourToRGB_perc(GLDG_Data.colours.header)
 	local f = 1-((r+g+b)/3)
 	GuildGreetListTitleText:SetTextColor(f,f,f,1)
-	GuildGreetListTitleTexture:SetTexture(r,g,b,a)
+	GuildGreetListTitleTexture:SetColorTexture(r,g,b,a)
 
 	-- Show main window
 	_G[GLDG_LIST]:Show()
