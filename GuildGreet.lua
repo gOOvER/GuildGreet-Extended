@@ -143,7 +143,7 @@ GLDG_InitCheck = 0		        -- Check for changes and display them; 0 = not start
 GLDG_ChangesText = {}		    -- text for popup display
 
 -- Various
-GLDG_Debug = true		-- Show debugging
+GLDG_Debug = false		-- Show debugging
 
 -- Core variables
 GLDG_Online = {}		-- Time of player going online
