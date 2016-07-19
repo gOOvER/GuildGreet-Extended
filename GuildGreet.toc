@@ -1,7 +1,7 @@
-## Interface: 60000
+## Interface: 70000
 ## Title: GuildGreet-Extended
-## Version: @project-version@
-## Author: gOOvER & Luzisto
+## Version: 7.0.0
+## Author: gOOvER
 ## X-Category: Guild
 ## X-Website: http://wow.curse-gaming.com/downloads/details/7529/
 ## URL: http://wow.curse-gaming.com/downloads/details/7529/
@@ -16,3 +16,5 @@ lang\locale.xml
 
 Locale\locale.xml
 GuildGreet.xml
+
+

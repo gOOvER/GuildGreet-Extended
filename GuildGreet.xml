@@ -1,9 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-<!-->	<Script file="todo.lua"/>
-	<Script file="history.lua"/>
-	<Script file="help.lua"/><-->
+
 	<Script file="GuildGreet.lua"/>
 	<Frame name="GuildGreet">
 		<Scripts>
@@ -5056,7 +5054,7 @@
 				end
 			</OnShow>
 			<OnColorSelect>
-				GLDG_ColorSwatch:SetTexture(r, g, b);
+				GLDG_ColorSwatch:SetColorTexture(r, g, b);
 				if ( self.func ) then
 					self.func();
 				end

@@ -56,7 +56,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 600000			-- Number code for this version
+GDLG_VNMBR	= 700000			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -71,7 +71,7 @@ GLDG_SubTab2Frame = {}
 GLDG_SubTab2Frame.Tab1 = "General"
 GLDG_SubTab2Frame.Tab2 = "Chat"
 GLDG_SubTab2Frame.Tab3 = "Greeting"
---GLDG_SubTab2Frame.Tab4 = "Debug"
+GLDG_SubTab2Frame.Tab4 = "Debug"
 GLDG_SubTab2Frame.Tab4 = "Other"
 
 
@@ -103,7 +103,7 @@ GLDG_IS_OFFLINE_COLOUR		= GLDG_DEFAULT_IS_OFFLINE_COLOUR
 GLDG_GOES_OFFLINE_COLOUR	= GLDG_DEFAULT_GOES_OFFLINE_COLOUR
 GLDG_ALIAS_COLOUR					= GLDG_DEFAULT_ALIAS_COLOUR
 
-GLDG_LEVEL_CAP = 100
+GLDG_LEVEL_CAP = 110
 
 GLDG_CONFIG_STRING = nil
 GLDG_CONFIG_STRING_A = nil
@@ -143,7 +143,7 @@ GLDG_InitCheck = 0		        -- Check for changes and display them; 0 = not start
 GLDG_ChangesText = {}		    -- text for popup display
 
 -- Various
-GLDG_Debug = false		-- Show debugging
+GLDG_Debug = true		-- Show debugging
 
 -- Core variables
 GLDG_Online = {}		-- Time of player going online
@@ -6358,11 +6358,11 @@ function GLDG_Test(showAll)
 				if isOnline then isOnline = "online" else isOnline = "offline" end
 				GLDG_Print("  BN friend ["..tostring(givenName).." "..tostring(surname).."] - ["..tostring(toonName).."] - ["..tostring(client).."] is ["..tostring(isOnline).."] since ["..tostring(GLDG_SecToTimeString(lastOnline)).."]");
 
-				numToons = BNGetNumFriendToons(i);
+				numToons = BNGetNumFriendGameAccounts(i);
 				if ( numToons > 0 ) then
 					GLDG_Print("  Has "..tostring(numToons).." toons")
 					for j = 1, numToons do
-						hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText = BNGetFriendToonInfo(i, j)
+						hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText = BNGetFriendGameAccountInfo(i, j)
 						--GLDG_Print("     Toon "..tostring(j)..": hasFocus ["..tostring(hasFocus).."] toonName ["..tostring(toonName).."] client ["..tostring(client).."] realmName ["..tostring(realmName).."] faction ["..tostring(faction).."] race ["..tostring(race).."] class ["..tostring(class).."] guild ["..tostring(guild).."] zoneName ["..tostring(zoneName).."] level ["..tostring(level).."] gameText ["..tostring(gameText).."]")
 						GLDG_Print("     Toon "..tostring(j)..": ["..tostring(toonName).."] on ["..tostring(realmName).."] ["..tostring(faction).."] is ["..tostring(race).."] ["..tostring(class).."] in guild ["..tostring(guild).."] currently in ["..tostring(zoneName).."] - level ["..tostring(level).."]")
 					end
@@ -6608,7 +6608,7 @@ end
 function GLDG_UpdateColoursSwatch()
 	local a,r,g,b = GLDG_ColourToRGB_perc(GLDG_colour)
 
-	GLDG_ColorSwatch:SetTexture(r, g, b);
+	GLDG_ColorSwatch:SetColorTexture(r, g, b);
 	GLDG_ColorPickerFrame:SetColorRGB(r, g, b);
 
 	GLDG_ColorPickerFrame.opacity = a
@@ -6766,7 +6766,7 @@ function GLDG_ColoursShow()
 			local colour = GLDG_Data.colours[GLDG_set_list[s]][GLDG_element_list[e]]
 			local a,r,g,b = GLDG_ColourToRGB_perc(colour)
 			local texture = _G[name..s..e.."ColourTexture"]
-			texture:SetTexture(r,g,b,a)
+			texture:SetColorTexture(r,g,b,a)
 			local text = _G[name..s..e.."Button"]
 			text:SetText(string.sub(colour, 5))
 		end
@@ -6774,13 +6774,13 @@ function GLDG_ColoursShow()
 
 	local a,r,g,b = GLDG_ColourToRGB_perc(GLDG_Data.colours.help)
 	local texture = _G[name.."HelpColourTexture"]
-	texture:SetTexture(r,g,b,a)
+	texture:SetColorTexture(r,g,b,a)
 	local text = _G[name.."HelpButton"]
 	text:SetText(string.sub(GLDG_Data.colours.help, 5))
 
 	a,r,g,b = GLDG_ColourToRGB_perc(GLDG_Data.colours.header)
 	texture = _G[name.."HeaderColourTexture"]
-	texture:SetTexture(r,g,b,a)
+	texture:SetColorTexture(r,g,b,a)
 	local text = _G[name.."HeaderButton"]
 	text:SetText(string.sub(GLDG_Data.colours.header, 3))
 end
