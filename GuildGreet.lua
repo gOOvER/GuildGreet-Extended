@@ -2615,7 +2615,7 @@ function GLDG_ShowQueue()
 	local a,r,g,b = GLDG_ColourToRGB_perc(GLDG_Data.colours.header)
 	local f = 1-((r+g+b)/3)
 	GuildGreetListTitleText:SetTextColor(f,f,f,1)
-	GuildGreetListTitleTexture:SetColorTexture(r,g,b,a)
+	GuildGreetListTitleTexture:SetColorTexture(r, g, b)
 
 	-- Show main window
 	_G[GLDG_LIST]:Show()
@@ -6769,7 +6769,7 @@ function GLDG_ColoursShow()
 			local colour = GLDG_Data.colours[GLDG_set_list[s]][GLDG_element_list[e]]
 			local a,r,g,b = GLDG_ColourToRGB_perc(colour)
 			local texture = _G[name..s..e.."ColourTexture"]
-			texture:SetColorTexture(r,g,b,a)
+			texture:SetColorTexture(r, g, b)
 			local text = _G[name..s..e.."Button"]
 			text:SetText(string.sub(colour, 5))
 		end
@@ -6777,13 +6777,13 @@ function GLDG_ColoursShow()
 
 	local a,r,g,b = GLDG_ColourToRGB_perc(GLDG_Data.colours.help)
 	local texture = _G[name.."HelpColourTexture"]
-	texture:SetColorTexture(r,g,b,a)
+	texture:SetColorTexture(r, g, b)
 	local text = _G[name.."HelpButton"]
 	text:SetText(string.sub(GLDG_Data.colours.help, 5))
 
 	a,r,g,b = GLDG_ColourToRGB_perc(GLDG_Data.colours.header)
 	texture = _G[name.."HeaderColourTexture"]
-	texture:SetColorTexture(r,g,b,a)
+	texture:SetColorTexture(r, g, b)
 	local text = _G[name.."HeaderButton"]
 	text:SetText(string.sub(GLDG_Data.colours.header, 3))
 end
@@ -8053,6 +8053,7 @@ end
 
 ------------------------------------------------------------
 --~~~ MSN1: New function to display guildless characters, displays list of guildless, then count of guildless and with guild after deletion
+
 function GLDG_ClickGuildlessDisplay()
 	guildless_count = 0
 	haveguild_count = 0
