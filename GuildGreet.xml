@@ -2510,10 +2510,18 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
+				<!-->DEMONHUNTERFilterText text<-->
+				<FontString name="$parentDEMONHUNTERFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentSHAMANFilterText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
 				<!-->WARLOCKFilterFilter text<-->
 				<FontString name="$parentWARLOCKFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
 					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="$parentSHAMANFilterText" relativePoint="TOPLEFT">
+						<Anchor point="TOPLEFT" relativeTo="$parentDEMONHUNTERFilterText" relativePoint="TOPLEFT">
 							<Offset><AbsDimension x="0" y="-15"/></Offset>
 						</Anchor>
 					</Anchors>
@@ -2973,6 +2981,24 @@
 				<Size><AbsDimension x="20" y="20"/></Size>
 				<Anchors>
 					<Anchor point="RIGHT" relativeTo="$parentSHAMANFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.SHAMANFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->DEMONHUNTERFilter Box<-->
+			<CheckButton name="$parentDEMONHUNTERFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentDEMONHUNTERFilterText" relativePoint="LEFT">
 						<Offset><AbsDimension x="-5" y="0"/></Offset>
 					</Anchor>
 				</Anchors>

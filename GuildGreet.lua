@@ -715,6 +715,7 @@ function GLDG_Init()
 	if GLDG_Data.PRIESTFilter == nil then GLDG_Data.PRIESTFilter = true end
 	if GLDG_Data.ROGUEFilter == nil then GLDG_Data.ROGUEFilter = true end
 	if GLDG_Data.SHAMANFilter == nil then GLDG_Data.SHAMANFilter = true end
+	if GLDG_Data.DEMONHUNTERFilter == nil then GLDG_Data.DEMONHUNTERFilter = true end
 	if GLDG_Data.WARLOCKFilter == nil then GLDG_Data.WARLOCKFilter = true end
 	if GLDG_Data.MONKFilter == nil then GLDG_Data.MONKFilter = true end
 
@@ -908,6 +909,7 @@ function GLDG_InitFrame(frameName)
 		_G[name.."PRIESTFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["PRIEST"])
 		_G[name.."ROGUEFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["ROGUE"])
 		_G[name.."SHAMANFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["SHAMAN"])
+		_G[name.."DEMONHUNTERFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["DEMONHUNTER"])
 		_G[name.."WARLOCKFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["WARLOCK"])
 		_G[name.."MONKFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["MONK"])
 		--_G[name.."GuildSortText"]:SetText(GLDG_TXT.guildSort)
@@ -1135,6 +1137,7 @@ function GLDG_UpdatePlayerCheckboxes()
 	_G[name.."PRIESTFilterBox"]:SetChecked(GLDG_Data.PRIESTFilter)
 	_G[name.."ROGUEFilterBox"]:SetChecked(GLDG_Data.ROGUEFilter)
 	_G[name.."SHAMANFilterBox"]:SetChecked(GLDG_Data.SHAMANFilter)
+	_G[name.."DEMONHUNTERFilterBox"]:SetChecked(GLDG_Data.DEMONHUNTERFilter)
 	_G[name.."WARLOCKFilterBox"]:SetChecked(GLDG_Data.WARLOCKFilter)
 	_G[name.."MONKFilterBox"]:SetChecked(GLDG_Data.MONKFilter)
 	--_G[name.."GuildSortBox"]:SetChecked(GLDG_Data.GuildSort)
@@ -7020,11 +7023,12 @@ classColors["WARLOCK"]		= "|cFF9682C9";
 classColors["PALADIN"]		= "|cFFF58CBA";
 classColors["DRUID"]		= "|cFFFF7D0A";
 classColors["SHAMAN"]		= "|cFF00DBBA";
+classColors["DEMONHUNTER"]  = "|cFFA330C9";
 classColors["WARRIOR"]		= "|cFFBE9C6E";
 classColors["ROGUE"]		= "|cFFFFF569";
 classColors["HUNTER"]		= "|cFFAAD473";
 classColors["DEADKNIGHT"]	= "|cFFC41F3B";
-classColors["MONK"]      = "|cFF558A84";
+classColors["MONK"]      	= "|cFF00FF96";
 
 ------------------------------------------------------------
 function GLDG_ChatFilter(chatFrame, event, ...) -- chatFrame = self
