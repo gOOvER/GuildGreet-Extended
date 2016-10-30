@@ -56,7 +56,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 700000			-- Number code for this version
+GDLG_VNMBR	= 701000			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -2615,7 +2615,7 @@ function GLDG_ShowQueue()
 	local a,r,g,b = GLDG_ColourToRGB_perc(GLDG_Data.colours.header)
 	local f = 1-((r+g+b)/3)
 	GuildGreetListTitleText:SetTextColor(f,f,f,1)
-	GuildGreetListTitleTexture:SetColorTexture(r, g, b)
+	GuildGreetListTitleTexture:SetColorTexture(r, g, b, a)
 
 	-- Show main window
 	_G[GLDG_LIST]:Show()
@@ -6611,8 +6611,8 @@ end
 function GLDG_UpdateColoursSwatch()
 	local a,r,g,b = GLDG_ColourToRGB_perc(GLDG_colour)
 
-	GLDG_ColorSwatch:SetColorTexture(r, g, b);
-	GLDG_ColorPickerFrame:SetColorRGB(r, g, b);
+	GLDG_ColorSwatch:SetColorTexture(r, g, b, a);
+	GLDG_ColorPickerFrame:SetColorRGB(r, g, b, a);
 
 	GLDG_ColorPickerFrame.opacity = a
 	GLDG_OpacitySliderFrame:SetValue(a);
@@ -6769,7 +6769,7 @@ function GLDG_ColoursShow()
 			local colour = GLDG_Data.colours[GLDG_set_list[s]][GLDG_element_list[e]]
 			local a,r,g,b = GLDG_ColourToRGB_perc(colour)
 			local texture = _G[name..s..e.."ColourTexture"]
-			texture:SetColorTexture(r, g, b)
+			texture:SetColorTexture(r, g, b, a)
 			local text = _G[name..s..e.."Button"]
 			text:SetText(string.sub(colour, 5))
 		end
@@ -6777,13 +6777,13 @@ function GLDG_ColoursShow()
 
 	local a,r,g,b = GLDG_ColourToRGB_perc(GLDG_Data.colours.help)
 	local texture = _G[name.."HelpColourTexture"]
-	texture:SetColorTexture(r, g, b)
+	texture:SetColorTexture(r, g, b, a)
 	local text = _G[name.."HelpButton"]
 	text:SetText(string.sub(GLDG_Data.colours.help, 5))
 
 	a,r,g,b = GLDG_ColourToRGB_perc(GLDG_Data.colours.header)
 	texture = _G[name.."HeaderColourTexture"]
-	texture:SetColorTexture(r, g, b)
+	texture:SetColorTexture(r, g, b, a)
 	local text = _G[name.."HeaderButton"]
 	text:SetText(string.sub(GLDG_Data.colours.header, 3))
 end
