@@ -1,7 +1,7 @@
 ## Interface: 70100
 ## Title: GuildGreet-Extended
-## Version: 7.1.0
-## Author: gOOvER & Chemeria - Malorne-EU
+## Version: @project-revision@
+## Author: @project-author@
 ## X-Category: Guild
 ## X-Website: http://wow.curse-gaming.com/downloads/details/7529/
 ## URL: http://wow.curse-gaming.com/downloads/details/7529/
