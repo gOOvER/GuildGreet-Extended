@@ -1,6 +1,7 @@
 GuildGreet Extended - A World of Warcraft guild and greeting tool
 -----------------------------------------------------------------
 
+
 History
 -------
 This Addon was originally written by Greya, his last release was 0.52.
