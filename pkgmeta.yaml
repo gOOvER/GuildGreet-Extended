@@ -73,6 +73,10 @@ externals:
     libs/LibStub:
 		url: svn://svn.wowace.com/wow/libstub/mainline/trunk
 		tag: latest
+        
+    libs/LibAlts-1.0:
+        url: https://repos.wowace.com/wow/libalts-1-0/trunk
+        tag: latest
 
 manual-changelog: CHANGELOG.txt
 license-output: LICENSE.txt
