@@ -1,5 +1,5 @@
 package-as: GuildGreet
-enable-nolib-creation: yes
+enable-nolib-creation: no
 
 externals:
     libs/CallbackHandler-1.0: 
