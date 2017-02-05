@@ -1,6 +1,6 @@
 ## Interface: 70100
 ## Title: GuildGreet-Extended
-## Version: @project-revision@
+## Version: @project-version@
 ## Author: @project-author@
 ## X-Category: Guild
 ## X-Website: http://wow.curse-gaming.com/downloads/details/7529/
