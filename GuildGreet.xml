@@ -177,7 +177,7 @@
 
 	
 	<!-->Configuration frame<-->
-	<Frame name="GuildGreetFrame" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
+	<Frame name="GuildGreetFrame" clampToScreen="true" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
 	
 	<Size><AbsDimension x="1420" y="580"/></Size>
 		<Anchors>
