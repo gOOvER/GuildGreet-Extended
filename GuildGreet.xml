@@ -32,7 +32,7 @@
 	</Button>
 
 	<!-->List frame<-->
-	<Frame name="GuildGreetList" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
+	<Frame name="GuildGreetList" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true" clampToScreen="true">
 		<Scripts>
 			<OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>
 			<OnDragStart>self:StartMoving();</OnDragStart>
@@ -175,10 +175,10 @@
 		</Scripts>
 	</Button>
 
-	
+
 	<!-->Configuration frame<-->
 	<Frame name="GuildGreetFrame" clampToScreen="true" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
-	
+
 	<Size><AbsDimension x="1420" y="580"/></Size>
 		<Anchors>
 			<Anchor point="CENTER">
@@ -346,7 +346,7 @@
 							<Offset><AbsDimension x="40" y="0"/></Offset>
 						</Anchor>
 					</Anchors>
-				</FontString>				
+				</FontString>
 				<!-->Relog slider text<-->
 				<FontString name="$parentRelogText" inherits="GLDG_OptionText">
 					<Anchors>
@@ -434,7 +434,7 @@
 							<Offset><AbsDimension x="750" y="-185"/></Offset>
 						</Anchor>
 					</Anchors>
-				</FontString>				
+				</FontString>
 				<!-->UseFriends<-->
 				<FontString name="$parentUseFriendsText" inherits="GLDG_LOptionText" justifyH="LEFT">
 					<Anchors>
@@ -2286,7 +2286,7 @@
 				<FontString name="$parentRankname" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
 					<Size><AbsDimension x="100" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentGuild" relativePoint="RIGHT"/></Anchors>
-				</FontString>				
+				</FontString>
 				<!-- pnote -->
 				<FontString name="$parentPnote" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
 					<Size><AbsDimension x="220" /></Size>
@@ -2296,7 +2296,7 @@
 				<FontString name="$parentOnote" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
 					<Size><AbsDimension x="220" /></Size>
 					<Anchors><Anchor point = "LEFT" relativeTo="$parentPnote" relativePoint="RIGHT"/></Anchors>
-				</FontString>								
+				</FontString>
 				<!-- channel -->
 				<FontString name="$parentChannel" inherits="GameFontHighlight" justifyH="LEFT" wordwrap="false">
 					<Size><AbsDimension x="20" /></Size>
@@ -3053,7 +3053,7 @@
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
 			</CheckButton>
-			
+
 			<!-->GuildFilter<-->
 
 			<Button name="$parentGuildFilterDropboxButton" inherits="UIDropDownMenuTemplate">
@@ -3606,7 +3606,7 @@
 			<OnShow>GLDG_ShowPublicPlayerNote(self:GetName())</OnShow>
 		</Scripts>
  	 </Frame>
-	 
+
  	<!-->Configuration players tab subframe: set  officernote<-->
  	 <Frame name="$parentOfficerNote" parent="GuildGreetFramePlayersSub" hidden="true" enableMouse="true" setAllPoints="true">
 		<Layers>
@@ -3688,9 +3688,9 @@
 			<OnShow>GLDG_ShowOfficerNote(self:GetName())</OnShow>
 		</Scripts>
  	 </Frame>
-	 
 
-	 
+
+
 	<!-->Configuration players tab subframe template: main/alt line<-->
 	<Button name="GLDG_MainLineTemplate" virtual= "true">
 		<Size><AbsDimension x="210" y="15"/></Size>
@@ -3906,8 +3906,8 @@
 							<Offset><AbsDimension x="0" y="0"/></Offset>
 						</Anchor>
 					</Anchors>
-				</FontString>				
-				
+				</FontString>
+
 			</Layer>
 		</Layers>
 		<Frames>
@@ -3995,8 +3995,8 @@
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
-			</Button>			
-			
+			</Button>
+
 			<!-->Configuration subframe<-->
 			<Frame name="$parentSub">
 				<Size><AbsDimension x="150" y="200"/></Size>
