@@ -263,7 +263,7 @@
 	</Button>
 
 	<!-->Configuration frame<-->
- 	<Frame name="$parentSettings" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true">
+ 	<Frame name="$parentSettings" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" clampToScreen="true">
 		<Size><AbsDimension x="980" y="390"/></Size>
 		<Anchors>
 			<Anchor point="CENTER">

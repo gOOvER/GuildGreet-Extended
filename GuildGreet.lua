@@ -273,7 +273,6 @@ function GLDG_OnEvent(self, event, ...)
 		GLDG_Main:UnregisterEvent("PLAYER_ENTERING_WORLD")
 		GLDG_Main:RegisterEvent("GUILD_ROSTER_UPDATE")
 		GLDG_Main:RegisterEvent("FRIENDLIST_UPDATE")
-		--GLDG_Main:RegisterEvent("FRIENDLIST_SHOW")
 		GLDG_Main:RegisterEvent("CHAT_MSG_CHANNEL_JOIN")
 		GLDG_Main:RegisterEvent("CHAT_MSG_CHANNEL_LEAVE")
 		GLDG_Main:RegisterEvent("CHAT_MSG_CHANNEL_NOTICE")
@@ -353,7 +352,7 @@ function GLDG_OnEvent(self, event, ...)
 	elseif (event == "CHAT_MSG_SYSTEM") then
 		GLDG_SystemMsg(arg1)
 
-	elseif ((event == "FRIENDLIST_UPDATE") then
+	elseif (event == "FRIENDLIST_UPDATE") then
 		if (GLDG_Realm and GLDG_Player) then
 			GLDG_FriendsUpdate()
 		else
