@@ -1,4 +1,4 @@
-## Interface: 70300
+## Interface: 80000
 ## Title: GuildGreet-Extended
 ## Version: @project-version@
 ## Author: @project-author@
@@ -15,5 +15,3 @@ embeds.xml
 lang\locale.xml
 Locale\locale.xml
 GuildGreet.xml
-
-

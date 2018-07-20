@@ -256,7 +256,7 @@ function GLDG_OnEvent(self, event, ...)
 --			GLDG_myAddons()
 			GLDG_Init()
 			--GLDG_RegisterUrbinAddon(GLDG_NAME, GLDG_About)
-		end				
+		end
 		GLDG_autoConsistencyCheckReady = true
 
 		-- add menu to player frame and chat menu
@@ -339,7 +339,7 @@ function GLDG_OnEvent(self, event, ...)
 		GLDG_TreatAchievment(arg1, arg2)
 
 		elseif (event == "CHAT_MSG_ACHIEVEMENT") then
-		GLDG_TreatAchievment(arg1, arg2)	
+		GLDG_TreatAchievment(arg1, arg2)
 
 	-- who response going to social frame
 	elseif (event == "WHO_LIST_UPDATE") then
@@ -352,7 +352,7 @@ function GLDG_OnEvent(self, event, ...)
 	-- guild members and/or friends joining/leaving
 	elseif (event == "CHAT_MSG_SYSTEM") then
 		GLDG_SystemMsg(arg1)
-			
+
 	elseif ((event == "FRIENDLIST_UPDATE") or (event == "FRIENDLIST_SHOW")) then
 		if (GLDG_Realm and GLDG_Player) then
 			GLDG_FriendsUpdate()
@@ -428,16 +428,16 @@ function GLDG_OnEvent(self, event, ...)
 					end
 				end
 			elseif (string.sub(arg2, 1, 6)=="QUERY:") then
-				SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
+				C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
 				local inInstance, instanceType = IsInInstance()
 				if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumSubgroupMembers() > 0) then
-					SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "PARTY")
+					C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "PARTY")
 				end
 				if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumGroupMembers() > 0) then
-					SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "RAID")
+					C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "RAID")
 				end
 				if (instanceType == "pvp") then
-					SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "BATTLEGROUND")
+					C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "BATTLEGROUND")
 				end
 			end
 		end
@@ -447,13 +447,13 @@ function GLDG_OnEvent(self, event, ...)
 	elseif (event == "GROUP_ROSTER_UPDATE") then
 		local inInstance, instanceType = IsInInstance()
 		if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumSubgroupMembers() > 0 ) then
-			SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "PARTY")
+			C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "PARTY")
 		end
 		if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumGroupMembers() > 0) then
-			SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "RAID")
+			C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "RAID")
 		end
 		if (instanceType == "pvp") then
-			SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "BATTLEGROUND")
+			C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "BATTLEGROUND")
 		end
 
 	elseif (event == "BN_CONNECTED") or
@@ -492,16 +492,16 @@ function GLDG_Init()
 	-- Clear obsolete options
 	GLDG_Data.EnableContextMenu = nil
 
-	-- Set defaults for missing settings	
+	-- Set defaults for missing settings
 	if GLDG_unique_GuildName then
 		if not GLDG_Data[GLDG_unique_GuildName] then
 			GLDG_Data[GLDG_unique_GuildName] = {}
 			GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = true
 		end
 	end
-	
+
 	if not GLDG_Data.GuildSettings then GLDG_Data.GuildSettings = {} end
-	
+
 	if GLDG_Data[GLDG_unique_GuildName] then
 	-- convert for API 6.0.2 begin
 		if GLDG_Data[GLDG_unique_GuildName].GreetAsMain==1 then GLDG_Data[GLDG_unique_GuildName].GreetAsMain=true end
@@ -533,7 +533,7 @@ function GLDG_Init()
 		if GLDG_Data[GLDG_unique_GuildName].DeltaPopup==1 then GLDG_Data[GLDG_unique_GuildName].DeltaPopup=true end
 		if GLDG_Data[GLDG_unique_GuildName].RelogTime==1 then GLDG_Data[GLDG_unique_GuildName].RelogTime=true end
 		if GLDG_Data[GLDG_unique_GuildName].MinLevelUp==1 then GLDG_Data[GLDG_unique_GuildName].MinLevelUp=true end
-		if GLDG_Data[GLDG_unique_GuildName].UseGuildDefault==1 then	GLDG_Data[GLDG_unique_GuildName].UseGuildDefault=true end	
+		if GLDG_Data[GLDG_unique_GuildName].UseGuildDefault==1 then	GLDG_Data[GLDG_unique_GuildName].UseGuildDefault=true end
 	-- convert for API 6.0.2 end
 		GLDG_Data.GuildSettings.GreetAsMain = GLDG_Data[GLDG_unique_GuildName].GreetAsMain
 		GLDG_Data.GuildSettings.Randomize = GLDG_Data[GLDG_unique_GuildName].Randomize
@@ -564,13 +564,13 @@ function GLDG_Init()
 		GLDG_Data.GuildSettings.DeltaPopup = GLDG_Data[GLDG_unique_GuildName].DeltaPopup
 		GLDG_Data.GuildSettings.RelogTime = GLDG_Data[GLDG_unique_GuildName].RelogTime
 		GLDG_Data.GuildSettings.MinLevelUp = GLDG_Data[GLDG_unique_GuildName].MinLevelUp
-		GLDG_Data.GuildSettings.UseGuildDefault = GLDG_Data[GLDG_unique_GuildName].UseGuildDefault	
+		GLDG_Data.GuildSettings.UseGuildDefault = GLDG_Data[GLDG_unique_GuildName].UseGuildDefault
 	end
-	
+
 
 --	if GLDG_Data.GuildSettings.UseGuildDefault==nil and GLDG_Data[GLDG_unique_GuildName] then
 --		GLDG_Data.GuildSettings = GLDG_Data[GLDG_unique_GuildName]
---	end	
+--	end
 	if not GLDG_Data.GuildSettings.RelogTime then GLDG_Data.GuildSettings.RelogTime = 2 end
 	if not GLDG_Data.GuildSettings.MinLevelUp then GLDG_Data.GuildSettings.MinLevelUp = 0 end
 	GLDG_Data.UpdateTime = 0
@@ -659,9 +659,9 @@ function GLDG_Init()
 		if GLDG_Data.GuildSettings.DeltaPopup==1 then GLDG_Data.GuildSettings.DeltaPopup=true end
 		if GLDG_Data.GuildSettings.RelogTime==1 then GLDG_Data.GuildSettings.RelogTime=true end
 		if GLDG_Data.GuildSettings.MinLevelUp==1 then GLDG_Data.GuildSettings.MinLevelUp=true end
-		if GLDG_Data.GuildSettings.UseGuildDefault==1 then	GLDG_Data.GuildSettings.UseGuildDefault=true end	
-	-- convert for API 6.0.2 end	
-	
+		if GLDG_Data.GuildSettings.UseGuildDefault==1 then	GLDG_Data.GuildSettings.UseGuildDefault=true end
+	-- convert for API 6.0.2 end
+
 	if not GLDG_Data.GreetGuild	then GLDG_Data.GreetGuild = {} end
 	if not GLDG_Data.GreetChannel	then GLDG_Data.GreetChannel = {} end
 	if not GLDG_Data.AutoGreet	then GLDG_Data.AutoGreet = {} end
@@ -727,9 +727,9 @@ function GLDG_Init()
 	if GLDG_Data.FilterMyFriends == 1 then GLDG_Data.FilterMyFriends = true end
 	if GLDG_Data.FilterWithFriends == 1 then GLDG_Data.FilterWithFriends = true end
 	if GLDG_Data.FilterCurrentChannel == 1 then GLDG_Data.FilterCurrentChannel = true end
-	if GLDG_Data.FilterWithChannel == 1 then GLDG_Data.FilterWithChannel = true end	
-	
-	
+	if GLDG_Data.FilterWithChannel == 1 then GLDG_Data.FilterWithChannel = true end
+
+
 	if not GLDG_Data.colours		then GLDG_Data.colours = {} end
 	if not GLDG_Data.colours.guild		then GLDG_Data.colours.guild = {} end
 	if not GLDG_Data.colours.friends	then GLDG_Data.colours.friends = {} end
@@ -769,8 +769,8 @@ function GLDG_Init()
 	if not GLDG_Data.colours.channel.rank	then GLDG_Data.colours.channel.rank = GLDG_DEFAULT_RANK_COLOUR end
 	if not GLDG_Data.colours.channel.relog	then GLDG_Data.colours.channel.relog = GLDG_DEFAULT_RELOG_COLOUR end
 	if not GLDG_Data.colours.channel.achievment then GLDG_Data.colours.channel.achievment = GLDG_DEFAULT_ACHIEVMENT_COLOUR end
-	
-	
+
+
 	-- Set initial pointers to avoid errors (hack!)
 	GLDG_DataChar = {}
 	GLDG_DataGreet = {}
@@ -933,7 +933,7 @@ function GLDG_InitFrame(frameName)
 		_G[name.."ActionButtonsNote"]:SetText(GLDG_TXT.pbnote)
 		_G[name.."ActionButtonsPublicNote"]:SetText(GLDG_TXT.pbpublicnote)
 		_G[name.."ActionButtonsOfficerNote"]:SetText(GLDG_TXT.pbofficernote)
-		
+
 		-- Set value for option checkboxes
 		GLDG_UpdatePlayerCheckboxes()
 	elseif (frameName == "Cleanup") then
@@ -952,9 +952,9 @@ function GLDG_InitFrame(frameName)
 		_G[name.."GuildlessHeader"]:SetText(GLDG_TXT.cleanupGuildlessHeader)
 		_G[name.."GuildlessInfo"]:SetText(GLDG_TXT.cleanupGuildlessInfo)
 		_G[name.."DisplayGuildlessHeader"]:SetText(GLDG_TXT.displayGuildlessHeader)
-		_G[name.."DisplayGuildlessInfo"]:SetText(GLDG_TXT.displayGuildlessInfo)		
+		_G[name.."DisplayGuildlessInfo"]:SetText(GLDG_TXT.displayGuildlessInfo)
 --~~~~
-		
+
 		_G[name.."Guild"]:SetText(GLDG_TXT.cleanupGuild)
 		_G[name.."Friends"]:SetText(GLDG_TXT.cleanupFriends)
 		_G[name.."Channel"]:SetText(GLDG_TXT.cleanupChannel)
@@ -1141,7 +1141,7 @@ function GLDG_UpdatePlayerCheckboxes()
 	_G[name.."WARLOCKFilterBox"]:SetChecked(GLDG_Data.WARLOCKFilter)
 	_G[name.."MONKFilterBox"]:SetChecked(GLDG_Data.MONKFilter)
 	--_G[name.."GuildSortBox"]:SetChecked(GLDG_Data.GuildSort)
-	
+
 	if (GLDG_Data.FilterOnline==true or GLDG_Data.GuildSort==true) then
 		_G[name.."Alt2Box"]:Disable()
 	else
@@ -1183,7 +1183,7 @@ function GLDG_InitRoster()
 	end
 	if not GLDG_unique_GuildName then
 		GLDG_unique_GuildName = ""
-	end	
+	end
 	if (GLDG_unique_GuildName == "") then
 		GLDG_GuildAlias = ""
 	else
@@ -1195,7 +1195,7 @@ function GLDG_InitRoster()
 
 	if not (GLDG_Realm and GLDG_Player) then return end
 
-	
+
 	-- create character store
 --	if (GLDG_Realm) then
 --		if (not GLDG_Data["Realm: "..GLDG_Realm]) then
@@ -1251,7 +1251,7 @@ function GLDG_InitRoster()
 	-- Update config dialog (can't be done in InitFrame())
 	local name = GLDG_GUI.."SettingsGreeting"
 	if (GLDG_unique_GuildName~="") then
-	
+
 		_G[name.."GuildAliasHeader"]:SetText(L["Guild alias for:"].." |cFFFFFF7F"..GLDG_unique_GuildName.."|r")
 		if (GLDG_GuildAlias ~= GLDG_unique_GuildName) then
 			_G[name.."GuildAliasEditbox"]:SetText(GLDG_GuildAlias)
@@ -1341,7 +1341,7 @@ end
 ------------------------------------------------------------
 function GLDG_OnUpdate(self, elapsed)
 	-- if we're not interested in updates, return
-	if ((not GLDG_UpdateRequest) and (not GLDG_UpdateRequestFriends)) then return end	
+	if ((not GLDG_UpdateRequest) and (not GLDG_UpdateRequestFriends)) then return end
 	-- are we interested in guild updates?
 	if (GLDG_UpdateRequest) then
 		-- is it time, yet?
@@ -1409,7 +1409,7 @@ function GLDG_OnUpdate(self, elapsed)
 		else
 			GLDG_UpdateRequestFriends = nil
 		end
-	end	
+	end
 end
 
 
@@ -1438,27 +1438,27 @@ function GLDG_RosterImport()
 					if GLDG_Data[i][oName].alt then
 						local altName, altRealm = string.split("-", GLDG_Data[i][oName].alt)
 						if not altRealm then
-							GLDG_Data[i][oName].alt = altName.."-"..string.gsub(oldrealm, " ", "")							
+							GLDG_Data[i][oName].alt = altName.."-"..string.gsub(oldrealm, " ", "")
 						else
-							GLDG_Data[i][oName].alt = string.gsub(GLDG_Data[i][oName].alt, " ", "")						
+							GLDG_Data[i][oName].alt = string.gsub(GLDG_Data[i][oName].alt, " ", "")
 						end
 					end
 					if GLDG_Data[i][oName].last then
 						local lastName, lastRealm = string.split("-", GLDG_Data[i][oName].last)
 						if not lastRealm then
-							GLDG_Data[i][oName].last = lastName.."-"..string.gsub(oldrealm, " ", "")							
+							GLDG_Data[i][oName].last = lastName.."-"..string.gsub(oldrealm, " ", "")
 						else
-							GLDG_Data[i][oName].last = string.gsub(GLDG_Data[i][oName].last, " ", "")						
+							GLDG_Data[i][oName].last = string.gsub(GLDG_Data[i][oName].last, " ", "")
 						end
 					end
 					if GLDG_Data[i][oName].promoter then
 						local promoName, promoRealm = string.split("-", GLDG_Data[i][oName].promoter)
 						if not promoRealm then
-							GLDG_Data[i][oName].promoter = promoName.."-"..string.gsub(oldrealm, " ", "")							
+							GLDG_Data[i][oName].promoter = promoName.."-"..string.gsub(oldrealm, " ", "")
 						else
-							GLDG_Data[i][oName].promoter = string.gsub(GLDG_Data[i][oName].promoter, " ", "")						
+							GLDG_Data[i][oName].promoter = string.gsub(GLDG_Data[i][oName].promoter, " ", "")
 						end
-					end						
+					end
 					GLDG_DataChar[newname] = GLDG_Data[i][oName]
 				end
 				GLDG_Data[i] = nil
@@ -1471,7 +1471,7 @@ function GLDG_RosterImport()
 	-- Update guildrank names
 	GLDG_Data.Ranks[GLDG_unique_GuildName] = {}
 	for i = 1, GuildControlGetNumRanks() do GLDG_Data.Ranks[GLDG_unique_GuildName][GuildControlGetRankName(i)] = i end
-	
+
 	-- Add info about all players of your guild
 	local mains = {}
 	local alts = {}
@@ -1598,7 +1598,7 @@ function GLDG_RosterImport()
 				else
 					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteAdded.." ["..Ambiguate(pl, "guild").."]. "..GLDG_TXT.deltaIs.." ["..pn.."]")
 				end
-				GLDG_DataChar[pl].pNote = pn				
+				GLDG_DataChar[pl].pNote = pn
 			else
 				if GLDG_DataChar[pl].pNote then
 					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteRemoved.." ["..Ambiguate(pl, "guild").."]. ("..GLDG_TXT.deltaWas.." ["..GLDG_DataChar[pl].pNote.."])")
@@ -1615,7 +1615,7 @@ function GLDG_RosterImport()
 					else
 						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteAdded.." ["..Ambiguate(pl, "guild").."]. "..GLDG_TXT.deltaIs.." ["..on.."]")
 					end
-					GLDG_DataChar[pl].oNote = on				
+					GLDG_DataChar[pl].oNote = on
 				else
 					if GLDG_DataChar[pl].oNote then
 						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteRemoved.." ["..Ambiguate(pl, "guild").."]. ("..GLDG_TXT.deltaWas.." ["..GLDG_DataChar[pl].oNote.."])")
@@ -2274,7 +2274,7 @@ function GLDG_SystemMsg(msg)
 	if player then
 		local GLDG_shortName, realm = string.split("-", player)
 		if not realm then player = GLDG_shortName.."-"..string.gsub(GLDG_Realm, " ", "") end
-		
+
 		if (GLDG_DataChar[player] and not GLDG_DataChar[player].ignore) then
 
 			if (not GLDG_DataChar[player].guild or GLDG_DataChar[player].guild ~= GLDG_unique_GuildName) and GLDG_DataChar[player].friends and GLDG_DataChar[player].friends[GLDG_Player] and GLDG_Data.UseFriends==false then
@@ -2285,7 +2285,7 @@ function GLDG_SystemMsg(msg)
 
 			-- always send to guild channel if we're in a guild
 			if (GLDG_unique_GuildName ~= "") then
-				SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
+				C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
 			end
 
 			GLDG_DebugPrint("player "..Ambiguate(player, "guild").." is a member of our guild")
@@ -2432,7 +2432,7 @@ function GLDG_SystemMsg(msg)
 		GLDG_Online[player] = GetTime()
 		GLDG_Offline[player] = false
 		GLDG_Queue[player] = GLDG_GetLogtime(player)
-		SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
+		C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
 		if (GLDG_Data.GuildSettings.SupressJoin==false) and (GLDG_TableSize(GLDG_FilterMessages(GLDG_DataChar[player], GLDG_DataGreet.Welcome)) > 0) then
 			GLDG_DataChar[player].new = true
 			GLDG_ShowQueue()
@@ -2477,7 +2477,7 @@ function GLDG_SystemMsg(msg)
 				GLDG_DataChar[player].newrank = nil
 				GLDG_Queue[player] = nil
 				GLDG_ShowQueue() end
-			return end	
+			return end
 	end
 
 end
@@ -2746,7 +2746,7 @@ function GLDG_ShowToolTip(self, buttonName)
 			end
 		end
 		if (GLDG_DataChar[oDBname].guild) then
-			if GLDG_DataChar[oDBname].guild==GLDG_unique_GuildName then 
+			if GLDG_DataChar[oDBname].guild==GLDG_unique_GuildName then
 				GameTooltip:AddDoubleLine(GLDG_TXT.tipGuild, GLDG_GuildName, 1, 1, 0, 1, 1, 1)
 			else
 				GameTooltip:AddDoubleLine(GLDG_TXT.tipGuild, GLDG_DataChar[oDBname].guild, 1, 1, 0, 1, 1, 1)
@@ -2805,7 +2805,7 @@ function GLDG_ClickName(button, name)
 	if not uRealm then
 		name = name.."-"
 		local len = string.len(name)
-		for i in pairs(GLDG_DataChar) do	
+		for i in pairs(GLDG_DataChar) do
 			if  string.sub(i, 1, len)==name and GLDG_DataChar[i].guild == GLDG_unique_GuildName then
 				name = i
 			end
@@ -2971,7 +2971,7 @@ function GLDG_ParseCustomMessage(cname, name, msg)
 	local p_n = nil
 	local _, uRealm = string.split("-", name)
 	if not uRealm then
-		p_n = name	-- %n = name as used today (depending on settings)	
+		p_n = name	-- %n = name as used today (depending on settings)
 	else
 		p_n = Ambiguate(name, "guild")	-- %n = name as used today (depending on settings)
 	end
@@ -3553,7 +3553,7 @@ function GLDG_SlashHandler(msg)
 			elseif (wordsLower[0]=="unnew") then
 				GLDG_Convert_Unnew()
 			elseif (wordsLower[0]=="aliasreset") then
-				GLDG_Reset_Aliases()				
+				GLDG_Reset_Aliases()
 			elseif (wordsLower[0]=="alert") then
 				GLDG_Data.CheckedGuildAlert = false	-- force check if called from command line
 				GLDG_CheckForGuildAlert()
@@ -3694,7 +3694,7 @@ function GLDG_SetCheckboxes()
 			_G[name1.."RelogSlider"]:Disable()
 			_G[name1.."RelogText"]:SetAlpha(0.5)
 			_G[name1.."MinLevelUpSlider"]:Disable()
-			_G[name1.."MinLevelUpText"]:SetAlpha(0.5)			
+			_G[name1.."MinLevelUpText"]:SetAlpha(0.5)
 			_G[name2.."ListNamesBox"]:Disable()
 			_G[name2.."ListNamesText"]:SetAlpha(0.5)
 			_G[name2.."ListNamesOffBox"]:Disable()
@@ -4308,7 +4308,7 @@ end
 function GLDG_SortString(player)
 	-- Helper function: returns string that should be used for sorting
 	local result = player
-	GLDG_Data.GuildSort=false --vorläufig abgeschaltet weil jetzt gefiltert wird 
+	GLDG_Data.GuildSort=false --vorläufig abgeschaltet weil jetzt gefiltert wird
 	if GLDG_Data.GuildSort==true then
 		if GLDG_DataChar[player].guild then
 			result = GLDG_DataChar[player].guild..player
@@ -4961,7 +4961,7 @@ function GLDG_ShowPlayerToolTip(element)
 			if GLDG_DataChar[p.last].enClass then
 				color_s = "|c"..RAID_CLASS_COLORS[GLDG_DataChar[p.last].enClass].colorStr
 				color_p = "|r"
-			end		
+			end
 			GameTooltip:AddDoubleLine(GLDG_TXT.tipLast, color_s..Ambiguate(p.last, "guild")..color_p, 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif p.alt and GLDG_DataChar[p.alt].last then
@@ -4970,7 +4970,7 @@ function GLDG_ShowPlayerToolTip(element)
 			if GLDG_DataChar[p.alt].enClass then
 				color_s = "|c"..RAID_CLASS_COLORS[GLDG_DataChar[GLDG_DataChar[p.alt].last].enClass].colorStr
 				color_p = "|r"
-			end	
+			end
 			GameTooltip:AddDoubleLine(GLDG_TXT.tipLast, color_s..Ambiguate(GLDG_DataChar[p.alt].last..color_p, "guild"), 1, 1, 0, 1, 1, 1)
 			added = true
 		end
@@ -5057,7 +5057,7 @@ function GLDG_ShowPlayerButtons()
 		_G[frame.."Remove"]:Hide()
 		_G[frame.."Note"]:Hide()
 		_G[frame.."PublicNote"]:Hide()
-		_G[frame.."OfficerNote"]:Hide()		
+		_G[frame.."OfficerNote"]:Hide()
 		return
 	end
 	-- show subframe
@@ -5116,7 +5116,7 @@ function GLDG_ShowPlayerButtons()
 		button:Enable()
 	else
 		button:Disable()
-	end	
+	end
 	-- Officernote button
 	button = _G[frame.."OfficerNote"]
 	button:Show()
@@ -5124,7 +5124,7 @@ function GLDG_ShowPlayerButtons()
 		button:Enable()
 	else
 		button:Disable()
-	end		
+	end
 	-- Note button
 	button = _G[frame.."Note"]
 	button:Show()
@@ -5634,7 +5634,7 @@ function GLDG_Help()
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg clear", true)
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg check", true)
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg alert", true)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg aliasreset", true)	
+	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg aliasreset", true)
 	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg greet "..GLDG_Data.colours.help.."| |rbye "..GLDG_Data.colours.help.."| |rlater "..GLDG_Data.colours.help.."[|r guild "..GLDG_Data.colours.help.."| |rchannel "..GLDG_Data.colours.help.."| |rall "..GLDG_Data.colours.help.."| <|rname"..GLDG_Data.colours.help.."> ]|r", true)
 	GLDG_Print(" - "..GLDG_Data.colours.help.."guild/all [show]:|r "..GLDG_TXT.help_all, true);
 	GLDG_Print(" - "..GLDG_Data.colours.help.."guild/all all:|r "..GLDG_TXT.help_online, true);
@@ -5894,8 +5894,8 @@ function GLDG_FriendsUpdate()
 			local _, uRealm = string.split("-", name)
 			if not uRealm then
 				name = name.."-"..string.gsub(GLDG_Realm, " ", "")
-			end			
-			
+			end
+
 			cnt = cnt + 1
 			-- mark this friend as "active" so it won't be purged below
 			purge[name] = true
@@ -6376,13 +6376,13 @@ function GLDG_Test(showAll)
 
 	--GLDG_Convert_Plausibility_Check()
 
-	--SendAddonMessage("GLDG", "Nur so ein Text", "WHISPER", "Urbin")
+	--C_ChatInfo.SendAddonMessage("GLDG", "Nur so ein Text", "WHISPER", "Urbin")
 
-	--SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
-	--SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "PARTY")
-	--SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "RAID")
+	--C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
+	--C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "PARTY")
+	--C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "RAID")
 
-	--SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version").."2", "GUILD")
+	--C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version").."2", "GUILD")
 
 	--GLDG_CreateTestChars()
 
@@ -6941,7 +6941,7 @@ function GLDG_ShowHelpToolTip(self, element)
 --~~~ MSN1: Display element for debugging purposes, to see what is in tooltip variable table (commented out now)
 --	GLDG_Print(element)
 --~~~~
-	
+
 	-- cut off leading frame name
 	if (string.find(element, GLDG_GUI)) then
 		name = string.sub(element, string.len(GLDG_GUI)+1)
@@ -7339,14 +7339,14 @@ end
 
 ------------------------------------------------------------
 function GLDG_PollBigBrother()
-	SendAddonMessage("GLDG", "QUERY:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
+	C_ChatInfo.SendAddonMessage("GLDG", "QUERY:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
 	local inInstance, instanceType = IsInInstance()
 	if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumPartyMembers() > 0) then
-		SendAddonMessage("GLDG", "QUERY:", "PARTY")
+		C_ChatInfo.SendAddonMessage("GLDG", "QUERY:", "PARTY")
 	end
 	local inInstance, instanceType = IsInInstance()
 	if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumRaidMembers() > 0) then
-		SendAddonMessage("GLDG", "QUERY:", "RAID")
+		C_ChatInfo.SendAddonMessage("GLDG", "QUERY:", "RAID")
 	end
 end
 
@@ -8034,13 +8034,13 @@ function GLDG_ClickGuildlessCleanup()
 	for p in pairs(GLDG_DataChar) do
 		if (not GLDG_DataChar[p].guild) then
 			guildless_count = guildless_count + 1
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemovedGuildless1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.cleanupRemovedGuildless2)			
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemovedGuildless1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.cleanupRemovedGuildless2)
 --Delete the character
 			GLDG_DataChar[p] = nil
 		end
 	end
 	GLDG_Print("Amount of guildless players removed: "..guildless_count)
-	
+
 	-- Hide the subframe window
 	_G[GLDG_GUI.."CleanupSubEntries"]:Hide()
 
@@ -8062,7 +8062,7 @@ function GLDG_ClickGuildlessDisplay()
 	for p in pairs(GLDG_DataChar) do
 		if (not GLDG_DataChar[p].guild) then
 			guildless_count = guildless_count + 1
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.displayRemovedGuildless1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.displayRemovedGuildless2)			
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.displayRemovedGuildless1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.displayRemovedGuildless2)
 		else
 			haveguild_count = haveguild_count + 1
 		end
@@ -8273,7 +8273,7 @@ function GLDG_readConfigString()
 		gstringstart = gstringstart + 4
 		local a,b,c = strfind(GLDG_ginfotxt, "(%S+)", gstringstart)
 		gstring1,gstring2,gstring3,gstring4 = string.split(":",c)
-		if gstring4 == nil then 
+		if gstring4 == nil then
 			GLDG_corrupted_config_from_guild = "{GG:"..c
 			GLDG_config_from_guild = "corrupted"
 		else
@@ -8352,7 +8352,7 @@ function GLDG_readConfigString()
 		GLDG_Data[GLDG_unique_GuildName].RelogTime = GLDG_Data.GuildSettings.RelogTime
 		GLDG_Data[GLDG_unique_GuildName].MinLevelUp = GLDG_Data.GuildSettings.MinLevelUp
 		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = true
-		
+
 		if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 1) then
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/Config string found. GuildGreet using default settings from %s!"],Ambiguate(GLDG_GuildLeader, "guild")))
 			GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
@@ -8405,7 +8405,7 @@ function GLDG_readConfigString()
 						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/Config string not found."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
 						GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
 						GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 2
-					end				
+					end
 				end
 			end
 			if GLDG_config_from_guild == "corrupted" then
@@ -8422,7 +8422,7 @@ function GLDG_readConfigString()
 						GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 5
 					end
 				end
-			end			
+			end
 		end
 	end
 	if (GLDG_Data.GuildSettings.UseGuildDefault==nil) then
@@ -8463,32 +8463,32 @@ function GLDG_readConfigString()
 					GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 10
 				end
 			end
-		end	
-	end	
+		end
+	end
 end
 
 function GLDG_WriteGuildString()
 	GLDG_ginfotxt = GetGuildInfoText()
-	
+
 	if not GLDG_CONFIG_STRING then GLDG_generateConfigString() end
 	local new_ginfotxt = nil
 
 	if GLDG_config_from_guild == nil then GLDG_readConfigString() end
 
 	if GLDG_ginfotxt == nil then GLDG_ginfotxt = " " end
-	
+
 	if GLDG_config_from_guild ~= nil and GLDG_config_from_guild =="not found" then
 		new_ginfotxt = GLDG_ginfotxt.."\r"..GLDG_CONFIG_STRING
 	end
-	
+
 	if GLDG_config_from_guild ~= nil and GLDG_config_from_guild =="corrupted" then
 		new_ginfotxt = string.gsub(GLDG_ginfotxt, GLDG_corrupted_config_from_guild, GLDG_CONFIG_STRING)
 	end
-	
+
 	if (GLDG_config_from_guild ~= nil) and (GLDG_config_from_guild ~="not found") and (GLDG_config_from_guild ~="corrupted")then
 		new_ginfotxt = string.gsub(GLDG_ginfotxt, GLDG_config_from_guild, GLDG_CONFIG_STRING)
 	end
-	
+
 	if strlen(new_ginfotxt)<=499 then
 		GLDG_config_from_guild = GLDG_CONFIG_STRING
 		GLDG_corrupted_config_from_guild = nil
