@@ -295,12 +295,6 @@ function GLDG_OnEvent(self, event, ...)
 		GLDG_Main:RegisterEvent("BN_FRIEND_ACCOUNT_OFFLINE")
 		GLDG_Main:RegisterEvent("BN_FRIEND_ACCOUNT_ONLINE")
 		GLDG_Main:RegisterEvent("BN_FRIEND_INFO_CHANGED")
-		GLDG_Main:RegisterEvent("BN_FRIEND_TOON_OFFLINE")
-		GLDG_Main:RegisterEvent("BN_FRIEND_TOON_ONLINE")
-		GLDG_Main:RegisterEvent("BN_SELF_OFFLINE")
-		GLDG_Main:RegisterEvent("BN_SELF_ONLINE")
-		GLDG_Main:RegisterEvent("BN_SYSTEM_MESSAGE")
-		GLDG_Main:RegisterEvent("BN_TOON_NAME_UPDATED")
 
 	elseif (event == "GUILD_ROSTER_UPDATE") then
 		if IsInGuild() then
@@ -459,13 +453,7 @@ function GLDG_OnEvent(self, event, ...)
 		(event == "BN_DISCONNECTED") or
 		(event == "BN_FRIEND_ACCOUNT_OFFLINE") or
 		(event == "BN_FRIEND_ACCOUNT_ONLINE") or
-		(event == "BN_FRIEND_INFO_CHANGED") or
-		(event == "BN_FRIEND_TOON_OFFLINE") or
-		(event == "BN_FRIEND_TOON_ONLINE") or
-		(event == "BN_SELF_OFFLINE") or
-		(event == "BN_SELF_ONLINE") or
-		(event == "BN_SYSTEM_MESSAGE") or
-		(event == "BN_TOON_NAME_UPDATED") then
+		(event == "BN_FRIEND_INFO_CHANGED") then
 		if (arg1~=nil) or (arg2~=nil) or (arg3~=nil) or (arg4~=nil) or (arg5~=nil) or (arg6~=nil) or (arg7~=nil) or (arg8~=nil) or (arg9~=nil) or (arg10~=nil) or (arg11~=nil) or (arg12~=nil) or (arg13~=nil) then
 			--GLDG_Print("[Battle.Net] event ["..tostring(event).."]: arg1: "..tostring(arg1).." - arg2: "..tostring(arg2).." - arg3: "..tostring(arg3).." - arg4: "..tostring(arg4).." - arg5: "..tostring(arg5).." - arg6: "..tostring(arg6).." - arg7: "..tostring(arg7).." - arg8: "..tostring(arg8).." - arg9: "..tostring(arg9).." - arg10: "..tostring(arg10).." - arg11: "..tostring(arg11).." - arg12: "..tostring(arg12).." - arg13: "..tostring(arg13));
 		end
