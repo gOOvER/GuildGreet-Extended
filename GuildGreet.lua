@@ -56,7 +56,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 701000			-- Number code for this version
+GDLG_VNMBR	= 801000			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -103,7 +103,7 @@ GLDG_IS_OFFLINE_COLOUR		= GLDG_DEFAULT_IS_OFFLINE_COLOUR
 GLDG_GOES_OFFLINE_COLOUR	= GLDG_DEFAULT_GOES_OFFLINE_COLOUR
 GLDG_ALIAS_COLOUR					= GLDG_DEFAULT_ALIAS_COLOUR
 
-GLDG_LEVEL_CAP = 110
+GLDG_LEVEL_CAP = 120
 
 GLDG_CONFIG_STRING = nil
 GLDG_CONFIG_STRING_A = nil
