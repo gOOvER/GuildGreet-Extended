@@ -201,39 +201,6 @@ function GLDG_OnLoad(self)
 	SLASH_GLDG3 = "/greet"
 	SlashCmdList.GLDG = GLDG_SlashHandler
 end
-------------------------------------------------------------
---function GLDG_myAddons()
---	-- Register addon with myAddons
---	if not (myAddOnsFrame_Register) then return end
---	local version = GetAddOnMetadata("GuildGreet", "Version");
---	local date = GetAddOnMetadata("GuildGreet", "X-Date");
---	local author = GetAddOnMetadata("GuildGreet", "Author");
---	local web = GetAddOnMetadata("GuildGreet", "X-Website");
---	if (version == nil) then
---		version = "unknown";
---	end
---	if (date == nil) then
---		date = "unknown";
---	end
---	if (author == nil) then
---		author = "unknown";
---	end
---	if (web == nil) then
---		web = "unknown";
---	end
-
---	myAddOnsFrame_Register({
---		name = GLDG_NAME,
---		version = version,
---		releaseDate = date,
---		author = author,
---		email = "none",
---		website = web,
---		category = MYADDONS_CATEGORY_GUILD,
---		optionsframe = GLDG_GUI,
---	})
---end
-
 
 ------------------------
 -- _03_ Event Handler --
@@ -1182,17 +1149,6 @@ function GLDG_InitRoster()
 
 	if not (GLDG_Realm and GLDG_Player) then return end
 
-
-	-- create character store
---	if (GLDG_Realm) then
---		if (not GLDG_Data["Realm: "..GLDG_Realm]) then
---			GLDG_Data["Realm: "..GLDG_Realm] = {}
---		end
---		-- set character section pointer
---		GLDG_DataChar = GLDG_Data["Realm: "..GLDG_Realm]
---	else
---		GLDG_DataChar = {}
---	end
 	if not GLDG_Data["DataChar"] then GLDG_Data["DataChar"] = {} end
 	GLDG_DataChar = GLDG_Data["DataChar"]
 
@@ -1518,7 +1474,9 @@ function GLDG_RosterImport()
 					end
 				end
 				------------- Alias-Zuordnung ende--------------------------
+
 				-- detect if note contains "alt-<main name>[ <discardable text]"
+
 				if (string.sub(pn, 1, 4)=="alt-") then
 					local main = string.sub(pn, 5)
 					local a,b,c=strfind(main, "(%S+)"); --contiguous string of non-space characters
