@@ -189,7 +189,7 @@
 			<Size><AbsDimension x="1370" y="15"/></Size>
 			<Anchors><Anchor point="TOP"/></Anchors>
 		</TitleRegion>
-		<bgFile="Interface\Tooltips\UI-Tooltip-Background" tile="true" edgeFile="Interface\DialogFrame\UI-DialogBox-Border">
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" tile="true" edgeFile="Interface\DialogFrame\UI-DialogBox-Border">
 		<Layers>
 			<Layer level="ARTWORK">
 				<!-->Title box<-->
@@ -270,7 +270,7 @@
 				<Offset><AbsDimension x="0" y="10"/></Offset>
 			</Anchor>
 		</Anchors>
-		<bgFile="Interface\Tooltips\UI-Tooltip-Background" tile="true" edgeFile="Interface\DialogFrame\UI-DialogBox-Border">
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" tile="true" edgeFile="Interface\DialogFrame\UI-DialogBox-Border">
 		<Frames>
 			<!-->Tabs<-->
 			<Button name="$parentTab1" inherits="GLDG_SubTabTemplate" id="1" hidden="true">
