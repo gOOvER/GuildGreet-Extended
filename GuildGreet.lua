@@ -56,7 +56,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 801000			-- Number code for this version
+GDLG_VNMBR	= 802000			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -198,7 +198,6 @@ function GLDG_OnLoad(self)
 	-- Slash commands for CLI
 	SLASH_GLDG1 = "/guildgreet"
 	SLASH_GLDG2 = "/gg"
-	SLASH_GLDG3 = "/greet"
 	SlashCmdList.GLDG = GLDG_SlashHandler
 end
 
@@ -6962,18 +6961,30 @@ end
 ------------------------------------------------------------
 -- extracted from r,g,b = RAID_CLASS_COLORS[enClass] * 255
 local classColors = {}
-classColors["MAGE"]			= "|cFF69CCF0";
-classColors["PRIEST"]		= "|cFFFFFFFF";
-classColors["WARLOCK"]		= "|cFF9682C9";
-classColors["PALADIN"]		= "|cFFF58CBA";
-classColors["DRUID"]		= "|cFFFF7D0A";
-classColors["SHAMAN"]		= "|cFF00DBBA";
-classColors["DEMONHUNTER"]  = "|cFFA330C9";
-classColors["WARRIOR"]		= "|cFFBE9C6E";
-classColors["ROGUE"]		= "|cFFFFF569";
-classColors["HUNTER"]		= "|cFFAAD473";
-classColors["DEADKNIGHT"]	= "|cFFC41F3B";
-classColors["MONK"]      	= "|cFF00FF96";
+classColors["MAGE"] = C_ClassColor.GetClassColor("MAGE");
+classColors["PRIEST"] = C_ClassColor.GetClassColor("PRIEST");
+classColors["WARLOCK"] = C_ClassColor.GetClassColor("WARLOCK");
+classColors["PALADIN"] = C_ClassColor.GetClassColor("PALADIN");
+classColors["DRUID"] = C_ClassColor.GetClassColor("DRUID");
+classColors["SHAMAN"] = C_ClassColor.GetClassColor("SHAMAN");
+classColors["DEMONHUNTER"] = C_ClassColor.GetClassColor("DEMONHUNTER");
+classColors["WARRIOR"] = C_ClassColor.GetClassColor("WARRIOR");
+classColors["ROGUE"] = C_ClassColor.GetClassColor("ROGUE");
+classColors["HUNTER"] = C_ClassColor.GetClassColor("HUNTER");
+classColors["DEADKNIGHT"] = C_ClassColor.GetClassColor("DEADKNIGHT");
+classColors["MONK"] = C_ClassColor.GetClassColor("MONK");
+--classColors["MAGE"]			= "|cFF69CCF0";
+--classColors["PRIEST"]		= "|cFFFFFFFF";
+--classColors["WARLOCK"]		= "|cFF9682C9";
+--classColors["PALADIN"]		= "|cFFF58CBA";
+--classColors["DRUID"]		= "|cFFFF7D0A";
+--classColors["SHAMAN"]		= "|cFF00DBBA";
+--classColors["DEMONHUNTER"]  = "|cFFA330C9";
+--classColors["WARRIOR"]		= "|cFFBE9C6E";
+---classColors["ROGUE"]		= "|cFFFFF569";
+--classColors["HUNTER"]		= "|cFFAAD473";
+--classColors["DEADKNIGHT"]	= "|cFFC41F3B";
+--classColors["MONK"]      	= "|cFF00FF96";
 
 ------------------------------------------------------------
 function GLDG_ChatFilter(chatFrame, event, ...) -- chatFrame = self
