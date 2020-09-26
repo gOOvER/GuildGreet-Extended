@@ -15,7 +15,7 @@
 	<!-->List frame template: name line<-->
 	<Button name="GLDG_LineTemplate" hidden="true" virtual="true">
 		<Size><AbsDimension x="210" y="15"/></Size>
-		<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" tile="true"/>
+		<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" tile="true" />
 		<Layers>
 			<Layer level="BORDER">
 				<FontString name="$parentText" inherits="GameFontHighlight" justifyH="LEFT"/>
@@ -42,7 +42,11 @@
 		<Anchors><Anchor point="LEFT"/></Anchors>
 		<TitleRegion>
 			<Size><AbsDimension x="210" y="15"/></Size>
-			<Anchors><Anchor point="TOP"/></Anchors>
+			<Anchors><Anchor point="TOP"/>
+				<Offset>
+            				<AbsDimension x="-10" y="0" />
+          			</Offset>
+			</Anchors>
 		</TitleRegion>
 		<Frames>
 			<Frame name="$parentTitle">
@@ -179,17 +183,17 @@
 	<!-->Configuration frame<-->
 	<Frame name="GuildGreetFrame" clampToScreen="true" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
 
-	<Size><AbsDimension x="1420" y="580"/></Size>
+	<Size><AbsDimension x="1320" y="580"/></Size>
 		<Anchors>
 			<Anchor point="CENTER">
-				<Offset><AbsDimension x="0" y="120"/></Offset>
+				<Offset><AbsDimension x="0" y="-10"/></Offset>
 			</Anchor>
 		</Anchors>
 		<TitleRegion>
-			<Size><AbsDimension x="1370" y="15"/></Size>
+			<Size><AbsDimension x="1270" y="15"/></Size>
 			<Anchors><Anchor point="TOP"/></Anchors>
 		</TitleRegion>
-		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" tile="true" edgeFile="Interface\DialogFrame\UI-DialogBox-Border">
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true"/>
 		<Layers>
 			<Layer level="ARTWORK">
 				<!-->Title box<-->
@@ -264,13 +268,13 @@
 
 	<!-->Configuration frame<-->
  	<Frame name="$parentSettings" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" clampToScreen="true">
-		<Size><AbsDimension x="980" y="390"/></Size>
+		<Size><AbsDimension x="1080" y="390"/></Size>
 		<Anchors>
 			<Anchor point="CENTER">
-				<Offset><AbsDimension x="0" y="10"/></Offset>
+				<Offset><AbsDimension x="10" y="10"/></Offset>
 			</Anchor>
 		</Anchors>
-		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" tile="true" edgeFile="Interface\DialogFrame\UI-DialogBox-Border">
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true"/>
 		<Frames>
 			<!-->Tabs<-->
 			<Button name="$parentTab1" inherits="GLDG_SubTabTemplate" id="1" hidden="true">
@@ -1562,7 +1566,7 @@
 	<!-->Configuration greetings tab template: collection line<-->
 	<Button name="GLDG_CollectLineTemplate" virtual= "true">
 		<Size><AbsDimension x="100" y="15"/></Size>
-		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
 			<Layer level="BORDER">
@@ -1598,7 +1602,7 @@
 	<!-->Configuration greetings tab template: message line<-->
 	<Button name="GLDG_MessageLineTemplate" virtual= "true" enableMouse="true">
 		<Size><AbsDimension x="700" y="15"/></Size>
-		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
 			<Layer level="BORDER">
@@ -1614,11 +1618,11 @@
 
 	<!-->Configuration greetings tab<-->
  	<Frame name="$parentGreetings" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
-		<Size x="1420" y="528"/>
+		<Size x="1220" y="528"/>
 		<Anchors>
 			<Anchor point="TOP">
 				<Offset>
-					<AbsDimension x="0" y="-22" />
+					<AbsDimension x="10" y="-22" />
 				</Offset>
 			</Anchor>
 		</Anchors>
@@ -2138,9 +2142,9 @@
 <!--> ============================================================================================================== <-->
 	<!-->Configuration players tab template: player line<-->
 	<Button name="GLDG_PlayerHeaderTemplate" virtual= "true">
-		<Size><AbsDimension x="1130" y="15"/></Size>
+		<Size><AbsDimension x="1030" y="15"/></Size>
 		<!--
-		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		-->
 		<Layers>
@@ -2254,7 +2258,7 @@
 
 	<Button name="GLDG_PlayerLineTemplate" virtual= "true">
 		<Size><AbsDimension x="1130" y="15"/></Size>
-		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
 			<Layer level="BORDER">
@@ -2334,7 +2338,7 @@
 
 	<!-->Configuration players tab<-->
  	<Frame name="$parentPlayers" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true"  movable="true">
-		<Size x="1420" y="528"/>
+		<Size x="1220" y="528"/>
 		<Anchors>
 			<Anchor point="TOP">
 				<Offset>
@@ -3694,7 +3698,7 @@
 	<!-->Configuration players tab subframe template: main/alt line<-->
 	<Button name="GLDG_MainLineTemplate" virtual= "true">
 		<Size><AbsDimension x="210" y="15"/></Size>
-		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
 			<Layer level="BORDER">
@@ -3778,7 +3782,7 @@
 <!--> ============================================================================================================== <-->
 	<!-->Configuration cleanup tab<-->
  	<Frame name="$parentCleanup" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
-		<Size x="1420" y="540"/>
+		<Size x="1030" y="540"/>
 		<Anchors>
 			<Anchor point="TOP">
 				<Offset>
@@ -4011,7 +4015,7 @@
 	<!-->Configuration players tab subframe template: main/alt line<-->
 	<Button name="GLDG_CleanupTemplate" virtual= "true">
 		<Size><AbsDimension x="110" y="15"/></Size>
-		<Backdrop bgFile="TileSet\Generic\Charcoal" tile="true"/>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
 			<Layer level="BORDER">
@@ -4136,7 +4140,7 @@
 
 	<!-->Configuration colour tab<-->
  	<Frame name="$parentColour" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
-		<Size x="1420" y="528"/>
+		<Size x="1030" y="528"/>
 		<Anchors>
 			<Anchor point="TOP">
 				<Offset>
