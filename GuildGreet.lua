@@ -39,7 +39,7 @@ _34_ interface options
 _35_ startup popup handling
 
 ]]----------------------------------------------------------
---local GLDG = LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
+local GLDG = LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 
 -- Binding names
@@ -56,7 +56,7 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 802000			-- Number code for this version
+GDLG_VNMBR	= 900010			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
@@ -5672,7 +5672,9 @@ end
 -- Create our list frame
 ------------------------------------------------------------
 function GLDG_CreatePasteListFrame()
-GLDG_PasteList.List = CreateFrame("Frame", nil, UIParent)
+-- H.Sch. - ReglohPri - changes for Patch 9.0.1 Shadowlands
+--GLDG_PasteList.List = CreateFrame("Frame", nil, UIParent)
+GLDG_PasteList.List = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
 GLDG_PasteList.List:SetMovable(true)
 GLDG_PasteList.List:SetResizable(true)
 GLDG_PasteList.List:EnableMouse(true)
@@ -5726,12 +5728,24 @@ GLDG_PasteList.List:SetUserPlaced(true)
 GLDG_PasteList.List:SetFrameStrata("DIALOG")
 GLDG_PasteList.List:SetHeight(GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].Height)
 GLDG_PasteList.List:SetWidth(GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].Width)
-GLDG_PasteList.List:SetBackdrop({
+
+-- H.Sch. - ReglohPri - changes for Patch 9.0.1 Shadowlands
+--[[GLDG_PasteList.List:SetBackdrop({
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
 	tile = true, tileSize = 32, edgeSize = 32,
 	insets = { left = 9, right = 9, top = 9, bottom = 9 }
-})
+})--]]
+
+GLDG_PasteList.List.backdropInfo = {
+	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+	tile = true, tileSize = 32, edgeSize = 32,
+	insets = { left = 9, right = 9, top = 9, bottom = 9 }
+}
+GLDG_PasteList.List:ApplyBackdrop()
+-- H.Sch. End for Patch 9.0.1
+
 GLDG_PasteList.List:SetBackdropColor(0,0,0, 0.8)
 GLDG_PasteList.List:SetScript("OnShow", GLDG_PasteList.Show)
 
