@@ -103,7 +103,7 @@ GLDG_IS_OFFLINE_COLOUR		= GLDG_DEFAULT_IS_OFFLINE_COLOUR
 GLDG_GOES_OFFLINE_COLOUR	= GLDG_DEFAULT_GOES_OFFLINE_COLOUR
 GLDG_ALIAS_COLOUR					= GLDG_DEFAULT_ALIAS_COLOUR
 
-GLDG_LEVEL_CAP = 120
+GLDG_LEVEL_CAP = 60
 
 GLDG_CONFIG_STRING = nil
 GLDG_CONFIG_STRING_A = nil
@@ -1225,7 +1225,8 @@ function GLDG_InitRoster()
 	if (IsInGuild()) then
 		local offline = GetGuildRosterShowOffline()
 		SetGuildRosterShowOffline(true)
-		GuildRoster()  -- ?
+		-- H.Sch. - ReglohPri - this is deprecated -> GuildRoster() - changed to C_GuildInfo.GuildRoster()
+		C_GuildInfo.GuildRoster();  -- ?
 		if not offline then SetGuildRosterShowOffline(false) end
 
 		if (GLDG_InitialGuildUpdate == nil) then
@@ -1242,7 +1243,8 @@ function GLDG_InitRoster()
 	end
 
 	-- Launch request for friends info
-	ShowFriends()
+	-- H.Sch. - ReglohPri - ShowFriends() is deprecated changed to C_FriendList.ShowFriends()
+	C_FriendList.ShowFriends();
 	if not GLDG_InitialFriendsUpdate then
 		if GLDG_Data.UseFriends==true and (GetNumFriends() > 0) and bit.band(GLDG_InitCheck, 2)~=2 then
 			GLDG_InitCheck = bit.bor(GLDG_InitCheck, 2)	-- friends started
@@ -1311,7 +1313,8 @@ function GLDG_OnUpdate(self, elapsed)
 				-- we've got all the base information -> renew full roster
 				local setting = GetGuildRosterShowOffline()
 				SetGuildRosterShowOffline(true)
-				GuildRoster()
+				-- H.Sch. - ReglohPri - this is deprecated -> GuildRoster() - changed to C_GuildInfo.GuildRoster()
+				C_GuildInfo.GuildRoster();
 				if not setting then SetGuildRosterShowOffline(false) end
 
 				-- trigger next update
@@ -1550,7 +1553,8 @@ function GLDG_RosterImport()
 				GLDG_DataChar[pl].pNote = nil
 			end
 
-			if CanViewOfficerNote() then
+			-- H.Sch. - ReglohPri - CanViewOfficerNote() is deprecated, changed to C_GuildInfo.CanViewOfficerNote()
+			if C_GuildInfo.CanViewOfficerNote() then
 				if on and on ~= "" then
 					if GLDG_DataChar[pl].oNote then
 						if on ~= GLDG_DataChar[pl].oNote then
@@ -1926,7 +1930,8 @@ function GLDG_getOnlineList()
 	local onList = {};
 
 	-- get guild members that are online
-	GuildRoster();
+	-- H.Sch. - ReglohPri - this is deprecated -> GuildRoster() - changed to C_GuildInfo.GuildRoster()
+	C_GuildInfo.GuildRoster();
 	local numTotal = GetNumGuildMembers(true);
 	local i
 	for i = 0, numTotal do
@@ -5064,7 +5069,8 @@ function GLDG_ShowPlayerButtons()
 	-- Officernote button
 	button = _G[frame.."OfficerNote"]
 	button:Show()
-	if (p.guild and p.guild == GLDG_unique_GuildName and CanEditOfficerNote()) then
+	-- H.Sch. - ReglohPri- CanEditOfficerNote() is deprecated, changed to C_GuildInfo.CanEditOfficerNote()
+	if (p.guild and p.guild == GLDG_unique_GuildName and C_GuildInfo.CanEditOfficerNote()) then
 		button:Enable()
 	else
 		button:Disable()
@@ -5367,7 +5373,8 @@ end
 ------------------------------------------------------------
 function GLDG_ClickWho()
 	if GLDG_SelPlrName then
-		SendWho('n-"'..GLDG_SelPlrName..'"')
+		-- H.Sch. - ReglohPri - SendWho is deprecated, changed to C_FriendList.SendWho
+		C_FriendList.SendWho('n-"'..GLDG_SelPlrName..'"')
 	end
 end
 
@@ -5383,11 +5390,13 @@ end
 
 ------------------------------------------------------------
 function GLDG_ParseWho()
-	local numWhos, totalCount = GetNumWhoResults()
+	-- H.Sch. - ReglohPri - GetNumWhoResults() is deprecated, changed to C_FriendList.GetNumWhoResults()
+	local numWhos, totalCount = C_FriendList.GetNumWhoResults()
 	local charname, guildname, level, race, class, zone, classFileName
 
 	for i=1,totalCount do
-		charname, guildname, level, race, class, zone, classFileName = GetWhoInfo(i)
+		-- H.Sch. - ReglohPri - GetWhoInfo is deprecated, changed to C_FriendList.GetWhoInfo
+		charname, guildname, level, race, class, zone, classFileName = C_FriendList.GetWhoInfo(i)
 		if (GLDG_DataChar[charname]) then
 			GLDG_TreatWhoInfo(charname, guildname, level, class)
 		end
@@ -5738,8 +5747,8 @@ GLDG_PasteList.List:SetWidth(GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player]
 })--]]
 
 GLDG_PasteList.List.backdropInfo = {
-	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 	tile = true, tileSize = 32, edgeSize = 32,
 	insets = { left = 9, right = 9, top = 9, bottom = 9 }
 }
