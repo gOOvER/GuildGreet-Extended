@@ -13,9 +13,14 @@
 
 <!--> ============================================================================================================== <-->
 	<!-->List frame template: name line<-->
-	<Button name="GLDG_LineTemplate" hidden="true" virtual="true">
+	<Button name="GLDG_LineTemplate" hidden="true" virtual="true" inherits="BackdropTemplate">
+	<!-- H.Sch. - ReglohPri - this is the changes for Backdrop. -->
+	<KeyValues>
+		<KeyValue key="backdropInfo" value="BACKDROP_TOAST_12_12" type="global"/>
+	</KeyValues>	
 		<Size><AbsDimension x="210" y="15"/></Size>
-		<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" tile="true" />
+		<!-- H.Sch. - ReglohPri - Backdrop is deprecated since Patch 9.0.1 - use KeyValues wiht key backdropInfo.
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" tile="true" /> -->
 		<Layers>
 			<Layer level="BORDER">
 				<FontString name="$parentText" inherits="GameFontHighlight" justifyH="LEFT"/>
@@ -42,11 +47,7 @@
 		<Anchors><Anchor point="LEFT"/></Anchors>
 		<TitleRegion>
 			<Size><AbsDimension x="210" y="15"/></Size>
-			<Anchors><Anchor point="TOP"/>
-				<Offset>
-            				<AbsDimension x="-10" y="0" />
-          			</Offset>
-			</Anchors>
+			<Anchors><Anchor point="TOP"/></Anchors>
 		</TitleRegion>
 		<Frames>
 			<Frame name="$parentTitle">
@@ -181,19 +182,29 @@
 
 
 	<!-->Configuration frame<-->
-	<Frame name="GuildGreetFrame" clampToScreen="true" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
+	<Frame name="GuildGreetFrame" clampToScreen="true" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true" inherits="BackdropTemplate">
+	<!-- H.Sch. - ReglohPri - this is the changes for Backdrop. -->
+	<KeyValues>
+            <KeyValue key="backdropInfo" value="BACKDROP_DIALOG_32_32" type="global"/>
+        </KeyValues>
 
-	<Size><AbsDimension x="1320" y="580"/></Size>
+	<Size><AbsDimension x="1420" y="580"/></Size>
 		<Anchors>
 			<Anchor point="CENTER">
-				<Offset><AbsDimension x="0" y="-10"/></Offset>
+				<Offset><AbsDimension x="0" y="120"/></Offset>
 			</Anchor>
 		</Anchors>
 		<TitleRegion>
-			<Size><AbsDimension x="1270" y="15"/></Size>
+			<Size><AbsDimension x="1370" y="15"/></Size>
 			<Anchors><Anchor point="TOP"/></Anchors>
 		</TitleRegion>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true"/>
+		<!-- H.Sch. - ReglohPri - makes the frame moveable. -->
+		<Scripts>
+			<OnMouseDown method="StartMoving"/>
+			<OnMouseUp method="StopMovingOrSizing"/>
+		</Scripts>
+		<!-- H.Sch. - ReglohPri - Backdrop is deprecated since Patch 9.0.1 - use KeyValues wiht key backdropInfo.
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true"/>-->
 		<Layers>
 			<Layer level="ARTWORK">
 				<!-->Title box<-->
@@ -267,14 +278,19 @@
 	</Button>
 
 	<!-->Configuration frame<-->
- 	<Frame name="$parentSettings" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" clampToScreen="true">
-		<Size><AbsDimension x="1080" y="390"/></Size>
+ 	<Frame name="$parentSettings" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" clampToScreen="true" inherits="BackdropTemplate">
+		<!-- H.Sch. - ReglohPri - this is the changes for Backdrop. -->
+		<KeyValues>
+			<KeyValue key="backdropInfo" value="BACKDROP_TOAST_12_12" type="global"/>
+		</KeyValues>		
+		<Size><AbsDimension x="980" y="390"/></Size>
 		<Anchors>
 			<Anchor point="CENTER">
-				<Offset><AbsDimension x="10" y="10"/></Offset>
+				<Offset><AbsDimension x="0" y="10"/></Offset>
 			</Anchor>
 		</Anchors>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true"/>
+		<!-- H.Sch. - ReglohPri - Backdrop is deprecated since Patch 9.0.1 - use KeyValues wiht key backdropInfo.
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true"/> -->
 		<Frames>
 			<!-->Tabs<-->
 			<Button name="$parentTab1" inherits="GLDG_SubTabTemplate" id="1" hidden="true">
@@ -1564,9 +1580,14 @@
 
 <!--> ============================================================================================================== <-->
 	<!-->Configuration greetings tab template: collection line<-->
-	<Button name="GLDG_CollectLineTemplate" virtual= "true">
+	<Button name="GLDG_CollectLineTemplate" virtual= "true" inherits="BackdropTemplate">
+	<!-- H.Sch. - ReglohPri - this is the changes for Backdrop. -->
+	<KeyValues>
+		<KeyValue key="backdropInfo" value="BACKDROP_TOAST_12_12" type="global"/>
+	</KeyValues>
 		<Size><AbsDimension x="100" y="15"/></Size>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
+		<!-- H.Sch. - ReglohPri - Backdrop is deprecated since Patch 9.0.1 - use KeyValues wiht key backdropInfo.
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" tile="true"/> -->
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
 			<Layer level="BORDER">
@@ -1600,9 +1621,14 @@
 	</Button>
 
 	<!-->Configuration greetings tab template: message line<-->
-	<Button name="GLDG_MessageLineTemplate" virtual= "true" enableMouse="true">
+	<Button name="GLDG_MessageLineTemplate" virtual= "true" enableMouse="true" inherits="BackdropTemplate">
+		<!-- H.Sch. - ReglohPri - this is the changes for Backdrop. -->
+		<KeyValues>
+			<KeyValue key="backdropInfo" value="BACKDROP_TOAST_12_12" type="global"/>
+		</KeyValues>
 		<Size><AbsDimension x="700" y="15"/></Size>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
+		<!-- H.Sch. - ReglohPri - Backdrop is deprecated since Patch 9.0.1 - use KeyValues wiht key backdropInfo.		
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" tile="true"/> -->
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
 			<Layer level="BORDER">
@@ -1618,11 +1644,11 @@
 
 	<!-->Configuration greetings tab<-->
  	<Frame name="$parentGreetings" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
-		<Size x="1220" y="528"/>
+		<Size x="1420" y="528"/>
 		<Anchors>
 			<Anchor point="TOP">
 				<Offset>
-					<AbsDimension x="10" y="-22" />
+					<AbsDimension x="0" y="-22" />
 				</Offset>
 			</Anchor>
 		</Anchors>
@@ -2142,9 +2168,9 @@
 <!--> ============================================================================================================== <-->
 	<!-->Configuration players tab template: player line<-->
 	<Button name="GLDG_PlayerHeaderTemplate" virtual= "true">
-		<Size><AbsDimension x="1030" y="15"/></Size>
+		<Size><AbsDimension x="1130" y="15"/></Size>
 		<!--
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" tile="true"/>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		-->
 		<Layers>
@@ -2256,9 +2282,14 @@
 		</Scripts>
 	</Button>
 
-	<Button name="GLDG_PlayerLineTemplate" virtual= "true">
+	<Button name="GLDG_PlayerLineTemplate" virtual= "true" inherits="BackdropTemplate">
+		<!-- H.Sch. - ReglohPri - this is the changes for Backdrop. -->
+		<KeyValues>
+			<KeyValue key="backdropInfo" value="BACKDROP_DUMMY" type="global"/>
+		</KeyValues>
 		<Size><AbsDimension x="1130" y="15"/></Size>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
+		<!-- H.Sch. - ReglohPri - Backdrop is deprecated since Patch 9.0.1 - use KeyValues wiht key backdropInfo.
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" tile="true"/> -->
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
 			<Layer level="BORDER">
@@ -2338,7 +2369,7 @@
 
 	<!-->Configuration players tab<-->
  	<Frame name="$parentPlayers" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true"  movable="true">
-		<Size x="1220" y="528"/>
+		<Size x="1420" y="528"/>
 		<Anchors>
 			<Anchor point="TOP">
 				<Offset>
@@ -3696,9 +3727,14 @@
 
 
 	<!-->Configuration players tab subframe template: main/alt line<-->
-	<Button name="GLDG_MainLineTemplate" virtual= "true">
+	<Button name="GLDG_MainLineTemplate" virtual= "true" inherits="BackdropTemplate">
+		<!-- H.Sch. - ReglohPri - this is the changes for Backdrop. -->
+		<KeyValues>
+			<KeyValue key="backdropInfo" value="BACKDROP_TOAST_12_12" type="global"/>
+		</KeyValues>
 		<Size><AbsDimension x="210" y="15"/></Size>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
+		<!-- H.Sch. - ReglohPri - Backdrop is deprecated since Patch 9.0.1 - use KeyValues wiht key backdropInfo.
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" tile="true"/> -->
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
 			<Layer level="BORDER">
@@ -3782,7 +3818,7 @@
 <!--> ============================================================================================================== <-->
 	<!-->Configuration cleanup tab<-->
  	<Frame name="$parentCleanup" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
-		<Size x="1030" y="540"/>
+		<Size x="1420" y="540"/>
 		<Anchors>
 			<Anchor point="TOP">
 				<Offset>
@@ -4013,9 +4049,14 @@
  	</Frame>
 
 	<!-->Configuration players tab subframe template: main/alt line<-->
-	<Button name="GLDG_CleanupTemplate" virtual= "true">
+	<Button name="GLDG_CleanupTemplate" virtual= "true" inherits="BackdropTemplate">
+		<!-- H.Sch. - ReglohPri - this is the changes for Backdrop. -->
+		<KeyValues>
+			<KeyValue key="backdropInfo" value="BACKDROP_TOAST_12_12" type="global"/>
+		</KeyValues>
 		<Size><AbsDimension x="110" y="15"/></Size>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
+		<!-- H.Sch. - ReglohPri - Backdrop is deprecated since Patch 9.0.1 - use KeyValues wiht key backdropInfo.
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" tile="true"/> -->
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 		<Layers>
 			<Layer level="BORDER">
@@ -4140,7 +4181,7 @@
 
 	<!-->Configuration colour tab<-->
  	<Frame name="$parentColour" setAllPoints="true" parent="GuildGreetFrame" enableMouse="true" hidden="true">
-		<Size x="1030" y="528"/>
+		<Size x="1420" y="528"/>
 		<Anchors>
 			<Anchor point="TOP">
 				<Offset>
@@ -4829,7 +4870,11 @@
 		</Scripts>
 	</EditBox>
 
-	<ColorSelect name="GLDG_ColorPickerFrame" toplevel="true" movable="true" enableMouse="true" enableKeyboard="true" hidden="true">
+	<ColorSelect name="GLDG_ColorPickerFrame" toplevel="true" movable="true" enableMouse="true" enableKeyboard="true" hidden="true" inherits="BackdropTemplate">
+		<!-- H.Sch. - ReglohPri - this is the changes for Backdrop. -->
+		<KeyValues>
+			<KeyValue key="backdropInfo" value="BACKDROP_DIALOG_32_32" type="global"/>
+		</KeyValues>
 		<Size>
 			<AbsDimension x="365" y="275"/>
 		</Size>
@@ -4850,7 +4895,13 @@
 				</Anchor>
 			</Anchors>
 		</TitleRegion>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+		<!-- H.Sch. - ReglohPri - this makes the frame movable -->
+		<Scripts>
+			<OnMouseDown method="StartMoving"/>
+			<OnMouseUp method="StopMovingOrSizing"/>
+		</Scripts>
+		<!-- H.Sch. - ReglohPri - Backdrop is deprecated since Patch 9.0.1 - use KeyValues wiht key backdropInfo.
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
 			<BackgroundInsets>
 				<AbsInset left="11" right="12" top="12" bottom="11"/>
 			</BackgroundInsets>
@@ -4860,7 +4911,7 @@
 			<EdgeSize>
 				<AbsValue val="32"/>
 			</EdgeSize>
-		</Backdrop>
+		</Backdrop> -->
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture name="GLDG_ColorSwatch">
@@ -4941,7 +4992,7 @@
 						if ( GLDG_ColorPickerFrame.cancelFunc ) then
 							GLDG_ColorPickerFrame.cancelFunc(GLDG_ColorPickerFrame.previousValues);
 						end
-						PlaySound("igMainMenuOptionCheckBoxOn");
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 					</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
@@ -4965,7 +5016,7 @@
 						if ( GLDG_ColorPickerFrame.opacityFunc ) then
 							GLDG_ColorPickerFrame.opacityFunc();
 						end
-						PlaySound("igMainMenuOptionCheckBoxOn");
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 					</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
@@ -4992,7 +5043,11 @@
 					</Anchor>
 				</Anchors>
 			</EditBox>
-			<Slider name="GLDG_OpacitySliderFrame" orientation="VERTICAL" minValue="0" maxValue="1" valueStep="0.01" defaultValue="1">
+			<Slider name="GLDG_OpacitySliderFrame" orientation="VERTICAL" minValue="0" maxValue="1" valueStep="0.01" defaultValue="1" inherits="BackdropTemplate">
+				<!-- H.Sch. - ReglohPri - this is the changes for Backdrop. -->
+				<KeyValues>
+					<KeyValue key="backdropInfo" value="BACKDROP_SLIDER_8_8" type="global"/>
+				</KeyValues>
 				<Size>
 					<AbsDimension x="16" y="128"/>
 				</Size>
@@ -5003,7 +5058,8 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
-				<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+				<!-- H.Sch. - ReglohPri - Backdrop is deprecated since Patch 9.0.1 - use KeyValues wiht key backdropInfo.
+				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
 					<EdgeSize>
 						<AbsValue val="8"/>
 					</EdgeSize>
@@ -5013,7 +5069,7 @@
 					<BackgroundInsets>
 						<AbsInset left="3" right="3" top="6" bottom="6"/>
 					</BackgroundInsets>
-				</Backdrop>
+				</Backdrop> -->
 				<Layers>
 					<Layer level="ARTWORK">
 						<FontString name="$parentText" inherits="GameFontNormalSmall">
