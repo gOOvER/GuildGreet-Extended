@@ -1246,7 +1246,8 @@ function GLDG_InitRoster()
 	-- H.Sch. - ReglohPri - ShowFriends() is deprecated changed to C_FriendList.ShowFriends()
 	C_FriendList.ShowFriends();
 	if not GLDG_InitialFriendsUpdate then
-		if GLDG_Data.UseFriends==true and (GetNumFriends() > 0) and bit.band(GLDG_InitCheck, 2)~=2 then
+		-- H.Sch. - ReglohPri - GetNumFriends() is deprecated changed to C_FriendList.GetNumFriends()
+		if GLDG_Data.UseFriends==true and (C_FriendList.GetNumFriends() > 0) and bit.band(GLDG_InitCheck, 2)~=2 then
 			GLDG_InitCheck = bit.bor(GLDG_InitCheck, 2)	-- friends started
 			--GLDG_Print("InitCheck is ["..tostring(GLDG_InitCheck).."] - friends started")
 		end
@@ -1343,7 +1344,8 @@ function GLDG_OnUpdate(self, elapsed)
 					GLDG_UpdateRequestFriends = GetTime() + 1
 				else
 					-- we've got all the base information -> check friends
-					ShowFriends()
+					-- H.Sch. - ReglohPri - ShowFriends() is deprecated changed to C_FriendList.ShowFriends()
+					C_FriendList.ShowFriends()
 
 					-- this will cause GLDG_FriendsUpdate() to be called
 					-- which will retrigger the update or not depending on
@@ -1944,11 +1946,16 @@ function GLDG_getOnlineList()
 	end
 
 	-- get friends that are online
-	numTotal = GetNumFriends()
+	-- H.Sch. - ReglohPri - GetNumFriends() is deprecated changed to C_FriendList.GetNumFriends()
+	numTotal = C_FriendList.GetNumFriends()
+	local myFriends = nil
+
+	-- H.Sch. - ReglohPri - GetFriendInfo(index) is deprecated changed to C_FriendList.GetFriendInfoByIndex(index)
 	for i = 1, numTotal do
-		local name, level, class, loc, connected, status = GetFriendInfo(i);
-		if ((name ~= nil) and connected) then
-			onList[name] = true;
+		--local name, level, class, loc, connected, status = GetFriendInfo(i);
+		myFriends = C_FriendList.GetFriendInfoByIndex(i)
+		if ((myFriends.name ~= nil) and myFriends.connected) then
+			onList[myFriends.name] = true;
 		end
 	end
 
@@ -5854,9 +5861,23 @@ function GLDG_FriendsUpdate()
 	-- parse friends list
 	local cnt = 0
 	local complete = false
-	local numTotal = GetNumFriends()
+	-- H.Sch. - ReglohPri - GetNumFriends() is deprecated changed to C_FriendList.GetNumFriends
+	local numTotal = C_FriendList.GetNumFriends()
+	local myFriends = nil
+	local name, level, class, loc, connected, status, note
+
+	-- H.Sch. - ReglohPri - GetFriendInfo(index) is deprecated changed to C_FriendList.GetFriendInfoByIndex(index)
 	for i = 1, numTotal do
-		local name, level, class, loc, connected, status, note = GetFriendInfo(i);
+		--local name, level, class, loc, connected, status, note = GetFriendInfo(i);
+		myFriends = C_FriendList.GetFriendInfoByIndex(i)
+		name = myFriends.name
+		level = myFriends.level
+		class = myFriends.className
+		loc = myFriends.area
+		connected = myFriends.connected
+		status = myFriends.afk
+		note = myFriends.notes
+
 		if (name) then
 			local _, uRealm = string.split("-", name)
 			if not uRealm then
@@ -7976,7 +7997,8 @@ function GLDG_CleanupExecute(entry)
 
 	-- retrigger channel and friends update (guild not needed, is done periodically)
 	GLDG_CheckChannel()
-	ShowFriends()
+	-- H.Sch. - ReglohPri - ShowFriends() is deprecated changed to C_FriendList.ShowFriends()
+	C_FriendList.ShowFriends()
 
 	GLDG_CleanupList = nil
 	GLDG_CleanupMode = nil
