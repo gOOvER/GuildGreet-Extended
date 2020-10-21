@@ -17,7 +17,7 @@
 	<!-- H.Sch. - ReglohPri - this is the changes for Backdrop. -->
 	<KeyValues>
 		<KeyValue key="backdropInfo" value="BACKDROP_TOAST_12_12" type="global"/>
-	</KeyValues>	
+	</KeyValues>
 		<Size><AbsDimension x="210" y="15"/></Size>
 		<!-- H.Sch. - ReglohPri - Backdrop is deprecated since Patch 9.0.1 - use KeyValues wiht key backdropInfo.
 		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" tile="true" /> -->

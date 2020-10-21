@@ -1,7 +1,7 @@
-## Interface: 80200
+## Interface: 90001
 ## Title: GuildGreet-Extended
-## Version: @project-version@
-## Author: @project-author@
+## Version: 9.0.1-beta
+## Author: gOOvER, Updated by ReglohPri
 ## X-Category: Guild
 ## X-Website: http://wow.curse-gaming.com/downloads/details/7529/
 ## URL: http://wow.curse-gaming.com/downloads/details/7529/
@@ -15,3 +15,4 @@ embeds.xml
 lang\locale.xml
 Locale\locale.xml
 GuildGreet.xml
+

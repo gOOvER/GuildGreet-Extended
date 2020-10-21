@@ -1,4 +1,4 @@
-﻿-- English localization file for enUS and enGB.
+-- English localization file for enUS and enGB.
 local debug = false
 --[===[@debug@
 debug = true

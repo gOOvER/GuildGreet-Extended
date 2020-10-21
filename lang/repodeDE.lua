@@ -1,4 +1,4 @@
-﻿local L = LibStub("AceLocale-3.0"):NewLocale("GuildGreet", "deDE")
+local L = LibStub("AceLocale-3.0"):NewLocale("GuildGreet", "deDE")
 if not L then return end
 
 
