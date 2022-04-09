@@ -1,4 +1,4 @@
-## Interface: 90001
+## Interface: 90200
 ## Title: GuildGreet-Extended
 ## Version: 9.0.1-beta
 ## Author: gOOvER, Updated by ReglohPri
