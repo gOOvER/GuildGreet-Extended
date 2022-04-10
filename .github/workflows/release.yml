@@ -19,10 +19,10 @@ jobs:
         with:
           fetch-depth: 100
 
-      - name: Run luacheck
-        uses: BigWigsMods/actions/luacheck@master
-        with:
-          args: -q
+      #- name: Run luacheck
+      #  uses: BigWigsMods/actions/luacheck@master
+      #  with:
+      #    args: -q
 
       - name: Package Retail
         uses: BigWigsMods/packager@master
