@@ -46,4 +46,4 @@ jobs:
       - name: Package and release for Burning Crusade Classic
         uses: BigWigsMods/packager@v2
         with:
-          args: -g bcc -w 0
+          args: -g retail -w 21709 -p 7529 -y 0 -u 
