@@ -1,6 +1,5 @@
 package-as: GuildGreet
-enable-nolib-creation: no
-enable-toc-creation: yes
+enable-nolib-creation: yes
 
 externals:
     libs/CallbackHandler-1.0: 

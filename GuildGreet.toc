@@ -1,0 +1,18 @@
+## Interface: 90200
+## Title: GuildGreet-Extended
+## Version: 9.2.0-alpha
+## Author: gOOvER, Updated by ReglohPri
+## X-Category: Guild
+## X-Website: http://wow.curse-gaming.com/downloads/details/7529/
+## URL: http://wow.curse-gaming.com/downloads/details/7529/
+## Description: Keeps a log of guildies waiting for your greeting
+## OptionalDeps: Ace3, LibSharedMedia-3.0, LibDBIcon-1.0, LibChatAnims, LibStub
+## Notes: Keeps a log of guildies waiting for your greeting
+## SavedVariables: GLDG_Data
+
+embeds.xml
+
+lang\locale.xml
+Locale\locale.xml
+GuildGreet.xml
+
