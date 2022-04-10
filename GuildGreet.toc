@@ -4,6 +4,7 @@
 ## Author: @project-author@
 ## X-Curse-Project-ID: 7529
 ## X-WoWI-ID: 21709
+## X-Wago-ID: WL6JA9Nv
 ## X-Category: Guild
 ## Description: Keeps a log of guildies waiting for your greeting
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, LibDBIcon-1.0, LibChatAnims, LibStub
@@ -15,4 +16,3 @@ embeds.xml
 lang\locale.xml
 Locale\locale.xml
 GuildGreet.xml
-
