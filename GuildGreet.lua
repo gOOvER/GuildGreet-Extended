@@ -1,44 +1,8 @@
 --[[--------------------------------------------------------
 -- GuildGreet, a World of Warcraft social guild assistant --
 ------------------------------------------------------------
-CODE INDEX (search on index for fast access):
-_01_ Addon Variables
-_02_ Addon Startup
-_03_ Event Handler
-_04_ Addon Initialization
-_05_ Guild Roster Import
-_06_ Monitor System Messages
-_07_ Display Greetlist
-_08_ Display Greeting Tooltip
-_09_ Greet Players
-_10_ Slash Handler
-_11_ Tab Changer
-_12_ Settings Tab Update
-_13_ Greetings Tab Update
-_14_ Players Tab Update
-_15_ General Helper Functions
-_16_ List frame
-_17_ player menu
-_18_ Friends list parsing
-_19_ Achievments
-_20_ Channel handling
-_21_ Testing
-_22_ Showing stored information
-_23_ Colour picker handling
-_24_ Colour handling
-_25_ Display Help Tooltip
-_26_ Chat name extension
-_27_ Debug dumping
-_28_ Interface reloading
-_29_ urbin addon listing
-_30_ big brother
-_31_ conversion
-_32_ guild alert check
-_33_ cleanup
-_34_ interface options
-_35_ startup popup handling
-
 ]]----------------------------------------------------------
+
 local GLDG = LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 
@@ -110,6 +74,7 @@ GLDG_CONFIG_STRING_A = nil
 GLDG_CONFIG_STRING_B = nil
 GLDG_CONFIG_STRING_C = nil
 GLDG_CONFIG_STRING_D = nil
+
 --------------------------
 -- _01_ Addon Variables --
 --------------------------
@@ -242,7 +207,6 @@ function GLDG_OnEvent(self, event, ...)
 		GLDG_Main:RegisterEvent("CHAT_MSG_CHANNEL_JOIN")
 		GLDG_Main:RegisterEvent("CHAT_MSG_CHANNEL_LEAVE")
 		GLDG_Main:RegisterEvent("CHAT_MSG_CHANNEL_NOTICE")
-		--GLDG_Main:RegisterEvent("CHAT_MSG_CHANNEL_LIST")
 		GLDG_Main:RegisterEvent("CHAT_MSG_ADDON")
 		GLDG_Main:RegisterEvent("GROUP_ROSTER_UPDATE")
 		GLDG_Main:RegisterEvent("CHAT_MSG_GUILD_ACHIEVEMENT")
@@ -521,9 +485,6 @@ function GLDG_Init()
 	end
 
 
---	if GLDG_Data.GuildSettings.UseGuildDefault==nil and GLDG_Data[GLDG_unique_GuildName] then
---		GLDG_Data.GuildSettings = GLDG_Data[GLDG_unique_GuildName]
---	end
 	if not GLDG_Data.GuildSettings.RelogTime then GLDG_Data.GuildSettings.RelogTime = 2 end
 	if not GLDG_Data.GuildSettings.MinLevelUp then GLDG_Data.GuildSettings.MinLevelUp = 0 end
 	GLDG_Data.UpdateTime = 0
@@ -844,15 +805,15 @@ function GLDG_InitFrame(frameName)
 		-- Header and option texts
 		_G[name.."Header"]:SetText(L["Configure settings for characters: ignore them, set main/alt and enter alias"])
 		_G[name.."IgnoreText"]:SetText(L["Include ignored players in the list"])
-		_G[name.."AltText"]:SetText(GLDG_TXT.showalt)
-		_G[name.."Alt2Text"]:SetText(GLDG_TXT.groupalt)
-		_G[name.."UnassignedText"]:SetText(GLDG_TXT.filterUnassigned)
-		--_G[name.."GuildText"]:SetText(GLDG_TXT.filterGuild)
-		_G[name.."OnlineText"]:SetText(GLDG_TXT.filterOnline)
-		_G[name.."MyFriendsText"]:SetText(GLDG_TXT.filterMyFriends)
-		_G[name.."WithFriendsText"]:SetText(GLDG_TXT.filterWithFriends)
-		_G[name.."CurrentChannelText"]:SetText(GLDG_TXT.filterCurrentChannel)
-		_G[name.."WithChannelText"]:SetText(GLDG_TXT.filterWithChannel)
+		_G[name.."AltText"]:SetText(L["Always show alts"])
+		_G[name.."Alt2Text"]:SetText(L["Keep with main"])
+		_G[name.."UnassignedText"]:SetText(L["Show only unassigned characters"])
+		--_G[name.."GuildText"]:SetText(L["Guild members only"])
+		_G[name.."OnlineText"]:SetText(L["Online only"])
+		_G[name.."MyFriendsText"]:SetText(L["My friends only"])
+		_G[name.."WithFriendsText"]:SetText(L["With friends only"])
+		_G[name.."CurrentChannelText"]:SetText(L["Current channel only"])
+		_G[name.."WithChannelText"]:SetText(GL["With channel only"])
 		_G[name.."WARRIORFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["WARRIOR"])
 		_G[name.."DEATHKNIGHTFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["DEATHKNIGHT"])
 		_G[name.."DRUIDFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["DRUID"])
@@ -6987,11 +6948,7 @@ function GLDG_ShowHelpToolTip(self, element)
 	GameTooltip_SetDefaultAnchor(GameTooltip, self)
 	if (head ~= "") then
 		GameTooltip:SetText(head, 1, 1, 0.5, 1.0, 1)
---		GameTooltip:AddLine(name, 1, 0, 0, 1.0, 1)
 		GameTooltip:AddLine(tip, 1, 1, 1, 1.0, 1)
---	else
---		GameTooltip:SetText(element, 1, 1, 0.5, 1.0, 1)
---		GameTooltip:AddLine(name, 1, 1, 1, 1.0, 1)
 	end
 
 	GameTooltip:Show()
@@ -7017,60 +6974,9 @@ classColors["ROGUE"] = C_ClassColor.GetClassColor("ROGUE");
 classColors["HUNTER"] = C_ClassColor.GetClassColor("HUNTER");
 classColors["DEADKNIGHT"] = C_ClassColor.GetClassColor("DEADKNIGHT");
 classColors["MONK"] = C_ClassColor.GetClassColor("MONK");
---classColors["MAGE"]			= "|cFF69CCF0";
---classColors["PRIEST"]		= "|cFFFFFFFF";
---classColors["WARLOCK"]		= "|cFF9682C9";
---classColors["PALADIN"]		= "|cFFF58CBA";
---classColors["DRUID"]		= "|cFFFF7D0A";
---classColors["SHAMAN"]		= "|cFF00DBBA";
---classColors["DEMONHUNTER"]  = "|cFFA330C9";
---classColors["WARRIOR"]		= "|cFFBE9C6E";
----classColors["ROGUE"]		= "|cFFFFF569";
---classColors["HUNTER"]		= "|cFFAAD473";
---classColors["DEADKNIGHT"]	= "|cFFC41F3B";
---classColors["MONK"]      	= "|cFF00FF96";
 
 ------------------------------------------------------------
 function GLDG_ChatFilter(chatFrame, event, ...) -- chatFrame = self
---[[
-	taken from "http://www.wowwiki.com/Events_C_(Cancel,_Character,_Chat,_Cinematic,_Clear,_Close,_Confirm,_Corpse,_Craft,_Current,_Cursor,_CVar)"
-
-	"CHAT_MSG_CHANNEL"
-	Called when the client recieves a channel message.
-	msg: chat message
-	arg2: author
-	arg3: language
-	arg4: channel name with number
-	arg5: unknown (empty string)
-	arg6: unknown (empty string)
-	arg7: unknown (appears to be channel number)
-	arg8: channel number
-	arg9: channel name without number
-	arg12: colour uid
-
-	"CHAT_MSG_GUILD"
-	Fired when a message is sent or received in the Guild channel.
-	msg: Message that was sent
-	arg2: Author
-	arg3: Language that the message was sent in
-	arg12: colour uid
-
-	"CHAT_MSG_OFFICER"
-	Fired when a message is sent or received in the Guild Officer channel.
-	msg: Message that was received
-	arg2: Author
-	arg3: Language used
-	arg12: colour uid
-
-	"CHAT_MSG_WHISPER"
-	Fired when a whisper is received from another player.
-	The rest of the arguments appear to be nil
-	msg: Message received
-	arg2: Author
-	arg3: Language (or nil if universal, like messages from GM)
-	arg6: status (like "DND" or "GM")
-	arg12: colour uid
-]]--
 
 	local msg, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
 
@@ -7121,9 +7027,6 @@ function GLDG_ChatFilter(chatFrame, event, ...) -- chatFrame = self
 			msg = GLDG_Data.colours.help.."{"..Ambiguate(main, "guild").."}|r "..msg
 		end
 
-		--if (treated) then
-			--GLDG_Print("Main of ["..tostring(arg2).."] is ["..tostring(main).."] - passed text is ["..tostring(msg).."]");
-		--end
 	end
 
 	return false, msg, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13;
@@ -7266,42 +7169,6 @@ function GLDG_PrepareReloadQuestion()
 	};
 end
 
---------------------------
--- _29_ urbin addon listing
---------------------------
---function GLDG_RegisterUrbinAddon(name, about)
---	if (not name) then return end
---	if (not URBIN_AddonList) then
---		URBIN_AddonList = {}
---	end
---	URBIN_AddonList[name] = {}
---	URBIN_AddonList[name].name = name
---	URBIN_AddonList[name].about = about
---end
-
-------------------------------------------------------------
---function GLDG_ListUrbinAddons(name)
---	if (not URBIN_AddonList) then
---		return
---	end
---
---	local addons = ""
---	for p in pairs(URBIN_AddonList) do
---		if (URBIN_AddonList[p].name ~= name) then
---			if (addons ~= "") then
---				addons = addons..", "
---			end
---			addons = addons..URBIN_AddonList[p].name
---		end
---	end
---
---	if (addons ~= "") then
---		GLDG_Print(" ", true);
---		GLDG_Print("  "..GLDG_TXT.urbin..": "..GLDG_Data.colours.help..addons.."|r", true);
---	end
---end
-
-------------------------------------------------------------
 function GLDG_ListUrbinAddonDetails()
 	if (not URBIN_AddonList) then
 		return

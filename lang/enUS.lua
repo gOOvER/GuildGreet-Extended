@@ -25,7 +25,7 @@ L["Set character collection"] = true
 L["Current value"] = true
 L["Create new collection"] = true
 L["cancel"] = true
-L["add"] 0 true
+L["add"] = true
 L["Selected collection"] = true
 L["Global defaults"] = true
 L["not defined"] = true
@@ -47,4 +47,13 @@ L["later channel"] = true
 L["achievment"] = true
 L["Configure settings for characters: ignore them, set main/alt and enter alias"] = true
 L["Include ignored players in the list"] = true
+L["Always show alts"] = true
+L["Keep with main"] = true
+L["Show only unassigned characters"] = true
+L["Online only"] = true
+L["My friends only"] = true
+L["With friends only"] = true
+L["Current channel only"] = true
+
+
 
