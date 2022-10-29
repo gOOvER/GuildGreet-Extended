@@ -22,8 +22,6 @@ as he is short on time anyway.
 Urbin, Dun-Morogh (EU)
 
 
-Test
-
 Extended features
 -----------------
 This extension includes all features of the base version (v2.2).
