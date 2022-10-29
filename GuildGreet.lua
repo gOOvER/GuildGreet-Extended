@@ -5357,7 +5357,7 @@ function GLDG_ClickRemove()
 	if GLDG_SelPlrName then
 		-- remove character
 		GLDG_DataChar[GLDG_SelPlrName] = nil
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.charRemoved1.." ["..GLDG_SelPlrName.."] "..GLDG_TXT.charRemoved2)
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Character"].." ["..GLDG_SelPlrName.."] "..L["removed"])
 
 		-- Show updated list
 		GLDG_ListPlayers()
@@ -5371,7 +5371,7 @@ function GLDG_ShowMainAlt(frame)
 	-- Set frame and linename
 	local name = frame:GetParent():GetName()
 	-- Set title
-	_G[name.."Header"]:SetText(string.format(GLDG_TXT.mainhead, GLDG_SelPlrName))
+	_G[name.."Header"]:SetText(string.format(L["Select main for character %s"], GLDG_SelPlrName))
 	-- Create a sorted list of all mains
 	local mainlist = {}
 	local total = 0
@@ -5501,58 +5501,28 @@ end
 ------------------------------------------------------------
 function GLDG_Help()
 	GLDG_Print(" ", true)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.help, true)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg guild "..GLDG_Data.colours.help.."[|rshow"..GLDG_Data.colours.help.."] | |rguild all "..GLDG_Data.colours.help.."| |rguild list", true)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg char "..GLDG_Data.colours.help.."[|rshow"..GLDG_Data.colours.help.."] | |rchar all "..GLDG_Data.colours.help.."| |rchar list", true)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg "..GLDG_Data.colours.help.."[|rshow"..GLDG_Data.colours.help.."] <|r"..GLDG_TXT.name..GLDG_Data.colours.help.."> | |rfull "..GLDG_Data.colours.help.."<|r"..GLDG_TXT.name..GLDG_Data.colours.help.."> | |rdetail "..GLDG_Data.colours.help.."<|r"..GLDG_TXT.name..GLDG_Data.colours.help..">|r", true)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg help "..GLDG_Data.colours.help.."| |rabout "..GLDG_Data.colours.help.."| |rconfig "..GLDG_Data.colours.help.."| |rtest", true)
---	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg urbin", true);
-	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg clear", true)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg check", true)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg alert", true)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg aliasreset", true)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_TXT.usage..":|r /gg greet "..GLDG_Data.colours.help.."| |rbye "..GLDG_Data.colours.help.."| |rlater "..GLDG_Data.colours.help.."[|r guild "..GLDG_Data.colours.help.."| |rchannel "..GLDG_Data.colours.help.."| |rall "..GLDG_Data.colours.help.."| <|rname"..GLDG_Data.colours.help.."> ]|r", true)
-	GLDG_Print(" - "..GLDG_Data.colours.help.."guild/all [show]:|r "..GLDG_TXT.help_all, true);
-	GLDG_Print(" - "..GLDG_Data.colours.help.."guild/all all:|r "..GLDG_TXT.help_online, true);
-	GLDG_Print(" - "..GLDG_Data.colours.help.."guild/all list:|r "..GLDG_TXT.help_list, true);
-	GLDG_Print(" - "..GLDG_Data.colours.help.."[show] <name>:|r "..GLDG_TXT.help_name, true);
-	GLDG_Print(" - "..GLDG_Data.colours.help.."full <name>:|r "..GLDG_TXT.help_name_full, true);
-	GLDG_Print(" - "..GLDG_Data.colours.help.."detail <name>:|r "..GLDG_TXT.help_name_detail, true);
-	GLDG_Print(" - "..GLDG_Data.colours.help.."clear:|r "..GLDG_TXT.help_clear, true);
-	GLDG_Print(" - "..GLDG_Data.colours.help.."check:|r "..GLDG_TXT.help_check, true);
-	GLDG_Print(" - "..GLDG_Data.colours.help.."alert:|r "..GLDG_TXT.help_alert, true);
-	GLDG_Print(" - "..GLDG_Data.colours.help.."urbin:|r "..GLDG_TXT.help_urbin, true);
-	GLDG_Print(" - "..GLDG_TXT.noargs, true);
+	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["A tool to manage mains and alts in the guild and greet them"], true)
+	GLDG_Print(GLDG_Data.colours.help..L["Usage"]..":|r /gg guild "..GLDG_Data.colours.help.."[|rshow"..GLDG_Data.colours.help.."] | |rguild all "..GLDG_Data.colours.help.."| |rguild list", true)
+	GLDG_Print(GLDG_Data.colours.help..L["Usage"]..":|r /gg char "..GLDG_Data.colours.help.."[|rshow"..GLDG_Data.colours.help.."] | |rchar all "..GLDG_Data.colours.help.."| |rchar list", true)
+	GLDG_Print(GLDG_Data.colours.help..L["Usage"]..":|r /gg "..GLDG_Data.colours.help.."[|rshow"..GLDG_Data.colours.help.."] <|r"..L["name"]..GLDG_Data.colours.help.."> | |rfull "..GLDG_Data.colours.help.."<|r"..L["name"]..GLDG_Data.colours.help.."> | |rdetail "..GLDG_Data.colours.help.."<|r"..L["name"]..GLDG_Data.colours.help..">|r", true)
+	GLDG_Print(GLDG_Data.colours.help..L["Usage"]..":|r /gg help "..GLDG_Data.colours.help.."| |rabout "..GLDG_Data.colours.help.."| |rconfig "..GLDG_Data.colours.help.."| |rtest", true)
+	GLDG_Print(GLDG_Data.colours.help..L["Usage"]..":|r /gg clear", true)
+	GLDG_Print(GLDG_Data.colours.help..L["Usage"]..":|r /gg check", true)
+	GLDG_Print(GLDG_Data.colours.help..L["Usage"]..":|r /gg alert", true)
+	GLDG_Print(GLDG_Data.colours.help..L["Usage"]..":|r /gg aliasreset", true)
+	GLDG_Print(GLDG_Data.colours.help..L["Usage"]..":|r /gg greet "..GLDG_Data.colours.help.."| |rbye "..GLDG_Data.colours.help.."| |rlater "..GLDG_Data.colours.help.."[|r guild "..GLDG_Data.colours.help.."| |rchannel "..GLDG_Data.colours.help.."| |rall "..GLDG_Data.colours.help.."| <|rname"..GLDG_Data.colours.help.."> ]|r", true)
+	GLDG_Print(" - "..GLDG_Data.colours.help.."guild/all [show]:|r "..L["List alts of all members to chat"], true);
+	GLDG_Print(" - "..GLDG_Data.colours.help.."guild/all all:|r "..L["List alts of members that are online to chat"], true);
+	GLDG_Print(" - "..GLDG_Data.colours.help.."guild/all list:|r "..L["List alts of all members for copying"], true);
+	GLDG_Print(" - "..GLDG_Data.colours.help.."[show] <name>:|r "..L["List main and alts for <name>"], true);
+	GLDG_Print(" - "..GLDG_Data.colours.help.."full <name>:|r "..L["List main and alts for <name> with full class and level info"], true);
+	GLDG_Print(" - "..GLDG_Data.colours.help.."detail <name>:|r "..L["Print a dump of internal data for character <name> to chat"], true);
+	GLDG_Print(" - "..GLDG_Data.colours.help.."clear:|r "..L["Clear the greet list without greeting anyone"], true);
+	GLDG_Print(" - "..GLDG_Data.colours.help.."check:|r "..L["Check if main-alt assignments are correct"], true);
+	GLDG_Print(" - "..GLDG_Data.colours.help.."alert:|r "..L["Check if |cFFFFFF7FGuild member notification|r is enabled"], true);
+	GLDG_Print(" - "..L["without argument, show config frame"], true);
 	GLDG_Print(" ", true)
 end
-
-------------------------------------------------------------
---function GLDG_About(urbin)
---	local ver = GetAddOnMetadata("GuildGreet", "Version");
---	local date = GetAddOnMetadata("GuildGreet", "X-Date");
---	local author = GetAddOnMetadata("GuildGreet", "Author");
---	local web = GetAddOnMetadata("GuildGreet", "X-Website");
---
---	if (author ~= nil) then
---		GLDG_Print(GLDG_NAME.." "..GLDG_TXT.by.." "..GLDG_Data.colours.help..author.."|r", true);
---	end
---	if (ver ~= nil) then
---		GLDG_Print("  "..GLDG_TXT.version..": "..GLDG_Data.colours.help..ver.."|r", true);
---	end
---	if (date ~= nil) then
---		GLDG_Print("  "..GLDG_TXT.date..": "..GLDG_Data.colours.help..date.."|r", true);
---	end
---	if (web ~= nil) then
---		GLDG_Print("  "..GLDG_TXT.web..": "..GLDG_Data.colours.help..web.."|r", true);
---	end
-
---	if (urbin) then
---		GLDG_Print("  "..GLDG_TXT.slash..": "..GLDG_Data.colours.help..SLASH_GLDG2.."|r", true);
---	else
---		GLDG_ListUrbinAddons(GLDG_NAME)
---	end
---end
-
 
 ---------------------
 -- _16_ List frame --
@@ -5662,13 +5632,6 @@ GLDG_PasteList.List:SetHeight(GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player
 GLDG_PasteList.List:SetWidth(GLDG_Data.Frameopts[GLDG_Realm.." - "..GLDG_Player].Width)
 
 -- H.Sch. - ReglohPri - changes for Patch 9.0.1 Shadowlands
---[[GLDG_PasteList.List:SetBackdrop({
-	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-	tile = true, tileSize = 32, edgeSize = 32,
-	insets = { left = 9, right = 9, top = 9, bottom = 9 }
-})--]]
-
 GLDG_PasteList.List.backdropInfo = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -5712,9 +5675,9 @@ end
 ------------------------------------------------------------
 function GLDG_AddPopUpButtons()
 	UnitPopupMenus["GLDG"] = {"GLDG_LOOKUP", "GLDG_BYE", "CANCEL"};
-	UnitPopupButtons["GLDG"] = { text = GLDG_TXT.menu, dist = 0, nested = 1};
-	UnitPopupButtons["GLDG_LOOKUP"] = { text = GLDG_TXT.lookup, dist = 0,};
-	UnitPopupButtons["GLDG_BYE"] = { text = GLDG_TXT.goodbye, dist = 0 };
+	UnitPopupButtons["GLDG"] = { text = L["GuildGreet"], dist = 0, nested = 1};
+	UnitPopupButtons["GLDG_LOOKUP"] = { text = L["Lookup"], dist = 0,};
+	UnitPopupButtons["GLDG_BYE"] = { text = L["Good bye"], dist = 0 };
 
 	table.insert(UnitPopupMenus["PLAYER"], #UnitPopupMenus["PLAYER"]-1, "GLDG");
 	table.insert(UnitPopupMenus["FRIEND"], #UnitPopupMenus["FRIEND"]-1, "GLDG");
@@ -5811,7 +5774,7 @@ function GLDG_FriendsUpdate()
 			-- update data for this friend
 			if (GLDG_DataChar[name] == nil) then
 				GLDG_DataChar[name] = {}
-				GLDG_AddToStartupList(GLDG_TXT.deltaFriends..": "..GLDG_TXT.deltaNewFriend.." ["..Ambiguate(name, "guild").."]")
+				GLDG_AddToStartupList(L["Friends"]..": "..L["New friend"].." ["..Ambiguate(name, "guild").."]")
 			end
 			if (GLDG_DataChar[name].lvl == nil) then
 				GLDG_DataChar[name].lvl = level
@@ -5821,7 +5784,7 @@ function GLDG_FriendsUpdate()
 				if (connected) then
 					-- Update player level
 					if (level > GLDG_DataChar[name].lvl) then
-						GLDG_AddToStartupList(GLDG_TXT.deltaFriends..": ["..Ambiguate(name, "guild").."]"..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[name].lvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(level).." "..GLDG_TXT.deltaIncrease3)
+						GLDG_AddToStartupList(L["Friends"]..": ["..Ambiguate(name, "guild").."]"..L["increased level from"].." "..tostring(GLDG_DataChar[name].lvl).." "..L["to"].." "..tostring(level).." "..L[""])
 						if GLDG_Data.GuildSettings.ListLevelUp==true then
 
 							local mainName = nil
@@ -6028,7 +5991,7 @@ function GLDG_InitChannel(data)
 				if (name) then
 					if (not GLDG_DataChar[name]) then
 						GLDG_DataChar[name] = {}
-						GLDG_AddToStartupList(GLDG_TXT.deltaChannel..": "..GLDG_TXT.deltaNewMember.." ["..Ambiguate(name, "guild").."]")
+						GLDG_AddToStartupList(L["Channel"]..": "..L["New member"].." ["..Ambiguate(name, "guild").."]")
 					end
 					if (not GLDG_DataChar[name].channels) then
 						GLDG_DataChar[name].channels = {}
@@ -6223,24 +6186,24 @@ function GLDG_SecToTimeString(secs)
 		secs = secs % 60
 
 		if (day > 1) then
-			result = result.." "..tostring(day).." days"
+			result = result.." "..tostring(day)..L[" days"]
 		elseif (day > 0) then
-			result = result.." "..tostring(day).." day"
+			result = result.." "..tostring(day)..L[" day"]
 		end
 		if (hours > 1) then
-			result = result.." "..tostring(hours).." hours"
+			result = result.." "..tostring(hours)..L[" hours"]
 		elseif (hours > 0) then
-			result = result.." "..tostring(hours).." hour"
+			result = result.." "..tostring(hours)..L[" hour"]
 		end
 		if (minutes > 1) then
-			result = result.." "..tostring(minutes).." minutes"
+			result = result.." "..tostring(minutes)..L[" minutes"]
 		elseif (minutes > 0) then
-			result = result.." "..tostring(minutes).." minute"
+			result = result.." "..tostring(minutes)..L[" minute"]
 		end
 		if (secs > 1) then
-			result = result.." "..tostring(secs).." seconds"
+			result = result.." "..tostring(secs)..L[" seconds"]
 		elseif (secs > 0) then
-			result = result.." "..tostring(secs).." second"
+			result = result.." "..tostring(secs)..L[" second"]
 		end
 
 	end
@@ -6277,70 +6240,6 @@ function GLDG_Test(showAll)
 			end
 		end
 	end
-
-	--GLDG_Convert_Plausibility_Check()
-
-	--C_ChatInfo.SendAddonMessage("GLDG", "Nur so ein Text", "WHISPER", "Urbin")
-
-	--C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
-	--C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "PARTY")
-	--C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "RAID")
-
-	--C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version").."2", "GUILD")
-
-	--GLDG_CreateTestChars()
-
-	--[[ -- used for screenshot in order not to use real guild names --
-	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Creating list")
-	local list = {}
-	list[1] = "[Magam] Lyb Venum - Mag"
-	list[2] = "[Kelthuzad] Ganad Tholie - Kel"
-	list[3] = "[Ronnie] Radon Rumag Renid - Ron"
-	list[4] = "[Tom] Saka Luna - Tom"
-	list[5] = "[Gundor] Hilada Vorix - Gundor"
-	list[6] = "[Luator] Tibbor Hagadu - Luator"
-	list[7] = "[Zapator] Mula Jeno Jilador Koradin Wegamul - Zappie"
-	list[8] = "[Hilane] Mulase Mimidor - Hil"
-	list[9] = "[Hugena] Fiodan - Huggie"
-	list[10] = "[Kyreena] Kalomur - Kyreena"
-	list[11] = "[Dinosa] Stib Lokinat - Dino"
-	list[12] = "[Xynasa] Wugedan - Xyn"
-	list[13] = "[Remolo] Quagal - Remo"
-	list[14] = "[Anima] Arista Olibeth - Ani"
-	list[15] = "[Pug] Thomas Charles - Pug"
-	list[16] = "[Dores] Frazon Wiligom - Dori"
-	list[17] = "[Numan] Jomin Yaldor - Numan"
-	list[18] = "[Haxxor] - Hax"
-	list[19] = "[Pwner] Gank0r - L00s0r"
-	list[20] = "[Nadel] Sabtise - Nad"
-	list[21] = "[Bunjipp] - Bun"
-	list[22] = "[Haruna] Jorador - Haru"
-	list[23] = "[Olibado] - Oli"
-	list[24] = "[Sumada] - Sum"
-	list[25] = "[Irida] - Iri"
-	list[26] = "[Manolo] - Mano"
-	list[27] = "[Tiara] - Tiara"
-	list[28] = "[Tonina] - Toni"
-	list[29] = "[Tamara] Solana Illidur - Tami"
-	list[30] = "[Ugida] - Ugida"
-	list[31] = "[Soleno] Somvitg - Sol"
-	list[32] = "[Frog] - Frog"
-	list[33] = "[Glazzi] - Glazzi"
-	list[34] = "[Weinbär] Brummbär Waschbär- Bär"
-	list[35] = "[Xhorosh] - Xor"
-	list[36] = "[Grubosh] - Grubosh"
-	list[37] = "[Mechtild] - Mechtild"
-	list[38] = "[Munher] - Muni"
-	list[39] = "[Liv] - Liv"
-	list[40] = "[Spifosa] - Spif"
-	list[41] = "[Hobbus] Calvadur - Hob"
-	list[42] = "[Taran] - Taran"
-	GLDG_list = list
-	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Showing list")
-	GLDG_PasteList.List:Show();
-	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Shown list")
-	]]--
-
 end
 
 ------------------------------------------------------------
