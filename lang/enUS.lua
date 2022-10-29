@@ -201,5 +201,24 @@ L["Officer Note"] = true
 L["Class"] = true
 L["Friends Note"] = true
 L["Note"] = true
-
+L["Could not parse command"] = true
+L["GUILDGREET DEBUG IS NOW "] = true
+L["Pasting to list"] = true
+L["update"] = true
+L["remove"] = true
+L["Set guild collection"] = true
+L["Set character collection"] = true
+L["Set realm collection"] = true
+L["No guild filter"] = true
+L["No rank filter"] = true
+L["IGNORE"] = true
+L["MAIN"] = true
+L["ALT"] = true
+L["Ignored"] = true
+L["Alts"] = true
+L["Yes"] = true
+L["No"] = true
+L["New in guild"] = true
+L["Last achievment"] = true
+L["Channel(s)"] = true
 

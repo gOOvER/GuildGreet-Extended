@@ -3236,7 +3236,7 @@ end
 ------------------------------------------------------------
 function GLDG_ByeChannel()
 	local list = GLDG_DataGreet.ByeChannel
-	-- if time is between 20:00 and 06:00 use night mode
+	-- if time is between 20:00 and 05:00 use night mode
 	local hour,min = GLDG_GetTime();
 	if ((hour >= 20) or (hour <=5)) then
 		list = GLDG_DataGreet.NightChannel;
@@ -3323,13 +3323,13 @@ function GLDG_SlashHandler(msg)
 					elseif (wordsLower[1]=="toggle") then
 						GLDG_Debug = not GLDG_Debug
 					else
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.command.." ["..GLDG_Data.colours.help..msgLower.."|r]")
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Could not parse command"].." ["..GLDG_Data.colours.help..msgLower.."|r]")
 						GLDG_Help()
 					end
 				end
 				local state = "OFF"
 				if GLDG_Debug then state = "ON" end
-				DEFAULT_CHAT_FRAME:AddMessage("GUILDGREET DEBUG IS NOW "..state)
+				DEFAULT_CHAT_FRAME:AddMessage(L["GUILDGREET DEBUG IS NOW "]..state)
 
 			elseif (wordsLower[0]=="force") then
 				GLDG_ForceChatlist()
@@ -3342,11 +3342,11 @@ function GLDG_SlashHandler(msg)
 					elseif (wordsLower[1]=="all") then
 						GLDG_ListAllPlayers(true, true)			-- include_offline=true, print=true, guildOnly=false
 					elseif (wordsLower[1]=="list") then
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.pasting);
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Pasting to list"]);
 						GLDG_list = GLDG_ListAllPlayers(true, false);	-- include_offline=true, print=false, guildOnly=false
 						GLDG_PasteList.List:Show();
 					else
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.command.." ["..GLDG_Data.colours.help..msgLower.."|r]")
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Could not parse command"].." ["..GLDG_Data.colours.help..msgLower.."|r]")
 						GLDG_Help()
 					end
 				else
@@ -3359,11 +3359,11 @@ function GLDG_SlashHandler(msg)
 					elseif (wordsLower[1]=="all") then
 						GLDG_ListAllPlayers(true, true, true)			-- include_offline=true, print=true, guildOnly=true
 					elseif (wordsLower[1]=="list") then
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.pasting);
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Pasting to list"]);
 						GLDG_list = GLDG_ListAllPlayers(true, false, true);	-- include_offline=true, print=true, guildOnly=true
 						GLDG_PasteList.List:Show();
 					else
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.command.." ["..GLDG_Data.colours.help..msgLower.."|r]")
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Could not parse command"].." ["..GLDG_Data.colours.help..msgLower.."|r]")
 						GLDG_Help()
 					end
 				else
@@ -3374,14 +3374,14 @@ function GLDG_SlashHandler(msg)
 				if (size>1) then
 					GLDG_ListForPlayer(words[1], false)
 				else
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.argmissing.." ["..GLDG_Data.colours.help..wordsLower[0].."|r]")
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Another argument is needed after command"].." ["..GLDG_Data.colours.help..wordsLower[0].."|r]")
 					GLDG_Help()
 				end
 			elseif (wordsLower[0]=="full") then
 				if (size>1) then
 					GLDG_ListForPlayer(words[1], true)
 				else
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.argmissing.." ["..GLDG_Data.colours.help..wordsLower[0].."|r]")
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Another argument is needed after command"].." ["..GLDG_Data.colours.help..wordsLower[0].."|r]")
 					GLDG_Help()
 				end
 
@@ -3389,7 +3389,7 @@ function GLDG_SlashHandler(msg)
 				if (size>1) then
 					GLDG_ShowDetails(words[1])
 				else
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.argmissing.." ["..GLDG_Data.colours.help..wordsLower[0].."|r]")
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Another argument is needed after command"].." ["..GLDG_Data.colours.help..wordsLower[0].."|r]")
 					GLDG_Help()
 				end
 
@@ -3438,7 +3438,7 @@ function GLDG_SlashHandler(msg)
 						GLDG_LaterGuild()
 						GLDG_LaterChannel()
 					else
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.command.." ["..GLDG_Data.colours.help..msgLower.."|r]")
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Could not parse command"].." ["..GLDG_Data.colours.help..msgLower.."|r]")
 						GLDG_Help()
 					end
 				else
@@ -3720,16 +3720,7 @@ function GLDG_UpdateChatFrame(self)
 
 		-- Store the new value
 		GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] = math.floor(self:GetValue())
-
-		--if (GLDG_Data.ChatFrame > NUM_CHAT_WINDOWS) then
-		--	local oldValue = GLDG_Data.ChatFrame
-		--	GLDG_Data.ChatFrame = NUM_CHAT_WINDOWS
-		--	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Chat frame "..oldValue.." does not exist, using chat frame "..GLDG_Data.ChatFrame.." instead")
-		--	self:SetValue(GLDG_Data.ChatFrame)
-		--end
-
-		-- Update display
-		--local text = _G[self:GetParent():GetName().."ChatFrameText"]
+		
 		if (GLDG_Data.PlayerChatFrame[GLDG_Player.."-"..GLDG_Realm] == 0) then
 			text:SetText(L["Using default chat frame"])
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r Now using default chat frame")
@@ -3950,10 +3941,10 @@ function GLDG_ShowGreetings(frame)
 	else _G[frame.."Editbox"]:SetText("") end
 	-- Set editbox buttons
 	if GLDG_SelMsgNum then
-		_G[frame.."MsgAdd"]:SetText(GLDG_TXT.update)
-		_G[frame.."MsgDel"]:SetText(GLDG_TXT.delete)
-	else	_G[frame.."MsgAdd"]:SetText(GLDG_TXT.add)
-		_G[frame.."MsgDel"]:SetText(GLDG_TXT.clear) end
+		_G[frame.."MsgAdd"]:SetText(L["update"])
+		_G[frame.."MsgDel"]:SetText(L["remove"])
+	else	_G[frame.."MsgAdd"]:SetText(L["add"])
+		_G[frame.."MsgDel"]:SetText(L["clear"]) end
 end
 
 ------------------------------------------------------------
@@ -4280,31 +4271,6 @@ function GLDG_ListPlayers()
 	GLDG_ClickPlayerBar() -- todo bee
 end
 
--- todo: this does not yet work on multiple levels, need to learn how to do this
---[[
-UIDropDownMenu_AddButton(info, level)
-...
-local listFrame = _G["DropDownList"..level];
-local listFrameName = listFrame:GetName();
-local index = listFrame.numButtons + 1;
-local width;
-
-local menuName = UIDROPDOWNMENU_OPEN_MENU;
-if ( not menuName ) then menuName = "<nil>"; end
-
--- If too many buttons error out
-if ( index > UIDROPDOWNMENU_MAXBUTTONS ) then
-_ERRORMESSAGE("Too many buttons in UIDropDownMenu: "..menuName);
-return;
-end
-
--- If too many levels error out
-if ( level > UIDROPDOWNMENU_MAXLEVELS ) then
-_ERRORMESSAGE("Too many levels in UIDropDownMenu: "..menuName);
-return;
-end
-]]
-
 ------------------------------------------------------------
 function GLDG_GuildFilterDropDownTemplate_OnLoad(self)
 	UIDropDownMenu_Initialize(self, GLDG_GuildFilterDropDown_Initialize);
@@ -4325,7 +4291,7 @@ function GLDG_GuildFilterDropDown_Initialize(frame, level)
 	if (not GLDG_DataChar) then return end
 
 	local count = 1
-	GLDG_guildFilterDropDownData[count] = GLDG_TXT.noGuildFilter
+	GLDG_guildFilterDropDownData[count] = L["No guild filter"]
 	count = count + 1
 	GLDG_guildFilterDropDownData[count] = " " -- separator
 	for p in pairs(GLDG_DataChar) do
@@ -4404,15 +4370,15 @@ function GLDG_GuildFilterDropDown_OnClick(self, list)
 	local name = self:GetName()
 	GLDG_Data.GuildFilter = GLDG_guildFilterDropDownData[(n-1)*20 + i]
 	if not GLDG_Data.GuildFilter then GLDG_Data.GuildFilter = "" end
-	if GLDG_Data.GuildFilter == GLDG_TXT.noGuildFilter then GLDG_Data.GuildFilter = "" end
+	if GLDG_Data.GuildFilter == L["No guild filter"] then GLDG_Data.GuildFilter = "" end
 
 	if (GLDG_Data.GuildFilter == "") then
-		UIDropDownMenu_SetText(_G[GLDG_GUI.."Players".."RankFilterDropboxButton"], GLDG_TXT.noRankFilter)
+		UIDropDownMenu_SetText(_G[GLDG_GUI.."Players".."RankFilterDropboxButton"], L["No rank filter"])
 		GLDG_Data.RankFilter = "";
 		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."GuildFilterDropboxButton"], 1);
 	else
 		UIDropDownMenu_SetSelectedID(_G[GLDG_GUI.."Players".."GuildFilterDropboxButton"], i);
-		UIDropDownMenu_SetText(_G[GLDG_GUI.."Players".."RankFilterDropboxButton"], GLDG_TXT.noRankFilter)
+		UIDropDownMenu_SetText(_G[GLDG_GUI.."Players".."RankFilterDropboxButton"], L["No rank filter"])
 		GLDG_Data.RankFilter = "";
 	end
 
@@ -4442,7 +4408,7 @@ function GLDG_RankFilterDropDown_Initialize(frame, level)
 	if (not GLDG_DataChar) then return end
 
 	local count = 1
-	GLDG_rankFilterDropDownData[count] = GLDG_TXT.noRankFilter
+	GLDG_rankFilterDropDownData[count] = L["No rank filter"]
 	count = count + 1
 	GLDG_rankFilterDropDownData[count] = " " -- separator
 	for p in pairs(GLDG_DataChar) do
@@ -4568,14 +4534,14 @@ function GLDG_ShowPlayers()
 		end
 		if p.ignore then
 			textGuild:SetTextColor(1, 0.25, 0.25)
-			textType:SetText(GLDG_TXT.markIGN)
+			textType:SetText(L["IGNORE"])
 		elseif p.main then
 			textGuild:SetTextColor(0.25, 1, 0.25)
-			textType:SetText(GLDG_TXT.markMAIN)
+			textType:SetText(L["MAIN"])
 		elseif p.alt then
 			--textName:SetTextColor(0.25, 0.25, 1)
 			textGuild:SetTextColor(0.25, 1, 1)
-			textType:SetText(GLDG_TXT.markALT)
+			textType:SetText(L["ALT"])
 		elseif p.alias then
 			textGuild:SetTextColor(0.68, 0.8, 1)
 		else
@@ -4702,7 +4668,7 @@ function GLDG_ShowPlayerToolTip(element)
 			end
 		end
 		if p.ignore then
-			GameTooltip:AddLine(GLDG_TXT.tipIgnore, 1, 0, 0)
+			GameTooltip:AddLine(L["Ignored"], 1, 0, 0)
 		end
 
 		GameTooltip:AddLine(" ", 1, 1, 0.75)
@@ -4710,7 +4676,7 @@ function GLDG_ShowPlayerToolTip(element)
 		local added = false
 
 		if p.alias then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipAlias, GLDG_ALIAS_COLOUR..p.alias.."|r", 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Alias"], GLDG_ALIAS_COLOUR..p.alias.."|r", 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 
@@ -4727,7 +4693,7 @@ function GLDG_ShowPlayerToolTip(element)
 					end
 					if first then
 						first = false
-						GameTooltip:AddDoubleLine(GLDG_TXT.tipAlts, color_s..Ambiguate(q, "guild")..color_p, 1, 1, 0, 1, 1, 1)
+						GameTooltip:AddDoubleLine(L["Alts"], color_s..Ambiguate(q, "guild")..color_p, 1, 1, 0, 1, 1, 1)
 					else
 						GameTooltip:AddDoubleLine(" ", color_s..Ambiguate(q, "guild")..color_p, 1, 1, 0, 1, 1, 1)
 					end
@@ -4736,7 +4702,7 @@ function GLDG_ShowPlayerToolTip(element)
 				end
 			end
 			if not hasAlts then
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, GLDG_TXT.tipMainYes, 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(L["Main"], L["Yes"], 1, 1, 0, 1, 1, 1)
 			end
 		elseif p.alt then
 			color_s = ""
@@ -4746,9 +4712,9 @@ function GLDG_ShowPlayerToolTip(element)
 				color_p = "|r"
 			end
 			if (GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].alias) then
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, color_s..Ambiguate(p.alt, "guild")..color_p.." "..GLDG_ALIAS_COLOUR.."("..GLDG_DataChar[p.alt].alias..")|r", 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(L["Main"], color_s..Ambiguate(p.alt, "guild")..color_p.." "..GLDG_ALIAS_COLOUR.."("..GLDG_DataChar[p.alt].alias..")|r", 1, 1, 0, 1, 1, 1)
 			else
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, color_s..Ambiguate(p.alt, "guild")..color_p, 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(L["Main"], color_s..Ambiguate(p.alt, "guild")..color_p, 1, 1, 0, 1, 1, 1)
 			end
 			local first = true
 			for q in pairs(GLDG_DataChar) do
@@ -4761,7 +4727,7 @@ function GLDG_ShowPlayerToolTip(element)
 					end
 					if first then
 						first = false
-						GameTooltip:AddDoubleLine(GLDG_TXT.tipAlts, color_s..Ambiguate(q, "guild")..color_p, 1, 1, 0, 1, 1, 1)
+						GameTooltip:AddDoubleLine(L["Alts"], color_s..Ambiguate(q, "guild")..color_p, 1, 1, 0, 1, 1, 1)
 						added = true
 					else
 						GameTooltip:AddDoubleLine(" ", color_s..Ambiguate(q, "guild")..color_p, 1, 1, 0, 1, 1, 1)
@@ -4778,51 +4744,51 @@ function GLDG_ShowPlayerToolTip(element)
 
 		if p.guild then
 			if p.guild==GLDG_unique_GuildName then
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipGuild, GLDG_GuildName, 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(L["Guild"], GLDG_GuildName, 1, 1, 0, 1, 1, 1)
 			else
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipGuild, p.guild, 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(L["Guild"], p.guild, 1, 1, 0, 1, 1, 1)
 			end
 			added = true
 			if p.new then
-				GameTooltip:AddDoubleLine(" ", GLDG_TXT.tipNew, 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(" ", L["New in guild"], 1, 1, 0, 1, 1, 1)
 			end
 		end
 		if p.rank and p.rankname then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, p.rankname.." ("..tostring(p.rank)..")", 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Rank"], p.rankname.." ("..tostring(p.rank)..")", 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif p.rank then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, tostring(p.rank), 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Rank"], tostring(p.rank), 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif p.rankname then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipRank, p.rankname, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Rank"], p.rankname, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if (p.rank or p.rankname) and p.newrank then
-			GameTooltip:AddDoubleLine(" ", GLDG_TXT.tipNewRank, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(" ", L["(new rank)"], 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if p.pNote then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipPlayerNote, p.pNote, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Player Note"], p.pNote, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if p.oNote then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipOfficerNote, p.oNote, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Officer Note"], p.oNote, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 
 		if p.class then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipClass, p.class, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Class"], p.class, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if p.storedLvl then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipLevel, p.storedLvl, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Level"], p.storedLvl, 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif p.lvl then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipLevel, p.lvl, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Level"], p.lvl, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if p.achievment then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipAchievment, p.achievment, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Last achievment"], p.achievment, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 
@@ -4836,7 +4802,7 @@ function GLDG_ShowPlayerToolTip(element)
 			for q in pairs(p.channels) do
 				if first then
 					first = false
-					GameTooltip:AddDoubleLine(GLDG_TXT.tipChannels, q, 1, 1, 0, 1, 1, 1)
+					GameTooltip:AddDoubleLine(L["Channel(s)"], q, 1, 1, 0, 1, 1, 1)
 					added = true
 				else
 					GameTooltip:AddDoubleLine(" ", q, 1, 1, 0, 1, 1, 1)
