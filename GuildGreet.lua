@@ -808,7 +808,6 @@ function GLDG_InitFrame(frameName)
 		_G[name.."AltText"]:SetText(L["Always show alts"])
 		_G[name.."Alt2Text"]:SetText(L["Keep with main"])
 		_G[name.."UnassignedText"]:SetText(L["Show only unassigned characters"])
-		--_G[name.."GuildText"]:SetText(L["Guild members only"])
 		_G[name.."OnlineText"]:SetText(L["Online only"])
 		_G[name.."MyFriendsText"]:SetText(L["My friends only"])
 		_G[name.."WithFriendsText"]:SetText(L["With friends only"])
@@ -826,83 +825,80 @@ function GLDG_InitFrame(frameName)
 		_G[name.."DEMONHUNTERFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["DEMONHUNTER"])
 		_G[name.."WARLOCKFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["WARLOCK"])
 		_G[name.."MONKFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["MONK"])
-		--_G[name.."GuildSortText"]:SetText(GLDG_TXT.guildSort)
+		_G[name.."MONKFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["EVOKER"])
+		
 		-- list header
-		_G[name.."HeaderLineName"]:SetText(GLDG_TXT.headerName)
-		_G[name.."HeaderLineType"]:SetText(GLDG_TXT.headerType)
-		_G[name.."HeaderLineAlias"]:SetText(GLDG_TXT.headerAlias)
-		_G[name.."HeaderLineGuild"]:SetText(GLDG_TXT.headerGuild)
-		_G[name.."HeaderLineRankname"]:SetText(GLDG_TXT.headerRankname)
-		_G[name.."HeaderLinePnote"]:SetText(GLDG_TXT.headerPnote)
-		_G[name.."HeaderLineOnote"]:SetText(GLDG_TXT.headerOnote)
-		_G[name.."HeaderLineChannel"]:SetText(GLDG_TXT.headerChannel)
-		_G[name.."HeaderLineFriend"]:SetText(GLDG_TXT.headerFriend)
-		_G[name.."HeaderLineNumFriends"]:SetText(GLDG_TXT.headerNumFriends)
+		_G[name.."HeaderLineName"]:SetText(L["Name"])
+		_G[name.."HeaderLineType"]:SetText(L["Type"])
+		_G[name.."HeaderLineAlias"]:SetText(L["Alias/Main"])
+		_G[name.."HeaderLineGuild"]:SetText(L["Guild"])
+		_G[name.."HeaderLineRankname"]:SetText(L["Rank"])
+		_G[name.."HeaderLinePnote"]:SetText(L["Player Note"])
+		_G[name.."HeaderLineOnote"]:SetText(L["Officer Note"])
+		_G[name.."HeaderLineChannel"]:SetText(L["{c}"])
+		_G[name.."HeaderLineFriend"]:SetText(L["{f}"])
+		_G[name.."HeaderLineNumFriends"]:SetText(L["#"])
 		-- Button text
-		_G[name.."ActionButtonsCheck"]:SetText(GLDG_TXT.pbcheck)
-		_G[name.."ActionButtonsAlias"]:SetText(GLDG_TXT.pbalias)
-		_G[name.."ActionButtonsGuild"]:SetText(GLDG_TXT.pbguild)
-		_G[name.."ActionButtonsWho"]:SetText(GLDG_TXT.pbwho)
-		_G[name.."ActionButtonsRemove"]:SetText(GLDG_TXT.pbremove)
-		_G[name.."ActionButtonsNote"]:SetText(GLDG_TXT.pbnote)
-		_G[name.."ActionButtonsPublicNote"]:SetText(GLDG_TXT.pbpublicnote)
-		_G[name.."ActionButtonsOfficerNote"]:SetText(GLDG_TXT.pbofficernote)
+		_G[name.."ActionButtonsCheck"]:SetText(L["Check consistency"])
+		_G[name.."ActionButtonsAlias"]:SetText(L["Set alias"])
+		_G[name.."ActionButtonsGuild"]:SetText(L["Set guild"])
+		_G[name.."ActionButtonsWho"]:SetText(L["Who query"])
+		_G[name.."ActionButtonsRemove"]:SetText(L["Remove char"])
+		_G[name.."ActionButtonsNote"]:SetText(L["Set note"])
+		_G[name.."ActionButtonsPublicNote"]:SetText(L["Edit public note"])
+		_G[name.."ActionButtonsOfficerNote"]:SetText(L["Edit officer note"])
 
 		-- Set value for option checkboxes
 		GLDG_UpdatePlayerCheckboxes()
 	elseif (frameName == "Cleanup") then
 		-- Header and option texts
-		_G[name.."Header"]:SetText(GLDG_TXT.cleanupHeader)
-		_G[name.."Info"]:SetText(GLDG_TXT.cleanupInfo)
-		_G[name.."GuildHeader"]:SetText(GLDG_TXT.cleanupGuildHeader)
-		_G[name.."GuildInfo"]:SetText(GLDG_TXT.cleanupGuildInfo)
-		_G[name.."FriendsHeader"]:SetText(GLDG_TXT.cleanupFriendsHeader)
-		_G[name.."FriendsInfo"]:SetText(GLDG_TXT.cleanupFriendsInfo)
-		_G[name.."ChannelHeader"]:SetText(GLDG_TXT.cleanupChannelHeader)
-		_G[name.."ChannelInfo"]:SetText(GLDG_TXT.cleanupChannelInfo)
-		_G[name.."OrphanHeader"]:SetText(GLDG_TXT.cleanupOrphanHeader)
-		_G[name.."OrphanInfo"]:SetText(GLDG_TXT.cleanupOrphanInfo)
---~~~ MSN1: Added assigning of program variables for 2 new buttons' text (for deleting and displaying guildless characters)
-		_G[name.."GuildlessHeader"]:SetText(GLDG_TXT.cleanupGuildlessHeader)
-		_G[name.."GuildlessInfo"]:SetText(GLDG_TXT.cleanupGuildlessInfo)
-		_G[name.."DisplayGuildlessHeader"]:SetText(GLDG_TXT.displayGuildlessHeader)
-		_G[name.."DisplayGuildlessInfo"]:SetText(GLDG_TXT.displayGuildlessInfo)
---~~~~
+		_G[name.."Header"]:SetText(L["Data cleanup"])
+		_G[name.."Info"]:SetText(L["As you switch between characters in different guilds, as you add and remove characters from your friend lists and as characters join and leave channels, a lot of character information assembles. Some of these characters may no longer be played, they may be deleted, renamed or transferred to the opposite faction or other servers.\r\nThis tab helps you to clean up stale characters."])
+		_G[name.."GuildHeader"]:SetText(L["Guild cleanup"])
+		_G[name.."GuildInfo"]:SetText(L["This button allows you to choose any guild (except the one you belong to), it will then remove this guild from any character that had it assigned. If it is a guild one of your characters belongs to, this information will automatically be added again for all guild members of that guild."])
+		_G[name.."FriendsHeader"]:SetText(L["Friends cleanup"])
+		_G[name.."FriendsInfo"]:SetText(L["This button allows you to choose any of your characters that has managed characters on their friend list and to remove this character from all friend references. If this character still exists, it will again be added automatically to those characters which are on its friend list."])
+		_G[name.."ChannelHeader"]:SetText(L["Channel cleanup"])
+		_G[name.."ChannelInfo"]:SetText(L["This button allows you to remove a channel from all characters that belong to it. The next time they revisit the channel, it will again be added to them automatically."])
+		_G[name.."OrphanHeader"]:SetText(L["Orphan cleanup"])
+		_G[name.."OrphanInfo"]:SetText(L["This button removes all characters that are not main or alt, have no friends and belong to no channel."])
+		_G[name.."GuildlessHeader"]:SetText(L["Guildless cleanup"])
+		_G[name.."GuildlessInfo"]:SetText(L["This button removes all characters that do NOT belong to a Guild."])
+		_G[name.."DisplayGuildlessHeader"]:SetText(L["Guildless display"])
+		_G[name.."DisplayGuildlessInfo"]:SetText(L["This button displays all characters that do NOT belong to a Guild and displays final counts for both guildless and with a guild."])
 
-		_G[name.."Guild"]:SetText(GLDG_TXT.cleanupGuild)
-		_G[name.."Friends"]:SetText(GLDG_TXT.cleanupFriends)
-		_G[name.."Channel"]:SetText(GLDG_TXT.cleanupChannel)
-		_G[name.."Orphan"]:SetText(GLDG_TXT.cleanupOrphan)
---~~~ MSN1: Added assigning of program variables for 2 new buttons' mouseover popup window info (for deleting and displaying guildless characters)
-		_G[name.."Guildless"]:SetText(GLDG_TXT.cleanupGuildless)
-		_G[name.."DisplayGuildless"]:SetText(GLDG_TXT.displayGuildless)
---~~~~
+		_G[name.."Guild"]:SetText(L["Choose guild to clean up"])
+		_G[name.."Friends"]:SetText(L["Choose friend to clean up"])
+		_G[name.."Channel"]:SetText(L["Choose channel to clean up"])
+		_G[name.."Orphan"]:SetText(L["Cleanup orphans"])
+		_G[name.."Guildless"]:SetText(L["Cleanup Guildless"])
+		_G[name.."DisplayGuildless"]:SetText(L["Display Guildless"])
 
 	elseif (frameName == "Colour") then
 		-- Column header
-		_G[name.."ColHeaderGuild"]:SetText(GLDG_TXT.colGuild)
-		_G[name.."ColHeaderFriends"]:SetText(GLDG_TXT.colFriends)
-		_G[name.."ColHeaderChannel"]:SetText(GLDG_TXT.colChannel)
+		_G[name.."ColHeaderGuild"]:SetText(L["Guild"])
+		_G[name.."ColHeaderFriends"]:SetText(L["Friends"])
+		_G[name.."ColHeaderChannel"]:SetText(L["Channel"])
 		-- Chat header and options
-		_G[name.."HeaderChat"]:SetText(GLDG_TXT.colChatHeader)
-		_G[name.."ComingOnline"]:SetText(GLDG_TXT.colOn)
-		_G[name.."GoingOffline"]:SetText(GLDG_TXT.colGoOff)
-		_G[name.."IsOffline"]:SetText(GLDG_TXT.colIsOff)
-		_G[name.."Alias"]:SetText(GLDG_TXT.colAlias)
+		_G[name.."HeaderChat"]:SetText(L["Chat"])
+		_G[name.."ComingOnline"]:SetText(L["Coming online"])
+		_G[name.."GoingOffline"]:SetText(L["Going offline"])
+		_G[name.."IsOffline"]:SetText(L["Is offline"])
+		_G[name.."Alias"]:SetText(L["Alias"])
 		-- List header and options
-		_G[name.."HeaderList"]:SetText(GLDG_TXT.colListHeader)
-		_G[name.."List"]:SetText(GLDG_TXT.colList)
-		_G[name.."Relog"]:SetText(GLDG_TXT.colRelog)
-		_G[name.."New"]:SetText(GLDG_TXT.colNew)
-		_G[name.."Level"]:SetText(GLDG_TXT.colLevel)
-		_G[name.."Rank"]:SetText(GLDG_TXT.colRank)
-		_G[name.."Achievment"]:SetText(GLDG_TXT.colAchievment)
+		_G[name.."HeaderList"]:SetText(L["Greet list"])
+		_G[name.."List"]:SetText(L["Coming online"])
+		_G[name.."Relog"]:SetText(L["Relogging"])
+		_G[name.."New"]:SetText(L["New member"])
+		_G[name.."Level"]:SetText(L["Level up"])
+		_G[name.."Rank"]:SetText(L["Promotion"])
+		_G[name.."Achievment"]:SetText(L["Achievment"])
 		-- Common header and options
-		_G[name.."HeaderCommon"]:SetText(GLDG_TXT.colCommonHeader)
-		_G[name.."Help"]:SetText(GLDG_TXT.colHelp)
-		_G[name.."Header"]:SetText(GLDG_TXT.colHeader)
+		_G[name.."HeaderCommon"]:SetText(L["Common"])
+		_G[name.."Help"]:SetText(L["Output"])
+		_G[name.."Header"]:SetText(L["Greet list header"])
 		-- Default button
-		_G[name.."DefaultButton"]:SetText(GLDG_TXT.colDefault)
+		_G[name.."DefaultButton"]:SetText(L["Default colours"])
 		-- Hide unused colours
 		_G[name.."FriendsNewButton"]:Hide()
 		_G[name.."FriendsNewColour"]:Hide()
@@ -1011,8 +1007,8 @@ function GLDG_InitFrame(frameName)
 		_G[name.."NoGratsOnLoginBox"]:SetChecked(GLDG_Data.GuildSettings.NoGratsOnLogin)
 		_G[name.."NoGratsOnLoginText"]:SetText(L["Don't congratulate players that just logged in"].."*")
 		-- guild alias
-		_G[name.."GuildAliasSet"]:SetText(GLDG_TXT.set)
-		_G[name.."GuildAliasClear"]:SetText(GLDG_TXT.clear)
+		_G[name.."GuildAliasSet"]:SetText(L["set"])
+		_G[name.."GuildAliasClear"]:SetText(L["clear"])
 	elseif (frameName == "SettingsOther") then
 		_G[name.."Header"]:SetText(L["Various settings"])
 		_G[name.."UseLocalTimeBox"]:SetChecked(GLDG_Data.UseLocalTime)
@@ -1036,7 +1032,6 @@ function GLDG_UpdatePlayerCheckboxes()
 	_G[name.."AltBox"]:SetChecked(GLDG_Data.ShowAlt)
 	_G[name.."Alt2Box"]:SetChecked(GLDG_Data.GroupAlt)
 	_G[name.."UnassignedBox"]:SetChecked(GLDG_Data.FilterUnassigned)
---	_G[name.."GuildBox"]:SetChecked(GLDG_Data.FilterGuild)
 	_G[name.."OnlineBox"]:SetChecked(GLDG_Data.FilterOnline)
 	_G[name.."MyFriendsBox"]:SetChecked(GLDG_Data.FilterMyFriends)
 	_G[name.."WithFriendsBox"]:SetChecked(GLDG_Data.FilterWithFriends)
@@ -1054,7 +1049,6 @@ function GLDG_UpdatePlayerCheckboxes()
 	_G[name.."DEMONHUNTERFilterBox"]:SetChecked(GLDG_Data.DEMONHUNTERFilter)
 	_G[name.."WARLOCKFilterBox"]:SetChecked(GLDG_Data.WARLOCKFilter)
 	_G[name.."MONKFilterBox"]:SetChecked(GLDG_Data.MONKFilter)
-	--_G[name.."GuildSortBox"]:SetChecked(GLDG_Data.GuildSort)
 
 	if (GLDG_Data.FilterOnline==true or GLDG_Data.GuildSort==true) then
 		_G[name.."Alt2Box"]:Disable()
@@ -1134,8 +1128,7 @@ function GLDG_InitRoster()
 	else
 		GLDG_ChannelName = ""
 	end
-	--_G[GLDG_GUI.."Settings".."ChannelNameEditbox"]:SetText(GLDG_ChannelName)
-
+	
 	if (GLDG_Realm and GLDG_unique_GuildName and GLDG_unique_GuildName~="" and GLDG_Player) then
 		-- Set greetings section pointer
 		if GLDG_InitGreet(GLDG_Realm.."-"..GLDG_Player) and
@@ -1219,7 +1212,7 @@ function GLDG_InitRoster()
 		if not GLDG_autoConsistencyChecked then
 			GLDG_autoConsistencyChecked = true
 			if GLDG_Convert_Plausibility_Check(true) then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.shouldFix)
+				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Inconsistencies detected. Please use |cFFFFFF7F/gg check|r to display them or |cFFFFFF7F/gg fix|r to fix them"])
 			end
 		end
 	end
@@ -1400,7 +1393,7 @@ function GLDG_RosterImport()
 				if (not GLDG_NewGuild) and (GLDG_Data.GuildSettings.SupressJoin==false) and (GLDG_TableSize(GLDG_DataGreet.Welcome) > 0) then
 					GLDG_DataChar[pl].new = true
 				end
-				GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaNewMember.." ["..Ambiguate(pl, "guild").."]")
+				GLDG_AddToStartupList(L["Guild"]..": "..L["New member"].." ["..Ambiguate(pl, "guild").."]")
 			end
 			if (pl == UnitName("player").."-"..string.gsub(GLDG_Realm, " ", "")) then
 				-- This player is our own: ignore completely
@@ -1503,15 +1496,15 @@ function GLDG_RosterImport()
 			if pn and pn ~= "" then
 				if GLDG_DataChar[pl].pNote then
 					if pn ~= GLDG_DataChar[pl].pNote then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteChanged.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaFrom.." ["..GLDG_DataChar[pl].pNote.."] "..GLDG_TXT.deltaTo.." ["..pn.."]")
+						GLDG_AddToStartupList(L["Guild"]..": "..L["The player note changed for player"].." ["..Ambiguate(pl, "guild").."] "..L["from"].." ["..GLDG_DataChar[pl].pNote.."] "..L["to"].." ["..pn.."]")
 					end
 				else
-					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteAdded.." ["..Ambiguate(pl, "guild").."]. "..GLDG_TXT.deltaIs.." ["..pn.."]")
+					GLDG_AddToStartupList(L["Guild"]..": "..L["A player note was added for player"].." ["..Ambiguate(pl, "guild").."]. "..L["The new note is"].." ["..pn.."]")
 				end
 				GLDG_DataChar[pl].pNote = pn
 			else
 				if GLDG_DataChar[pl].pNote then
-					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaPnoteRemoved.." ["..Ambiguate(pl, "guild").."]. ("..GLDG_TXT.deltaWas.." ["..GLDG_DataChar[pl].pNote.."])")
+					GLDG_AddToStartupList(L["Guild"]..": "..L["The player note was removed for player"].." ["..Ambiguate(pl, "guild").."]. ("..L["The old note was"].." ["..GLDG_DataChar[pl].pNote.."])")
 				end
 				GLDG_DataChar[pl].pNote = nil
 			end
@@ -1521,15 +1514,15 @@ function GLDG_RosterImport()
 				if on and on ~= "" then
 					if GLDG_DataChar[pl].oNote then
 						if on ~= GLDG_DataChar[pl].oNote then
-							GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteChanged.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaFrom.." ["..GLDG_DataChar[pl].oNote.."] "..GLDG_TXT.deltaTo.." ["..on.."]")
+							GLDG_AddToStartupList(L["Guild"]..": "..L["The officer note changed for player"].." ["..Ambiguate(pl, "guild").."] "..L["from"].." ["..GLDG_DataChar[pl].oNote.."] "..L["to"].." ["..on.."]")
 						end
 					else
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteAdded.." ["..Ambiguate(pl, "guild").."]. "..GLDG_TXT.deltaIs.." ["..on.."]")
+						GLDG_AddToStartupList(L["Guild"]..": "..L["A officer note was added for player"].." ["..Ambiguate(pl, "guild").."]. "..L["The new note is"].." ["..on.."]")
 					end
 					GLDG_DataChar[pl].oNote = on
 				else
 					if GLDG_DataChar[pl].oNote then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteRemoved.." ["..Ambiguate(pl, "guild").."]. ("..GLDG_TXT.deltaWas.." ["..GLDG_DataChar[pl].oNote.."])")
+						GLDG_AddToStartupList(L["Guild"]..": "..L["The officer note was removed for player"].." ["..Ambiguate(pl, "guild").."]. ("..L["The old note was"].." ["..GLDG_DataChar[pl].oNote.."])")
 					end
 					GLDG_DataChar[pl].oNote = nil
 				end
@@ -1550,34 +1543,34 @@ function GLDG_RosterImport()
 				if GLDG_DataChar[pl].newrank and (ri > GLDG_DataChar[pl].newrank) then
 					-- Player got demoted again
 					if (GLDG_DataChar[pl].rankname) then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaDemoted1.." ["..GLDG_DataChar[pl].rankname.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaDemoted2)
+						GLDG_AddToStartupList(L["Guild"]..": "..L["Player"].." ["..Ambiguate(pl, "guild").."] "..L["was demoted from rank"].." ["..GLDG_DataChar[pl].rankname.."] "..L["to rank"].." ["..rn.."] "..L[""])
 					else
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaDemoted1.." ["..GLDG_DataChar[pl].newrank.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaDemoted2)
+						GLDG_AddToStartupList(L["Guild"]..": "..L["Player"].." ["..Ambiguate(pl, "guild").."] "..L["was demoted from rank"].." ["..GLDG_DataChar[pl].newrank.."] "..L["to rank"].." ["..rn.."] "..L[""])
 					end
 					GLDG_DataChar[pl].promotor = nil
 					GLDG_DataChar[pl].newrank = nil
 				elseif GLDG_DataChar[pl].rank and (ri > GLDG_DataChar[pl].rank) then
 					-- Player got demoted
 					if (GLDG_DataChar[pl].rankname) then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaDemoted1.." ["..GLDG_DataChar[pl].rankname.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaDemoted2)
+						GLDG_AddToStartupList(L["Guild"]..": "..L["Player"].." ["..Ambiguate(pl, "guild").."] "..L["was demoted from rank"].." ["..GLDG_DataChar[pl].rankname.."] "..L["to rank"].." ["..rn.."] "..L[""])
 					else
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaDemoted1.." ["..GLDG_DataChar[pl].rank.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaDemoted2)
+						GLDG_AddToStartupList(L["Guild"]..": "..L["Player"].." ["..Ambiguate(pl, "guild").."] "..L["was demoted from rank"].." ["..GLDG_DataChar[pl].rank.."] "..L["to rank"].." ["..rn.."] "..L[""])
 					end
 				elseif GLDG_DataChar[pl].newrank and (ri < GLDG_DataChar[pl].newrank) then
 					-- Player got promoted again
 					if (GLDG_DataChar[pl].rankname) then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaPromoted1.." ["..GLDG_DataChar[pl].rankname.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaPromoted2)
+						GLDG_AddToStartupList(L["Guild"]..": "..L["Player"].." ["..Ambiguate(pl, "guild").."] "..L["was demoted from rank"].." ["..GLDG_DataChar[pl].rankname.."] "..L["to rank"].." ["..rn.."] "..L[""])
 					else
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaPromoted1.." ["..GLDG_DataChar[pl].newrank.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaPromoted2)
+						GLDG_AddToStartupList(L["Guild"]..": "..L["Player"].." ["..Ambiguate(pl, "guild").."] "..L["was demoted from rank"].." ["..GLDG_DataChar[pl].newrank.."] "..L["to rank"].." ["..rn.."] "..L[""])
 					end
 					GLDG_DataChar[pl].promotor = nil
 					GLDG_DataChar[pl].newrank = ri
 				elseif GLDG_DataChar[pl].rank and (ri < GLDG_DataChar[pl].rank) then
 					-- Player got promoted
 					if (GLDG_DataChar[pl].rankname) then
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaPromoted1.." ["..GLDG_DataChar[pl].rankname.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaPromoted2)
+						GLDG_AddToStartupList(L["Guild"]..": "..L["Player"].." ["..Ambiguate(pl, "guild").."] "..L["was demoted from rank"].." ["..GLDG_DataChar[pl].rankname.."] "..L["to rank"].." ["..rn.."] "..L[""])
 					else
-						GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaRank.." ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaPromoted1.." ["..GLDG_DataChar[pl].rank.."] "..GLDG_TXT.deltaRankTo.." ["..rn.."] "..GLDG_TXT.deltaPromoted2)
+						GLDG_AddToStartupList(GL["Guild"]..": "..L["Player"].." ["..Ambiguate(pl, "guild").."] "..L["was demoted from rank"].." ["..GLDG_DataChar[pl].rank.."] "..L["to rank"].." ["..rn.."] "..L[""])
 					end
 					GLDG_DataChar[pl].newrank = ri
 				end
@@ -1631,7 +1624,7 @@ function GLDG_RosterImport()
 				GLDG_DataChar[pl].lvl = lv
 				GLDG_DataChar[pl].storedLvl = nil	-- if the char is online, there is no need to store an old level
 				if (GLDG_DataChar[pl].lvl > GLDG_DataChar[pl].oldlvl) then
-					GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[pl].oldlvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(lv).." "..GLDG_TXT.deltaIncrease3)
+					GLDG_AddToStartupList(L["Guild"]..": ["..Ambiguate(pl, "guild").."] "..L["increased level from"].." "..tostring(GLDG_DataChar[pl].oldlvl).." "..L["to"].." "..tostring(lv).." "..L[""])
 					if (not GLDG_DataChar[pl].own) then
 						if GLDG_Data.GuildSettings.ListLevelUp==true then
 							if (mainName) then
@@ -1664,7 +1657,7 @@ function GLDG_RosterImport()
 				if (not GLDG_DataChar[pl].own) then
 					if (lv > GLDG_DataChar[pl].lvl) then
 						if ((GLDG_DataChar[pl].storedLvl == nil) or (lv > GLDG_DataChar[pl].storedLvl)) then
-							GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..Ambiguate(pl, "guild").."] "..GLDG_TXT.deltaIncrease1.." "..tostring(GLDG_DataChar[pl].lvl).." "..GLDG_TXT.deltaIncrease2.." "..tostring(lv).." "..GLDG_TXT.deltaIncrease3)
+							GLDG_AddToStartupList(L["Guild"]..": ["..Ambiguate(pl, "guild").."] "..L["increased level from"].." "..tostring(GLDG_DataChar[pl].lvl).." "..L["to"].." "..tostring(lv).." "..L[""])
 							if GLDG_Data.GuildSettings.ListLevelUpOff==true then
 								if (mainName) then
 									GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":"..GLDG_GOES_OFFLINE_COLOUR.." ["..Ambiguate(pl, "guild").."] "..GLDG_Data.colours.help.."{"..mainName.."}|r "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[pl].lvl, lv).." (off)");
@@ -1775,7 +1768,7 @@ function GLDG_findMainname(_main, _pl)
 				cntMains = cntMains+1
 				if cntMains >= 2 then
 					if CanEditOfficerNote() then
-						GLDG_AddToStartupList("|cFF7F7F7F"..GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteFrom.." ["..Ambiguate(_pl, "guild").." ] "..GLDG_TXT.deltaOnoteInvalid.." "..GLDG_TXT.deltaOnoteToManyMatches.." [".._main.."]!|r")
+						GLDG_AddToStartupList("|cFF7F7F7F"..L["Guild"]..": "..L["The officer note from"].." ["..Ambiguate(_pl, "guild").." ] "..L["is invalid =>"].." "..L["too many matches for"].." [".._main.."]!|r")
 					end
 					--print("Die Offiziersnotiz von "..pl.." ist ungültig (zu viele Treffer):"..oDBname.."Zähler: "..cnt)
 					_main = nil
@@ -1785,7 +1778,7 @@ function GLDG_findMainname(_main, _pl)
 		end
 		if cntMains == 0 then
 			if CanEditOfficerNote() then
-				GLDG_AddToStartupList("|cFF7F7F7F"..GLDG_TXT.deltaGuild..": "..GLDG_TXT.deltaOnoteFrom.." ["..Ambiguate(_pl, "guild").." ] "..GLDG_TXT.deltaOnoteInvalid.." [".._main.."] "..GLDG_TXT.deltaOnoteNotFound.."|r")
+				GLDG_AddToStartupList("|cFF7F7F7F"..L["Guild"]..": "..L["The officer note from"].." ["..Ambiguate(_pl, "guild").." ] "..L["is invalid =>"].." [".._main.."] "..L["not found"].."|r")
 			end
 			--print("Die Offiziersnotiz von "..pl.." ist ungültig (nicht gefunden) Zähler: "..cntMains)
 		elseif cntMains == 1 then
@@ -1796,12 +1789,6 @@ function GLDG_findMainname(_main, _pl)
 end
 ------------------------------------------------------------
 function GLDG_RosterPurge()
-	-- Don't purge if list is not complete
---	if not GetGuildRosterShowOffline() then
---		GLDG_Print("  --> returning early")
---		return
---	end
-	--GLDG_Print("  --> doing purge")
 
 	-- Set guildlist
 	local purge = {}
@@ -1814,7 +1801,7 @@ function GLDG_RosterPurge()
 	end
 	for p in pairs(purge) do
 		if (GLDG_DataChar[p].guild and GLDG_DataChar[p].guild==GLDG_unique_GuildName) then
-			GLDG_AddToStartupList(GLDG_TXT.deltaGuild..": ["..Ambiguate(p, "guild").."] "..GLDG_TXT.deltaLeftGuild)
+			GLDG_AddToStartupList(L["Guild"]..": ["..Ambiguate(p, "guild").."] "..L["left guild"])
 			if GLDG_Data.GuildSettings.ListQuit==true then
 				if (GLDG_DataChar[p] and GLDG_DataChar[p].alt) then
 					local main = GLDG_DataChar[p].alt;
