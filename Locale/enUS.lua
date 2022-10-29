@@ -6,7 +6,7 @@ if (not GLDG_TXT) then
 end
 
 -- Players tab
-GLDG_TXT.playersheader	= "Configure settings for characters: ignore them, set main/alt and enter alias"
+--GLDG_TXT.playersheader	= "Configure settings for characters: ignore them, set main/alt and enter alias"
 GLDG_TXT.markIGN	= "IGNORE"
 GLDG_TXT.markMAIN	= "MAIN"
 GLDG_TXT.markALT	= "ALT"
@@ -63,17 +63,17 @@ GLDG_TXT.OfficerNotehead = "Edit officer note for character %s"
 
 GLDG_TXT.tipIgnore	= "Ignored"
 GLDG_TXT.tipAlias	= "Alias"
-GLDG_TXT.tipMain	= "Main"
+--GLDG_TXT.tipMain	= "Main"
 GLDG_TXT.tipMainYes	= "Yes"
 GLDG_TXT.tipAlts	= "Alts"
-GLDG_TXT.tipGuild	= "Guild"
+--GLDG_TXT.tipGuild	= "Guild" --L["Guild"]
 GLDG_TXT.tipNew		= "New in guild"
-GLDG_TXT.tipRank	= "Rank"
-GLDG_TXT.tipNewRank	= "(new rank)"
-GLDG_TXT.tipPlayerNote	= "Player Note"
-GLDG_TXT.tipOfficerNote = "Officer Note"
+--GLDG_TXT.tipRank	= "Rank"
+--GLDG_TXT.tipNewRank	= "(new rank)"
+--GLDG_TXT.tipPlayerNote	= "Player Note"
+--GLDG_TXT.tipOfficerNote = "Officer Note"
 GLDG_TXT.tipNote	= "Note"
-GLDG_TXT.tipClass	= "Class"
+--GLDG_TXT.tipClass	= "Class"
 GLDG_TXT.tipLevel	= "Level"
 GLDG_TXT.tipLast	= "Last on with"
 GLDG_TXT.tipOnline	= "Online"
@@ -81,7 +81,7 @@ GLDG_TXT.tipOnlineYes	= "Online"
 GLDG_TXT.tipOffline	= "Went offline at"
 GLDG_TXT.tipQueue	= "In queue since"
 GLDG_TXT.tipFriends	= "Friends"
-GLDG_TXT.tipFriendNote	= "Friends Note"
+--GLDG_TXT.tipFriendNote	= "Friends Note"
 GLDG_TXT.tipChannels	= "Channel(s)"
 GLDG_TXT.tipAchievment  = "Last achievment"
 
@@ -163,10 +163,10 @@ GLDG_TXT.displayRemovedGuildless2	= ""
 --GLDG_TXT.colDefault	= "Default colours"
 
 -- Colour picker extension
-GLDG_TXT.red		= "Red"
-GLDG_TXT.green		= "Green"
-GLDG_TXT.blue		= "Blue"
-GLDG_TXT.opactiy	= "Opacity"
+--GLDG_TXT.red		= "Red"
+--GLDG_TXT.green		= "Green"
+--GLDG_TXT.blue		= "Blue"
+--GLDG_TXT.opactiy	= "Opacity"
 GLDG_TXT.colourConfig	= "Cannot configure two colours at once"
 GLDG_TXT.colourDefault	= "Cannot set default colours while colour picker is open"
 
@@ -198,11 +198,11 @@ GLDG_TXT.help_check		= "Check if main-alt assignments are correct"
 GLDG_TXT.help_alert		= "Check if |cFFFFFF7FGuild member notification|r is enabled"
 GLDG_TXT.help_urbin		= "List details about all addons by Urbin"
 GLDG_TXT.noargs			= "without argument, show config frame"
-GLDG_TXT.listall		= "Listing all characters (also offline)"
+--GLDG_TXT.listall		= "Listing all characters (also offline)"
 GLDG_TXT.listonline		= "Listing online characters only"
-GLDG_TXT.notinguild		= "is not in guild"
-GLDG_TXT.notfriend		= "or a friend"
-GLDG_TXT.notchannel		= "or in channel"
+--GLDG_TXT.notinguild		= "is not in guild"
+--GLDG_TXT.notfriend		= "or a friend"
+--GLDG_TXT.notchannel		= "or in channel"
 GLDG_TXT.pasting		= "Pasting to list"
 GLDG_TXT.disabled		= "Friends support disabled"
 GLDG_TXT.disabled_c		= "Channel support disabled"
@@ -213,7 +213,7 @@ GLDG_TXT.version		= "Version"
 GLDG_TXT.date			= "Date"
 GLDG_TXT.web			= "Website"
 GLDG_TXT.slash			= "Slash command"
-GLDG_TXT.urbin			= "Other addons by Urbin"
+--GLDG_TXT.urbin			= "Other addons by Urbin"
 
 -- Force Chatlist
 GLDG_TXT.forceChatList	= "Forced chatlist to be displayed in chat"
@@ -260,15 +260,15 @@ GLDG_TXT.lookup		= "Lookup"
 GLDG_TXT.goodbye	= "Good bye"
 
 -- Version check
-GLDG_TXT.newer		= "A newer Version of the addon is available."
-GLDG_TXT.newer1		= "You have version "
-GLDG_TXT.newer2		= "Player "
+--GLDG_TXT.newer		= "A newer Version of the addon is available."
+--GLDG_TXT.newer1		= "You have version "
+--GLDG_TXT.newer2		= "Player "
 GLDG_TXT.newer3		= " has version "
 GLDG_TXT.newer4		= "."
-GLDG_TXT.bigBrother	= " is using version "
-GLDG_TXT.bigBrother2	= " has updated from version "
-GLDG_TXT.bigBrother3	= " to version "
-GLDG_TXT.bigBrother4	= ""
+--GLDG_TXT.bigBrother	= " is using version "
+--GLDG_TXT.bigBrother2	= " has updated from version "
+--GLDG_TXT.bigBrother3	= " to version "
+--GLDG_TXT.bigBrother4	= ""
 GLDG_TXT.bigBrother5	= "Listing known GuildGreet users"
 GLDG_TXT.bigBrother6	= "No other GuildGreet users known"
 
@@ -768,68 +768,3 @@ GLDG_TXT.elements.name.TodoHelpBox	= GLDG_TXT.infoHelp
 GLDG_TXT.elements.tip.TodoHelpBox	= "Click this box to get information on how to use this addon."
 
 
--- Some greetings to get started: those can be changed in the configuration GUI
--- Important note: this list will only be used when no configuration is found!
--------------------------------------------------------------------------------
-
--- Default
-GLDG_GREET = {}
-GLDG_GREET[1] = "Hi %s"
-GLDG_GREET[2] = "Hello %s"
-GLDG_GREET[3] = "Hey %s"
--- Relogs
-GLDG_GREETBACK = {}
-GLDG_GREETBACK[1] = "Welcome back %s"
-GLDG_GREETBACK[2] = "Hi again %s"
-GLDG_GREETBACK[3] = "Hi %s, welcome back"
--- Welcome to guild
-GLDG_WELCOME = {}
-GLDG_WELCOME[1] = "Welcome to the guild %s"
-GLDG_WELCOME[2] = "Hi %s, nice to have you in the guild"
-GLDG_WELCOME[3] = "Welcome %s, good you're joining us"
--- Promotion
-GLDG_RANK = {}
-GLDG_RANK[1] = "Congratulations %s with your promotion to %s"
-GLDG_RANK[2] = "Grats for %s on becoming %s"
--- New level
-GLDG_LEVEL = {}
-GLDG_LEVEL[1] = "Congratulations %s on reaching level %s"
-GLDG_LEVEL[2] = "%s, grats on getting level %s"
--- Leaving (day)
-GLDG_BYE = {}
-GLDG_BYE[1] = "Goodbye %s"
-GLDG_BYE[2] = "Bye bye %s"
--- Leaving (night)
-GLDG_NIGHT = {}
-GLDG_NIGHT[1] = "Goodbye %s"
-GLDG_NIGHT[2] = "Bye bye %s"
-GLDG_NIGHT[3] = "Good night %s"
--- Greeting guild
-GLDG_GUILD = {}
-GLDG_GUILD[1] = "Hi guildies"
--- Greeting channel
-GLDG_CHANNEL = {}
-GLDG_CHANNEL[1] = "Hi friends"
--- Good bye guild
-GLDG_BYE_GUILD = {}
-GLDG_BYE_GUILD[1] = "Good bye guildies"
--- Good night guild
-GLDG_NIGHT_GUILD = {}
-GLDG_NIGHT_GUILD[1] = "Good night guildies"
--- Good bye channel
-GLDG_BYE_CHANNEL = {}
-GLDG_BYE_CHANNEL[1] = "Good bye friends"
--- Good night channel
-GLDG_NIGHT_CHANNEL = {}
-GLDG_NIGHT_CHANNEL[1] = "Good night friends"
--- See you later guild
-GLDG_LATER_GUILD = {}
-GLDG_LATER_GUILD[1] = "See you later guildies"
--- See you later channel
-GLDG_LATER_CHANNEL = {}
-GLDG_LATER_CHANNEL[1] = "See you later friends"
--- Achievment
-GLDG_ACHIEVMENT = {}
-GLDG_ACHIEVMENT[1] = "Congratulations %s for %s"
-GLDG_ACHIEVMENT[2] = "Congratulations %s"
-GLDG_ACHIEVMENT[3] = "Grats %s"

@@ -75,6 +75,8 @@ GLDG_CONFIG_STRING_B = nil
 GLDG_CONFIG_STRING_C = nil
 GLDG_CONFIG_STRING_D = nil
 
+
+
 --------------------------
 -- _01_ Addon Variables --
 --------------------------
@@ -329,9 +331,9 @@ function GLDG_OnEvent(self, event, ...)
 						end
 						if (not GLDG_BigBrother[arg4]) then
 							GLDG_BigBrother[arg4] = hisVersion
-							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..arg4..GLDG_TXT.bigBrother..hisVersion)
+							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..arg4..L[" is using version "]..hisVersion)
 						elseif (GLDG_BigBrother[arg4] ~= hisVersion) then
-							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..arg4..GLDG_TXT.bigBrother2..GLDG_BigBrother[arg4]..GLDG_TXT.bigBrother3..hisVersion..GLDG_TXT.bigBrother4)
+							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..arg4..L[" has updated from version "]..GLDG_BigBrother[arg4]..L[" to version "]..hisVersion..L[""])
 							GLDG_BigBrother[arg4] = hisVersion
 						end
 					end
@@ -342,9 +344,9 @@ function GLDG_OnEvent(self, event, ...)
 							-- to make sure, we only warn once
 							GLDG_HighestVersion = hisVersion
 
-							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.newer)
-							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.newer1..myVersion..GLDG_TXT.newer4)
-							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.newer2..arg4..GLDG_TXT.newer3..hisVersion..GLDG_TXT.newer4)
+							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["A newer Version of the addon is available."])
+							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["You have version "]..myVersion..L["."])
+							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Player"]..arg4..L[" has version "]..hisVersion..GL["."])
 						else
 							--GLDG_Print("    "..arg4.." has version "..hisVersion.." - you have "..myVersion.." - highest seen "..GLDG_HighestVersion)
 						end
@@ -632,6 +634,7 @@ function GLDG_Init()
 	if GLDG_Data.DEMONHUNTERFilter == nil then GLDG_Data.DEMONHUNTERFilter = true end
 	if GLDG_Data.WARLOCKFilter == nil then GLDG_Data.WARLOCKFilter = true end
 	if GLDG_Data.MONKFilter == nil then GLDG_Data.MONKFilter = true end
+	if GLDG_Data.EVOKERFilter == nil then GLDG_Data.EVOKERFilter = true end
 
 	if GLDG_Data.ShowIgnore == 1 then GLDG_Data.ShowIgnore = true end
 	if GLDG_Data.ShowAlt == 1 then GLDG_Data.ShowAlt = true end
@@ -705,10 +708,10 @@ function GLDG_Init()
 	_G[GLDG_GUI.."Title"]:SetText(GLDG_NAME.." "..version)
 
 	-- Initialize the colour picker frame
-	_G[GLDG_COLOUR.."RedText"]:SetText(GLDG_TXT.red)
-	_G[GLDG_COLOUR.."GreenText"]:SetText(GLDG_TXT.green)
-	_G[GLDG_COLOUR.."BlueText"]:SetText(GLDG_TXT.blue)
-	_G[GLDG_COLOUR.."OpacityText"]:SetText(GLDG_TXT.opactiy)
+	_G[GLDG_COLOUR.."RedText"]:SetText(L["Red"])
+	_G[GLDG_COLOUR.."GreenText"]:SetText(L["Green"])
+	_G[GLDG_COLOUR.."BlueText"]:SetText(L["Blue"])
+	_G[GLDG_COLOUR.."OpacityText"]:SetText(L["Opacity"])
 
 	-- Make GUI close on escape
 	tinsert(UISpecialFrames, GLDG_GUI)
@@ -2083,12 +2086,12 @@ function GLDG_ListForPlayer(playerName, allDetails, onList, print, guildOnly)
 				result = result..L["No characters found"]
 			end
 		else
-			result = playerName.." "..GLDG_TXT.notinguild;
+			result = playerName.." "..L["is not in guild"];
 			if GLDG_Data.UseFriends==true then
-				result = result.." "..GLDG_TXT.notfriend;
+				result = result.." "..L["or a friend"];
 			end
 			if GLDG_inChannel then
-				result = result.." "..GLDG_TXT.notchannel;
+				result = result.." "..L["or in channel"];
 			end
 		end
 		if (print) then
@@ -2116,7 +2119,7 @@ function GLDG_ListAllPlayers(offline, print, guildOnly)
 
 	if offline then
 		if (print) then
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.listall)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Listing all characters (also offline)"])
 		end
 		for player in pairs(GLDG_DataChar) do
 			if (not guildOnly and (GLDG_DataChar[player].main or not GLDG_DataChar[player].alt)) or
@@ -2129,7 +2132,7 @@ function GLDG_ListAllPlayers(offline, print, guildOnly)
 		end
 	else
 		if (print) then
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.listonline)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Listing online characters only"])
 		end
 		for player in pairs(onList) do
 			if (not guildOnly or (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_unique_GuildName)) then
@@ -2644,53 +2647,53 @@ function GLDG_ShowToolTip(self, buttonName)
 		GameTooltip:AddLine(" ", 1, 1, 1, 1.0, 1)
 		if (GLDG_DataChar[oDBname].alt) then
 			if (GLDG_DataChar[GLDG_DataChar[oDBname].alt].alias) then
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, GLDG_DataChar[oDBname].alt.." ("..GLDG_DataChar[GLDG_DataChar[oDBname].alt].alias..")", 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(L["Main"], GLDG_DataChar[oDBname].alt.." ("..GLDG_DataChar[GLDG_DataChar[oDBname].alt].alias..")", 1, 1, 0, 1, 1, 1)
 			else
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipMain, Ambiguate(GLDG_DataChar[oDBname].alt, "guild"), 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(L["Main"], Ambiguate(GLDG_DataChar[oDBname].alt, "guild"), 1, 1, 0, 1, 1, 1)
 			end
 		end
 		if (GLDG_DataChar[oDBname].guild) then
 			if GLDG_DataChar[oDBname].guild==GLDG_unique_GuildName then
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipGuild, GLDG_GuildName, 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(L["Guild"], GLDG_GuildName, 1, 1, 0, 1, 1, 1)
 			else
-				GameTooltip:AddDoubleLine(GLDG_TXT.tipGuild, GLDG_DataChar[oDBname].guild, 1, 1, 0, 1, 1, 1)
+				GameTooltip:AddDoubleLine(L["Guild"], GLDG_DataChar[oDBname].guild, 1, 1, 0, 1, 1, 1)
 			end
 		end
 		if GLDG_DataChar[oDBname].rank and GLDG_DataChar[oDBname].rankname then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipNewRank, GLDG_DataChar[oDBname].rankname.." ("..tostring(GLDG_DataChar[oDBname].rank)..")", 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["(new rank)"], GLDG_DataChar[oDBname].rankname.." ("..tostring(GLDG_DataChar[oDBname].rank)..")", 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif GLDG_DataChar[oDBname].rank then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipNewRank, tostring(GLDG_DataChar[oDBname].rank), 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["(new rank)"], tostring(GLDG_DataChar[oDBname].rank), 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif GLDG_DataChar[oDBname].rankname then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipNewRank, GLDG_DataChar[oDBname].rankname, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["(new rank)"], GLDG_DataChar[oDBname].rankname, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if GLDG_DataChar[oDBname].pNote then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipPlayerNote, GLDG_DataChar[oDBname].pNote, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Player Note"], GLDG_DataChar[oDBname].pNote, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if GLDG_DataChar[oDBname].oNote then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipOfficerNote, GLDG_DataChar[oDBname].oNote, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Officer Note"], GLDG_DataChar[oDBname].oNote, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 
 		if GLDG_DataChar[oDBname].class then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipClass, GLDG_DataChar[oDBname].class, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Class"], GLDG_DataChar[oDBname].class, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if GLDG_DataChar[oDBname].storedLvl then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipLevel, GLDG_DataChar[oDBname].storedLvl, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Level"], GLDG_DataChar[oDBname].storedLvl, 1, 1, 0, 1, 1, 1)
 		elseif GLDG_DataChar[oDBname].lvl then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipLevel, GLDG_DataChar[oDBname].lvl, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Level"], GLDG_DataChar[oDBname].lvl, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if (GLDG_DataChar[oDBname].friends and GLDG_DataChar[oDBname].friends[GLDG_Player] and GLDG_DataChar[oDBname].friends[GLDG_Player]~="") then
 			GameTooltip:AddLine(" ", 1, 1, 1, 1.0, 1)
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipFriendNote, GLDG_DataChar[oDBname].friends[GLDG_Player], 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Friends Note"], GLDG_DataChar[oDBname].friends[GLDG_Player], 1, 1, 0, 1, 1, 1)
 		end
 		if GLDG_DataChar[oDBname].note then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipNote, GLDG_DataChar[oDBname].note, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Note"].tipNote, GLDG_DataChar[oDBname].note, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 	end
@@ -2859,7 +2862,6 @@ function GLDG_FilterMessages(player, list)
 
 	return newlist
 end
-
 
 ------------------------------------------------------------
 function GLDG_ParseCustomMessage(cname, name, msg)
@@ -3078,7 +3080,7 @@ function GLDG_SendBye(name, testing)
 	local option = ""
 	local list = GLDG_DataGreet.Bye
 
-	-- if time is between 20:00 and 06:00 use night mode
+	-- if time is between 20:00 and 05:00 use night mode
 	local hour,min = GLDG_GetTime();
 	if ((hour >= 20) or (hour <=5)) then
 		list = GLDG_DataGreet.Night;
