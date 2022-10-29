@@ -11,5 +11,6 @@
 	<Include file="ruRU.lua" />
 	<Include file="itIT.lua" />
 	<Include file="ptBR.lua" />
+	<Include file="elements.lua />"
 
 </Ui>

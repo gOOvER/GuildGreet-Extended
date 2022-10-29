@@ -352,3 +352,4 @@ L["ChatMsg/GuildGreet using your own settings (But a config string is in the gui
 L["ChatMsg/Guild info written successfully!"] = true
 L["ChatMsg/The guild info is too long..."] = true
 L["Forced chatlist to be displayed in chat"] = true
+L["Only show relogs after more then %d min"] = true
