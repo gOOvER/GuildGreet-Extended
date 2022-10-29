@@ -1,4 +1,4 @@
-## Interface: 90200
+## Interface: 100000
 
 ## Title: GuildGreet-Extended
 ## Version: @project-version@
@@ -6,6 +6,8 @@
 
 ## X-Category: Guild
 ## X-License: All Rights Reserved: You are free to fork and modify on GitHub, please ask us about anything else.
+## X-Website: https://www.goover.de
+## X-Email: info@goover.de
 ## X-Curse-Project-ID: 4391
 ## X-WoWI-ID: 21709
 ## X-Wago-ID: WL6JA9Nv
@@ -16,5 +18,5 @@
 
 embeds.xml
 
-lang\locale.xml
+Locale\locale.xml
 GuildGreet.xml
