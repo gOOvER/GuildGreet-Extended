@@ -4811,7 +4811,7 @@ function GLDG_ShowPlayerToolTip(element)
 			end
 		end
 		if p.friends then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipFriends, GLDG_TableSize(p.friends), 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Friends"], GLDG_TableSize(p.friends), 1, 1, 0, 1, 1, 1)
 			for q in pairs(p.friends) do
 				if p.friends[q] ~= "" then
 					GameTooltip:AddDoubleLine(" ", q.." (|cFFFFFFBF"..p.friends[q].."|r)", 1, 1, 0, 1, 1, 1)	-- show friends note
@@ -4834,7 +4834,7 @@ function GLDG_ShowPlayerToolTip(element)
 				color_s = "|c"..RAID_CLASS_COLORS[GLDG_DataChar[p.last].enClass].colorStr
 				color_p = "|r"
 			end
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipLast, color_s..Ambiguate(p.last, "guild")..color_p, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Last on with"], color_s..Ambiguate(p.last, "guild")..color_p, 1, 1, 0, 1, 1, 1)
 			added = true
 		elseif p.alt and GLDG_DataChar[p.alt].last then
 			color_s = ""
@@ -4843,20 +4843,20 @@ function GLDG_ShowPlayerToolTip(element)
 				color_s = "|c"..RAID_CLASS_COLORS[GLDG_DataChar[GLDG_DataChar[p.alt].last].enClass].colorStr
 				color_p = "|r"
 			end
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipLast, color_s..Ambiguate(GLDG_DataChar[p.alt].last..color_p, "guild"), 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Last on with"], color_s..Ambiguate(GLDG_DataChar[p.alt].last..color_p, "guild"), 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 
 		if GLDG_Online[name] then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipOnline, GLDG_TXT.tipOnlineYes, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Online"], L["Online"], 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if GLDG_Offline[name] then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipOffline, GLDG_Offline[name], 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Offline"], GLDG_Offline[name], 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 		if GLDG_Queue[name] then
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipQueue, GLDG_Queue[name], 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["In queue since"], GLDG_Queue[name], 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 
@@ -4865,7 +4865,7 @@ function GLDG_ShowPlayerToolTip(element)
 				GameTooltip:AddLine(" ", 1, 1, 0.75)
 				added = false
 			end
-			GameTooltip:AddDoubleLine(GLDG_TXT.tipNote, p.note, 1, 1, 0, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Note"], p.note, 1, 1, 0, 1, 1, 1)
 			added = true
 		end
 
@@ -4941,9 +4941,9 @@ function GLDG_ShowPlayerButtons()
 	-- Ignore button
 	local button = _G[frame.."Ignore"]
 	if p.ignore then
-		button:SetText(GLDG_TXT.pbrign)
+		button:SetText(L["Unignore"])
 	else
-		button:SetText(GLDG_TXT.pbsign)
+		button:SetText(L["Ignore"])
 	end
 	button:Show()
 	-- Alias button
@@ -4954,11 +4954,11 @@ function GLDG_ShowPlayerButtons()
 	button = _G[frame.."Main"]
 	button:Show()
 	if p.alt then
-		button:SetText(GLDG_TXT.pbpmain)
+		button:SetText(L["Promote to main"])
 	elseif not p.main then
-		button:SetText(GLDG_TXT.pbsmain)
+		button:SetText(L["Set as main"])
 	elseif (GLDG_NumAlts == 0) then
-		button:SetText(GLDG_TXT.pbrmain)
+		button:SetText(L["Unset as main"])
 	else
 		button:Hide()
 	end
@@ -4967,11 +4967,11 @@ function GLDG_ShowPlayerButtons()
 	button:Show()
 	button:Enable()
 	if p.alt then
-		button:SetText(GLDG_TXT.pbralt)
+		button:SetText(L["Unset as alt"])
 	elseif p.main then
 		button:Hide()
 	else
-		button:SetText(GLDG_TXT.pbsalt)
+		button:SetText(L["Set as alt"])
 	end
 	-- Guild button
 	button = _G[frame.."Guild"]
@@ -5048,16 +5048,16 @@ end
 ------------------------------------------------------------
 function GLDG_ShowPlayerAlias(frame)
 	-- Set title
-	_G[frame.."Header"]:SetText(string.format(GLDG_TXT.aliashead, GLDG_SelPlrName))
+	_G[frame.."Header"]:SetText(string.format(L["Set alias for character %s"], GLDG_SelPlrName))
 	-- Set editbox and buttons text
 	local p = GLDG_DataChar[GLDG_SelPlrName]
 	if p.alias then
-		_G[frame.."Set"]:SetText(GLDG_TXT.update)
-		_G[frame.."Del"]:SetText(GLDG_TXT.delete)
+		_G[frame.."Set"]:SetText(L["update"])
+		_G[frame.."Del"]:SetText(L["delete"])
 		_G[frame.."Editbox"]:SetText(p.alias)
 	else
-		_G[frame.."Set"]:SetText(GLDG_TXT.set)
-		_G[frame.."Del"]:SetText(GLDG_TXT.cancel)
+		_G[frame.."Set"]:SetText(L["set"])
+		_G[frame.."Del"]:SetText(L["cancel"])
 		_G[frame.."Editbox"]:SetText("") end
 end
 
@@ -5137,16 +5137,16 @@ end
 ------------------------------------------------------------
 function GLDG_ShowPlayerGuild(frame)
 	-- Set title
-	_G[frame.."Header"]:SetText(string.format(GLDG_TXT.guildhead, GLDG_SelPlrName))
+	_G[frame.."Header"]:SetText(string.format(L["Set guild for character %s"], GLDG_SelPlrName))
 	-- Set editbox and buttons text
 	local p = GLDG_DataChar[GLDG_SelPlrName]
 	if p.guild then
-		_G[frame.."Set"]:SetText(GLDG_TXT.update)
-		_G[frame.."Del"]:SetText(GLDG_TXT.delete)
+		_G[frame.."Set"]:SetText(L["update"])
+		_G[frame.."Del"]:SetText(L["delete"])
 		_G[frame.."Editbox"]:SetText(p.guild)
 	else
-		_G[frame.."Set"]:SetText(GLDG_TXT.set)
-		_G[frame.."Del"]:SetText(GLDG_TXT.cancel)
+		_G[frame.."Set"]:SetText(L["set"])
+		_G[frame.."Del"]:SetText(L["cancel"])
 		_G[frame.."Editbox"]:SetText("") end
 end
 
@@ -5179,16 +5179,16 @@ end
 ------------------------------------------------------------
 function GLDG_ShowPlayerNote(frame)
 	-- Set title
-	_G[frame.."Header"]:SetText(string.format(GLDG_TXT.notehead, GLDG_SelPlrName))
+	_G[frame.."Header"]:SetText(string.format(L["Set note for character %s"], GLDG_SelPlrName))
 	-- Set editbox and buttons text
 	local p = GLDG_DataChar[GLDG_SelPlrName]
 	if p.note then
-		_G[frame.."Set"]:SetText(GLDG_TXT.update)
-		_G[frame.."Del"]:SetText(GLDG_TXT.delete)
+		_G[frame.."Set"]:SetText(L["update"])
+		_G[frame.."Del"]:SetText(L["delete"])
 		_G[frame.."Editbox"]:SetText(p.note)
 	else
-		_G[frame.."Set"]:SetText(GLDG_TXT.set)
-		_G[frame.."Del"]:SetText(GLDG_TXT.cancel)
+		_G[frame.."Set"]:SetText(L["set"])
+		_G[frame.."Del"]:SetText(L["cancel"])
 		_G[frame.."Editbox"]:SetText("") end
 end
 
@@ -5218,7 +5218,7 @@ end
 ------------------------------------------------------------
 function GLDG_ShowPublicPlayerNote(frame)
 	-- Set title
-	_G[frame.."Header"]:SetText(string.format(GLDG_TXT.PublicNotehead, GLDG_SelPlrName))
+	_G[frame.."Header"]:SetText(string.format(L["Edit public note for character %s"], GLDG_SelPlrName))
 	-- Set editbox and buttons text
 	local publicnote = nil
 	for i = 1, GetNumGuildMembers() do
@@ -5227,12 +5227,12 @@ function GLDG_ShowPublicPlayerNote(frame)
 	end
 
 	if publicnote then
-		_G[frame.."Set"]:SetText(GLDG_TXT.update)
-		_G[frame.."Del"]:SetText(GLDG_TXT.cancel)
+		_G[frame.."Set"]:SetText(L["update"])
+		_G[frame.."Del"]:SetText(L["cancel"])
 		_G[frame.."Editbox"]:SetText(publicnote)
 	else
-		_G[frame.."Set"]:SetText(GLDG_TXT.set)
-		_G[frame.."Del"]:SetText(GLDG_TXT.cancel)
+		_G[frame.."Set"]:SetText(L["set"])
+		_G[frame.."Del"]:SetText(L["cancel"])
 		_G[frame.."Editbox"]:SetText("") end
 end
 
@@ -5262,7 +5262,7 @@ end
 ------------------------------------------------------------
 function GLDG_ShowOfficerNote(frame)
 	-- Set title
-	_G[frame.."Header"]:SetText(string.format(GLDG_TXT.OfficerNotehead, GLDG_SelPlrName))
+	_G[frame.."Header"]:SetText(string.format(L["Edit officer note for character %s"], GLDG_SelPlrName))
 	-- Set editbox and buttons text
 	local officernote = nil
 	for i = 1, GetNumGuildMembers() do
@@ -5271,12 +5271,12 @@ function GLDG_ShowOfficerNote(frame)
 	end
 
 	if officernote then
-		_G[frame.."Set"]:SetText(GLDG_TXT.update)
-		_G[frame.."Del"]:SetText(GLDG_TXT.cancel)
+		_G[frame.."Set"]:SetText(L["update"])
+		_G[frame.."Del"]:SetText(L["cancel"])
 		_G[frame.."Editbox"]:SetText(officernote)
 	else
-		_G[frame.."Set"]:SetText(GLDG_TXT.set)
-		_G[frame.."Del"]:SetText(GLDG_TXT.cancel)
+		_G[frame.."Set"]:SetText(L["set"])
+		_G[frame.."Del"]:SetText(L["cancel"])
 		_G[frame.."Editbox"]:SetText("") end
 end
 
@@ -5305,7 +5305,7 @@ end
 function GLDG_SendWho(name)
 	if name then
 		if (GLDG_Data.GuildSettings.ShowWhoSpam==true) then
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.request.." ["..Ambiguate(name, "guild").."]")
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Sending /who request for"].." ["..Ambiguate(name, "guild").."]")
 		end
 		SendWho('n-"'..Ambiguate(name, "guild")..'"')
 	end
@@ -5332,14 +5332,14 @@ function GLDG_TreatWhoInfo(charname, guildname, level, class)
 	if not charname then return end
 
 	if GLDG_DataChar[charname] then
-		result = GLDG_TXT.whoResult1.." ["..tostring(charname).."] "
+		result = L["Who results for"].." ["..tostring(charname).."] "
 		if guildname and guildname ~= "" then
 			GLDG_DataChar[charname].guild = guildname
 			result = result.."<"..tostring(guildname)..">"
 		end
 		if level then
 			GLDG_DataChar[charname].lvl = level
-			result = result..", "..GLDG_TXT.whoResult2.." "..tostring(level)
+			result = result..", "..L["Level"].." "..tostring(level)
 			-- todo: handle level up check (does this make sense, it might have been ages ago?)
 		end
 		if class then
