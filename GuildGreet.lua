@@ -826,7 +826,7 @@ function GLDG_InitFrame(frameName)
 		_G[name.."DEMONHUNTERFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["DEMONHUNTER"])
 		_G[name.."WARLOCKFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["WARLOCK"])
 		_G[name.."MONKFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["MONK"])
-		_G[name.."MONKFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["EVOKER"])
+		_G[name.."EVOKERFilterText"]:SetText(LOCALIZED_CLASS_NAMES_MALE["EVOKER"])
 		
 		-- list header
 		_G[name.."HeaderLineName"]:SetText(L["Name"])
@@ -1050,6 +1050,7 @@ function GLDG_UpdatePlayerCheckboxes()
 	_G[name.."DEMONHUNTERFilterBox"]:SetChecked(GLDG_Data.DEMONHUNTERFilter)
 	_G[name.."WARLOCKFilterBox"]:SetChecked(GLDG_Data.WARLOCKFilter)
 	_G[name.."MONKFilterBox"]:SetChecked(GLDG_Data.MONKFilter)
+	_G[name.."EVOKERFilterBox"]:SetChecked(GLDG_Data.EVOKERFilter)
 
 	if (GLDG_Data.FilterOnline==true or GLDG_Data.GuildSort==true) then
 		_G[name.."Alt2Box"]:Disable()
@@ -6823,8 +6824,9 @@ classColors["ROGUE"] = C_ClassColor.GetClassColor("ROGUE");
 classColors["HUNTER"] = C_ClassColor.GetClassColor("HUNTER");
 classColors["DEADKNIGHT"] = C_ClassColor.GetClassColor("DEADKNIGHT");
 classColors["MONK"] = C_ClassColor.GetClassColor("MONK");
+classColors["EVOKER"] = C_ClassColor.GetClassColor("EVOKER");
 
-------------------------------------------------------------
+------------------------------------------------------------EVOKER
 function GLDG_ChatFilter(chatFrame, event, ...) -- chatFrame = self
 
 	local msg, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;

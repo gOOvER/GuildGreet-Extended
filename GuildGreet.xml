@@ -2574,6 +2574,14 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
+				<!-->EVOKERFilterFilter text<-->
+				<FontString name="$parentEVOKERFilterText" inherits="GLDG_LOptionText" wordwrap="false" >
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentWARLOCKFilterText" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
 			</Layer>
 		</Layers>
 		<Frames>
@@ -3081,6 +3089,24 @@
 				<Scripts>
 					<OnClick>
 						GLDG_Data.MONKFilter = self:GetChecked()
+						GLDG_UpdatePlayerCheckboxes()
+						GLDG_ListPlayers()
+					</OnClick>
+					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
+					<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<!-->EVOKERFilter Box<-->
+			<CheckButton name="$parentEVOKERFilterBox" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentEVOKERFilterText" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GLDG_Data.EVOKERFilter = self:GetChecked()
 						GLDG_UpdatePlayerCheckboxes()
 						GLDG_ListPlayers()
 					</OnClick>
