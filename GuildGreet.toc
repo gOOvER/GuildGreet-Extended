@@ -16,7 +16,6 @@
 ## Notes: Keeps a log of guildies waiting for your greeting
 ## SavedVariables: GLDG_Data
 
-elements.lua
 embeds.xml
 
 lang\locale.xml
