@@ -1,6 +1,8 @@
 GuildGreet Extended - A World of Warcraft guild and greeting tool
 -----------------------------------------------------------------
 
+I don't play WoW since reales of Shadowland, so a lot is needed to update. Any help is welcome :)
+
 
 History
 -------
@@ -21,8 +23,6 @@ as he is short on time anyway.
 
 Urbin, Dun-Morogh (EU)
 
-
-Test
 
 Extended features
 -----------------
