@@ -56,23 +56,23 @@ GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
 GLDG_COLOUR	= "GuildGreetColourFrame"	-- Name of colour picker addition
-GDLG_VNMBR	= 902000			-- Number code for this version
+GDLG_VNMBR	= 100000			-- Number code for this version
 
 -- Table linking tabs to frames
 GLDG_Tab2Frame = {}
-GLDG_Tab2Frame.Tab1 = "Settings"
-GLDG_Tab2Frame.Tab2 = "Greetings"
-GLDG_Tab2Frame.Tab3 = "Players"
-GLDG_Tab2Frame.Tab4 = "Cleanup"
-GLDG_Tab2Frame.Tab5 = "Colour"
+GLDG_Tab2Frame.Tab1 = L["Settings"]
+GLDG_Tab2Frame.Tab2 = L["Greetings"]
+GLDG_Tab2Frame.Tab3 = L["Players"]
+GLDG_Tab2Frame.Tab4 = L["Cleanup"]
+GLDG_Tab2Frame.Tab5 = L["Colour"]
 
 
 GLDG_SubTab2Frame = {}
-GLDG_SubTab2Frame.Tab1 = "General"
-GLDG_SubTab2Frame.Tab2 = "Chat"
-GLDG_SubTab2Frame.Tab3 = "Greeting"
+GLDG_SubTab2Frame.Tab1 = L["General"]
+GLDG_SubTab2Frame.Tab2 = L["Chat"]
+GLDG_SubTab2Frame.Tab3 = L["Greeting"]
 --GLDG_SubTab2Frame.Tab4 = "Debug"
-GLDG_SubTab2Frame.Tab4 = "Other"
+GLDG_SubTab2Frame.Tab4 = L["Other"]
 
 
 -- Strings we look for
@@ -98,10 +98,10 @@ GLDG_DEFAULT_RANK_COLOUR			= "|cFFCC00CC"
 GLDG_DEFAULT_RELOG_COLOUR			= "|cFF3FFF3F"
 GLDG_DEFAULT_ACHIEVMENT_COLOUR		= "|cFF001FFF"
 
-GLDG_ONLINE_COLOUR				= GLDG_DEFAULT_ONLINE_COLOUR
+GLDG_ONLINE_COLOUR			= GLDG_DEFAULT_ONLINE_COLOUR
 GLDG_IS_OFFLINE_COLOUR		= GLDG_DEFAULT_IS_OFFLINE_COLOUR
 GLDG_GOES_OFFLINE_COLOUR	= GLDG_DEFAULT_GOES_OFFLINE_COLOUR
-GLDG_ALIAS_COLOUR					= GLDG_DEFAULT_ALIAS_COLOUR
+GLDG_ALIAS_COLOUR			= GLDG_DEFAULT_ALIAS_COLOUR
 
 GLDG_LEVEL_CAP = 60
 
@@ -818,12 +818,12 @@ function GLDG_InitFrame(frameName)
 		_G[name.."ColPlayer"]:SetText(L["Set character collection"])
 		_G[name.."SubCustomHeader"]:SetText(L["Current value"])
 		_G[name.."SubNewHeader"]:SetText(L["Create new collection"])
-		_G[name.."SubNewAdd"]:SetText(GLDG_TXT.add)
-		_G[name.."SubNewCancel"]:SetText(GLDG_TXT.cancel)
+		_G[name.."SubNewAdd"]:SetText(L["add"])
+		_G[name.."SubNewCancel"]:SetText(L["cancel"])
 		_G[name.."SubChangeSelection"]:SetText(L["Selected collection"])
 		_G[name.."SubChangeGlobal"]:SetText(L["Global defaults"])
 		_G[name.."SubChangeClear"]:SetText(L["not defined"])
-		_G[name.."SubChangeCancel"]:SetText(GLDG_TXT.cancel)
+		_G[name.."SubChangeCancel"]:SetText(L["cancel"])
 		_G[name.."SelDefault"]:SetText(L["coming online"])
 		_G[name.."SelRelog"]:SetText(L["relogging"])
 		_G[name.."SelJoin"]:SetText(L["joining guild"])
@@ -842,8 +842,8 @@ function GLDG_InitFrame(frameName)
 		_G[name.."SelAchievment"]:SetText(L["achievment"])
 	elseif (frameName == "Players") then
 		-- Header and option texts
-		_G[name.."Header"]:SetText(GLDG_TXT.playersheader)
-		_G[name.."IgnoreText"]:SetText(GLDG_TXT.ignores)
+		_G[name.."Header"]:SetText(L["Configure settings for characters: ignore them, set main/alt and enter alias"])
+		_G[name.."IgnoreText"]:SetText(L["Include ignored players in the list"])
 		_G[name.."AltText"]:SetText(GLDG_TXT.showalt)
 		_G[name.."Alt2Text"]:SetText(GLDG_TXT.groupalt)
 		_G[name.."UnassignedText"]:SetText(GLDG_TXT.filterUnassigned)

@@ -1,3 +1,50 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("GuildGreet", "enUS", true)
+if not L then return end
 
---@localization(locale="enUS", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
+L["GuildGreet"] = true
+L["Open config window"] = true
+L["Clear greet list"] = true
+L["Test trigger"] = true
+L["Greet Guild and Channel"] = true
+L["Say goodbye to guild and channel"] = true
+L["Say see you later to guild and channel"] = true
+L["Settings"] = true
+L["Greetings"] = true
+L["Players"] = true
+L["Cleanup"] = true
+L["Colour"] = true
+L["General"] = true
+L["Chat"] = true
+L["Greeting"] = true
+L["Other"] = true
+L["Manage the messages you want to use for greeting"] = true
+L["Custom collections"] = true
+L["Set realm collection"] = true
+L["Set guild collection"] = true
+L["Set character collection"] = true
+L["Current value"] = true
+L["Create new collection"] = true
+L["cancel"] = true
+L["add"] 0 true
+L["Selected collection"] = true
+L["Global defaults"] = true
+L["not defined"] = true
+L["coming online"] = true
+L["relogging"] = true
+L["joining guild"] = true
+L["promotion"] = true
+L["leveling"] = true
+L["bye char"] = true
+L["night char"] = true
+L["greet guild"] = true
+L["greet channel"] = true
+L["bye guild"] = true
+L["night guild"] = true
+L["bye channel"] = true
+L["night channel"] = true
+L["later guild"] = true
+L["later channel"] = true
+L["achievment"] = true
+L["Configure settings for characters: ignore them, set main/alt and enter alias"] = true
+L["Include ignored players in the list"] = true
+
