@@ -75,8 +75,6 @@ GLDG_CONFIG_STRING_B = nil
 GLDG_CONFIG_STRING_C = nil
 GLDG_CONFIG_STRING_D = nil
 
-
-
 --------------------------
 -- _01_ Addon Variables --
 --------------------------
@@ -6157,7 +6155,7 @@ end
 
 ------------------------------------------------------------
 function GLDG_ForceChatlist()
-	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.forceChatList)
+	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Forced chatlist to be displayed in chat"])
 	GLDG_unregister = 0
 	DEFAULT_CHAT_FRAME:RegisterEvent("CHAT_MSG_CHANNEL_LIST")
 end
@@ -6279,7 +6277,7 @@ function GLDG_ShowDetails(name)
 			end
 		end
 	else
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.nodata1.." ["..Ambiguate(name, "guild").."] "..GLDG_TXT.nodata2)
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["No data found for character"].." ["..Ambiguate(name, "guild").."] "..L[""])
 	end
 end
 
@@ -6341,10 +6339,8 @@ function GLDG_ShowColourPicker()
 	GLDG_updating = nil
 
 	-- show window
-	--GuildGreetColourFrame:Show()
 	GLDG_ColorPickerFrame:Show();
-	--GuildGreetColourFrame:Lower()
-
+	
 	GLDG_colorPickerShown = true
 
 end
@@ -6353,7 +6349,6 @@ end
 function GLDG_HideColourPicker()
 	-- hide window
 	GLDG_ColorPickerFrame:Hide();
-	--GuildGreetColourFrame:Hide()
 	GLDG_colorPickerShown = nil
 
 	-- restore old callbacks
@@ -6529,16 +6524,16 @@ end
 -----------------------------
 -- todo: remove sets
 function GLDG_SetActiveColourSet(set)
-	GLDG_ONLINE_COLOUR		= GLDG_DEFAULT_ONLINE_COLOUR
+	GLDG_ONLINE_COLOUR			= GLDG_DEFAULT_ONLINE_COLOUR
 	GLDG_IS_OFFLINE_COLOUR		= GLDG_DEFAULT_IS_OFFLINE_COLOUR
 	GLDG_GOES_OFFLINE_COLOUR	= GLDG_DEFAULT_GOES_OFFLINE_COLOUR
-	GLDG_ALIAS_COLOUR		= GLDG_DEFAULT_ALIAS_COLOUR
+	GLDG_ALIAS_COLOUR			= GLDG_DEFAULT_ALIAS_COLOUR
 
 	if (set and GLDG_Data.colours[set]) then
-		GLDG_ONLINE_COLOUR		= GLDG_Data.colours[set].online
+		GLDG_ONLINE_COLOUR			= GLDG_Data.colours[set].online
 		GLDG_IS_OFFLINE_COLOUR		= GLDG_Data.colours[set].isOff
 		GLDG_GOES_OFFLINE_COLOUR	= GLDG_Data.colours[set].goOff
-		GLDG_ALIAS_COLOUR		= GLDG_Data.colours[set].alias
+		GLDG_ALIAS_COLOUR			= GLDG_Data.colours[set].alias
 	end
 end
 
@@ -6727,7 +6722,7 @@ function GLDG_ColourRestoreDefaults()
 
 		GLDG_ColoursShow()
 	else
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.colourDefault)
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Cannot set default colours while colour picker is open"])
 	end
 end
 
@@ -7007,32 +7002,20 @@ end
 ------------------------------------------------------------
 function GLDG_PrepareReloadQuestion()
 	StaticPopupDialogs["GLDG_RELOAD"] = {
-		text = GLDG_TXT.reloadQuestion,
-		button1 = GLDG_TXT.reloadNow,
-		button2 = GLDG_TXT.later,
+		text = L["You must reload your interface for this change to take effect. Shall this be done now?"],
+		button1 = L["Reload now"],
+		button2 = L["Reload later"],
 		OnAccept = function()
 			ReloadUI();
 			end,
 		OnCancel = function()
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|cFFFF0000 "..GLDG_TXT.reload)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|cFFFF0000 "..L["You must manually reload your interface by typing /console reloadui"])
 			end,
 		timeout = 0,
 		whileDead = 1,
 		hideOnEscape = 1,
 		sound = "igQuestFailed",
 	};
-end
-
-function GLDG_ListUrbinAddonDetails()
-	if (not URBIN_AddonList) then
-		return
-	end
-
-	for p in pairs(URBIN_AddonList) do
-		if (URBIN_AddonList[p].about) then
-			URBIN_AddonList[p].about(true)
-		end
-	end
 end
 
 --------------------------
@@ -7049,12 +7032,12 @@ end
 ------------------------------------------------------------
 function GLDG_ShowBigBrother()
 	if (GLDG_Data.BigBrother and GLDG_BigBrother) then
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.bigBrother5)
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Listing known GuildGreet users"])
 		for p in pairs(GLDG_BigBrother) do
 			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..Ambiguate(p, "guild")..": "..GLDG_BigBrother[p])
 		end
 	else
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.bigBrother6)
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["No other GuildGreet users known"])
 	end
 end
 
@@ -7176,7 +7159,7 @@ end
 
 ------------------------------------------------------------
 function GLDG_Convert_Guild(realm, guild)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertGuild1.."["..tostring(guild).."]"..GLDG_TXT.convertGuild2.."["..tostring(realm).."]"..GLDG_TXT.convertGuild3)
+	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Converting guild"].."["..tostring(guild).."]"..L["found for realm"].."["..tostring(realm).."]"..L[""])
 
 	local key = realm.." - "..guild
 	local newKey = "Realm: "..realm
@@ -7226,7 +7209,7 @@ end
 
 ------------------------------------------------------------
 function GLDG_Convert_Channel(realm, channel)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertChannel1.."["..tostring(channel).."]"..GLDG_TXT.convertChannel2.."["..tostring(realm).."]"..GLDG_TXT.convertChannel3)
+	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Converting channel"].."["..tostring(channel).."]"..L["found for realm"].."["..tostring(realm).."]"..L[""])
 
 
 	local key = realm.." - channel - "..channel
@@ -7283,7 +7266,7 @@ end
 
 ------------------------------------------------------------
 function GLDG_Convert_Friends(realm)
-	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertFriends1.."["..tostring(realm).."]"..GLDG_TXT.convertFriends2)
+	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Converting friends found for realm"].."["..tostring(realm).."]"..L[""])
 
 	local key = realm.." -- friends"
 	local newKey = "Realm: "..realm
@@ -7378,7 +7361,7 @@ function GLDG_Convert_Plausibility_Check(suppressOutput)
 
 	-- check for entries with both main and alt
 	if not suppressOutput then
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertVerify1)
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Verifying double main-alt entries"])
 	end
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alt and GLDG_DataChar[p].main) then
@@ -7390,12 +7373,12 @@ function GLDG_Convert_Plausibility_Check(suppressOutput)
 				if (GLDG_DataChar[alt].alt) then
 					-- the main has the same problem as the current char
 					if not suppressOutput then
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict3.." ["..GLDG_DataChar[alt].alt.."] "..GLDG_TXT.convertConflict4);
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"].." ["..Ambiguate(p, "guild").."] "..L["is both main and alt. It's main"].." ["..alt.."] "..L["however is also main and alt, its main"].." ["..GLDG_DataChar[alt].alt.."] "..L["has not been checked, but will be seperately."]);
 					end
 				else
 					-- ok, we could just de-main this char and we would be fine
 					if not suppressOutput then
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict5);
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"].." ["..Ambiguate(p, "guild").."] "..L["is both main and alt. It's main"].." ["..alt.."] "..L["should probably be main."]);
 					end
 				end
 			else
@@ -7403,12 +7386,12 @@ function GLDG_Convert_Plausibility_Check(suppressOutput)
 				if (GLDG_DataChar[alt].alt) then
 					-- the apparent main is not main, but has a main of its own, we could just bend to that char
 					if not suppressOutput then
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict6.." ["..GLDG_DataChar[alt].alt.."] "..GLDG_TXT.convertConflict4);
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"].." ["..Ambiguate(p, "guild").."] "..L["is both main and alt. It's main"].." ["..alt.."] "..L["however is not main but an alt, its main"].." ["..GLDG_DataChar[alt].alt.."] "..L["has not been checked, but will be seperately."]);
 					end
 				else
 					-- the apparent main is neither main nor has a main, we should probably just set it as main
 					if not suppressOutput then
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict7);
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"].." ["..Ambiguate(p, "guild").."] "..L["is both main and alt. It's main"].." ["..alt.."] "..L["is neither main or alt."]);
 					end
 				end
 			end
@@ -7419,41 +7402,41 @@ function GLDG_Convert_Plausibility_Check(suppressOutput)
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alt and GLDG_DataChar[p].alt == p) then
 			fixNeeded = true
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict11.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict12)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"]..L["character"].." ["..Ambiguate(p, "guild").."] "..L["is its own main. This reference should be removed."])
 		end
 	end
 
 	-- check for entries where an alt-link points to a char which doesn't exist
 	if not suppressOutput then
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertVerify5)
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Verifying main-alt relations part 2"])
 	end
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alt and not GLDG_DataChar[GLDG_DataChar[p].alt]) then
 			fixNeeded = true
 			if not suppressOutput then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertConflict13)
+				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"]..L["alt"].." ["..Ambiguate(p, "guild").."] "..L["has main"].." ["..GLDG_DataChar[p].alt.."] "..L["which does not exist."])
 			end
 		end
 	end
 
 	-- check for entries where an alt-link points to a main that isn't main
 	if not suppressOutput then
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertVerify2)
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Verifying main-alt relations"])
 	end
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alt and GLDG_DataChar[GLDG_DataChar[p].alt] and not GLDG_DataChar[GLDG_DataChar[p].alt].main) then
 			fixNeeded = true
 			if not suppressOutput then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertConflict10)
+				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"]..L["alt"].." ["..Ambiguate(p, "guild").."] "..L["has main"].." ["..GLDG_DataChar[p].alt.."] "..L["which is not marked as main."])
 			end
 		end
 	end
 
 	if not suppressOutput then
 		if fixNeeded then
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertVerify4)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Done. Type |cFFFFFF7F/gg fix|r to automatically fix these issues"])
 		else
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertVerify3)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Done"])
 		end
 	end
 
@@ -7468,7 +7451,7 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 
 	-- check for entries with both main and alt
 	if (not suppressTitle) then
-		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertFix)
+		GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Automatically fixing inconsistencies"])
 	end
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alt and GLDG_DataChar[p].main) then
@@ -7479,34 +7462,34 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 				-- char is main
 				if (GLDG_DataChar[alt].alt) then
 					-- the main has the same problem as the current char, let's de-main this char, and check for the higher conflict later
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict3.." ["..GLDG_DataChar[alt].alt.."] "..GLDG_TXT.convertFix5);
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"].." ["..Ambiguate(p, "guild").."] "..L["is both main and alt. It's main"].." ["..alt.."] "..L["however is also main and alt, its main"].." ["..GLDG_DataChar[alt].alt.."] "..L["will be the new main, even though it is also main and alt, its main"]);
 				else
 					-- ok, we could just de-main this char and we would be fine
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertFix1);
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"].." ["..Ambiguate(p, "guild").."] "..L["is both main and alt. It's main"].." ["..alt.."] "..L["will be the new main."]);
 				end
 				GLDG_DataChar[p].main = nil
 				for q in pairs(GLDG_DataChar) do
 					if GLDG_DataChar[q].alt and GLDG_DataChar[q].alt==p then
 						GLDG_DataChar[q].alt = alt
-						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r    "..GLDG_TXT.convertFix2.." ["..q.."] "..GLDG_TXT.convertFix3.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertFix4.." ["..alt.."]");
+						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r    "..L["Moving alt"].." ["..q.."] "..L["from main"].." ["..Ambiguate(p, "guild").."] "..L["to main"].." ["..alt.."]");
 					end
 				end
 			else
 				-- char is not main - strange
 				if (GLDG_DataChar[alt].alt) then
 					-- the apparent main is not main, but has a main of its own, we could just bend to that char
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertConflict6.." ["..GLDG_DataChar[alt].alt.."] "..GLDG_TXT.convertFix7.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertFix8);
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"].." ["..Ambiguate(p, "guild").."] "..L["is both main and alt. It's main"].." ["..alt.."] "..L["however is not main but an alt, its main"].." ["..GLDG_DataChar[alt].alt.."] "..L["will become main for"].." ["..Ambiguate(p, "guild").."] "..L["and all its alts"]);
 					GLDG_DataChar[p].main = nil
 					GLDG_DataChar[p].alt = GLDG_DataChar[alt].alt
 					for q in pairs(GLDG_DataChar) do
 						if GLDG_DataChar[q].alt and GLDG_DataChar[q].alt==p then
 							GLDG_DataChar[q].alt = GLDG_DataChar[alt].alt
-							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r    "..GLDG_TXT.convertFix2.." ["..q.."] "..GLDG_TXT.convertFix3.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertFix4.." ["..GLDG_DataChar[alt].alt.."]");
+							GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r    "..L["Moving alt"].." ["..q.."] "..L["from main"].." ["..Ambiguate(p, "guild").."] "..L["to main"].." ["..GLDG_DataChar[alt].alt.."]");
 						end
 					end
 				else
 					-- the apparent main is neither main nor has a main, we should probably just set the original character as main
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict2.." ["..alt.."] "..GLDG_TXT.convertFix6.." ["..Ambiguate(p, "guild").."]");
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"].." ["..Ambiguate(p, "guild").."] "..L["is both main and alt. It's main"].." ["..alt.."] "..L["is neither main or alt but will become alt of"].." ["..Ambiguate(p, "guild").."]");
 					GLDG_DataChar[alt].alt = p
 					GLDG_DataChar[p].alt = nil
 				end
@@ -7518,7 +7501,7 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alt and GLDG_DataChar[p].alt == p) then
 			fixNeeded = true
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict11.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertFix12)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"]..L["character"].." ["..Ambiguate(p, "guild").."] "..L["is its own main. This reference has been removed."])
 			GLDG_DataChar[p].alt = nil
 		end
 	end
@@ -7527,7 +7510,7 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alt and not GLDG_DataChar[GLDG_DataChar[p].alt]) then
 			fixNeeded = true
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertFix14)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"]..L["alt"].." ["..Ambiguate(p, "guild").."] "..L["will become main for"].." ["..GLDG_DataChar[p].alt.."] "..L["which does not exist. This reference will be removed."])
 			GLDG_DataChar[p].alt = nil
 		end
 	end
@@ -7536,7 +7519,7 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alt and GLDG_DataChar[GLDG_DataChar[p].alt] and not GLDG_DataChar[GLDG_DataChar[p].alt].main) then
 			fixNeeded = true
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertConflict1..GLDG_TXT.convertConflict8.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.convertConflict9.." ["..GLDG_DataChar[p].alt.."] "..GLDG_TXT.convertFix9)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["--> conflict:"]..L["alt"].." ["..Ambiguate(p, "guild").."] "..L["has main"].." ["..GLDG_DataChar[p].alt.."] "..L["which is not marked as main. This will be set."])
 			GLDG_DataChar[GLDG_DataChar[p].alt].main = true
 		end
 	end
@@ -7548,14 +7531,14 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 			fixNeeded = GLDG_Convert_Plausibility_Fix(true)
 
 			if not suppressTitle then
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertFix10)
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Entries have been fixed. Check manually if all main-alt groups have the correct main. If not, use the '|cFFFFFF7F Promote to main|r' function."])
 			end
 		else
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertFix13)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["There seems to be a circular inconsistency that could not be fixed even after 10 iterations. Giving up. Please report this to gOOvER on the addon's page at www.github.com."])
 		end
 	else
 		if not suppressTitle then
-				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.convertFix11)
+				GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Nothing needed to be fixed."])
 		end
 	end
 
@@ -7574,11 +7557,11 @@ function GLDG_Reset_Aliases()
 end
 ------------------------------------------------------------
 function GLDG_Convert_Unnew()
-	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.unnew1)
+	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Clearing 'new in guild' flag for all characters"])
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].new) then
 			GLDG_DataChar[p].new = nil
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.unnew2.." ["..Ambiguate(p, "guild").."]")
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Removing the 'new in guild' flag for"].." ["..Ambiguate(p, "guild").."]")
 		end
 	end
 end
@@ -7591,7 +7574,7 @@ function GLDG_CheckForGuildAlert()
 		if (GetCVar("guildMemberNotify") ~= "1") then
 			StaticPopup_Show("GLDG_GUILD_ALERT");
 		else
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.alertIsOn)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Guild member notification is active."])
 		end
 		GLDG_Data.CheckedGuildAlert = true
 	end
@@ -7600,15 +7583,15 @@ end
 ------------------------------------------------------------
 function GLDG_PrepareAlertQuestion()
 	StaticPopupDialogs["GLDG_GUILD_ALERT"] = {
-		text = GLDG_TXT.alertQuestion,
-		button1 = GLDG_TXT.alertOn,
-		button2 = GLDG_TXT.alertLeave,
+		text = L["|cFFFFFF7FGuild member notification|r is currently turned off (See Interface settings, Game, Social).\r\nThis means that GuildGreet is unable to reliably track when your guild mates come online or go offline.\r\n\r\nThis question will only be asked once. To manually check later on type |cFFFFFF7F/gg alert|r.\r\n\r\nDo you want to activate these notifications? (Recommended)"],
+		button1 = L["Activate notification"],
+		button2 = L["Leave inactive"],
 		OnAccept = function()
 			SetCVar("guildMemberNotify", 1)
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.alertTurnedOn)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Guild member notification has been turned on."])
 			end,
 		OnCancel = function()
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.alertUnchanged)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Guild member notification has not been turned on. |cFFFF0000GuildGreet will not be able to reliably track your guild members coming online and going offline.|r"])
 			end,
 		timeout = 0,
 		whileDead = 1,
@@ -7702,17 +7685,17 @@ function GLDG_CleanupExecute(entry)
 					GLDG_DataChar[p].rankname = nil
 					GLDG_DataChar[p].pNote = nil
 					GLDG_DataChar[p].oNote = nil
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemoveGuild1.." ["..entry.."] "..GLDG_TXT.cleanupRemoveGuild2.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.cleanupRemoveGuild3)
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Removed guild"].." ["..entry.."] "..L["from character"].." ["..Ambiguate(p, "guild").."] "..L[""])
 				elseif (GLDG_CleanupMode == "friends" and GLDG_DataChar[p].friends and GLDG_DataChar[p].friends[entry]) then
 					GLDG_DataChar[p].friends[entry] = nil
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemoveFriend1.." ["..entry.."] "..GLDG_TXT.cleanupRemoveFriend2.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.cleanupRemoveFriend3)
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Removed friend"].." ["..entry.."] "..L["from character"].." ["..Ambiguate(p, "guild").."] "..L[""])
 				elseif (GLDG_CleanupMode == "channel" and GLDG_DataChar[p].channels and GLDG_DataChar[p].channels[entry]) then
 					GLDG_DataChar[p].channels[entry] = nil
-					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemoveChannel1.." ["..entry.."] "..GLDG_TXT.cleanupRemoveChannel2.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.cleanupRemoveChannel3)
+					GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Removed channel"].." ["..entry.."] "..L["from character"].." ["..Ambiguate(p, "guild").."] "..L[""])
 				end
 			end
 		else
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupNotfound1.." ["..entry.."] "..GLDG_TXT.cleanupNotfound2.." ["..GLDG_CleanupMode.."]")
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Entry"].." ["..entry.."] "..L["was not found in list of available entries for mode."].." ["..GLDG_CleanupMode.."]")
 		end
 	end
 
@@ -7727,7 +7710,7 @@ end
 
 ------------------------------------------------------------
 function GLDG_ClickOrphanCleanup()
-	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupOrphan)
+	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Orphan cleanup"])
 	for p in pairs(GLDG_DataChar) do
 		if (not GLDG_DataChar[p].main and
 		    not GLDG_DataChar[p].alt and
@@ -7735,7 +7718,7 @@ function GLDG_ClickOrphanCleanup()
 		    (not GLDG_DataChar[p].channels or GLDG_TableSize(GLDG_DataChar[p].channels)==0) and
 		    (not GLDG_DataChar[p].friends or GLDG_TableSize(GLDG_DataChar[p].friends)==0)) then
 			GLDG_DataChar[p] = nil
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemovedOrphan1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.cleanupRemovedOrphan2)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Removed orphan"].." ["..Ambiguate(p, "guild").."] "..L[""])
 		end
 	end
 
@@ -7752,11 +7735,11 @@ end
 --~~~ MSN1: New function to delete guildless characters, displays list and count after deletion
 function GLDG_ClickGuildlessCleanup()
 	guildless_count = 0
-	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupGuildless)
+	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Guildless cleanup"])
 	for p in pairs(GLDG_DataChar) do
 		if (not GLDG_DataChar[p].guild) then
 			guildless_count = guildless_count + 1
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.cleanupRemovedGuildless1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.cleanupRemovedGuildless2)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Removed guildless"].." ["..Ambiguate(p, "guild").."] "..L[""])
 --Delete the character
 			GLDG_DataChar[p] = nil
 		end
@@ -7780,11 +7763,11 @@ function GLDG_ClickGuildlessDisplay()
 	guildless_count = 0
 	haveguild_count = 0
 	total_count = 0
-	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.displayGuildless)
+	GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Guildless display"])
 	for p in pairs(GLDG_DataChar) do
 		if (not GLDG_DataChar[p].guild) then
 			guildless_count = guildless_count + 1
-			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..GLDG_TXT.displayRemovedGuildless1.." ["..Ambiguate(p, "guild").."] "..GLDG_TXT.displayRemovedGuildless2)
+			GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["Can remove guildless"].." ["..Ambiguate(p, "guild").."] "..L[""])
 		else
 			haveguild_count = haveguild_count + 1
 		end
@@ -7812,21 +7795,21 @@ function GLDG_ShowCleanupEntries(frame)
 	-- Set title
 	if (GLDG_TableSize(GLDG_CleanupList) > 0) then
 		if GLDG_CleanupMode == "guild" then
-			_G[name.."Header"]:SetText(GLDG_TXT.cleanupHeaderEntryGuild)
+			_G[name.."Header"]:SetText(L["Select a guild to remove"])
 		elseif GLDG_CleanupMode == "friends" then
-			_G[name.."Header"]:SetText(GLDG_TXT.cleanupHeaderEntryFriends)
+			_G[name.."Header"]:SetText(L["Select a friend to remove"])
 		elseif GLDG_CleanupMode == "channel" then
-			_G[name.."Header"]:SetText(GLDG_TXT.cleanupHeaderEntryChannel)
+			_G[name.."Header"]:SetText(L["Select a channel to remove"])
 		else
 			_G[name.."Header"]:SetText("")
 		end
 	else
 		if GLDG_CleanupMode == "guild" then
-			_G[name.."Header"]:SetText(GLDG_TXT.cleanupHeaderNoEntryGuild)
+			_G[name.."Header"]:SetText(L["No guilds found to remove"])
 		elseif GLDG_CleanupMode == "friends" then
-			_G[name.."Header"]:SetText(GLDG_TXT.cleanupHeaderNoEntryFriends)
+			_G[name.."Header"]:SetText(L["No friends found to remove"])
 		elseif GLDG_CleanupMode == "channel" then
-			_G[name.."Header"]:SetText(GLDG_TXT.cleanupHeaderNoEntryChannel)
+			_G[name.."Header"]:SetText(L["No channels found to remove"])
 		else
 			_G[name.."Header"]:SetText("")
 		end
@@ -7914,9 +7897,6 @@ function GLDG_AddToStartupList(entry)
 	local index = GLDG_TableSize(GLDG_ChangesText) + 1
 	GLDG_ChangesText[index] = entry
 end
-
-
--------------------------------------------------------------
 
 --------------------------
 -- _36_ guildconfig
@@ -8132,12 +8112,8 @@ function GLDG_readConfigString()
 			end
 			if GLDG_config_from_guild == "corrupted" then
 				if IsGuildLeader() then
-					--if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 4) then
 						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..L["ChatMsg/The config string seems to be corrupted. Please generating a new one."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
-					--	GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-					--	GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 4
-					--end
-				else
+					else
 					if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 5) then
 						GLDG_Print(GLDG_Data.colours.help..GLDG_NAME..":|r "..string.format(L["ChatMsg/The config string seems to be corrupted. Please inform %s!"],Ambiguate(GLDG_GuildLeader, "guild")).." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
 						GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
