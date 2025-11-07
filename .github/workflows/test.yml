@@ -26,7 +26,14 @@ jobs:
         
     - name: Run luacheck
       run: |
-        luacheck --no-color --codes GuildGreet.lua
+        echo "Running luacheck with configuration..."
+        if [ -f ".luacheckrc" ]; then
+          echo "Using .luacheckrc configuration file"
+          luacheck --no-color --codes .
+        else
+          echo "No .luacheckrc found, falling back to basic check"
+          luacheck --no-color --codes GuildGreet.lua
+        fi
         
     - name: Check TOC files
       run: |

@@ -1,108 +1,98 @@
--- Luacheck configuration for WoW Addons
--- https://luacheck.readthedocs.io/en/stable/config.html
-
+-- Simple Luacheck configuration for WoW Addon
 std = "lua51"
 
--- Allow unused self parameter
-self = false
+-- Don't require unused function parameters (common in WoW addon callbacks)
+unused_args = false
 
--- Global WoW API functions and variables
-read_globals = {
-    -- Standard Lua
-    "string", "table", "math", "pairs", "ipairs", "next", "type", "tonumber", "tostring",
-    "print", "error", "assert", "pcall", "xpcall", "strlen", "strsub", "strfind",
-    "strupper", "strlower", "format", "gsub", "gmatch", "match",
-    
-    -- WoW Global API
-    "GetGuildInfoText", "SetGuildInfoText", "GetNumGuildMembers", "GetGuildRosterInfo",
-    "GetFriendInfo", "GetNumFriends", "ShowFriends",
-    "UnitName", "UnitClass", "UnitLevel", "UnitGUID", "UnitIsPlayer",
-    "GetTime", "time", "date",
-    "PlaySound", "PlaySoundFile",
-    "SendChatMessage", "GetDefaultLanguage",
-    "IsInGuild", "GetGuildName", "CanEditGuildInfo", "CanViewGuildInfo",
-    "GetRealmName", "GetNormalizedRealmName", "GetAutoCompleteRealms",
-    
-    -- WoW Frame/UI API
-    "CreateFrame", "UIParent", "GameTooltip", "WorldFrame",
-    "InterfaceOptionsFrame_OpenToCategory", "InterfaceOptions_AddCategory",
-    "StaticPopupDialogs", "StaticPopup_Show", "StaticPopup_Hide",
-    "FauxScrollFrame_Update", "FauxScrollFrame_GetOffset", "HybridScrollFrame_GetOffset",
-    "GameFontNormal", "GameFontHighlight", "GameFontDisable",
-    
-    -- WoW Events
-    "GUILD_ROSTER_UPDATE", "GUILD_MOTD", "CHAT_MSG_GUILD",
-    "ADDON_LOADED", "PLAYER_LOGIN", "PLAYER_LOGOUT",
-    "FRIENDLIST_UPDATE", "WHO_LIST_UPDATE",
-    
-    -- WoW Chat
-    "ChatFrame1", "DEFAULT_CHAT_FRAME", "ChatFrame_AddMessageEventFilter",
-    "ChatFrame_RemoveMessageEventFilter",
-    
-    -- WoW Variables/Constants
-    "GUILD", "RAID", "PARTY", "SAY", "YELL", "WHISPER",
-    "LE_PARTY_CATEGORY_HOME", "LE_PARTY_CATEGORY_INSTANCE",
-    
-    -- Ace3 Libraries  
-    "LibStub",
-    
-    -- WoW Specific Functions
-    "Ambiguate", "GetPlayerInfoByGUID",
-    
-    -- Additional WoW APIs for newer versions
-    "C_FriendList", "C_GuildInfo", "C_ChatInfo",
-    "Settings", "InterfaceOptionsFrame",
-    "_G"
-}
-
--- Global variables that are written to (addon namespace)
+-- Global variables that our addon creates
 globals = {
-    "GLDG", "GLDG_Data", "GLDG_DataChar", "GLDG_DataFriends", "GLDG_DataChannel",
-    "GLDG_NAME", "GLDG_VERSION", "GLDG_AUTHOR",
-    "GLDG_GUI", "GLDG_config_from_guild", "GLDG_corrupted_config_from_guild",
-    "GLDG_CONFIG_STRING", "GLDG_ginfotxt",
+    "GLDG",
+    "GLDG_Data", "GLDG_DataChar", "GLDG_DataFriends", "GLDG_DataChannel",
+    "GLDG_NAME", "GLDG_VERSION", "GLDG_AUTHOR", "GLDG_GUI", "GLDG_LIST", "GLDG_COLOUR",
+    "GLDG_config_from_guild", "GLDG_corrupted_config_from_guild",
+    "GLDG_CONFIG_STRING", "GLDG_ginfotxt", "GLDG_GuildLeader",
     "GLDG_CleanupList", "GLDG_CleanupMode", "GLDG_NumSubRows",
-    "GLDG_autoGreeted", "GLDG_RosterImportRunning", "GLDG_GuildLeader",
+    "GLDG_autoGreeted", "GLDG_RosterImportRunning",
     
-    -- Global functions (backwards compatibility)
+    -- Frame tables and UI globals
+    "GLDG_Tab2Frame", "GLDG_SubTab2Frame",
+    
+    -- Pattern globals for message parsing
+    "GLDG_ONLINE", "GLDG_OFFLINE", "GLDG_JOINED", "GLDG_PROMO",
+    
+    -- Additional globals referenced in code
+    "GLDG_GREET", "GLDG_BYE", "GLDG_unique_GuildName", 
+    "GLDG_Greet", "GLDG_Bye", "GLDG_autoGreet", "GLDG_autoBye",
+    "GLDG_GreetAnnounce", "GLDG_ByeAnnounce",
+    
+    -- Global functions for backwards compatibility
     "GLDG_Print", "GLDG_WriteGuildString", "GLDG_readConfigString",
     "GLDG_RosterImport", "GLDG_RosterImportFull", "GLDG_TableSize",
     "GLDG_GetWords", "GLDG_Convert", "GLDG_SendGreet", "GLDG_ParseCustomMessage",
     "GLDG_InitColors", "GLDG_GetColorCode", "GLDG_generateConfigString",
     "GLDG_InitGreet", "GLDG_ClickGuildAliasSet", "GLDG_ClickGuildAliasClear",
-    
-    -- Event handlers and GUI functions
     "GLDG_OnEvent", "GLDG_OnLoad", "GLDG_PrepareAlertQuestion",
     "GLDG_ShowCleanupEntries", "GLDG_ClickCleanupEntry",
-    "GLDG_ClickOrphanCleanup", "GLDG_ClickGuildlessCleanup", "GLDG_ClickGuildlessDisplay",
-    "GLDG_AddToStartupList", "GLDG_OnLoadOptions",
-    
-    -- Localization
+    "GLDG_ClickOrphanCleanup", "GLDG_ClickGuildlessCleanup", 
+    "GLDG_ClickGuildlessDisplay", "GLDG_AddToStartupList", "GLDG_OnLoadOptions",
     "L"
 }
 
--- Exclude some checks that are problematic with WoW addons
+-- Read-only global functions from WoW API and Ace3
+read_globals = {
+    -- LibStub and Ace3
+    "LibStub",
+    
+    -- Standard Lua (WoW modifications)
+    "string", "table", "math", "pairs", "ipairs", "next", "type", 
+    "tonumber", "tostring", "strlen", "strsub", "strfind", "strupper", 
+    "strlower", "format", "gsub", "gmatch", "match",
+    
+    -- WoW Error Message Patterns
+    "ERR_FRIEND_ONLINE_SS", "ERR_FRIEND_OFFLINE_S", "ERR_GUILD_JOIN_S", 
+    "ERR_GUILD_PROMOTE_SSS",
+    
+    -- WoW API functions
+    "GetGuildInfoText", "SetGuildInfoText", "GetNumGuildMembers", "GetGuildRosterInfo",
+    "GetFriendInfo", "GetNumFriends", "ShowFriends", "C_FriendList",
+    "UnitName", "UnitClass", "UnitLevel", "UnitGUID", "UnitIsPlayer",
+    "GetTime", "time", "date", "GetRealmName", "Ambiguate",
+    "PlaySound", "PlaySoundFile", "SendChatMessage", "GetDefaultLanguage",
+    "IsInGuild", "GetGuildName", "CanEditGuildInfo", "CanViewGuildInfo",
+    "CreateFrame", "UIParent", "GameTooltip", "StaticPopupDialogs",
+    "StaticPopup_Show", "StaticPopup_Hide", "FauxScrollFrame_Update",
+    "FauxScrollFrame_GetOffset", "ChatFrame_AddMessageEventFilter",
+    "ChatFrame_RemoveMessageEventFilter", "InterfaceOptions_AddCategory",
+    "Settings", "InterfaceOptionsFrame", "_G",
+    
+    -- WoW Events and Constants
+    "GUILD_ROSTER_UPDATE", "GUILD_MOTD", "CHAT_MSG_GUILD",
+    "ADDON_LOADED", "PLAYER_LOGIN", "PLAYER_LOGOUT",
+    "FRIENDLIST_UPDATE", "WHO_LIST_UPDATE", "ChatFrame1",
+    "DEFAULT_CHAT_FRAME", "GUILD", "RAID", "PARTY", "SAY", "YELL", "WHISPER"
+}
+
+-- Ignore some warnings that are common in WoW addons
 ignore = {
-    "212", -- Unused argument (self parameter is common in WoW)
-    "213", -- Unused loop variable
+    "212", -- Unused argument (self is common in methods)
+    "213", -- Unused loop variable  
     "512", -- Loop can be executed at most once
     "611", -- Line contains only whitespace
-    "612", -- Line contains trailing whitespace  
-    "614", -- Trailing whitespace in comment
-    "621", -- Inconsistent indentation
-    "631", -- Line is too long
+    "612", -- Line contains trailing whitespace
 }
 
--- Allow longer lines for some cases
+-- Set line length limit
 max_line_length = 120
 
--- Specific file configurations
-files["lang/*.lua"] = {
-    ignore = {"111", "112", "113", "212", "213"}, -- Allow undefined globals in locale files
-    globals = {"L"}
+-- Specific overrides for different file types
+files = {}
+
+-- Locale files can have undefined globals
+files["lang/"] = {
+    ignore = {"111", "112", "113"}
 }
 
-files["libs/*.lua"] = {
-    ignore = {"212", "213"}, -- Allow unused self in library files
-    globals = {"GLDG"}
+-- Library files should allow GLDG as a global
+files["libs/"] = {
+    allow_defined_top = true
 }
