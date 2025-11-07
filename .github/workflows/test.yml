@@ -27,27 +27,32 @@ jobs:
     - name: Run luacheck
       run: |
         echo "Running luacheck for basic syntax checking..."
-        # Run luacheck and capture output, but don't fail on warnings
-        luacheck_output=$(luacheck --no-color --codes --ignore 111 112 113 . 2>&1 || true)
         
-        # Check for actual errors (E-codes) vs warnings (W-codes)
-        error_count=$(echo "$luacheck_output" | grep -c "(E[0-9]*)" || echo "0")
-        
-        if echo "$luacheck_output" | grep -q "/ 0 errors"; then
-          echo "✓ Luacheck passed - no syntax errors found"
-          warning_count=$(echo "$luacheck_output" | grep -o "[0-9]* warnings" | head -1 | grep -o "[0-9]*" || echo "0")
-          if [ "$warning_count" -gt 0 ]; then
-            echo "⚠ Found $warning_count warnings (acceptable for WoW addons)"
-          fi
-          echo "Summary from luacheck:"
-          echo "$luacheck_output" | tail -2
-        elif [ "$error_count" -eq 0 ]; then
-          echo "✓ No syntax errors found (warnings are acceptable)"
+        # Run luacheck and save output to file for parsing
+        if luacheck --no-color --codes --ignore 111 112 113 . > luacheck_result.txt 2>&1; then
+          echo "✓ Luacheck completed successfully"
+          cat luacheck_result.txt | tail -1
         else
-          echo "✗ Found $error_count syntax errors"
-          echo "$luacheck_output"
-          exit 1
+          echo "Luacheck completed with warnings/errors, analyzing output..."
+          
+          # Check if the output contains "0 errors"
+          if grep -q "/ 0 errors" luacheck_result.txt; then
+            echo "✅ PASS: No syntax errors found"
+            # Show warning count if available
+            if grep -q "warnings" luacheck_result.txt; then
+              warning_line=$(grep "warnings.*errors" luacheck_result.txt | tail -1)
+              echo "📊 Result: $warning_line"
+              echo "⚠️ Warnings are acceptable for WoW addons with complex API usage"
+            fi
+          else
+            echo "❌ FAIL: Syntax errors detected"
+            cat luacheck_result.txt
+            exit 1
+          fi
         fi
+        
+        # Cleanup
+        rm -f luacheck_result.txt
         
     - name: Check TOC files
       run: |
