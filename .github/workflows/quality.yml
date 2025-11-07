@@ -26,12 +26,21 @@ jobs:
         
     - name: Run luacheck on main files
       run: |
-        echo "Running luacheck on main addon files..."
-        luacheck --no-color --codes GuildGreet.lua
+        echo "Running luacheck on addon files..."
         
-        # Check for additional Lua files
-        if [ -f "Bindings.lua" ]; then
-          luacheck --no-color --codes Bindings.lua
+        # Run luacheck with our configuration file
+        if [ -f ".luacheckrc" ]; then
+          echo "Using .luacheckrc configuration file"
+          luacheck --no-color --codes .
+        else
+          echo "No .luacheckrc found, using basic check"
+          luacheck --no-color --codes GuildGreet.lua
+        fi
+        
+        # Check library files specifically  
+        if [ -d "libs" ]; then
+          echo "Checking library files..."
+          luacheck --no-color --codes libs/*.lua || true
         fi
         
         if [ -d "lang" ]; then
@@ -44,23 +53,24 @@ jobs:
         echo "## 🔍 Code Quality Report" >> $GITHUB_STEP_SUMMARY
         echo "### Luacheck Results" >> $GITHUB_STEP_SUMMARY
         
-        # Run luacheck and capture output
-        if luacheck --no-color --formatter=plain GuildGreet.lua > luacheck_output.txt 2>&1; then
-          echo "✅ **No issues found in main file**" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "⚠️ **Issues found in main file:**" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          cat luacheck_output.txt >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-        fi
-        
-        if [ -d "lang" ]; then
-          if luacheck --no-color --formatter=plain lang/*.lua > luacheck_locale.txt 2>&1; then
-            echo "✅ **No issues found in locale files**" >> $GITHUB_STEP_SUMMARY
+        # Run luacheck with configuration and capture output
+        if [ -f ".luacheckrc" ]; then
+          if luacheck --no-color --formatter=plain . > luacheck_output.txt 2>&1; then
+            echo "✅ **No issues found in addon files**" >> $GITHUB_STEP_SUMMARY
           else
-            echo "⚠️ **Issues found in locale files:**" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Issues found in addon files:**" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            cat luacheck_locale.txt >> $GITHUB_STEP_SUMMARY
+            head -50 luacheck_output.txt >> $GITHUB_STEP_SUMMARY  # Limit output
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          # Fallback to basic checking
+          if luacheck --no-color --formatter=plain GuildGreet.lua > luacheck_output.txt 2>&1; then
+            echo "✅ **No issues found in main file**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Issues found in main file:**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat luacheck_output.txt >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
           fi
         fi
