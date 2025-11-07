@@ -1,10 +1,10 @@
 <Bindings>
 	<Binding name="GUILDGREETCONFIG" header="GUILDGREET" runOnUp="true">
 		if ( keystate == "down" ) then
-			if getglobal(GLDG_GUI):IsVisible() then
-				getglobal(GLDG_GUI):Hide();
+			if _G[GLDG_GUI]:IsVisible() then
+				_G[GLDG_GUI]:Hide();
 			else
-				getglobal(GLDG_GUI):Show();
+				_G[GLDG_GUI]:Show();
 			end
 		end
 	</Binding>

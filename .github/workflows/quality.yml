@@ -1,0 +1,270 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ master, main, dev, develop ]
+  pull_request:
+    branches: [ master, main ]
+  schedule:
+    # Run weekly on Sundays at 3 AM UTC
+    - cron: '0 3 * * 0'
+
+jobs:
+  luacheck:
+    name: Lua Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Lua and luacheck
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lua5.1 luarocks
+        sudo luarocks install luacheck
+        
+    - name: Run luacheck on main files
+      run: |
+        echo "Running luacheck on main addon files..."
+        luacheck --no-color --codes GuildGreet.lua
+        
+        # Check for additional Lua files
+        if [ -f "Bindings.lua" ]; then
+          luacheck --no-color --codes Bindings.lua
+        fi
+        
+        if [ -d "lang" ]; then
+          echo "Checking locale files..."
+          luacheck --no-color --codes lang/*.lua || true
+        fi
+        
+    - name: Generate code quality report
+      run: |
+        echo "## 🔍 Code Quality Report" >> $GITHUB_STEP_SUMMARY
+        echo "### Luacheck Results" >> $GITHUB_STEP_SUMMARY
+        
+        # Run luacheck and capture output
+        if luacheck --no-color --formatter=plain GuildGreet.lua > luacheck_output.txt 2>&1; then
+          echo "✅ **No issues found in main file**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ **Issues found in main file:**" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat luacheck_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if [ -d "lang" ]; then
+          if luacheck --no-color --formatter=plain lang/*.lua > luacheck_locale.txt 2>&1; then
+            echo "✅ **No issues found in locale files**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Issues found in locale files:**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat luacheck_locale.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+        fi
+
+  toc-validation:
+    name: TOC File Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate TOC structure
+      run: |
+        echo "Validating TOC file structure..."
+        
+        # Check if TOC file exists
+        if [ ! -f "GuildGreet.toc" ]; then
+          echo "❌ TOC file not found!"
+          exit 1
+        fi
+        
+        echo "✅ TOC file found"
+        
+        # Extract and validate required fields
+        INTERFACE=$(grep "## Interface:" GuildGreet.toc | head -1 | cut -d' ' -f3)
+        TITLE=$(grep "## Title:" GuildGreet.toc | cut -d' ' -f3-)
+        VERSION=$(grep "## Version:" GuildGreet.toc | cut -d' ' -f3)
+        AUTHOR=$(grep "## Author:" GuildGreet.toc | cut -d' ' -f3-)
+        
+        echo "Found TOC fields:"
+        echo "  Interface: $INTERFACE"
+        echo "  Title: $TITLE"
+        echo "  Version: $VERSION"
+        echo "  Author: $AUTHOR"
+        
+        # Validate interface versions
+        echo "Checking interface versions..."
+        
+        RETAIL_INTERFACE=$(grep "## Interface-Retail:" GuildGreet.toc | cut -d' ' -f3 || echo $INTERFACE)
+        CLASSIC_INTERFACE=$(grep "## Interface-Classic:" GuildGreet.toc | cut -d' ' -f3)
+        BCC_INTERFACE=$(grep "## Interface-BCC:" GuildGreet.toc | cut -d' ' -f3)
+        WRATH_INTERFACE=$(grep "## Interface-Wrath:" GuildGreet.toc | cut -d' ' -f3)
+        CATA_INTERFACE=$(grep "## Interface-Cata:" GuildGreet.toc | cut -d' ' -f3)
+        
+        # Validate version format
+        if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "⚠️ Version format should be X.Y.Z, found: $VERSION"
+        else
+          echo "✅ Version format is valid: $VERSION"
+        fi
+        
+    - name: Check for required files mentioned in TOC
+      run: |
+        echo "Checking file references..."
+        while IFS= read -r line; do
+          # Skip comments and empty lines
+          if [[ $line =~ ^[[:space:]]*# ]] || [[ -z "${line// }" ]]; then
+            continue
+          fi
+          
+          # Skip #@no-lib-strip@ blocks
+          if [[ $line =~ ^#@.*@$ ]]; then
+            continue
+          fi
+          
+          # Check if file exists
+          filename=$(echo "$line" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
+          if [ -n "$filename" ]; then
+            if [ -f "$filename" ]; then
+              echo "✅ File found: $filename"
+            else
+              echo "⚠️ File not found: $filename"
+            fi
+          fi
+        done < <(tail -n +10 GuildGreet.toc)  # Skip first 10 lines (headers)
+        
+    - name: Generate TOC validation report
+      run: |
+        echo "## 📋 TOC Validation Report" >> $GITHUB_STEP_SUMMARY
+        
+        VERSION=$(grep "## Version:" GuildGreet.toc | cut -d' ' -f3)
+        INTERFACE=$(grep "## Interface:" GuildGreet.toc | head -1 | cut -d' ' -f3)
+        
+        echo "### Current Version Information" >> $GITHUB_STEP_SUMMARY
+        echo "- **Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
+        echo "- **Main Interface:** $INTERFACE" >> $GITHUB_STEP_SUMMARY
+        
+        echo "### Interface Compatibility" >> $GITHUB_STEP_SUMMARY
+        echo "| Version | Interface | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|---------|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+        
+        # Check each interface version
+        for variant in "Retail" "Classic" "BCC" "Wrath" "Cata"; do
+          interface_line=$(grep "## Interface-$variant:" GuildGreet.toc || echo "")
+          if [ -n "$interface_line" ]; then
+            interface_version=$(echo "$interface_line" | cut -d' ' -f3)
+            echo "| $variant | $interface_version | ✅ Supported |" >> $GITHUB_STEP_SUMMARY
+          else
+            if [ "$variant" = "Retail" ]; then
+              echo "| $variant | $INTERFACE | ✅ Default |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| $variant | - | ❌ Not specified |" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+        done
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Scan for sensitive patterns
+      run: |
+        echo "Scanning for potential security issues..."
+        
+        # Check for common security anti-patterns in Lua/WoW addons
+        echo "## 🔒 Security Scan Results" >> $GITHUB_STEP_SUMMARY
+        
+        security_issues=0
+        
+        # Check for potentially dangerous functions
+        dangerous_patterns=(
+          "RunScript"
+          "loadstring" 
+          "dofile"
+          "load"
+          "getfenv"
+          "setfenv"
+        )
+        
+        for pattern in "${dangerous_patterns[@]}"; do
+          if grep -r "$pattern" *.lua 2>/dev/null; then
+            echo "⚠️ Found potentially dangerous function: $pattern" >> $GITHUB_STEP_SUMMARY
+            security_issues=$((security_issues + 1))
+          fi
+        done
+        
+        # Check for hardcoded secrets/tokens
+        secret_patterns=(
+          "password.*="
+          "token.*="
+          "key.*="
+          "secret.*="
+        )
+        
+        for pattern in "${secret_patterns[@]}"; do
+          if grep -i "$pattern" *.lua 2>/dev/null; then
+            echo "⚠️ Potential hardcoded secret found: $pattern" >> $GITHUB_STEP_SUMMARY
+            security_issues=$((security_issues + 1))
+          fi
+        done
+        
+        if [ $security_issues -eq 0 ]; then
+          echo "✅ **No security issues detected**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ **$security_issues potential security issues found**" >> $GITHUB_STEP_SUMMARY
+        fi
+
+  addon-metadata:
+    name: Addon Metadata Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Extract and validate metadata
+      run: |
+        echo "## 📊 Addon Metadata" >> $GITHUB_STEP_SUMMARY
+        
+        # Extract metadata from TOC
+        TITLE=$(grep "## Title:" GuildGreet.toc | cut -d' ' -f3-)
+        NOTES=$(grep "## Notes:" GuildGreet.toc | cut -d' ' -f3-)
+        AUTHOR=$(grep "## Author:" GuildGreet.toc | cut -d' ' -f3-)
+        VERSION=$(grep "## Version:" GuildGreet.toc | cut -d' ' -f3)
+        WEBSITE=$(grep "## X-Website:" GuildGreet.toc | cut -d' ' -f3-)
+        CURSE_ID=$(grep "## X-Curse-Project-ID:" GuildGreet.toc | cut -d' ' -f3)
+        WOWI_ID=$(grep "## X-WoWI-ID:" GuildGreet.toc | cut -d' ' -f3)
+        WAGO_ID=$(grep "## X-Wago-ID:" GuildGreet.toc | cut -d' ' -f3)
+        
+        echo "### Basic Information" >> $GITHUB_STEP_SUMMARY
+        echo "- **Title:** $TITLE" >> $GITHUB_STEP_SUMMARY
+        echo "- **Description:** $NOTES" >> $GITHUB_STEP_SUMMARY
+        echo "- **Author:** $AUTHOR" >> $GITHUB_STEP_SUMMARY
+        echo "- **Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
+        echo "- **Website:** $WEBSITE" >> $GITHUB_STEP_SUMMARY
+        
+        echo "### Platform Integration" >> $GITHUB_STEP_SUMMARY
+        echo "| Platform | ID | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|----------|-----|--------|" >> $GITHUB_STEP_SUMMARY
+        echo "| CurseForge | $CURSE_ID | $([ -n "$CURSE_ID" ] && echo "✅ Configured" || echo "❌ Missing") |" >> $GITHUB_STEP_SUMMARY
+        echo "| WoWInterface | $WOWI_ID | $([ -n "$WOWI_ID" ] && echo "✅ Configured" || echo "❌ Missing") |" >> $GITHUB_STEP_SUMMARY
+        echo "| Wago | $WAGO_ID | $([ -n "$WAGO_ID" ] && echo "✅ Configured" || echo "❌ Missing") |" >> $GITHUB_STEP_SUMMARY
+        
+        # Check for missing locale files
+        echo "### Localization Status" >> $GITHUB_STEP_SUMMARY
+        if [ -d "lang" ]; then
+          locale_count=$(find lang -name "*.lua" | wc -l)
+          echo "- **Locale files:** $locale_count found" >> $GITHUB_STEP_SUMMARY
+          echo "- **Languages:** $(find lang -name "*.lua" | sed 's|lang/||' | sed 's|\.lua||' | sort | tr '\n' ', ' | sed 's|, $||')" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "- **Locale files:** None found" >> $GITHUB_STEP_SUMMARY
+        fi

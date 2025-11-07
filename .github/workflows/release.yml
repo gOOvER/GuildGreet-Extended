@@ -1,34 +1,610 @@
-name: Package Retail
+name: Releasename: Package Retail
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - master
-    tags:
-      - '*'
-      - '!**-classic'
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout addon
-        uses: actions/checkout@v1
-        with:
-          fetch-depth: 100
+on:on:
 
-      #- name: Run luacheck
+  push:  workflow_dispatch:
+
+    tags:  push:
+
+      - 'v*'    branches:
+
+  workflow_dispatch:      - master
+
+    inputs:    tags:
+
+      version:      - '*'
+
+        description: 'Version to release (e.g., 3.5.5 or 3.6.0-beta1)'      - '!**-classic'
+
+        required: true
+
+        type: stringjobs:
+
+      create_tag:  build:
+
+        description: 'Create git tag'    runs-on: ubuntu-latest
+
+        required: true
+
+        type: boolean    steps:
+
+        default: true      - name: Checkout addon
+
+      prerelease:        uses: actions/checkout@v1
+
+        description: 'Mark as prerelease (for beta/alpha versions)'        with:
+
+        required: false          fetch-depth: 100
+
+        type: boolean
+
+        default: false      #- name: Run luacheck
+
       #  uses: BigWigsMods/actions/luacheck@master
-      #  with:
-      #    args: -q
 
-      - name: Package Retail
-        uses: BigWigsMods/packager@master
-        env:
-          CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
-          WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
-          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+jobs:      #  with:
+
+  validate-release:      #    args: -q
+
+    name: Validate Release
+
+    runs-on: ubuntu-latest      name: Release
+
+    outputs:
+
+      version: ${{ steps.version.outputs.version }}on:
+
+      tag_name: ${{ steps.version.outputs.tag_name }}  push:
+
+      is_prerelease: ${{ steps.version.outputs.is_prerelease }}    tags:
+
+          - 'v*'
+
+    steps:  workflow_dispatch:
+
+    - name: Checkout code    inputs:
+
+      uses: actions/checkout@v4      version:
+
+              description: 'Version to release (e.g., 3.5.5 or 3.6.0-beta1)'
+
+    - name: Determine version        required: true
+
+      id: version        type: string
+
+      run: |      create_tag:
+
+        if [[ "${{ github.event_name }}" == "push" ]]; then        description: 'Create git tag'
+
+          VERSION=${GITHUB_REF#refs/tags/v}        required: true
+
+          TAG_NAME=$GITHUB_REF_NAME        type: boolean
+
+          if [[ "$VERSION" =~ (alpha|beta|rc|dev|pre) ]]; then        default: true
+
+            IS_PRERELEASE="true"      prerelease:
+
+          else        description: 'Mark as prerelease (for beta/alpha versions)'
+
+            IS_PRERELEASE="false"        required: false
+
+          fi        type: boolean
+
+        else        default: false
+
+          VERSION="${{ github.event.inputs.version }}"
+
+          TAG_NAME="v$VERSION"jobs:
+
+          IS_PRERELEASE="${{ github.event.inputs.prerelease }}"  validate-release:
+
+        fi    name: Validate Release
+
+            runs-on: ubuntu-latest
+
+        echo "version=$VERSION" >> $GITHUB_OUTPUT    outputs:
+
+        echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT      version: ${{ steps.version.outputs.version }}
+
+        echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT      tag_name: ${{ steps.version.outputs.tag_name }}
+
+              is_prerelease: ${{ steps.version.outputs.is_prerelease }}
+
+    - name: Validate version format    
+
+      run: |    steps:
+
+        VERSION="${{ steps.version.outputs.version }}"    - name: Checkout code
+
+        IS_PRERELEASE="${{ steps.version.outputs.is_prerelease }}"      uses: actions/checkout@v4
+
+              
+
+        if [[ "$IS_PRERELEASE" == "true" ]]; then    - name: Determine version
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-(alpha|beta|rc|dev)[0-9]*$ ]]; then      id: version
+
+            echo "✗ Invalid prerelease version format: $VERSION"      run: |
+
+            exit 1        if [[ "${{ github.event_name }}" == "push" ]]; then
+
+          fi          # Extract version from tag
+
+        else          VERSION=${GITHUB_REF#refs/tags/v}
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then          TAG_NAME=$GITHUB_REF_NAME
+
+            echo "✗ Invalid stable version format: $VERSION"          
+
+            exit 1          # Auto-detect prerelease from version string
+
+          fi          if [[ "$VERSION" =~ (alpha|beta|rc|dev|pre) ]]; then
+
+        fi            IS_PRERELEASE="true"
+
+          else
+
+  package-addon:            IS_PRERELEASE="false"
+
+    name: Package Addon          fi
+
+    runs-on: ubuntu-latest        else
+
+    needs: validate-release          # Use manual input
+
+              VERSION="${{ github.event.inputs.version }}"
+
+    steps:          TAG_NAME="v$VERSION"
+
+    - name: Checkout code          IS_PRERELEASE="${{ github.event.inputs.prerelease }}"
+
+      uses: actions/checkout@v4        fi
+
+      with:        
+
+        fetch-depth: 0        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+                echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+
+    - name: Update version in TOC file        echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+
+      run: |        echo "Release version: $VERSION"
+
+        VERSION="${{ needs.validate-release.outputs.version }}"        echo "Tag name: $TAG_NAME"
+
+        sed -i "s/@project-version@/$VERSION/g" GuildGreet.toc        echo "Is prerelease: $IS_PRERELEASE"
+
+        echo "Updated TOC version:"        
+
+        grep "## Version:" GuildGreet.toc    - name: Validate version format
+
+              run: |
+
+    - name: Package with BigWigs Packager        VERSION="${{ steps.version.outputs.version }}"
+
+      id: bigwigs_package        IS_PRERELEASE="${{ steps.version.outputs.is_prerelease }}"
+
+      uses: BigWigsMods/packager@v2        
+
+      with:        # Allow prerelease formats: X.Y.Z-alpha1, X.Y.Z-beta1, X.Y.Z-rc1, X.Y.Z-dev
+
+        args: -S        if [[ "$IS_PRERELEASE" == "true" ]]; then
+
+      env:          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-(alpha|beta|rc|dev)[0-9]*$ ]]; then
+
+        CF_API_KEY: ${{ needs.validate-release.outputs.is_prerelease == 'true' && '' || secrets.CF_API_KEY }}            echo "✗ Invalid prerelease version format: $VERSION"
+
+        WAGO_API_TOKEN: ${{ needs.validate-release.outputs.is_prerelease == 'true' && '' || secrets.WAGO_API_TOKEN }}            echo "Expected formats: X.Y.Z-alpha1, X.Y.Z-beta1, X.Y.Z-rc1, X.Y.Z-dev"
+
+        WOWI_API_TOKEN: ${{ needs.validate-release.outputs.is_prerelease == 'true' && '' || secrets.WOWI_API_TOKEN }}            exit 1
+
+        GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}          fi
+
+      continue-on-error: true          echo "✓ Prerelease version format is valid: $VERSION"
+
+                else
+
+    - name: Manual package fallback          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+
+      if: always()            echo "✗ Invalid stable version format: $VERSION (expected: X.Y.Z)"
+
+      id: manual_package            exit 1
+
+      run: |          fi
+
+        BW_SUCCESS="${{ steps.bigwigs_package.outcome }}"          echo "✓ Stable version format is valid: $VERSION"
+
+                fi
+
+        if [[ "$BW_SUCCESS" == "success" ]] && [ -d ".release" ] && [ "$(find .release -name "*.zip" | wc -l)" -gt 0 ]; then        
+
+          echo "✅ BigWigs Packager succeeded"    - name: Check TOC version consistency
+
+          echo "manual_package_created=false" >> $GITHUB_OUTPUT      run: |
+
+          exit 0        VERSION="${{ steps.version.outputs.version }}"
+
+        fi        IS_PRERELEASE="${{ steps.version.outputs.is_prerelease }}"
+
+                TOC_VERSION=$(grep "## Version:" GuildGreet.toc | cut -d' ' -f3)
+
+        echo "Creating manual package..."        
+
+        VERSION="${{ needs.validate-release.outputs.version }}"        # For prereleases, allow TOC version to be different (development version)
+
+        PACKAGE_NAME="GuildGreet-Extended-$VERSION"        if [[ "$IS_PRERELEASE" == "true" ]]; then
+
+                  echo "ℹ️ Prerelease detected - skipping TOC version check"
+
+        mkdir -p temp_package/GuildGreet-Extended          echo "TOC version: $TOC_VERSION, Release version: $VERSION"
+
+                else
+
+        cp GuildGreet.toc temp_package/GuildGreet-Extended/          if [[ "$TOC_VERSION" != "$VERSION" && "$TOC_VERSION" != "@project-version@" ]]; then
+
+        cp GuildGreet.lua temp_package/GuildGreet-Extended/            echo "✗ Version mismatch: TOC ($TOC_VERSION) != Release ($VERSION)"
+
+        cp GuildGreet.xml temp_package/GuildGreet-Extended/ 2>/dev/null || true            echo "For stable releases, TOC version must match or use @project-version@ placeholder"
+
+        cp Bindings.xml temp_package/GuildGreet-Extended/ 2>/dev/null || true            exit 1
+
+        cp embeds.xml temp_package/GuildGreet-Extended/ 2>/dev/null || true          fi
+
+                  echo "✓ TOC version is compatible with release version: $VERSION"
+
+        if [ -d "lang" ]; then        fi
+
+          cp -r lang temp_package/GuildGreet-Extended/
+
+        fi  create-tag:
+
+            name: Create Git Tag
+
+        cp README.md temp_package/GuildGreet-Extended/ 2>/dev/null || true    runs-on: ubuntu-latest
+
+        cp LICENCE.md temp_package/GuildGreet-Extended/ 2>/dev/null || true    needs: validate-release
+
+            if: github.event_name == 'workflow_dispatch' && github.event.inputs.create_tag == 'true'
+
+        cd temp_package    
+
+        zip -r "../$PACKAGE_NAME.zip" GuildGreet-Extended/    steps:
+
+        cd ..    - name: Checkout code
+
+              uses: actions/checkout@v4
+
+        if [ -f "$PACKAGE_NAME.zip" ]; then      
+
+          echo "✅ Manual package created: $PACKAGE_NAME.zip"    - name: Create and push tag
+
+          echo "package_file=$PACKAGE_NAME.zip" >> $GITHUB_OUTPUT      run: |
+
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT        TAG_NAME="${{ needs.validate-release.outputs.tag_name }}"
+
+          echo "manual_package_created=true" >> $GITHUB_OUTPUT        VERSION="${{ needs.validate-release.outputs.version }}"
+
+        else        IS_PRERELEASE="${{ needs.validate-release.outputs.is_prerelease }}"
+
+          echo "❌ Failed to create manual package!"        
+
+          exit 1        git config user.name "GitHub Actions"
+
+        fi        git config user.email "actions@github.com"
+
+                
+
+    - name: Upload package artifact        # Create appropriate tag message
+
+      uses: actions/upload-artifact@v4        if [[ "$IS_PRERELEASE" == "true" ]]; then
+
+      with:          git tag -a "$TAG_NAME" -m "Prerelease version $VERSION"
+
+        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}          echo "✓ Created prerelease tag: $TAG_NAME"
+
+        path: |        else
+
+          ${{ steps.manual_package.outputs.package_file }}          git tag -a "$TAG_NAME" -m "Release version $VERSION"
+
+          .release/*.zip          echo "✓ Created release tag: $TAG_NAME"
+
+        retention-days: 90        fi
+
+        
+
+  create-github-release:        git push origin "$TAG_NAME"
+
+    name: Create GitHub Release
+
+    runs-on: ubuntu-latest  package-addon:
+
+    needs: [validate-release, package-addon]    name: Package Addon
+
+    if: always() && needs.validate-release.result == 'success' && needs.package-addon.result == 'success'    runs-on: ubuntu-latest
+
+        needs: validate-release
+
+    steps:    
+
+    - name: Checkout code    steps:
+
+      uses: actions/checkout@v4    - name: Checkout code
+
+      with:      uses: actions/checkout@v4
+
+        fetch-depth: 0      with:
+
+              fetch-depth: 0  # Fetch full history for proper changelog generation
+
+    - name: Download package artifact        
+
+      uses: actions/download-artifact@v4    - name: Update version in TOC file
+
+      with:      run: |
+
+        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}        VERSION="${{ needs.validate-release.outputs.version }}"
+
+        path: ./artifacts        echo "Updating version placeholder in TOC file to: $VERSION"
+
+                sed -i "s/@project-version@/$VERSION/g" GuildGreet.toc
+
+    - name: Find package file        
+
+      id: find_package        # Verify the version was updated
+
+      run: |        echo "Updated TOC version line:"
+
+        PACKAGE_FILE=$(find ./artifacts -name "*.zip" | head -1)        grep "## Version:" GuildGreet.toc
+
+        if [ -n "$PACKAGE_FILE" ]; then        
+
+          echo "✅ Found package: $PACKAGE_FILE"    - name: Package with BigWigs Packager
+
+          echo "package_file=$PACKAGE_FILE" >> $GITHUB_OUTPUT      id: bigwigs_package
+
+          PACKAGE_NAME=$(basename "$PACKAGE_FILE" .zip)      uses: BigWigsMods/packager@v2
+
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT      with:
+
+        else        args: -S  # Create multi-version TOCs automatically
+
+          echo "❌ No package file found!"      env:
+
+          exit 1        CF_API_KEY: ${{ needs.validate-release.outputs.is_prerelease == 'true' && '' || secrets.CF_API_KEY }}
+
+        fi        WAGO_API_TOKEN: ${{ needs.validate-release.outputs.is_prerelease == 'true' && '' || secrets.WAGO_API_TOKEN }}
+
+                WOWI_API_TOKEN: ${{ needs.validate-release.outputs.is_prerelease == 'true' && '' || secrets.WOWI_API_TOKEN }}
+
+    - name: Generate release notes        GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+
+      run: |      continue-on-error: true
+
+        VERSION="${{ needs.validate-release.outputs.version }}"        
+
+            - name: Manual package fallback
+
+        PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -v "^${{ needs.validate-release.outputs.tag_name }}$" | head -1)      if: always()
+
+              id: manual_package
+
+        if [ -n "$PREVIOUS_TAG" ]; then      run: |
+
+          COMMITS=$(git log --pretty=format:"- %s (%h)" ${PREVIOUS_TAG}..HEAD --no-merges | head -10)        # Check if BigWigs Packager succeeded
+
+          COMMIT_COUNT=$(git rev-list --count ${PREVIOUS_TAG}..HEAD --no-merges)        BW_SUCCESS="${{ steps.bigwigs_package.outcome }}"
+
+        else        
+
+          COMMITS="- Initial release of GuildGreet Extended"        if [[ "$BW_SUCCESS" == "success" ]] && [ -d ".release" ] && [ "$(find .release -name "*.zip" | wc -l)" -gt 0 ]; then
+
+          COMMIT_COUNT=1          echo "✅ BigWigs Packager succeeded, skipping manual fallback"
+
+        fi          echo "manual_package_created=false" >> $GITHUB_OUTPUT
+
+                  exit 0
+
+        cat > release_notes.md << EOF        fi
+
+        ## 🎮 GuildGreet Extended v$VERSION        
+
+                echo "Creating manual package fallback..."
+
+        ### Professional WoW Addon - Guild Management Enhancement        VERSION="${{ needs.validate-release.outputs.version }}"
+
+                PACKAGE_NAME="GuildGreet-Extended-$VERSION"
+
+        **Version:** $VERSION          
+
+        **Release Date:** $(date +"%B %d, %Y")          # Create package directory
+
+        **Compatible with:** Retail, Classic Era, Burning Crusade Classic, Wrath Classic, Cataclysm Classic        mkdir -p temp_package/GuildGreet-Extended
+
+                
+
+        ### 📦 Installation        # Copy addon files
+
+        1. Download the \`${{ steps.find_package.outputs.package_name }}.zip\` file below        cp GuildGreet.toc temp_package/GuildGreet-Extended/
+
+        2. Extract to your World of Warcraft \`Interface/AddOns/\` directory        cp GuildGreet.lua temp_package/GuildGreet-Extended/
+
+        3. Restart World of Warcraft        cp GuildGreet.xml temp_package/GuildGreet-Extended/ 2>/dev/null || echo "No GuildGreet.xml found"
+
+        4. Configure via \`/gg config\` in-game        cp Bindings.xml temp_package/GuildGreet-Extended/ 2>/dev/null || echo "No Bindings.xml found"
+
+                cp embeds.xml temp_package/GuildGreet-Extended/ 2>/dev/null || echo "No embeds.xml found"
+
+        ### 🆕 What's New ($COMMIT_COUNT changes)        
+
+                # Copy locale directory if it exists
+
+        $COMMITS        if [ -d "lang" ]; then
+
+                  cp -r lang temp_package/GuildGreet-Extended/
+
+        ### 🔧 Core Features        fi
+
+        - ✨ **Smart Guild Greetings** - Automated welcome and farewell messages        
+
+        - 🌍 **Universal WoW Support** - Works on Retail + All Classic versions        # Copy documentation
+
+        - ⚙️ **Modern Ace3 Framework** - Professional addon architecture        cp README.md temp_package/GuildGreet-Extended/ 2>/dev/null || echo "No README.md found"
+
+        - 📊 **Advanced Roster Tracking** - Monitor guild member activity        cp LICENCE.md temp_package/GuildGreet-Extended/ 2>/dev/null || echo "No LICENCE.md found"
+
+        - 🎯 **Intelligent Notifications** - Context-aware guild updates        
+
+        - 🌐 **Multi-Language Support** - Localized for multiple regions        # Create ZIP package
+
+                cd temp_package
+
+        ### ⚡ Quick Commands        zip -r "../$PACKAGE_NAME.zip" GuildGreet-Extended/
+
+        - \`/gg\` or \`/guildgreet\` - Toggle addon        cd ..
+
+        - \`/gg config\` - Open configuration        
+
+        - \`/gg test\` - Test greeting functionality        # Verify package creation
+
+        - \`/gg help\` - Show all commands        if [ -f "$PACKAGE_NAME.zip" ]; then
+
+                  echo "✅ Manual package created successfully: $PACKAGE_NAME.zip"
+
+        ### 🔗 Support          echo "package_file=$PACKAGE_NAME.zip" >> $GITHUB_OUTPUT
+
+        - **Bug Reports:** [GitHub Issues](https://github.com/gOOvER/GuildGreet-Extended/issues)          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+
+        - **Source Code:** [GitHub Repository](https://github.com/gOOvER/GuildGreet-Extended)          echo "manual_package_created=true" >> $GITHUB_OUTPUT
+
+        - **Developer:** https://www.goover.dev        else
+
+        EOF          echo "❌ Failed to create manual package!"
+
+                  exit 1
+
+    - name: Create GitHub Release        fi
+
+      uses: softprops/action-gh-release@v1        
+
+      with:    - name: Upload package artifact
+
+        tag_name: ${{ needs.validate-release.outputs.tag_name }}      uses: actions/upload-artifact@v4
+
+        name: GuildGreet Extended v${{ needs.validate-release.outputs.version }}      with:
+
+        body_path: release_notes.md        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}
+
+        files: ${{ steps.find_package.outputs.package_file }}        path: |
+
+        draft: false          ${{ steps.manual_package.outputs.package_file }}
+
+        prerelease: ${{ needs.validate-release.outputs.is_prerelease == 'true' }}          .release/*.zip
+
+      env:        retention-days: 90
+
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  create-github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [validate-release, package-addon]
+    if: always() && needs.validate-release.result == 'success' && needs.package-addon.result == 'success'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+      
+    - name: Download package artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}
+        path: ./artifacts
+        
+    - name: Find package file
+      id: find_package
+      run: |
+        PACKAGE_FILE=$(find ./artifacts -name "*.zip" | head -1)
+        if [ -n "$PACKAGE_FILE" ]; then
+          echo "✅ Found package file: $PACKAGE_FILE"
+          echo "package_file=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+          PACKAGE_NAME=$(basename "$PACKAGE_FILE" .zip)
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+        else
+          echo "❌ No package file found!"
+          exit 1
+        fi
+        
+    - name: Generate release notes
+      id: release_notes
+      run: |
+        VERSION="${{ needs.validate-release.outputs.version }}"
+        IS_PRERELEASE="${{ needs.validate-release.outputs.is_prerelease }}"
+        
+        # Get previous tag for changelog
+        PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -v "^${{ needs.validate-release.outputs.tag_name }}$" | head -1)
+        
+        if [ -n "$PREVIOUS_TAG" ]; then
+          COMMITS=$(git log --pretty=format:"- %s (%h)" ${PREVIOUS_TAG}..HEAD --no-merges | head -10)
+          COMMIT_COUNT=$(git rev-list --count ${PREVIOUS_TAG}..HEAD --no-merges)
+        else
+          COMMITS="- Initial release of GuildGreet Extended"
+          COMMIT_COUNT=1
+        fi
+        
+        # Generate release notes
+        cat > release_notes.md << EOF
+        ## 🎮 GuildGreet Extended v$VERSION
+        
+        ### Professional WoW Addon - Guild Management Enhancement
+        
+        **Version:** $VERSION  
+        **Release Date:** $(date +"%B %d, %Y")  
+        **Compatible with:** Retail, Classic Era, Burning Crusade Classic, Wrath Classic, Cataclysm Classic
+        
+        ### 📦 Installation
+        1. Download the \`${{ steps.find_package.outputs.package_name }}.zip\` file below
+        2. Extract to your World of Warcraft \`Interface/AddOns/\` directory
+        3. Restart World of Warcraft
+        4. Configure via \`/gg config\` in-game
+        
+        ### 🆕 What's New ($COMMIT_COUNT changes since last release)
+        
+        $COMMITS
+        
+        ### 🔧 Core Features
+        - ✨ **Smart Guild Greetings** - Automated welcome and farewell messages
+        - 🌍 **Universal WoW Support** - Works on Retail + All Classic versions
+        - ⚙️ **Modern Ace3 Framework** - Professional addon architecture
+        - 📊 **Advanced Roster Tracking** - Monitor guild member activity
+        - 🎯 **Intelligent Notifications** - Context-aware guild updates
+        - 🌐 **Multi-Language Support** - Localized for multiple regions
+        
+        ### ⚡ Quick Commands
+        - \`/gg\` or \`/guildgreet\` - Toggle addon
+        - \`/gg config\` - Open configuration
+        - \`/gg test\` - Test greeting functionality
+        - \`/gg help\` - Show all commands
+        
+        ### 🔗 Support
+        - **Bug Reports:** [GitHub Issues](https://github.com/gOOvER/GuildGreet-Extended/issues)
+        - **Source Code:** [GitHub Repository](https://github.com/gOOvER/GuildGreet-Extended)
+        - **Developer:** https://www.goover.dev
+        EOF
+        
+        echo "release_notes_file=release_notes.md" >> $GITHUB_OUTPUT
+        
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ needs.validate-release.outputs.tag_name }}
+        name: GuildGreet Extended v${{ needs.validate-release.outputs.version }}
+        body_path: release_notes.md
+        files: ${{ steps.find_package.outputs.package_file }}
+        draft: false
+        prerelease: ${{ needs.validate-release.outputs.is_prerelease == 'true' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
  

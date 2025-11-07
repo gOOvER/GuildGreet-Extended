@@ -1,0 +1,277 @@
+name: Tests
+
+on:
+  push:
+    branches: [ master, main, dev, develop ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  lua-syntax:
+    name: Lua Syntax Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Lua
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lua5.1 luarocks
+        
+    - name: Install luacheck
+      run: |
+        sudo luarocks install luacheck
+        
+    - name: Run luacheck
+      run: |
+        luacheck --no-color --codes GuildGreet.lua
+        
+    - name: Check TOC files
+      run: |
+        # Validate TOC file format
+        if [ -f "GuildGreet.toc" ]; then
+          echo "✓ TOC file exists"
+          grep -q "## Interface:" GuildGreet.toc && echo "✓ Interface version found" || exit 1
+          grep -q "## Title:" GuildGreet.toc && echo "✓ Title found" || exit 1
+          grep -q "## Version:" GuildGreet.toc && echo "✓ Version found" || exit 1
+        else
+          echo "✗ TOC file missing"
+          exit 1
+        fi
+
+  validate-structure:
+    name: Validate Addon Structure
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate addon structure
+      run: |
+        echo "Validating WoW addon structure..."
+        
+        # Check required files
+        [ -f "GuildGreet.toc" ] && echo "✓ TOC file present" || (echo "✗ TOC file missing" && exit 1)
+        [ -f "GuildGreet.lua" ] && echo "✓ Main Lua file present" || (echo "✗ Main Lua file missing" && exit 1)
+        [ -f "embeds.xml" ] && echo "✓ Embeds file present" || echo "⚠ Embeds file missing (optional)"
+        [ -f "Bindings.xml" ] && echo "✓ Bindings file present" || echo "⚠ Bindings file missing (optional)"
+        [ -f "GuildGreet.xml" ] && echo "✓ GUI XML file present" || echo "⚠ GUI XML file missing (optional)"
+        
+        # Check locale structure
+        if [ -d "lang" ]; then
+          echo "✓ Localization directory present"
+          locale_count=$(find lang -name "*.lua" | wc -l)
+          echo "  Found $locale_count locale files"
+          
+          # Check for required locale files
+          [ -f "lang/locale.xml" ] && echo "✓ Locale XML present" || echo "⚠ Locale XML missing"
+          [ -f "lang/enUS.lua" ] && echo "✓ English locale present" || echo "⚠ English locale missing"
+        fi
+        
+        # Check documentation
+        [ -f "README.md" ] && echo "✓ README present" || echo "⚠ README missing"
+        [ -f "LICENCE.md" ] && echo "✓ License present" || echo "⚠ License missing"
+        
+        echo "Addon structure validation completed successfully!"
+
+  version-consistency:
+    name: Check Version Consistency
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Extract versions
+      id: versions
+      run: |
+        # Extract version from TOC file
+        TOC_VERSION=$(grep "## Version:" GuildGreet.toc | cut -d' ' -f3)
+        echo "toc_version=$TOC_VERSION" >> $GITHUB_OUTPUT
+        echo "TOC Version: $TOC_VERSION"
+        
+        # If this is a tagged release, compare with tag
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          echo "tag_version=$TAG_VERSION" >> $GITHUB_OUTPUT
+          echo "Tag Version: $TAG_VERSION"
+        fi
+        
+    - name: Validate version consistency
+      run: |
+        TOC_VERSION="${{ steps.versions.outputs.toc_version }}"
+        TAG_VERSION="${{ steps.versions.outputs.tag_version }}"
+        
+        if [[ -n "$TAG_VERSION" ]]; then
+          if [[ "$TOC_VERSION" != "$TAG_VERSION" ]]; then
+            echo "✗ Version mismatch: TOC ($TOC_VERSION) != Tag ($TAG_VERSION)"
+            exit 1
+          else
+            echo "✓ Version consistency check passed: $TOC_VERSION"
+          fi
+        else
+          echo "✓ No tag to compare, TOC version: $TOC_VERSION"
+        fi
+
+  test-interfaces:
+    name: Test Interface Compatibility
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate interface versions
+      run: |
+        echo "Checking interface version compatibility..."
+        
+        # Extract interface versions from TOC
+        RETAIL_INTERFACE=$(grep "## Interface-Retail:" GuildGreet.toc | cut -d' ' -f3 || grep "## Interface:" GuildGreet.toc | cut -d' ' -f3)
+        CLASSIC_INTERFACE=$(grep "## Interface-Classic:" GuildGreet.toc | cut -d' ' -f3)
+        BCC_INTERFACE=$(grep "## Interface-BCC:" GuildGreet.toc | cut -d' ' -f3)
+        WRATH_INTERFACE=$(grep "## Interface-Wrath:" GuildGreet.toc | cut -d' ' -f3)
+        CATA_INTERFACE=$(grep "## Interface-Cata:" GuildGreet.toc | cut -d' ' -f3)
+        
+        echo "Interface versions found:"
+        echo "  Retail: $RETAIL_INTERFACE"
+        echo "  Classic: $CLASSIC_INTERFACE"
+        echo "  BCC: $BCC_INTERFACE"
+        echo "  Wrath: $WRATH_INTERFACE"
+        echo "  Cata: $CATA_INTERFACE"
+        
+        # Validate version format (should be numeric)
+        for version in "$RETAIL_INTERFACE" "$CLASSIC_INTERFACE" "$BCC_INTERFACE" "$WRATH_INTERFACE" "$CATA_INTERFACE"; do
+          if [[ -n "$version" ]] && [[ ! "$version" =~ ^[0-9]+$ ]]; then
+            echo "✗ Invalid interface version format: $version"
+            exit 1
+          fi
+        done
+        
+        echo "✓ All interface versions are valid"
+        
+    - name: Check for deprecated WoW API usage
+      run: |
+        echo "Checking for deprecated WoW API usage..."
+        
+        # List of commonly deprecated APIs to check for
+        deprecated_apis=(
+          "UnitHealthMax"
+          "UnitManaMax"
+          "GetPlayerTradeMoney"
+          "GetCoinIcon"
+          "GetMerchantItemLink"
+          "GetQuestLogTitle"
+          "GetNumQuestLogEntries"
+          "GetQuestLogSelection"
+        )
+        
+        deprecated_found=0
+        for api in "${deprecated_apis[@]}"; do
+          if grep -r "$api" GuildGreet.lua 2>/dev/null; then
+            echo "⚠️ Deprecated API found: $api"
+            deprecated_found=$((deprecated_found + 1))
+          fi
+        done
+        
+        if [ $deprecated_found -eq 0 ]; then
+          echo "✓ No deprecated APIs found"
+        else
+          echo "⚠️ Found $deprecated_found deprecated API calls - consider updating"
+        fi
+
+  ace3-compatibility:
+    name: Ace3 Framework Compatibility
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check Ace3 integration
+      run: |
+        echo "Checking Ace3 framework integration..."
+        
+        # Check if embeds.xml exists and contains Ace3 libraries
+        if [ -f "embeds.xml" ]; then
+          echo "✓ Embeds.xml found"
+          
+          ace_libs=(
+            "AceAddon-3.0"
+            "AceConsole-3.0"
+            "AceEvent-3.0"
+            "AceDB-3.0"
+            "AceLocale-3.0"
+            "AceGUI-3.0"
+            "AceConfig-3.0"
+            "AceTimer-3.0"
+          )
+          
+          for lib in "${ace_libs[@]}"; do
+            if grep -q "$lib" embeds.xml; then
+              echo "✓ $lib embedded"
+            else
+              echo "⚠ $lib not found in embeds.xml"
+            fi
+          done
+        else
+          echo "⚠ No embeds.xml found - checking for inline Ace3 usage"
+        fi
+        
+        # Check for proper Ace3 usage in main file
+        if grep -q "LibStub.*AceAddon.*NewAddon" GuildGreet.lua; then
+          echo "✓ Proper AceAddon initialization found"
+        else
+          echo "⚠ AceAddon initialization not found or using legacy pattern"
+        fi
+        
+        if grep -q "self:RegisterEvent" GuildGreet.lua; then
+          echo "✓ Modern event registration found"
+        else
+          echo "⚠ Legacy event registration may be in use"
+        fi
+
+  locale-validation:
+    name: Localization Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate locale files
+      run: |
+        echo "Validating localization files..."
+        
+        if [ -d "lang" ]; then
+          echo "✓ Localization directory found"
+          
+          # Check for base English locale
+          if [ -f "lang/enUS.lua" ]; then
+            echo "✓ English base locale found"
+          else
+            echo "✗ English base locale (enUS.lua) missing"
+            exit 1
+          fi
+          
+          # Count locale files
+          locale_count=$(find lang -name "*.lua" | wc -l)
+          echo "Found $locale_count locale files"
+          
+          # List all locales
+          echo "Available locales:"
+          find lang -name "*.lua" | sed 's|lang/||' | sed 's|\.lua||' | sort
+          
+          # Basic syntax check on locale files
+          echo "Checking locale file syntax..."
+          for locale_file in lang/*.lua; do
+            if [ -f "$locale_file" ]; then
+              echo "Checking: $(basename $locale_file)"
+              lua5.1 -p "$locale_file" && echo "✓ Valid syntax" || echo "✗ Syntax error in $locale_file"
+            fi
+          done
+        else
+          echo "⚠ No localization directory found"
+        fi

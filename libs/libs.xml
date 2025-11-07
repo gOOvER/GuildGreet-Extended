@@ -1,0 +1,17 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<!-- GuildGreet Libraries -->
+	<Script file="GuildGreet-Utils.lua"/>
+	<Script file="GuildGreet-Database.lua"/>
+	<Script file="GuildGreet-Colors.lua"/>
+	<Script file="GuildGreet-PlayerManager.lua"/>
+	<Script file="GuildGreet-Messages.lua"/>
+	<Script file="GuildGreet-GUI.lua"/>
+	<Script file="GuildGreet-Migration.lua"/>
+	<Script file="GuildGreet-Settings.lua"/>
+	<Script file="GuildGreet-Core.lua"/>
+	<Script file="GuildGreet-ChatSystem.lua"/>
+	<Script file="GuildGreet-PlayerUtils.lua"/>
+	<Script file="GuildGreet-HelpUtils.lua"/>
+	<Script file="GuildGreet-UIHelpers.lua"/>
+	<Script file="GuildGreet-CleanupUtils.lua"/>
+</Ui>

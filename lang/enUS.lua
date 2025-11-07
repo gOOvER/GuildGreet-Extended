@@ -202,7 +202,7 @@ L["Class"] = true
 L["Friends Note"] = true
 L["Note"] = true
 L["Could not parse command"] = true
-L["GUILDGREET DEBUG IS NOW "] = true
+-- Removed debug localization key
 L["Pasting to list"] = true
 L["update"] = true
 L["remove"] = true
@@ -353,3 +353,253 @@ L["ChatMsg/Guild info written successfully!"] = true
 L["ChatMsg/The guild info is too long..."] = true
 L["Forced chatlist to be displayed in chat"] = true
 L["Only show relogs after more then %d min"] = true
+
+-- New GUI strings added for AceGUI interface
+-- Core GUI
+L["Guild Greeter"] = true
+L["Main Window"] = true
+L["Show main window"] = true
+L["Hide main window"] = true
+L["Toggle main window"] = true
+L["Open settings"] = true
+L["Open players tab"] = true
+L["Open greetings tab"] = true
+L["Open cleanup tab"] = true
+L["Open colours tab"] = true
+L["Show this help"] = true
+L["GUI system initialized. Type /gg to open the interface."] = true
+L["GuildGreet Commands:"] = true
+
+-- Cleanup GUI
+L["Information"] = true
+L["This section helps you clean up outdated player data and greeting statistics. Use these tools to maintain your GuildGreet database."] = true
+L["Player Data Cleanup"] = true
+L["Remove players offline > 30 days"] = true
+L["Remove non-guild members"] = true
+L["Reset greeting statistics"] = true
+L["Show cleanup candidates"] = true
+L["Database Maintenance"] = true
+L["Compact database"] = true
+L["Export settings"] = true
+L["Import settings"] = true
+L["Cleanup Results"] = true
+L["Copy this text to save your settings"] = true
+L["Paste your settings text here"] = true
+L["Import"] = true
+L["Settings imported successfully"] = true
+L["Failed to import settings"] = true
+L["Database compacted: %d -> %d entries"] = true
+L["Database compaction complete"] = true
+L["Export Settings"] = true
+L["Import Settings"] = true
+L["Removed %d players offline > %d days"] = true
+L["Removed %d non-guild members"] = true
+L["Reset greeting statistics for %d players"] = true
+L["Found %d cleanup candidates"] = true
+L["No data to display"] = true
+L["Not in guild or no player data"] = true
+L["Cleanup complete: Removed %d players"] = true
+L["Cleanup complete: Removed %d non-guild members"] = true
+
+-- Colour GUI
+L["Colour Settings"] = true
+L["Configure colours for different guild ranks and roles. Click on a colour button to change it."] = true
+L["Guild Rank Colours"] = true
+L["Special Role Colours"] = true
+L["Chat Message Colours"] = true
+L["Guild Master"] = true
+L["Officer"] = true
+L["Veteran"] = true
+L["Member"] = true
+L["Recruit"] = true
+L["Alt Character"] = true
+L["Greeting Messages"] = true
+L["Whisper Messages"] = true
+L["System Messages"] = true
+L["Colour Controls"] = true
+L["Reset All Colours"] = true
+L["Import Scheme"] = true
+L["Export Scheme"] = true
+L["Choose colour for %s"] = true
+L["Current Colour"] = true
+L["RGB Values"] = true
+L["Red"] = true
+L["Green"] = true
+L["Blue"] = true
+L["OK"] = true
+L["Cancel"] = true
+L["Reset"] = true
+L["All colours reset to defaults"] = true
+L["Import Colour Scheme"] = true
+L["Export Colour Scheme"] = true
+L["Paste colour scheme data here"] = true
+L["Copy this text to save your colour scheme"] = true
+L["Colour scheme imported successfully"] = true
+L["Failed to import colour scheme"] = true
+
+-- Common UI elements
+L["Close"] = true
+L["Save"] = true
+L["Load"] = true
+L["Delete"] = true
+L["Edit"] = true
+L["New"] = true
+L["Copy"] = true
+L["Paste"] = true
+L["Clear"] = true
+L["Refresh"] = true
+L["Apply"] = true
+L["Browse"] = true
+L["Search"] = true
+L["Filter"] = true
+L["Sort"] = true
+L["Select"] = true
+L["None"] = true
+L["All"] = true
+L["Default"] = true
+L["Custom"] = true
+L["Advanced"] = true
+L["Basic"] = true
+
+-- Messages and notifications
+L["No items found"] = true
+L["Loading..."] = true
+L["Processing..."] = true
+L["Complete"] = true
+L["Error"] = true
+L["Warning"] = true
+L["Success"] = true
+L["Failed"] = true
+L["Cancelled"] = true
+L["Saved"] = true
+L["Loaded"] = true
+L["Deleted"] = true
+L["Created"] = true
+L["Updated"] = true
+L["Removed"] = true
+
+-- Settings categories
+L["Interface"] = true
+L["Appearance"] = true
+L["Behavior"] = true
+L["Performance"] = true
+L["Advanced Settings"] = true
+L["Reset Settings"] = true
+L["Default Settings"] = true
+
+-- Player status indicators
+L["Online"] = true
+L["Offline"] = true
+L["Away"] = true
+L["Busy"] = true
+L["Unknown"] = true
+L["Main"] = true
+L["Alt"] = true
+L["Friend"] = true
+L["Guild Member"] = true
+L["Channel Member"] = true
+
+-- Time and date formats
+L["seconds ago"] = true
+L["minutes ago"] = true
+L["hours ago"] = true
+L["days ago"] = true
+L["Last seen: %s"] = true
+L["Never"] = true
+
+-- Achievement and leveling
+L["NEW"] = true
+L["LEVEL"] = true
+L["RANK"] = true
+L["ACHV"] = true
+L["Achievement"] = true
+L["Level Up"] = true
+L["Promotion"] = true
+L["New Member"] = true
+
+-- New GUI system strings
+L["GUI system initialized. Type /gg to open the interface."] = true
+L["GuildGreet Commands:"] = true
+L["Show main window"] = true
+L["Hide main window"] = true
+L["Toggle main window"] = true
+L["Open settings"] = true
+L["Open players tab"] = true
+L["Open greetings tab"] = true
+L["Open cleanup tab"] = true
+L["Open colours tab"] = true
+L["Show this help"] = true
+
+-- Cleanup messages
+L["Removed %d players offline > %d days"] = true
+L["Found %d cleanup candidates"] = true
+L["No data to display"] = true
+L["Database compacted: %d -> %d entries"] = true
+L["Database compaction complete"] = true
+L["Copy this text to save your settings"] = true
+L["Paste your settings text here"] = true
+L["Import"] = true
+L["Settings imported successfully"] = true
+L["Failed to import settings"] = true
+L["Information"] = true
+L["This section helps you clean up outdated player data and greeting statistics. Use these tools to maintain your GuildGreet database."] = true
+L["Player Data Cleanup"] = true
+L["Remove players offline > 30 days"] = true
+L["Remove non-guild members"] = true
+L["Reset greeting statistics"] = true
+L["Show cleanup candidates"] = true
+L["Database Maintenance"] = true
+L["Compact database"] = true
+L["Export settings"] = true
+L["Import settings"] = true
+L["Cleanup Results"] = true
+
+-- Collection management
+L["Collections"] = true
+L["Select Collection"] = true
+L["Create New Collection"] = true
+L["Collection Name"] = true
+L["Delete Collection"] = true
+L["Are you sure you want to delete this collection?"] = true
+L["Collection deleted"] = true
+L["Collection created"] = true
+L["Invalid collection name"] = true
+
+-- Message management
+L["Messages"] = true
+L["Add Message"] = true
+L["Edit Message"] = true
+L["Delete Message"] = true
+L["Message Text"] = true
+L["Are you sure you want to delete this message?"] = true
+L["Message added"] = true
+L["Message updated"] = true
+L["Message deleted"] = true
+L["Invalid message text"] = true
+
+-- Player management additions
+L["All Players"] = true
+L["Guild Members"] = true
+L["Channel Members"] = true
+L["Main Character"] = true
+L["Set as Main"] = true
+L["Set as Alt"] = true
+L["Set Alias"] = true
+L["Ignore Player"] = true
+L["Unignore Player"] = true
+L["Ignored"] = true
+
+-- Status indicators
+L["Class"] = true
+L["Last Seen"] = true
+L["Note"] = true
+L["Permission denied"] = true
+L["Not found"] = true
+L["Invalid input"] = true
+L["With channel only"] = true
+
+-- Chat frame messages  
+L["Now using chat frame %d (%s)"] = true
+L["Cannot set default colours while colour picker is open"] = true
+
+--@localization(locale="enUS", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@

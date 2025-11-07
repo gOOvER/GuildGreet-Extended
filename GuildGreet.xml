@@ -31,7 +31,7 @@
 			<OnLoad>self:RegisterForClicks("LeftButtonDown", "RightButtonDown")</OnLoad>
 			<OnEnter>GLDG_ShowToolTip(self, self:GetName())</OnEnter>
 			<OnLeave>GameTooltip:Hide()</OnLeave>
-			<OnClick>GLDG_ClickName(button, getglobal(self:GetName().."Text"):GetText())</OnClick>
+			<OnClick>GLDG_ClickName(button, _G[self:GetName().."Text"]:GetText())</OnClick>
 		</Scripts>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 	</Button>
@@ -546,8 +546,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(self:GetName().."Low"):SetText("0")
-						getglobal(self:GetName().."High"):SetText("120")
+						_G[self:GetName().."Low"]:SetText("0")
+						_G[self:GetName().."High"]:SetText("120")
 						self:SetMinMaxValues(0,120)
 						self:SetValueStep(1)
 					</OnLoad>
@@ -566,8 +566,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(self:GetName().."Low"):SetText("0")
-						getglobal(self:GetName().."High"):SetText("100")
+						_G[self:GetName().."Low"]:SetText("0")
+						_G[self:GetName().."High"]:SetText("100")
 						self:SetMinMaxValues(0,100)
 						self:SetValueStep(1)
 					</OnLoad>
@@ -586,8 +586,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(self:GetName().."Low"):SetText("0")
-						getglobal(self:GetName().."High"):SetText("180")
+						_G[self:GetName().."Low"]:SetText("0")
+						_G[self:GetName().."High"]:SetText("180")
 						self:SetMinMaxValues(0,18)
 						self:SetValueStep(1)
 					</OnLoad>
@@ -800,8 +800,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(self:GetName().."Low"):SetText("1")
-						getglobal(self:GetName().."High"):SetText("15")
+						_G[self:GetName().."Low"]:SetText("1")
+						_G[self:GetName().."High"]:SetText("15")
 						self:SetMinMaxValues(1,15)
 						self:SetValueStep(1)
 					</OnLoad>
@@ -933,8 +933,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(self:GetName().."Low"):SetText("0")
-						getglobal(self:GetName().."High"):SetText(GLDG_GetNumActiveChatFrames())
+						_G[self:GetName().."Low"]:SetText("0")
+						_G[self:GetName().."High"]:SetText(GLDG_GetNumActiveChatFrames())
 						self:SetMinMaxValues(0,GLDG_GetNumActiveChatFrames())
 						self:SetValueStep(1)
 					</OnLoad>
@@ -1595,7 +1595,7 @@
 			</Layer>
 		</Layers>
 		<Scripts>
-			<OnClick>GLDG_ClickCollection(self, getglobal(self:GetName().."Text"):GetText())</OnClick>
+			<OnClick>GLDG_ClickCollection(self, _G[self:GetName().."Text"]:GetText())</OnClick>
 			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 			<OnLeave>GameTooltip:Hide()</OnLeave>
 		</Scripts>
@@ -1999,7 +1999,7 @@
 		</Frames>
 		<Scripts>
 			<OnShow>
-				getglobal(self:GetName().."Collectbar"):Show()
+				_G[self:GetName().."Collectbar"]:Show()
 				GLDG_ClickGreetButton(self)
 			</OnShow>
 		</Scripts>
@@ -2351,7 +2351,7 @@
 		</Layers>
 		<Scripts>
 			<OnClick>
-				GLDG_ClickPlayer(string.gsub(getglobal(self:GetName().."Name"):GetText(), "%*", ""))
+				GLDG_ClickPlayer(string.gsub(_G[self:GetName().."Name"]:GetText(), "%*", ""))
 			</OnClick>
 			<OnEnter>GLDG_ShowPlayerToolTip(self:GetName())</OnEnter>
 			<OnLeave>GameTooltip:Hide()</OnLeave>
@@ -3398,7 +3398,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_ClickAliasSet(getglobal(self:GetParent():GetName().."Editbox"):GetText())</OnClick>
+					<OnClick>GLDG_ClickAliasSet(_G[self:GetParent():GetName().."Editbox"]:GetText())</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -3480,7 +3480,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_ClickGuildSet(getglobal(self:GetParent():GetName().."Editbox"):GetText())</OnClick>
+					<OnClick>GLDG_ClickGuildSet(_G[self:GetParent():GetName().."Editbox"]:GetText())</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -3562,7 +3562,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_ClickNoteSet(getglobal(self:GetParent():GetName().."Editbox"):GetText())</OnClick>
+					<OnClick>GLDG_ClickNoteSet(_G[self:GetParent():GetName().."Editbox"]:GetText())</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -3644,7 +3644,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_ClickPublicNoteSet(getglobal(self:GetParent():GetName().."Editbox"):GetText())</OnClick>
+					<OnClick>GLDG_ClickPublicNoteSet(_G[self:GetParent():GetName().."Editbox"]:GetText())</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -3726,7 +3726,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>GLDG_ClickOfficerNoteSet(getglobal(self:GetParent():GetName().."Editbox"):GetText())</OnClick>
+					<OnClick>GLDG_ClickOfficerNoteSet(_G[self:GetParent():GetName().."Editbox"]:GetText())</OnClick>
 					<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 					<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
@@ -3768,7 +3768,7 @@
 			</Layer>
 		</Layers>
 		<Scripts>
-			<OnClick>GLDG_ClickMainAlt(self, getglobal(self:GetName().."Text"):GetText())</OnClick>
+			<OnClick>GLDG_ClickMainAlt(self, _G[self:GetName().."Text"]:GetText())</OnClick>
 			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 			<OnLeave>GameTooltip:Hide()</OnLeave>
 		</Scripts>
@@ -3835,7 +3835,7 @@
 			</ScrollFrame>
 		</Frames>
 		<Scripts>
-			<OnShow>getglobal(self:GetName().."Scrollbar"):Show()</OnShow>
+			<OnShow>_G[self:GetName().."Scrollbar"]:Show()</OnShow>
 		</Scripts>
 	</Frame>
 
@@ -4090,7 +4090,7 @@
 			</Layer>
 		</Layers>
 		<Scripts>
-			<OnClick>GLDG_ClickCleanupEntry(self, getglobal(self:GetName().."Text"):GetText())</OnClick>
+			<OnClick>GLDG_ClickCleanupEntry(self, _G[self:GetName().."Text"]:GetText())</OnClick>
 			<OnEnter>GLDG_ShowHelpToolTip(self, self:GetName())</OnEnter>
 			<OnLeave>GameTooltip:Hide()</OnLeave>
 		</Scripts>
@@ -4157,7 +4157,7 @@
 			</ScrollFrame>
 		</Frames>
 		<Scripts>
-			<OnShow>getglobal(self:GetName().."Scrollbar"):Show()</OnShow>
+			<OnShow>_G[self:GetName().."Scrollbar"]:Show()</OnShow>
 		</Scripts>
 	</Frame>
 

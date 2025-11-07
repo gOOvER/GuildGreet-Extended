@@ -1,4 +1,4 @@
-## Interface: 100000
+## Interface: 110005
 
 ## Title: GuildGreet-Extended
 ## Version: @project-version@
@@ -18,5 +18,20 @@
 
 embeds.xml
 
+# Localization files
 lang\locale.xml
-GuildGreet.xml
+
+# Library files (must be loaded before main file)
+libs\libs.xml
+
+# Core Lua file
+GuildGreet.lua
+
+# New GUI Modules
+GUI\Core.lua
+GUI\Settings.lua
+GUI\Greetings.lua
+GUI\Players.lua
+GUI\Cleanup.lua
+GUI\Colour.lua
+GUI\Init.lua
