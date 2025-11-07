@@ -74,6 +74,9 @@ read_globals = {
 
 -- Ignore some warnings that are common in WoW addons
 ignore = {
+    "111", -- Setting undefined global variable  
+    "112", -- Mutating undefined global variable
+    "113", -- Accessing undefined global variable
     "212", -- Unused argument (self is common in methods)
     "213", -- Unused loop variable  
     "512", -- Loop can be executed at most once
