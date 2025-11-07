@@ -28,21 +28,31 @@ jobs:
       run: |
         echo "Running luacheck on addon files..."
         
-        # Try full check first
-        if luacheck --no-color --codes . > luacheck_output.txt 2>&1; then
-          echo "✓ Full luacheck passed"
-          cat luacheck_output.txt || true
-        else
-          echo "⚠ Full luacheck failed, trying without undefined global checks"
-          if luacheck --no-color --codes --ignore 111 112 113 . > luacheck_output.txt 2>&1; then
-            echo "✓ Luacheck passed ignoring undefined globals"
-            cat luacheck_output.txt || true
-          else
-            echo "✗ Luacheck found issues even ignoring undefined globals"
-            cat luacheck_output.txt || true
-            # Don't fail the build for WoW addons with complex API usage
-            echo "Continuing despite luacheck issues (common in WoW addons)"
+        # Run luacheck and capture output
+        luacheck_output=$(luacheck --no-color --codes --ignore 111 112 113 . 2>&1 || true)
+        
+        # Extract statistics
+        total_warnings=$(echo "$luacheck_output" | grep -o "[0-9]* warnings" | head -1 | grep -o "[0-9]*" || echo "0")
+        total_errors=$(echo "$luacheck_output" | grep -o "[0-9]* errors" | head -1 | grep -o "[0-9]*" || echo "0") 
+        file_count=$(echo "$luacheck_output" | grep -o "in [0-9]* files" | grep -o "[0-9]*" || echo "0")
+        
+        echo "📊 Luacheck Results:"
+        echo "  Files checked: $file_count"
+        echo "  Warnings: $total_warnings"
+        echo "  Errors: $total_errors"
+        
+        # Show summary line
+        echo "$luacheck_output" | tail -1
+        
+        if [ "$total_errors" -eq 0 ]; then
+          echo "✅ No syntax errors found!"
+          if [ "$total_warnings" -gt 0 ]; then
+            echo "⚠️  Found $total_warnings warnings (acceptable for WoW addons with complex API usage)"
           fi
+        else
+          echo "❌ Found $total_errors syntax errors that need to be fixed"
+          echo "$luacheck_output"
+          exit 1
         fi
         
     - name: Generate code quality report

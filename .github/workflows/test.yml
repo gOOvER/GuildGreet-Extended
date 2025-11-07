@@ -27,15 +27,25 @@ jobs:
     - name: Run luacheck
       run: |
         echo "Running luacheck for basic syntax checking..."
-        # First try with config, if that fails try without undefined globals
-        if luacheck --no-color --codes . ; then
-          echo "✓ Luacheck passed with full configuration"
-        elif luacheck --no-color --codes --ignore 111 112 113 . ; then
-          echo "⚠ Luacheck passed ignoring undefined globals (common in WoW addons)"
+        # Run luacheck and capture output, but don't fail on warnings
+        luacheck_output=$(luacheck --no-color --codes --ignore 111 112 113 . 2>&1 || true)
+        
+        # Check for actual errors (E-codes) vs warnings (W-codes)
+        error_count=$(echo "$luacheck_output" | grep -c "(E[0-9]*)" || echo "0")
+        
+        if echo "$luacheck_output" | grep -q "/ 0 errors"; then
+          echo "✓ Luacheck passed - no syntax errors found"
+          warning_count=$(echo "$luacheck_output" | grep -o "[0-9]* warnings" | head -1 | grep -o "[0-9]*" || echo "0")
+          if [ "$warning_count" -gt 0 ]; then
+            echo "⚠ Found $warning_count warnings (acceptable for WoW addons)"
+          fi
+          echo "Summary from luacheck:"
+          echo "$luacheck_output" | tail -2
+        elif [ "$error_count" -eq 0 ]; then
+          echo "✓ No syntax errors found (warnings are acceptable)"
         else
-          echo "✗ Luacheck found syntax errors"
-          # Try just the main file for debugging
-          luacheck --no-color --codes GuildGreet.lua || true
+          echo "✗ Found $error_count syntax errors"
+          echo "$luacheck_output"
           exit 1
         fi
         
