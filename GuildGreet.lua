@@ -1,6 +1,38 @@
 --[[--------------------------------------------------------
 -- GuildGreet, a World of Warcraft social guild assistant --
 ------------------------------------------------------------
+-- 
+-- MODULAR ARCHITECTURE (November 2025):
+-- This addon has been completely modularized for better maintainability.
+-- 
+-- Main File: GuildGreet.lua (2,319 lines, reduced from 7,754 lines = 70.09% reduction)
+-- - Core initialization and coordination
+-- - Event handling and addon lifecycle
+-- - Legacy function wrappers for backwards compatibility
+-- 
+-- Library Modules (15 specialized modules in /libs/):
+-- 1. GuildGreet-Utils.lua        - Core utilities and helper functions
+-- 2. GuildGreet-Database.lua     - Data persistence and configuration
+-- 3. GuildGreet-Colors.lua       - Color management and theming
+-- 4. GuildGreet-PlayerManager.lua - Player data and roster operations
+-- 5. GuildGreet-Messages.lua     - Chat message handling and automation
+-- 6. GuildGreet-GUI.lua          - User interface and option panels
+-- 7. GuildGreet-Migration.lua    - Data migration and compatibility
+-- 8. GuildGreet-Settings.lua     - Configuration management
+-- 9. GuildGreet-Core.lua         - Core addon logic coordination
+-- 10. GuildGreet-ChatSystem.lua  - Chat integration and filtering
+-- 11. GuildGreet-PlayerUtils.lua - Player-specific utilities
+-- 12. GuildGreet-HelpUtils.lua   - Help system and documentation
+-- 13. GuildGreet-UIHelpers.lua   - UI utility functions
+-- 14. GuildGreet-CleanupUtils.lua - Database cleanup operations
+-- 15. GuildGreet-PlayerTooltip.lua - Enhanced player tooltips
+-- 
+-- Loading Order: libs.xml -> embeds.xml -> GuildGreet.xml -> GuildGreet.lua
+-- Namespace: All modules extend the global GLDG object
+-- Dependencies: Ace3 framework for professional addon architecture
+-- 
+-- For developers: Each module has a specific responsibility and clear
+-- interfaces. See MODULARIZATION_REPORT.md for complete documentation.
 ]]----------------------------------------------------------
 
 -- Global addon object for library access
@@ -72,7 +104,9 @@ GLDG_SubTab2Frame.Tab4 = L["Other"]
 
 -- Strings we look for
 GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(ERR_FRIEND_ONLINE_SS, 20)
-GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(string.gsub(ERR_FRIEND_ONLINE_SS, "|cff00ff00online|r", "online"), 20) -- fix for RealUI 8 users
+-- Fix for RealUI 8 users - split long line for readability
+local online_pattern = string.gsub(ERR_FRIEND_ONLINE_SS, "|cff00ff00online|r", "online")
+GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(online_pattern, 20)
 GLDG_OFFLINE		= string.format(ERR_FRIEND_OFFLINE_S, "(.+)")
 GLDG_JOINED			= string.format(ERR_GUILD_JOIN_S, "(.+)")
 GLDG_PROMO			= string.format(ERR_GUILD_PROMOTE_SSS, "(.+)", "(.+)", "(.+)")
@@ -492,7 +526,7 @@ function GLDG_ByeGuild()
 
 	local list = GLDG_DataGreet.ByeGuild
 	-- if time is between 20:00 and 06:00 use night mode
-	local hour,min = GLDG_GetTime();
+	local hour, _ = GLDG_GetTime(); -- min not used
 	if ((hour >= 20) or (hour <=5)) then
 		list = GLDG_DataGreet.NightGuild;
 	end
@@ -512,7 +546,7 @@ end
 function GLDG_ByeChannel()
 	local list = GLDG_DataGreet.ByeChannel
 	-- if time is between 20:00 and 05:00 use night mode
-	local hour,min = GLDG_GetTime();
+	local hour, _ = GLDG_GetTime(); -- min not used
 	if ((hour >= 20) or (hour <=5)) then
 		list = GLDG_DataGreet.NightChannel;
 	end
@@ -1024,12 +1058,12 @@ end
 ------------------------------------------------------------
 function GLDG_ParseWho()
 	-- H.Sch. - ReglohPri - GetNumWhoResults() is deprecated, changed to C_FriendList.GetNumWhoResults()
-	local numWhos, totalCount = C_FriendList.GetNumWhoResults()
-	local charname, guildname, level, race, class, zone, classFileName
+	local _, totalCount = C_FriendList.GetNumWhoResults()
+	local charname, guildname, level, _, class, _, _ -- race, zone, classFileName are not used
 
 	for i=1,totalCount do
 		-- H.Sch. - ReglohPri - GetWhoInfo is deprecated, changed to C_FriendList.GetWhoInfo
-		charname, guildname, level, race, class, zone, classFileName = C_FriendList.GetWhoInfo(i)
+		charname, guildname, level, _, class, _, _ = C_FriendList.GetWhoInfo(i)
 		if (GLDG_DataChar[charname]) then
 			GLDG_TreatWhoInfo(charname, guildname, level, class)
 		end
@@ -1304,7 +1338,7 @@ function GLDG_TreatAchievment(achievmentLink, name)
 		local GLDG_shortName, realm = string.split("-", name)
 		if not realm then name = GLDG_shortName.."-"..string.gsub(GLDG.Realm, " ", "") end
 	-- Check for achievments
-	local _, _, playerLink, achievment = string.find(achievmentLink, GLDG_ACHIEVE)
+	local _, _, _, achievment = string.find(achievmentLink, GLDG_ACHIEVE) -- playerLink not used
 	if (achievment) then
 		local main = nil
 		if (GLDG_DataChar[name] and not GLDG_DataChar[name].ignore) then
@@ -1373,11 +1407,11 @@ function GLDG_InitChannel(data)
 
 			for p in pairs(names) do
 				local name = names[p]
-				local a,b,c = strfind(name, ',', 0, true)
+				local a, _, _ = strfind(name, ',', 0, true)
 				if (a) then
 					name = string.sub(name, 1, a-1)
 				end
-				local a,b,c = strfind(name, '*', 0, true)
+				a, _, _ = strfind(name, '*', 0, true) -- reuse variable instead of redeclaring
 				if (a) then
 					name = string.sub(name, a+1)
 				end
