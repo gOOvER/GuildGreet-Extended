@@ -3,6 +3,8 @@
 -- Handles channel management, chat filtering and communication features
 ------------------------------------------------------------
 
+-- Ensure GLDG exists (defensive loading for library modules)
+GLDG = GLDG or {}
 GLDG.ChatSystem = {}
 
 ------------------------------------------------------------

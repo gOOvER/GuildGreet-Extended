@@ -3,6 +3,8 @@
 -- Handles addon core logic, configuration generation and system functions
 ------------------------------------------------------------
 
+-- Ensure GLDG exists (defensive loading for library modules)
+GLDG = GLDG or {}
 GLDG.Core = {}
 
 ------------------------------------------------------------

@@ -3,7 +3,15 @@
 -- Handles data conversion, migration, and consistency checks
 ------------------------------------------------------------]]
 
-local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet")
+-- Defensive loading: ensure GLDG exists before attempting to get addon
+local GLDG
+if LibStub("AceAddon-3.0").addons and LibStub("AceAddon-3.0").addons["GuildGreet"] then
+	GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet")
+else
+	-- Fallback: create basic table structure if addon not yet loaded
+	GLDG = GLDG or {}
+end
+
 local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 
 -- Migration Library Namespace

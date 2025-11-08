@@ -1,8 +1,10 @@
 ------------------------------------------------------------
 -- GuildGreet Settings Library
--- Handles addon configuration and settings management
+-- Handles addon configuration, player settings and guild management
 ------------------------------------------------------------
 
+-- Ensure GLDG exists (defensive loading for library modules)
+GLDG = GLDG or {}
 GLDG.Settings = {}
 
 ------------------------------------------------------------
