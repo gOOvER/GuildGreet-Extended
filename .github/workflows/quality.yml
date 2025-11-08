@@ -1,89 +1,174 @@
-name: Code Quality
+name: Code Qualityname: Code Quality
 
-on:
-  push:
-    branches: [ master, main, dev, develop ]
-  pull_request:
-    branches: [ master, main ]
+
+
+on:on:
+
+  push:  push:
+
+    branches: [ master, main, dev, develop ]    branches: [ master, main, dev, develop ]
+
+  pull_request:  pull_request:
+
+    branches: [ master, main ]    branches: [ master, main ]
+
   schedule:
-    # Run weekly on Sundays at 3 AM UTC
-    - cron: '0 3 * * 0'
 
-jobs:
-  luacheck:
-    name: Lua Code Quality
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Install Lua and luacheck
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y lua5.1 luarocks
-        sudo luarocks install luacheck
-        
-    - name: Run luacheck on addon files
-      run: |
-        echo "Running luacheck on addon files..."
-        
-        # List files to be checked
-        echo "Lua files found:"
-        find . -name "*.lua" -type f | wc -l
-        
-        # Test luacheck functionality first
-        echo 'print("test")' > test_minimal.lua
-        if luacheck test_minimal.lua > /dev/null 2>&1; then
-          echo "✅ Luacheck is functional"
-          rm test_minimal.lua
-          
-          # Run luacheck on individual files to avoid argument passing issues
-          echo "Performing individual file analysis..."
-          
-          total_warnings=0
-          total_errors=0
-          files_checked=0
-          all_output=""
-          
-          # Check each Lua file individually
-          for lua_file in $(find . -name "*.lua" -type f); do
-            files_checked=$((files_checked + 1))
-            echo "Analyzing: $lua_file"
-            
-            # Run luacheck on individual file
-            if luacheck --no-color --codes --ignore 111 112 113 "$lua_file" > individual_result.txt 2>&1; then
-              # File passed - might have warnings
-              if [ -s individual_result.txt ]; then
-                all_output="$all_output\n$(cat individual_result.txt)"
-                warnings=$(grep -c "warning" individual_result.txt 2>/dev/null || echo "0")
-                total_warnings=$((total_warnings + warnings))
-              fi
-            else
-              # File failed - check if it's errors or just warnings
-              file_output=$(cat individual_result.txt)
-              all_output="$all_output\n$file_output"
-              
-              if echo "$file_output" | grep -q "syntax error\|Error:" && ! echo "$file_output" | grep -q "warnings"; then
-                echo "❌ Syntax error in: $lua_file"
-                total_errors=$((total_errors + 1))
-              else
-                # Count warnings
-                warnings=$(echo "$file_output" | grep -c "warning" 2>/dev/null || echo "0")
-                total_warnings=$((total_warnings + warnings))
-              fi
-            fi
-            rm -f individual_result.txt
-          done
-          
-          # Show consolidated results
-          echo ""
-          echo "📊 Comprehensive Code Quality Analysis:"
-          echo "   Files analyzed: $files_checked"
-          echo "   Warnings found: $total_warnings"
-          echo "   Errors found: $total_errors"
-          
-          # Show sample of output (last few findings)
+jobs:    # Run weekly on Sundays at 3 AM UTC
+
+  luacheck:    - cron: '0 3 * * 0'
+
+    name: Lua Code Quality Check
+
+    runs-on: ubuntu-latestjobs:
+
+      luacheck:
+
+    steps:    name: Lua Code Quality
+
+    - name: Checkout code    runs-on: ubuntu-latest
+
+      uses: actions/checkout@v4    
+
+          steps:
+
+    - name: Install Lua and luacheck    - name: Checkout code
+
+      run: |      uses: actions/checkout@v4
+
+        sudo apt-get update      
+
+        sudo apt-get install -y lua5.1 luarocks    - name: Install Lua and luacheck
+
+        sudo luarocks install luacheck      run: |
+
+                sudo apt-get update
+
+    - name: Simple individual file luacheck        sudo apt-get install -y lua5.1 luarocks
+
+      run: |        sudo luarocks install luacheck
+
+        echo "🔍 Running luacheck on individual files to avoid argument errors..."        
+
+            - name: Run luacheck on addon files
+
+        # Test luacheck functionality      run: |
+
+        echo 'print("test")' > /tmp/test.lua        echo "Running luacheck on addon files..."
+
+        if luacheck /tmp/test.lua > /dev/null 2>&1; then        
+
+          echo "✅ Luacheck is working correctly"        # List files to be checked
+
+          rm /tmp/test.lua        echo "Lua files found:"
+
+        else        find . -name "*.lua" -type f | wc -l
+
+          echo "❌ Luacheck installation failed"        
+
+          rm -f /tmp/test.lua        # Test luacheck functionality first
+
+          exit 1        echo 'print("test")' > test_minimal.lua
+
+        fi        if luacheck test_minimal.lua > /dev/null 2>&1; then
+
+                  echo "✅ Luacheck is functional"
+
+        # Simple approach: process each lua file one by one          rm test_minimal.lua
+
+        echo "📁 Finding Lua files..."          
+
+        lua_files_count=0          # Run luacheck on individual files to avoid argument passing issues
+
+        error_count=0          echo "Performing individual file analysis..."
+
+        warning_count=0          
+
+                  total_warnings=0
+
+        # Process each file individually            total_errors=0
+
+        for luafile in $(find . -name "*.lua" -type f); do          files_checked=0
+
+          lua_files_count=$((lua_files_count + 1))          all_output=""
+
+          echo "🔎 Checking: $luafile"          
+
+                    # Check each Lua file individually
+
+          # Run luacheck on single file with proper error handling          for lua_file in $(find . -name "*.lua" -type f); do
+
+          if luacheck --no-color --codes --ignore 111 112 113 -- "$luafile" 2>&1 | tee /tmp/check_result.txt; then            files_checked=$((files_checked + 1))
+
+            # Count warnings if any            echo "Analyzing: $lua_file"
+
+            if [ -s /tmp/check_result.txt ]; then            
+
+              file_warnings=$(grep -c "warning" /tmp/check_result.txt 2>/dev/null || echo "0")            # Run luacheck on individual file
+
+              warning_count=$((warning_count + file_warnings))            if luacheck --no-color --codes --ignore 111 112 113 "$lua_file" > individual_result.txt 2>&1; then
+
+            fi              # File passed - might have warnings
+
+          else              if [ -s individual_result.txt ]; then
+
+            # Check if it's a real error or just warnings with non-zero exit                all_output="$all_output\n$(cat individual_result.txt)"
+
+            if grep -q "syntax error\|Error:" /tmp/check_result.txt; then                warnings=$(grep -c "warning" individual_result.txt 2>/dev/null || echo "0")
+
+              error_count=$((error_count + 1))                total_warnings=$((total_warnings + warnings))
+
+              echo "❌ Syntax error found in: $luafile"              fi
+
+            else            else
+
+              # Probably just warnings causing non-zero exit              # File failed - check if it's errors or just warnings
+
+              file_warnings=$(grep -c "warning" /tmp/check_result.txt 2>/dev/null || echo "0")              file_output=$(cat individual_result.txt)
+
+              warning_count=$((warning_count + file_warnings))              all_output="$all_output\n$file_output"
+
+            fi              
+
+          fi              if echo "$file_output" | grep -q "syntax error\|Error:" && ! echo "$file_output" | grep -q "warnings"; then
+
+          rm -f /tmp/check_result.txt                echo "❌ Syntax error in: $lua_file"
+
+        done                total_errors=$((total_errors + 1))
+
+                      else
+
+        # Final results                # Count warnings
+
+        echo ""                warnings=$(echo "$file_output" | grep -c "warning" 2>/dev/null || echo "0")
+
+        echo "📊 Luacheck Analysis Complete:"                total_warnings=$((total_warnings + warnings))
+
+        echo "   Files processed: $lua_files_count"              fi
+
+        echo "   Warnings found: $warning_count"            fi
+
+        echo "   Errors found: $error_count"            rm -f individual_result.txt
+
+                  done
+
+        if [ $error_count -eq 0 ]; then          
+
+          echo "✅ SUCCESS: No syntax errors detected!"          # Show consolidated results
+
+          if [ $warning_count -gt 0 ]; then          echo ""
+
+            echo "ℹ️  Found $warning_count warnings (normal for WoW addons)"          echo "📊 Comprehensive Code Quality Analysis:"
+
+          fi          echo "   Files analyzed: $files_checked"
+
+        else          echo "   Warnings found: $total_warnings"
+
+          echo "❌ FAILURE: Found $error_count syntax errors that must be fixed"          echo "   Errors found: $total_errors"
+
+          exit 1          
+
+        fi          # Show sample of output (last few findings)
           if [ -n "$all_output" ]; then
             echo ""
             echo "Sample analysis output:"
