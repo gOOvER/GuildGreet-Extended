@@ -52,5 +52,8 @@
         "ColorPickerFrame",
         "Settings",
         "AddonCompartmentFrame"
+    ],
+    "Lua.diagnostics.disable": [
+        "assign-type-mismatch"
     ]
 }
