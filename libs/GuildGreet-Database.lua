@@ -39,7 +39,7 @@ local GLDG_ACHIEVMENT = {}
 -------------------------------
 
 function GLDG.Database:Init()
-	local version = GetAddOnMetadata("GuildGreet", "Version");
+	local version = GLDG_GetAddOnMetadata("GuildGreet", "Version");
 	if (version == nil) then
 		version = "unknown";
 	end

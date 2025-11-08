@@ -41,6 +41,18 @@
 GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 
+-- Global helper function for cross-version API compatibility
+function GLDG_GetAddOnMetadata(addonName, field)
+	-- Use modern C_AddOns API if available (WoW 10.0+), fallback to legacy GetAddOnMetadata
+	if C_AddOns and C_AddOns.GetAddOnMetadata then
+		return C_AddOns.GetAddOnMetadata(addonName, field)
+	elseif GetAddOnMetadata then
+		return GetAddOnMetadata(addonName, field)
+	else
+		return "Unknown"
+	end
+end
+
 -- Database defaults für AceDB-3.0
 local defaults = {
 	profile = {

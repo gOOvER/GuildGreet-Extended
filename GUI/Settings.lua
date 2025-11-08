@@ -279,13 +279,13 @@ function SettingsGUI:CreateOtherTab(container)
 	
 	-- Version label
 	local version = AceGUI:Create("Label")
-	version:SetText((L["Version"] or "Version") .. ": " .. (GetAddOnMetadata("GuildGreet", "Version") or "Unknown"))
+	version:SetText((L["Version"] or "Version") .. ": " .. (GLDG_GetAddOnMetadata("GuildGreet", "Version") or "Unknown"))
 	version:SetFullWidth(true)
 	versionGroup:AddChild(version)
 	
 	-- Author label
 	local author = AceGUI:Create("Label")
-	author:SetText((L["Author"] or "Author") .. ": " .. (GetAddOnMetadata("GuildGreet", "Author") or "Unknown"))
+	author:SetText((L["Author"] or "Author") .. ": " .. (GLDG_GetAddOnMetadata("GuildGreet", "Author") or "Unknown"))
 	author:SetFullWidth(true)
 	versionGroup:AddChild(author)
 	

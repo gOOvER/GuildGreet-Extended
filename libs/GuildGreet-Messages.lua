@@ -957,7 +957,7 @@ function GLDG.Messages:OnEvent(mainObj, event, ...)
 
 			if (string.sub(arg2, 1, 4)=="VER:") then
 				if (mainObj.db.profile.ShowNewerVersions==true) then
-					local myVersion	= GetAddOnMetadata("GuildGreet", "Version")
+					local myVersion	= GLDG_GetAddOnMetadata("GuildGreet", "Version")
 					local hisVersion = string.sub(arg2, 5)
 
 					if (not GLDG_HighestVersion) then

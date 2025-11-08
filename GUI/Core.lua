@@ -64,9 +64,10 @@ function GUI:ShowMainWindow()
 		return
 	end
 
-	-- Create main frame
+	-- Create main frame with version-safe metadata access
 	local frame = AceGUI:Create("Frame")
-	frame:SetTitle("GuildGreet " .. GetAddOnMetadata("GuildGreet", "Version"))
+	local version = GLDG_GetAddOnMetadata("GuildGreet", "Version") or "Unknown"
+	frame:SetTitle("GuildGreet " .. version)
 	frame:SetWidth(800)
 	frame:SetHeight(600)
 	frame:SetLayout("Fill")
