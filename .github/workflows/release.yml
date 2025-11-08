@@ -96,4 +96,34 @@ jobs:
           WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: -g ${{ steps.create_release.outputs.id }}
+          args: -S
+
+      - name: Upload release assets
+        if: success()
+        run: |
+          # Find generated zip files and upload them to the GitHub release
+          echo "Looking for generated packages..."
+          
+          if [ -d ".release" ]; then
+            cd .release
+            for zipfile in *.zip; do
+              if [ -f "$zipfile" ]; then
+                echo "Found package: $zipfile"
+                
+                # Upload to GitHub Release using GitHub CLI
+                gh release upload "${{ steps.version.outputs.version }}" "$zipfile" --clobber
+                echo "✅ Uploaded $zipfile to GitHub Release"
+              fi
+            done
+          else
+            echo "⚠️ No .release directory found - packages may be in root"
+            for zipfile in *.zip; do
+              if [ -f "$zipfile" ]; then
+                echo "Found package: $zipfile"
+                gh release upload "${{ steps.version.outputs.version }}" "$zipfile" --clobber
+                echo "✅ Uploaded $zipfile to GitHub Release"
+              fi
+            done
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
