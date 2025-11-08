@@ -60,6 +60,26 @@ luacheck --config .luacheckrc .
 # Uses BigWigs Packager via GitHub Actions
 ```
 
+### Release Process
+The addon uses automated releases via GitHub Actions:
+
+```bash
+# Create and push a version tag
+git tag 11.0.0-alpha3
+git push origin 11.0.0-alpha3
+
+# This automatically triggers:
+# 1. GitHub Release creation (with prerelease detection)
+# 2. BigWigs Packager build
+# 3. Automatic upload to CurseForge and Wago.io
+# 4. Archive attachment to GitHub Release
+```
+
+**Tag Patterns Supported:**
+- `11.0.0-alpha1` - Prerelease (alpha/beta/rc auto-detected)
+- `11.1.0` - Stable release
+- `v11.0.0` - Traditional v-prefixed tags
+
 ### Architecture
 - **Namespace**: Global `GLDG` object with modular organization
 - **Dependencies**: Ace3 framework for professional addon development
