@@ -1271,5 +1271,5 @@ end
 function GLDG.Utils:Initialize()
 	-- Utils module doesn't need special initialization
 	-- All functions are available immediately
-	GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r "..L["Utilities module initialized"])
+	print("GuildGreet: Utilities module initialized")
 end

@@ -26,7 +26,7 @@ function GLDG.Messages:Initialize()
 	-- Set up message filters
 	self:SetupMessageFilters()
 	
-	GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r "..L["Message system initialized"])
+	print("GuildGreet: Message system initialized")
 end
 
 -------------------------------

@@ -770,5 +770,6 @@ function GLDG.Database:Initialize()
 	self:InitializeBooleanDefaults()
 	self:InitializeGreetings()
 	
-	GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r "..L["Database module initialized"])
+	-- Use simple print during initialization to avoid circular dependency with Colors
+	print("GuildGreet: Database module initialized")
 end

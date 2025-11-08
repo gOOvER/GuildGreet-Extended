@@ -368,7 +368,7 @@ function GLDG.Colors:Initialize()
 	-- Set active color set to guild by default
 	self:SetActiveColourSet("guild")
 	
-	GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r "..L["Color system initialized"])
+	print("GuildGreet: Color system initialized")
 end
 
 -------------------------------
@@ -376,6 +376,12 @@ end
 -------------------------------
 
 function GLDG.Colors:InitializeColorSchemes()
+	-- Ensure GLDG_Data exists before accessing colours
+	if not GLDG_Data then
+		GLDG:Print("Warning: GLDG_Data not yet initialized, skipping color scheme setup")
+		return
+	end
+	
 	local colors = GLDG_Data.colours
 	
 	-- Initialize help and header colors
@@ -430,9 +436,19 @@ end
 -------------------------------
 
 function GLDG.Colors:GetColors()
+	-- Return default colors if GLDG_Data is not ready yet
+	if not GLDG_Data then
+		return {
+		help = GLDG_DEFAULT_HELP_COLOUR or "|cFFFFFFFF",
+			header = GLDG_DEFAULT_HEADER_COLOUR or "|cFFFFFFFF"
+		}
+	end
+	
+	-- Initialize colour structure if needed
 	if not GLDG_Data.colours then
 		self:InitializeColorSchemes()
 	end
+	
 	return GLDG_Data.colours
 end
 

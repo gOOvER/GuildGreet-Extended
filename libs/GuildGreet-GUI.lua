@@ -22,7 +22,7 @@ function GLDG.GUI:Initialize()
 	-- Initialize GUI dropdowns
 	self:InitializeDropdowns()
 	
-	GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r "..L["GUI system initialized"])
+	print("GuildGreet: GUI system initialized")
 end
 
 -------------------------------

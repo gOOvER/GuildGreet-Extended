@@ -28,7 +28,7 @@ function GLDG.Migration:Initialize()
 	-- Check if migration is needed
 	self:CheckMigrationNeeded()
 	
-	GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r "..L["Migration system initialized"])
+	print("GuildGreet: Migration system initialized")
 end
 
 -------------------------------

@@ -1327,5 +1327,5 @@ function GLDG.PlayerManager:Initialize()
 	if not GLDG_Offline then GLDG_Offline = {} end
 	if not GLDG_SortedList then GLDG_SortedList = {} end
 	
-	GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r "..L["Player Manager module initialized"])
+	print("GuildGreet: Player Manager module initialized")
 end
