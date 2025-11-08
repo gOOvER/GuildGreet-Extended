@@ -28,12 +28,23 @@ jobs:
       run: |
         echo "Running luacheck on addon files..."
         
-        # Run luacheck and save output
-        if luacheck --no-color --codes --ignore 111 112 113 . > luacheck_output.txt 2>&1; then
+        # List files to be checked
+        echo "Lua files found:"
+        find . -name "*.lua" -type f | wc -l
+        
+        # Run luacheck with explicit file specification - try different approaches
+        if luacheck --no-color --codes --ignore 111 112 113 *.lua libs/*.lua lang/*.lua > luacheck_output.txt 2>&1; then
           echo "✅ Luacheck completed successfully - no issues found"
+          cat luacheck_output.txt
+        elif luacheck --no-color --codes --ignore 111 112 113 . > luacheck_output.txt 2>&1; then
+          echo "✅ Luacheck completed with directory scan"
           cat luacheck_output.txt
         else
           echo "Luacheck completed, analyzing results..."
+          
+          # Show the actual output first
+          echo "Luacheck output:"
+          cat luacheck_output.txt
           
           # Check the summary line for errors vs warnings
           if grep -q "/ 0 errors" luacheck_output.txt; then

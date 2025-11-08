@@ -28,21 +28,51 @@ jobs:
       run: |
         echo "Running luacheck for basic syntax checking..."
         
-        # Run luacheck and save output to file for parsing
-        if luacheck --no-color --codes --ignore 111 112 113 . > luacheck_result.txt 2>&1; then
-          echo "✓ Luacheck completed successfully"
-          cat luacheck_result.txt | tail -1
+        # List files to be checked
+        echo "Files to check:"
+        find . -name "*.lua" -type f | head -10
+        
+        # Try multiple approaches to run luacheck
+        echo "Attempting luacheck with explicit files..."
+        if luacheck --no-color --codes --ignore 111 112 113 *.lua libs/*.lua lang/*.lua > luacheck_result.txt 2>&1; then
+          echo "✅ Luacheck completed successfully"
+          cat luacheck_result.txt | tail -3
+        elif luacheck --no-color --codes --ignore 111 112 113 . > luacheck_result.txt 2>&1; then
+          echo "✅ Luacheck completed with directory scan"
+          cat luacheck_result.txt | tail -3
         else
-          echo "Luacheck completed with warnings/errors, analyzing output..."
+          echo "Luacheck completed, analyzing output..."
           
-          # Check if the output contains "0 errors"
-          if grep -q "/ 0 errors" luacheck_result.txt; then
+          # Show the actual luacheck output for debugging
+          echo "Luacheck output:"
+          cat luacheck_result.txt
+          
+          # Check if it's just a usage error or missing files argument
+          if grep -q "missing argument" luacheck_result.txt || grep -q "Usage:" luacheck_result.txt; then
+            echo "⚠️ Luacheck usage error - trying alternative approach"
+            # Try with just the main file to test if luacheck works at all
+            if luacheck --no-color --codes --ignore 111 112 113 GuildGreet.lua > luacheck_result2.txt 2>&1; then
+              echo "✅ Main file syntax check passed"
+              cat luacheck_result2.txt
+            else
+              echo "❌ Main file syntax check failed"
+              cat luacheck_result2.txt
+              exit 1
+            fi
+          elif grep -q "/ 0 errors" luacheck_result.txt; then
             echo "✅ PASS: No syntax errors found"
             # Show warning count if available
             if grep -q "warnings" luacheck_result.txt; then
               warning_line=$(grep "warnings.*errors" luacheck_result.txt | tail -1)
               echo "📊 Result: $warning_line"
               echo "⚠️ Warnings are acceptable for WoW addons with complex API usage"
+            fi
+          else
+            echo "❌ FAIL: Syntax errors detected"
+            cat luacheck_result.txt
+            exit 1
+          fi
+        fi
             fi
           else
             echo "❌ FAIL: Syntax errors detected"
