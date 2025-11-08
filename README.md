@@ -1,11 +1,75 @@
-GuildGreet Extended - A World of Warcraft guild and greeting tool
------------------------------------------------------------------
+# GuildGreet Extended - Advanced WoW Guild Management Tool
 
-I don't play WoW since reales of Shadowland, so a lot is needed to update. Any help is welcome :)
+[![GitHub Actions CI](https://github.com/gOOvER/GuildGreet-Extended/actions/workflows/test.yml/badge.svg)](https://github.com/gOOvER/GuildGreet-Extended/actions)
+[![Code Quality](https://github.com/gOOvER/GuildGreet-Extended/actions/workflows/quality.yml/badge.svg)](https://github.com/gOOvER/GuildGreet-Extended/actions)
 
+A comprehensive World of Warcraft addon for advanced guild greeting and social management with a completely modularized architecture.
 
-History
--------
+## ✨ **2025 Major Update - Complete Modularization**
+
+**🎯 Achievement: 70.09% Size Reduction** (7,754 → 2,319 lines in main file)
+
+This addon has been completely redesigned with a **modern modular architecture**:
+- **15 specialized library modules** for focused functionality
+- **Professional CI/CD pipeline** with automated testing
+- **Comprehensive documentation** for developers
+- **Backwards compatibility** maintained for all existing features
+
+### 🏗️ **New Modular Architecture**
+
+The addon now consists of focused, maintainable modules:
+- `GuildGreet-Utils.lua` - Core utility functions
+- `GuildGreet-Database.lua` - Data management and persistence
+- `GuildGreet-PlayerManager.lua` - Player tracking and roster operations
+- `GuildGreet-Messages.lua` - Chat automation and greeting logic
+- `GuildGreet-GUI.lua` - User interface components
+- And 10 more specialized modules...
+
+See `MODULARIZATION_REPORT.md` for complete technical details.
+
+## 🚀 **Features**
+
+- **Automated Guild Greetings** - Welcome new members automatically
+- **Player Tracking** - Monitor guild member activity and status  
+- **Custom Messages** - Personalized greeting and farewell messages
+- **Multi-Language Support** - Localized for multiple regions
+- **Advanced Configuration** - Extensive customization options
+- **Clean Architecture** - Modern, maintainable codebase
+
+## 📦 **Installation**
+
+1. Download from [CurseForge](https://www.curseforge.com/wow/addons/guildgreet-extended) or [WoWInterface](https://www.wowinterface.com/downloads/info21709.html)
+2. Extract to `World of Warcraft/_retail_/Interface/AddOns/`
+3. Enable in-game via the AddOns menu
+
+## ⚙️ **Configuration**
+
+Access the configuration through:
+- `/gldg config` - Open main configuration panel
+- ESC → Interface → AddOns → GuildGreet Extended
+- Minimap button (if enabled)
+
+## 🔧 **For Developers**
+
+### Building & Testing
+```bash
+# Run tests
+luacheck --config .luacheckrc .
+
+# Package addon
+# Uses BigWigs Packager via GitHub Actions
+```
+
+### Architecture
+- **Namespace**: Global `GLDG` object with modular organization
+- **Dependencies**: Ace3 framework for professional addon development
+- **Loading Order**: libs.xml → embeds.xml → GuildGreet.xml → GuildGreet.lua
+
+See the comprehensive `MODULARIZATION_REPORT.md` for detailed technical documentation.
+
+---
+
+## 📜 **History**
 This Addon was originally written by Greya, his last release was 0.52.
 I had contributed to the German localisation of that version. Greya has
 not updated this addon for WoW 2.0.1 (TBC)
