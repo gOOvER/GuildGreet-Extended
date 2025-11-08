@@ -758,3 +758,16 @@ end
 function GLDG_RosterImportFull()
 	GLDG.Database:RosterImportFull()
 end
+
+-------------------------------
+-- Database Initialization --
+-------------------------------
+
+function GLDG.Database:Initialize()
+	-- Initialize default values and greetings
+	self:InitializeDefaults()
+	self:InitializeBooleanDefaults()
+	self:InitializeGreetings()
+	
+	GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r "..L["Database module initialized"])
+end

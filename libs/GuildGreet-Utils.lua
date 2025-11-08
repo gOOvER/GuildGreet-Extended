@@ -835,7 +835,7 @@ function GLDG_Print(message, color)
 end
 
 -- Command processing and slash commands
-function GuildGreetUtils:SlashHandler(msg)
+function GLDG.Utils:SlashHandler(msg)
 	if not msg then
 		_G[GLDG_GUI]:Show()
 	else
@@ -996,7 +996,7 @@ function GuildGreetUtils:SlashHandler(msg)
 end
 
 -- Roster initialization and guild setup
-function GuildGreetUtils:InitRoster()
+function GLDG.Utils:InitRoster()
 	-- convert GLDG_Data from old format
 	GLDG_Convert()
 
@@ -1261,4 +1261,14 @@ function GLDG.Utils:ShowDetails(name)
 	else
 		GLDG:PrintHelp(L["No data found for character"].." ["..Ambiguate(name, "guild").."] "..L[""])
 	end
+end
+
+-------------------------------
+-- Utils Initialization --
+-------------------------------
+
+function GLDG.Utils:Initialize()
+	-- Utils module doesn't need special initialization
+	-- All functions are available immediately
+	GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r "..L["Utilities module initialized"])
 end

@@ -28,11 +28,11 @@ embeds.xml
 # Localization files
 lang\locale.xml
 
-# Core Lua file (MUST be loaded first to create GLDG object)
-GuildGreet.lua
-
-# Library files (loaded after GLDG object exists)
+# Library files (MUST be loaded FIRST!)
 libs\libs.xml
+
+# Core Lua file (loaded AFTER libraries are available)
+GuildGreet.lua
 
 # New GUI Modules
 GUI\Core.lua

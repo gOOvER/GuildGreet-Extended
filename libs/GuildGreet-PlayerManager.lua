@@ -1311,3 +1311,20 @@ function GLDG.PlayerManager:SortString(player)
 	end
 	return string.lower(result)
 end
+
+-------------------------------
+-- Player Manager Initialization --
+-------------------------------
+
+function GLDG.PlayerManager:Initialize()
+	-- Initialize player tracking variables
+	GLDG_RosterImportRunning = false
+	GLDG_ReadNotes = false
+	
+	-- Initialize player lists
+	if not GLDG_Online then GLDG_Online = {} end
+	if not GLDG_Offline then GLDG_Offline = {} end
+	if not GLDG_SortedList then GLDG_SortedList = {} end
+	
+	GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r "..L["Player Manager module initialized"])
+end

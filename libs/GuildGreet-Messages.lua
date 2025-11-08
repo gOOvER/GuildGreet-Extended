@@ -1080,7 +1080,7 @@ function GLDG_ChatFilter(...)
 end
 
 -- Message filtering and processing
-function GuildGreetMessages:FilterMessages(player, list)
+function GLDG.Messages:FilterMessages(player, list)
 	local newlist = {}
 	local count = 0
 
@@ -1141,7 +1141,7 @@ function GuildGreetMessages:FilterMessages(player, list)
 end
 
 -- Parse custom message with variable substitution
-function GuildGreetMessages:ParseCustomMessage(cname, name, msg)
+function GLDG.Messages:ParseCustomMessage(cname, name, msg)
 	local result = msg
 
 	local player = GLDG_DataChar[cname]
