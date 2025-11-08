@@ -3,7 +3,8 @@
 -- Handles database initialization, configuration, and migration
 ------------------------------------------------------------]]
 
-local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet")
+-- Get or create the GuildGreet addon instance
+local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 
 -- Database Library Namespace
