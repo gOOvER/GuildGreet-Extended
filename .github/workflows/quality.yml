@@ -38,12 +38,20 @@ jobs:
           echo "✅ Luacheck is functional"
           rm test_minimal.lua
           
-          # Use find command with exec to handle file arguments properly
-          echo "Running comprehensive luacheck analysis..."
-          find . -name "*.lua" -type f -exec luacheck --no-color --codes --ignore 111 112 113 {} + > luacheck_output.txt 2>&1 || true
+          # Create file list and use xargs for proper argument handling
+          echo "Creating comprehensive file list..."
+          find . -name "*.lua" -type f > lua_files.txt
+          echo "Processing $(wc -l < lua_files.txt) Lua files"
+          
+          # Run luacheck using xargs to handle file arguments properly
+          if cat lua_files.txt | xargs luacheck --no-color --codes --ignore 111 112 113 > luacheck_output.txt 2>&1; then
+            echo "✅ Luacheck analysis completed successfully"
+          else
+            echo "Luacheck analysis completed with findings"
+          fi
           
           # Show results
-          echo "Luacheck analysis complete:"
+          echo "Luacheck analysis results:"
           cat luacheck_output.txt
           
           # Check for syntax errors vs warnings
@@ -66,8 +74,12 @@ jobs:
           else
             echo ""
             echo "❌ FAIL: Syntax errors found that need fixing"
+            rm -f lua_files.txt luacheck_output.txt
             exit 1
           fi
+          
+          # Cleanup
+          rm -f lua_files.txt luacheck_output.txt
           
         else
           echo "⚠️ Luacheck not functional, using basic syntax check"

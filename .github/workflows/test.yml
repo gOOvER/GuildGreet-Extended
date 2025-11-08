@@ -44,24 +44,38 @@ jobs:
           echo "✅ Luacheck is functional"
           rm test_minimal.lua test_result.txt
           
-          # Now try with our actual files using find command
-          echo "Running luacheck on all Lua files..."
-          find . -name "*.lua" -type f -exec luacheck --no-color --codes --ignore 111 112 113 {} + > luacheck_result.txt 2>&1 || true
+          # Create explicit file list and run luacheck
+          echo "Creating file list for luacheck..."
+          find . -name "*.lua" -type f > lua_files.txt
+          echo "Found $(wc -l < lua_files.txt) Lua files"
           
-          # Check results
-          if grep -q "/ 0 errors" luacheck_result.txt; then
-            echo "✅ PASS: No syntax errors found"
-            if grep -q "warnings" luacheck_result.txt; then
-              warning_line=$(grep "warnings.*errors" luacheck_result.txt | tail -1)
-              echo "📊 Result: $warning_line"
-              echo "⚠️ Warnings are acceptable for WoW addons"
-            fi
+          # Run luacheck with file list from stdin or xargs
+          if cat lua_files.txt | xargs luacheck --no-color --codes --ignore 111 112 113 > luacheck_result.txt 2>&1; then
+            echo "✅ Luacheck completed successfully"
             cat luacheck_result.txt | tail -5
           else
-            echo "❌ FAIL: Issues detected"
-            cat luacheck_result.txt
-            exit 1
+            echo "Luacheck completed with issues, analyzing..."
+            
+            # Check for specific success patterns
+            if grep -q "/ 0 errors" luacheck_result.txt; then
+              echo "✅ PASS: No syntax errors found"
+              if grep -q "warnings" luacheck_result.txt; then
+                warning_line=$(grep -E "(warnings|errors)" luacheck_result.txt | tail -1)
+                echo "📊 Result: $warning_line"
+                echo "⚠️ Warnings are acceptable for WoW addons"
+              fi
+              cat luacheck_result.txt | tail -3
+            else
+              echo "❌ FAIL: Syntax errors detected"
+              cat luacheck_result.txt
+              rm -f lua_files.txt luacheck_result.txt
+              exit 1
+            fi
           fi
+          
+          # Cleanup
+          rm -f lua_files.txt luacheck_result.txt
+          
         else
           echo "❌ Luacheck is not functional, falling back to basic Lua syntax check"
           rm -f test_minimal.lua test_result.txt
