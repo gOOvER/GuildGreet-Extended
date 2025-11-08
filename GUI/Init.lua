@@ -141,8 +141,8 @@ function GLDG_OpenSettings()
 	end
 end
 
--- Initialize GUI when addon is ready
-GLDG:RegisterEvent("ADDON_LOADED")
+-- Initialize GUI when all modules are ready
+-- Using module callback instead of ADDON_LOADED event
 GLDG:SetCallback("OnModuleCreated", function(addon, module)
 	-- When all modules are loaded, initialize GUI
 	if module.GetName and module:GetName() == "ColourGUI" then
