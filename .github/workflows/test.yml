@@ -32,44 +32,58 @@ jobs:
         echo "Files to check:"
         find . -name "*.lua" -type f | head -10
         
-        # Try multiple approaches to run luacheck
-        echo "Attempting luacheck with explicit files..."
-        if luacheck --no-color --codes --ignore 111 112 113 *.lua libs/*.lua lang/*.lua > luacheck_result.txt 2>&1; then
-          echo "✅ Luacheck completed successfully"
-          cat luacheck_result.txt | tail -3
-        elif luacheck --no-color --codes --ignore 111 112 113 . > luacheck_result.txt 2>&1; then
-          echo "✅ Luacheck completed with directory scan"
-          cat luacheck_result.txt | tail -3
-        else
-          echo "Luacheck completed, analyzing output..."
+        # Test if luacheck is working at all
+        echo "Testing luacheck installation..."
+        luacheck --version || echo "Luacheck version check failed"
+        
+        # Create a minimal test file to verify luacheck functionality
+        echo 'print("test")' > test_minimal.lua
+        
+        # Try to run luacheck on the test file
+        if luacheck test_minimal.lua > test_result.txt 2>&1; then
+          echo "✅ Luacheck is functional"
+          rm test_minimal.lua test_result.txt
           
-          # Show the actual luacheck output for debugging
-          echo "Luacheck output:"
-          cat luacheck_result.txt
+          # Now try with our actual files using find command
+          echo "Running luacheck on all Lua files..."
+          find . -name "*.lua" -type f -exec luacheck --no-color --codes --ignore 111 112 113 {} + > luacheck_result.txt 2>&1 || true
           
-          # Check if it's just a usage error or missing files argument
-          if grep -q "missing argument" luacheck_result.txt || grep -q "Usage:" luacheck_result.txt; then
-            echo "⚠️ Luacheck usage error - trying alternative approach"
-            # Try with just the main file to test if luacheck works at all
-            if luacheck --no-color --codes --ignore 111 112 113 GuildGreet.lua > luacheck_result2.txt 2>&1; then
-              echo "✅ Main file syntax check passed"
-              cat luacheck_result2.txt
-            else
-              echo "❌ Main file syntax check failed"
-              cat luacheck_result2.txt
-              exit 1
-            fi
-          elif grep -q "/ 0 errors" luacheck_result.txt; then
+          # Check results
+          if grep -q "/ 0 errors" luacheck_result.txt; then
             echo "✅ PASS: No syntax errors found"
-            # Show warning count if available
             if grep -q "warnings" luacheck_result.txt; then
               warning_line=$(grep "warnings.*errors" luacheck_result.txt | tail -1)
               echo "📊 Result: $warning_line"
-              echo "⚠️ Warnings are acceptable for WoW addons with complex API usage"
+              echo "⚠️ Warnings are acceptable for WoW addons"
             fi
+            cat luacheck_result.txt | tail -5
           else
-            echo "❌ FAIL: Syntax errors detected"
+            echo "❌ FAIL: Issues detected"
             cat luacheck_result.txt
+            exit 1
+          fi
+        else
+          echo "❌ Luacheck is not functional, falling back to basic Lua syntax check"
+          rm -f test_minimal.lua test_result.txt
+          
+          # Basic Lua syntax check using lua -c (compile check)
+          echo "Performing basic Lua syntax validation..."
+          syntax_errors=0
+          
+          for file in $(find . -name "*.lua" -type f); do
+            echo "Checking: $file"
+            if ! lua -c "$file" > /dev/null 2>&1; then
+              echo "❌ Syntax error in: $file"
+              lua -c "$file"
+              syntax_errors=$((syntax_errors + 1))
+            fi
+          done
+          
+          if [ $syntax_errors -eq 0 ]; then
+            echo "✅ PASS: All Lua files have valid syntax"
+            echo "ℹ️  Basic syntax check completed (luacheck unavailable)"
+          else
+            echo "❌ FAIL: Found $syntax_errors files with syntax errors"
             exit 1
           fi
         fi

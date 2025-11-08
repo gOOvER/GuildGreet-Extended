@@ -32,27 +32,72 @@ jobs:
         echo "Lua files found:"
         find . -name "*.lua" -type f | wc -l
         
-        # Run luacheck with explicit file specification - try different approaches
-        if luacheck --no-color --codes --ignore 111 112 113 *.lua libs/*.lua lang/*.lua > luacheck_output.txt 2>&1; then
-          echo "✅ Luacheck completed successfully - no issues found"
-          cat luacheck_output.txt
-        elif luacheck --no-color --codes --ignore 111 112 113 . > luacheck_output.txt 2>&1; then
-          echo "✅ Luacheck completed with directory scan"
-          cat luacheck_output.txt
-        else
-          echo "Luacheck completed, analyzing results..."
+        # Test luacheck functionality first
+        echo 'print("test")' > test_minimal.lua
+        if luacheck test_minimal.lua > /dev/null 2>&1; then
+          echo "✅ Luacheck is functional"
+          rm test_minimal.lua
           
-          # Show the actual output first
-          echo "Luacheck output:"
+          # Use find command with exec to handle file arguments properly
+          echo "Running comprehensive luacheck analysis..."
+          find . -name "*.lua" -type f -exec luacheck --no-color --codes --ignore 111 112 113 {} + > luacheck_output.txt 2>&1 || true
+          
+          # Show results
+          echo "Luacheck analysis complete:"
           cat luacheck_output.txt
           
-          # Check the summary line for errors vs warnings
+          # Check for syntax errors vs warnings
           if grep -q "/ 0 errors" luacheck_output.txt; then
+            echo ""
             echo "✅ PASS: No syntax errors detected"
             
-            # Extract and display statistics
-            summary_line=$(grep "Total:" luacheck_output.txt | tail -1)
-            echo "📊 Summary: $summary_line"
+            # Extract statistics
+            if grep -q "Total:" luacheck_output.txt; then
+              summary_line=$(grep "Total:" luacheck_output.txt | tail -1)
+              echo "📊 Summary: $summary_line"
+            fi
+            
+            echo ""
+            echo "ℹ️  Code quality analysis complete:"
+            echo "   • All files have valid Lua syntax"
+            echo "   • Warnings are normal for WoW addons"
+            echo "   • Complex API usage triggers expected warnings"
+            
+          else
+            echo ""
+            echo "❌ FAIL: Syntax errors found that need fixing"
+            exit 1
+          fi
+          
+        else
+          echo "⚠️ Luacheck not functional, using basic syntax check"
+          rm -f test_minimal.lua
+          
+          # Fallback to basic Lua syntax checking
+          echo "Performing basic Lua syntax validation..."
+          syntax_errors=0
+          total_files=0
+          
+          for file in $(find . -name "*.lua" -type f); do
+            total_files=$((total_files + 1))
+            if ! lua -c "$file" > /dev/null 2>&1; then
+              echo "❌ Syntax error in: $file"
+              syntax_errors=$((syntax_errors + 1))
+            fi
+          done
+          
+          echo ""
+          echo "📊 Basic syntax check results:"
+          echo "   Files checked: $total_files"
+          echo "   Syntax errors: $syntax_errors"
+          
+          if [ $syntax_errors -eq 0 ]; then
+            echo "✅ PASS: All files have valid Lua syntax"
+          else
+            echo "❌ FAIL: Found syntax errors in $syntax_errors files"
+            exit 1
+          fi
+        fi
             
             # Show that warnings are acceptable
             if grep -q "warnings" luacheck_output.txt; then
