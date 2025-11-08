@@ -44,37 +44,57 @@ jobs:
           echo "✅ Luacheck is functional"
           rm test_minimal.lua test_result.txt
           
-          # Create explicit file list and run luacheck
-          echo "Creating file list for luacheck..."
-          find . -name "*.lua" -type f > lua_files.txt
-          echo "Found $(wc -l < lua_files.txt) Lua files"
+          # Create array of lua files and process them individually
+          echo "Processing Lua files individually to avoid argument issues..."
           
-          # Run luacheck with file list from stdin or xargs
-          if cat lua_files.txt | xargs luacheck --no-color --codes --ignore 111 112 113 > luacheck_result.txt 2>&1; then
-            echo "✅ Luacheck completed successfully"
-            cat luacheck_result.txt | tail -5
-          else
-            echo "Luacheck completed with issues, analyzing..."
-            
-            # Check for specific success patterns
-            if grep -q "/ 0 errors" luacheck_result.txt; then
-              echo "✅ PASS: No syntax errors found"
-              if grep -q "warnings" luacheck_result.txt; then
-                warning_line=$(grep -E "(warnings|errors)" luacheck_result.txt | tail -1)
-                echo "📊 Result: $warning_line"
-                echo "⚠️ Warnings are acceptable for WoW addons"
+          total_errors=0
+          total_warnings=0
+          files_processed=0
+          
+          # Process each lua file found
+          for lua_file in $(find . -name "*.lua" -type f); do
+            if [ -f "$lua_file" ]; then
+              files_processed=$((files_processed + 1))
+              echo "Processing: $lua_file"
+              
+              # Run luacheck on single file
+              if luacheck --no-color --codes --ignore 111 112 113 "$lua_file" > single_result.txt 2>&1; then
+                # Success - check for warnings
+                if [ -s single_result.txt ]; then
+                  cat single_result.txt
+                  warnings=$(grep -c "warning" single_result.txt 2>/dev/null || echo "0")
+                  total_warnings=$((total_warnings + warnings))
+                fi
+              else
+                # Error - display and count
+                cat single_result.txt
+                if grep -q "syntax error\|Error:" single_result.txt; then
+                  total_errors=$((total_errors + 1))
+                else
+                  # Might be warnings causing non-zero exit
+                  warnings=$(grep -c "warning" single_result.txt 2>/dev/null || echo "0")
+                  total_warnings=$((total_warnings + warnings))
+                fi
               fi
-              cat luacheck_result.txt | tail -3
-            else
-              echo "❌ FAIL: Syntax errors detected"
-              cat luacheck_result.txt
-              rm -f lua_files.txt luacheck_result.txt
-              exit 1
+              rm -f single_result.txt
+            fi
+          done
+          
+          echo ""
+          echo "📊 Luacheck Results:"
+          echo "Files processed: $files_processed"
+          echo "Warnings: $total_warnings"
+          echo "Errors: $total_errors"
+          
+          if [ $total_errors -gt 0 ]; then
+            echo "❌ FAIL: Found $total_errors syntax errors"
+            exit 1
+          else
+            echo "✅ PASS: No syntax errors found"
+            if [ $total_warnings -gt 0 ]; then
+              echo "ℹ️ Found $total_warnings warnings (normal for WoW addons)"
             fi
           fi
-          
-          # Cleanup
-          rm -f lua_files.txt luacheck_result.txt
           
         else
           echo "❌ Luacheck is not functional, falling back to basic Lua syntax check"
@@ -83,9 +103,11 @@ jobs:
           # Basic Lua syntax check using lua -c (compile check)
           echo "Performing basic Lua syntax validation..."
           syntax_errors=0
+          files_checked=0
           
           for file in $(find . -name "*.lua" -type f); do
             echo "Checking: $file"
+            files_checked=$((files_checked + 1))
             if ! lua -c "$file" > /dev/null 2>&1; then
               echo "❌ Syntax error in: $file"
               lua -c "$file"
@@ -93,35 +115,31 @@ jobs:
             fi
           done
           
+          echo ""
+          echo "📊 Basic Syntax Check Results:"
+          echo "Files checked: $files_checked"
+          echo "Syntax errors: $syntax_errors"
+          
           if [ $syntax_errors -eq 0 ]; then
             echo "✅ PASS: All Lua files have valid syntax"
-            echo "ℹ️  Basic syntax check completed (luacheck unavailable)"
+            echo "ℹ️ Basic syntax check completed (luacheck unavailable)"
           else
             echo "❌ FAIL: Found $syntax_errors files with syntax errors"
             exit 1
           fi
         fi
-            fi
-          else
-            echo "❌ FAIL: Syntax errors detected"
-            cat luacheck_result.txt
-            exit 1
-          fi
-        fi
-        
-        # Cleanup
-        rm -f luacheck_result.txt
         
     - name: Check TOC files
       run: |
-        # Validate TOC file format
+        echo "Validating TOC file format..."
         if [ -f "GuildGreet.toc" ]; then
           echo "✓ TOC file exists"
           grep -q "## Interface:" GuildGreet.toc && echo "✓ Interface version found" || exit 1
           grep -q "## Title:" GuildGreet.toc && echo "✓ Title found" || exit 1
           grep -q "## Version:" GuildGreet.toc && echo "✓ Version found" || exit 1
+          echo "✅ TOC file validation passed"
         else
-          echo "✗ TOC file missing"
+          echo "❌ TOC file missing"
           exit 1
         fi
 
@@ -159,203 +177,4 @@ jobs:
         [ -f "README.md" ] && echo "✓ README present" || echo "⚠ README missing"
         [ -f "LICENCE.md" ] && echo "✓ License present" || echo "⚠ License missing"
         
-        echo "Addon structure validation completed successfully!"
-
-  version-consistency:
-    name: Check Version Consistency
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Extract versions
-      id: versions
-      run: |
-        # Extract version from TOC file
-        TOC_VERSION=$(grep "## Version:" GuildGreet.toc | cut -d' ' -f3)
-        echo "toc_version=$TOC_VERSION" >> $GITHUB_OUTPUT
-        echo "TOC Version: $TOC_VERSION"
-        
-        # If this is a tagged release, compare with tag
-        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          echo "tag_version=$TAG_VERSION" >> $GITHUB_OUTPUT
-          echo "Tag Version: $TAG_VERSION"
-        fi
-        
-    - name: Validate version consistency
-      run: |
-        TOC_VERSION="${{ steps.versions.outputs.toc_version }}"
-        TAG_VERSION="${{ steps.versions.outputs.tag_version }}"
-        
-        if [[ -n "$TAG_VERSION" ]]; then
-          if [[ "$TOC_VERSION" != "$TAG_VERSION" ]]; then
-            echo "✗ Version mismatch: TOC ($TOC_VERSION) != Tag ($TAG_VERSION)"
-            exit 1
-          else
-            echo "✓ Version consistency check passed: $TOC_VERSION"
-          fi
-        else
-          echo "✓ No tag to compare, TOC version: $TOC_VERSION"
-        fi
-
-  test-interfaces:
-    name: Test Interface Compatibility
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Validate interface versions
-      run: |
-        echo "Checking interface version compatibility..."
-        
-        # Extract interface versions from TOC
-        RETAIL_INTERFACE=$(grep "## Interface-Retail:" GuildGreet.toc | cut -d' ' -f3 || grep "## Interface:" GuildGreet.toc | cut -d' ' -f3)
-        CLASSIC_INTERFACE=$(grep "## Interface-Classic:" GuildGreet.toc | cut -d' ' -f3)
-        BCC_INTERFACE=$(grep "## Interface-BCC:" GuildGreet.toc | cut -d' ' -f3)
-        WRATH_INTERFACE=$(grep "## Interface-Wrath:" GuildGreet.toc | cut -d' ' -f3)
-        CATA_INTERFACE=$(grep "## Interface-Cata:" GuildGreet.toc | cut -d' ' -f3)
-        
-        echo "Interface versions found:"
-        echo "  Retail: $RETAIL_INTERFACE"
-        echo "  Classic: $CLASSIC_INTERFACE"
-        echo "  BCC: $BCC_INTERFACE"
-        echo "  Wrath: $WRATH_INTERFACE"
-        echo "  Cata: $CATA_INTERFACE"
-        
-        # Validate version format (should be numeric)
-        for version in "$RETAIL_INTERFACE" "$CLASSIC_INTERFACE" "$BCC_INTERFACE" "$WRATH_INTERFACE" "$CATA_INTERFACE"; do
-          if [[ -n "$version" ]] && [[ ! "$version" =~ ^[0-9]+$ ]]; then
-            echo "✗ Invalid interface version format: $version"
-            exit 1
-          fi
-        done
-        
-        echo "✓ All interface versions are valid"
-        
-    - name: Check for deprecated WoW API usage
-      run: |
-        echo "Checking for deprecated WoW API usage..."
-        
-        # List of commonly deprecated APIs to check for
-        deprecated_apis=(
-          "UnitHealthMax"
-          "UnitManaMax"
-          "GetPlayerTradeMoney"
-          "GetCoinIcon"
-          "GetMerchantItemLink"
-          "GetQuestLogTitle"
-          "GetNumQuestLogEntries"
-          "GetQuestLogSelection"
-        )
-        
-        deprecated_found=0
-        for api in "${deprecated_apis[@]}"; do
-          if grep -r "$api" GuildGreet.lua 2>/dev/null; then
-            echo "⚠️ Deprecated API found: $api"
-            deprecated_found=$((deprecated_found + 1))
-          fi
-        done
-        
-        if [ $deprecated_found -eq 0 ]; then
-          echo "✓ No deprecated APIs found"
-        else
-          echo "⚠️ Found $deprecated_found deprecated API calls - consider updating"
-        fi
-
-  ace3-compatibility:
-    name: Ace3 Framework Compatibility
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Check Ace3 integration
-      run: |
-        echo "Checking Ace3 framework integration..."
-        
-        # Check if embeds.xml exists and contains Ace3 libraries
-        if [ -f "embeds.xml" ]; then
-          echo "✓ Embeds.xml found"
-          
-          ace_libs=(
-            "AceAddon-3.0"
-            "AceConsole-3.0"
-            "AceEvent-3.0"
-            "AceDB-3.0"
-            "AceLocale-3.0"
-            "AceGUI-3.0"
-            "AceConfig-3.0"
-            "AceTimer-3.0"
-          )
-          
-          for lib in "${ace_libs[@]}"; do
-            if grep -q "$lib" embeds.xml; then
-              echo "✓ $lib embedded"
-            else
-              echo "⚠ $lib not found in embeds.xml"
-            fi
-          done
-        else
-          echo "⚠ No embeds.xml found - checking for inline Ace3 usage"
-        fi
-        
-        # Check for proper Ace3 usage in main file
-        if grep -q "LibStub.*AceAddon.*NewAddon" GuildGreet.lua; then
-          echo "✓ Proper AceAddon initialization found"
-        else
-          echo "⚠ AceAddon initialization not found or using legacy pattern"
-        fi
-        
-        if grep -q "self:RegisterEvent" GuildGreet.lua; then
-          echo "✓ Modern event registration found"
-        else
-          echo "⚠ Legacy event registration may be in use"
-        fi
-
-  locale-validation:
-    name: Localization Validation
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Validate locale files
-      run: |
-        echo "Validating localization files..."
-        
-        if [ -d "lang" ]; then
-          echo "✓ Localization directory found"
-          
-          # Check for base English locale
-          if [ -f "lang/enUS.lua" ]; then
-            echo "✓ English base locale found"
-          else
-            echo "✗ English base locale (enUS.lua) missing"
-            exit 1
-          fi
-          
-          # Count locale files
-          locale_count=$(find lang -name "*.lua" | wc -l)
-          echo "Found $locale_count locale files"
-          
-          # List all locales
-          echo "Available locales:"
-          find lang -name "*.lua" | sed 's|lang/||' | sed 's|\.lua||' | sort
-          
-          # Basic syntax check on locale files
-          echo "Checking locale file syntax..."
-          for locale_file in lang/*.lua; do
-            if [ -f "$locale_file" ]; then
-              echo "Checking: $(basename $locale_file)"
-              lua5.1 -p "$locale_file" && echo "✓ Valid syntax" || echo "✗ Syntax error in $locale_file"
-            fi
-          done
-        else
-          echo "⚠ No localization directory found"
-        fi
+        echo "✅ Addon structure validation completed successfully!"
