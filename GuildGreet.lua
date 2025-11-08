@@ -36,7 +36,8 @@
 ]]----------------------------------------------------------
 
 -- Global addon object for library access
-GLDG = LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceDB-3.0")
+-- Using LibStub for AceDB-3.0 to avoid version conflicts with other addons
+GLDG = LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 
 -- Database defaults für AceDB-3.0
