@@ -1,0 +1,349 @@
+=== LOKALISIERUNGS-ANALYSE ===
+Verwendete Keys im Code: 265
+Definierte Keys in enUS.lua: 489
+Definierte Keys in deDE.lua: 407
+
+=== FEHLENDE KEYS IN enUS.lua (65) ===
+   joined the channel
+  %s : select the greeting category you want to edit
+  <none>
+  Achievement Points
+  Alt of
+  Always show level-up
+  Always show relogs
+  Another argument is needed after command
+  Available backups:
+  Backup created: %s
+  Backup not found: 
+  Channel members: %d
+  ChatMsg/Config string found. GuildGreet using default settings from %s!
+  ChatMsg/The config string seems to be corrupted. Please inform %s!
+  Circular main-alt reference detected
+  Collection %q
+  Conflict resolved for
+  Data conversion completed
+  Data issues found: %d
+  Data restored from backup: %s
+  Database initialized successfully
+  Default colors restored
+  Details for
+  Display a maximum of %d queued players
+  earned the achievement
+  Editbox/"..GLDG_Selection]) -- generate L["Editbox/Achievment
+  Editbox/Bye
+  Fixed %d issues
+  Fixed: Removed invalid alt reference from
+  Fixed: Removed main flag from
+  Fixed: Removed self-reference from
+  Fixed: Set main flag for
+  Friends: %d
+  Guild members: %d
+  has earned
+  Migration Report:
+  Migration tasks needed: 
+  New friend
+  No backups found
+  No characters found
+  No data issues found
+  No issues found to fix
+  Only show level-up for levels above %d
+  Only update guild roster on events
+  Player
+  Player has invalid main reference
+  Player has rank number but no rank name
+  Player not found
+  Promote to main
+  Public Note
+  Purged %d characters
+  Remove selection
+  Roster import completed
+  Select main for character %s
+  Starting data conversion...
+  Total players: %d
+  Type |cFFFFFF7F/gg convert|r to start migration
+  Update guild roster every %d seconds
+  Using chat frame %d (%s)
+  Using default chat frame
+  Verifying data consistency...
+  was demoted to
+  was promoted to
+  went offline
+  Zone
+
+=== FEHLENDE KEYS IN deDE.lua (129) ===
+  --> conflict:
+  (new rank)
+  %s : select the greeting category you want to edit
+  |cFFFFFF7FGuild member notification|r is currently turned off (See Interface settings, Game, Social).\r\nThis means that GuildGreet is unable to reliably track when your guild mates come online or go offline.\r\n\r\nThis question will only be asked once. To manually check later on type |cFFFFFF7F/gg alert|r.\r\n\r\nDo you want to activate these notifications? (Recommended)
+  A tool to manage mains and alts in the guild and greet them
+  Activate notification
+  Alias
+  alt
+  Alts
+  and all its alts
+  Automatically fixing inconsistencies
+  Backup not found: 
+  Can remove guildless
+  Channel
+  Channel(s)
+  character
+  ChatMsg/Config string found. GuildGreet using default settings from %s!
+  ChatMsg/Config string not found.
+  ChatMsg/Guild info written successfully!
+  ChatMsg/GuildGreet using default settings!
+  ChatMsg/GuildGreet using your own settings (But a config string is in the guild info available).
+  ChatMsg/GuildGreet using your own settings!
+  ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please generating a new one.
+  ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please inform %s!
+  ChatMsg/Note to the guild master to create the config string
+  ChatMsg/The config string seems to be corrupted. Please generating a new one.
+  ChatMsg/The config string seems to be corrupted. Please inform %s!
+  ChatMsg/The guild info is too long...
+  ChatMsg/To set the config string ...
+  Check if |cFFFFFF7FGuild member notification|r is enabled
+  Check if main-alt assignments are correct
+  Clear the greet list without greeting anyone
+  Clearing 'new in guild' flag for all characters
+  Converting channel
+  Converting friends found for realm
+  Converting guild
+  Done
+  Done. Type |cFFFFFF7F/gg fix|r to automatically fix these issues
+  Edit officer note for character %s
+  Edit public note for character %s
+  Editbox/"..GLDG_Selection]) -- generate L["Editbox/Achievment
+  Entries have been fixed. Check manually if all main-alt groups have the correct main. If not, use the '|cFFFFFF7F Promote to main|r' function.
+  Forced chatlist to be displayed in chat
+  found for realm
+  from character
+  from main
+  Good bye
+  Guild Member
+  Guild member notification has been turned on.
+  Guild member notification has not been turned on. |cFFFF0000GuildGreet will not be able to reliably track your guild members coming online and going offline.|r
+  Guild member notification is active.
+  Guildless display
+  has increased his level from %s to %s
+  has main
+  has not been checked, but will be seperately.
+  however is also main and alt, its main
+  however is not main but an alt, its main
+  Ignore
+  In queue since
+  Inconsistencies detected. Please use |cFFFFFF7F/gg check|r to display them or |cFFFFFF7F/gg fix|r to fix them
+  increased level from
+  is both main and alt. It's main
+  is its own main. This reference has been removed.
+  is its own main. This reference should be removed.
+  is neither main or alt but will become alt of
+  is neither main or alt.
+  is not in guild
+  Last achievment
+  Last on with
+  Leave inactive
+  List alts of all members for copying
+  List alts of all members to chat
+  List alts of members that are online to chat
+  List main and alts for <name>
+  List main and alts for <name> with full class and level info
+  Listing all characters (also offline)
+  Listing known GuildGreet users
+  Listing online characters only
+  Lookup
+  Main
+  Migration tasks needed: 
+  Moving alt
+  New in guild
+  New member
+  No channels found to remove
+  No data found for character
+  No friends found to remove
+  No guilds found to remove
+  No other GuildGreet users known
+  Nothing needed to be fixed.
+  Only show relogs after more then %d min
+  or a friend
+  or in channel
+  Pasting to list
+  Print a dump of internal data for character <name> to chat
+  Reload later
+  Reload now
+  Removed channel
+  Removed friend
+  Removed guild
+  Removed guildless
+  Removed orphan
+  Removing the 'new in guild' flag for
+  Select a channel to remove
+  Select a friend to remove
+  Select a guild to remove
+  Sending /who request for
+  Set alias for character %s
+  Set guild for character %s
+  Set note for character %s
+  should probably be main.
+  There seems to be a circular inconsistency that could not be fixed even after 10 iterations. Giving up. Please report this to gOOvER on the addon's page at www.github.com.
+  to main
+  Verifying double main-alt entries
+  Verifying main-alt relations
+  Verifying main-alt relations part 2
+  was not found in list of available entries for mode.
+  which does not exist.
+  which does not exist. This reference will be removed.
+  which is not marked as main.
+  which is not marked as main. This will be set.
+  Who results for
+  will be the new main, even though it is also main and alt, its main
+  will be the new main.
+  will become main for
+  without argument, show config frame
+  You have version 
+  You must manually reload your interface by typing /console reloadui
+  You must reload your interface for this change to take effect. Shall this be done now?
+
+=== KEYS IN enUS.lua ABER NICHT IN deDE.lua (145) ===
+  --> conflict:
+  (new rank)
+  |cFFFFFF7FGuild member notification|r is currently turned off (See Interface settings, Game, Social).\r\nThis means that GuildGreet is unable to reliably track when your guild mates come online or go offline.\r\n\r\nThis question will only be asked once. To manually check later on type |cFFFFFF7F/gg alert|r.\r\n\r\nDo you want to activate these notifications? (Recommended)
+  A officer note was added for player
+  A player note was added for player
+  A tool to manage mains and alts in the guild and greet them
+  Achievement
+  ACHV
+  Activate notification
+  Alias
+  Alt
+  Alts
+  and all its alts
+  As you switch between characters in different guilds, as you add and remove characters from your friend lists and as characters join and leave channels, a lot of character information assembles. Some of these characters may no longer be played, they may be deleted, renamed or transferred to the opposite faction or other servers.\r\nThis tab helps you to clean up stale characters.
+  Automatically fixing inconsistencies
+  Can remove guildless
+  Channel
+  Channel Member
+  Channel(s)
+  character
+  ChatMsg/Config string not found.
+  ChatMsg/Guild info written successfully!
+  ChatMsg/GuildGreet using default settings!
+  ChatMsg/GuildGreet using your own settings (But a config string is in the guild info available).
+  ChatMsg/GuildGreet using your own settings!
+  ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please generating a new one.
+  ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please inform %s!
+  ChatMsg/Note to the guild master to create the config string
+  ChatMsg/The config string seems to be corrupted. Please generating a new one.
+  ChatMsg/The guild info is too long...
+  ChatMsg/To set the config string ...
+  Check if |cFFFFFF7FGuild member notification|r is enabled
+  Check if main-alt assignments are correct
+  Clear the greet list without greeting anyone
+  Clearing 'new in guild' flag for all characters
+  Converting channel
+  Converting friends found for realm
+  Converting guild
+  Display Guildless
+  Done
+  Done. Type |cFFFFFF7F/gg fix|r to automatically fix these issues
+  Edit officer note for character %s
+  Edit public note for character %s
+  Entries have been fixed. Check manually if all main-alt groups have the correct main. If not, use the '|cFFFFFF7F Promote to main|r' function.
+  Forced chatlist to be displayed in chat
+  found for realm
+  Friends Note
+  from character
+  from main
+  Good bye
+  Guild Greeter
+  Guild Member
+  Guild member notification has been turned on.
+  Guild member notification has not been turned on. |cFFFF0000GuildGreet will not be able to reliably track your guild members coming online and going offline.|r
+  Guild member notification is active.
+  Guildless display
+  has increased his level from %s to %s
+  has main
+  has not been checked, but will be seperately.
+  however is also main and alt, its main
+  however is not main but an alt, its main
+  Ignore
+  In queue since
+  Inconsistencies detected. Please use |cFFFFFF7F/gg check|r to display them or |cFFFFFF7F/gg fix|r to fix them
+  increased level from
+  is both main and alt. It's main
+  is its own main. This reference has been removed.
+  is its own main. This reference should be removed.
+  is neither main or alt but will become alt of
+  is neither main or alt.
+  is not in guild
+  Last achievment
+  Last on with
+  Leave inactive
+  List alts of all members for copying
+  List alts of all members to chat
+  List alts of members that are online to chat
+  List main and alts for <name>
+  List main and alts for <name> with full class and level info
+  Listing all characters (also offline)
+  Listing known GuildGreet users
+  Listing online characters only
+  Lookup
+  Main
+  Moving alt
+  New in guild
+  New Member
+  No channels found to remove
+  No data found for character
+  No friends found to remove
+  No guilds found to remove
+  No other GuildGreet users known
+  Nothing needed to be fixed.
+  Only show relogs after more then %d min
+  or a friend
+  or in channel
+  Pasting to list
+  Print a dump of internal data for character <name> to chat
+  Reload later
+  Reload now
+  Removed channel
+  Removed friend
+  Removed guild
+  Removed guildless
+  Removed orphan
+  Removing the 'new in guild' flag for
+  Select a channel to remove
+  Select a friend to remove
+  Select a guild to remove
+  Sending /who request for
+  Set alias for character %s
+  Set guild for character %s
+  Set note for character %s
+  should probably be main.
+  The new note is
+  The officer note changed for player
+  The officer note from
+  The officer note was removed for player
+  The old note was
+  The player note changed for player
+  The player note was removed for player
+  There seems to be a circular inconsistency that could not be fixed even after 10 iterations. Giving up. Please report this to gOOvER on the addon's page at www.github.com.
+  This button allows you to choose any guild (except the one you belong to), it will then remove this guild from any character that had it assigned. If it is a guild one of your characters belongs to, this information will automatically be added again for all guild members of that guild.
+  This button allows you to choose any of your characters that has managed characters on their friend list and to remove this character from all friend references. If this character still exists, it will again be added automatically to those characters which are on its friend list.
+  This button allows you to remove a channel from all characters that belong to it. The next time they revisit the channel, it will again be added to them automatically.
+  This button displays all characters that do NOT belong to a Guild and displays final counts for both guildless and with a guild.
+  This button removes all characters that are not main or alt, have no friends and belong to no channel.
+  This button removes all characters that do NOT belong to a Guild.
+  to main
+  Verifying double main-alt entries
+  Verifying main-alt relations
+  Verifying main-alt relations part 2
+  was not found in list of available entries for mode.
+  which does not exist.
+  which does not exist. This reference will be removed.
+  which is not marked as main.
+  which is not marked as main. This will be set.
+  Who results for
+  will be the new main, even though it is also main and alt, its main
+  will be the new main.
+  will become main for
+  without argument, show config frame
+  You have version 
+  You must manually reload your interface by typing /console reloadui
+  You must reload your interface for this change to take effect. Shall this be done now?
