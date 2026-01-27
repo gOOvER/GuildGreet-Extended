@@ -39,24 +39,23 @@ jobs:
     - name: Determine version
       id: version
       run: |
-        if [[ "${{ github.event_name }}" == "push" ]]; then
-          VERSION=${GITHUB_REF#refs/tags/v}
-          TAG_NAME=$GITHUB_REF_NAME
-          if [[ "$VERSION" =~ (alpha|beta|rc|dev|pre) ]]; then
-            IS_PRERELEASE="true"
+        VERSION="${{ github.event.inputs.version }}"
+        if [[ -z "$VERSION" || "$VERSION" == "auto" ]]; then
+          if [ -f CHANGELOG.md ]; then
+            VERSION=$(awk '/^## \[/{gsub(/\[|\]/, "", $2); print $2; exit}' CHANGELOG.md)
+            echo "ℹ️ Auto-detected version from CHANGELOG.md: $VERSION"
           else
-            IS_PRERELEASE="false"
+            echo "❌ No CHANGELOG.md found and no version specified"
+            exit 1
           fi
+        fi
+
+        TAG_NAME="v$VERSION"
+
+        if [[ "$VERSION" =~ (alpha|beta|rc|dev|pre) ]]; then
+          IS_PRERELEASE="true"
         else
-          VERSION="${{ github.event.inputs.version }}"
-          if [[ -z "$VERSION" || "$VERSION" == "auto" ]]; then
-            if [ -f CHANGELOG.md ]; then
-              VERSION=$(awk '/^## \[/{gsub(/\[|\]/, "", $2); print $2; exit}' CHANGELOG.md)
-              echo "ℹ️ Auto-detected version from CHANGELOG.md: $VERSION"
-            fi
-          fi
-          TAG_NAME="v$VERSION"
-          IS_PRERELEASE="${{ github.event.inputs.prerelease }}"
+          IS_PRERELEASE="false"
         fi
 
         echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -105,7 +104,7 @@ jobs:
     name: Create Git Tag
     runs-on: ubuntu-latest
     needs: validate-release
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.create_tag == 'true'
+    if: github.event.inputs.create_tag == 'true'
 
     steps:
     - name: Checkout code
@@ -237,7 +236,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-bigwigs
-        path: ".release/*.zip"
+        path: .release/*.zip
         retention-days: 90
 
     - name: Verify at least one package exists
@@ -247,7 +246,6 @@ jobs:
         BW_SUCCESS="${{ steps.bigwigs_package.outcome }}"
 
         HAS_PACKAGE="false"
-        BIGWIGS_AVAILABLE="false"
 
         if [[ "$MANUAL_CREATED" == "true" ]]; then
           HAS_PACKAGE="true"
@@ -255,11 +253,9 @@ jobs:
 
         if [[ "$BW_SUCCESS" == "success" ]] && [ -d ".release" ] && [ "$(find .release -name "*.zip" | wc -l)" -gt 0 ]; then
           HAS_PACKAGE="true"
-          BIGWIGS_AVAILABLE="true"
         fi
 
         echo "package_available=$HAS_PACKAGE" >> $GITHUB_OUTPUT
-        echo "bigwigs_available=$BIGWIGS_AVAILABLE" >> $GITHUB_OUTPUT
 
         if [[ "$HAS_PACKAGE" != "true" ]]; then
           echo "❌ No packages were created successfully!" && exit 1
@@ -337,8 +333,7 @@ EOF
         tag_name: ${{ needs.validate-release.outputs.tag_name }}
         name: GuildGreet-Extended v${{ needs.validate-release.outputs.version }}
         body_path: release_notes.md
-        files: |
-          ${{ steps.find_package.outputs.package_file }}
+        files: ${{ steps.find_package.outputs.package_file }}
         draft: false
         prerelease: ${{ needs.validate-release.outputs.is_prerelease == 'true' }}
       env:
@@ -356,29 +351,42 @@ EOF
         echo "## 📦 Release Summary" >> $GITHUB_STEP_SUMMARY
         echo "**Version:** ${{ needs.validate-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
         echo "**Tag:** ${{ needs.validate-release.outputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
-        echo "**Type:** $([[ "${{ needs.validate-release.outputs.is_prerelease }}" == "true" ]] && echo "🧪 Prerelease" || echo "✅ Stable Release")" >> $GITHUB_STEP_SUMMARY
+        echo "**Type:** $(if [[ \"${{ needs.validate-release.outputs.is_prerelease }}\" == \"true\" ]]; then echo \"🧪 Prerelease\"; else echo \"✅ Stable Release\"; fi)" >> $GITHUB_STEP_SUMMARY
 
         PACKAGE_RESULT="${{ needs.package-addon.result }}"
         RELEASE_RESULT="${{ needs.create-github-release.result }}"
 
+        echo "" >> $GITHUB_STEP_SUMMARY
         echo "### Job Results" >> $GITHUB_STEP_SUMMARY
         echo "| Job | Status | Notes |" >> $GITHUB_STEP_SUMMARY
         echo "|-----|--------|-------|" >> $GITHUB_STEP_SUMMARY
-        echo "| Package Creation | $([[ "$PACKAGE_RESULT" == "success" ]] && echo "✅ Success" || echo "❌ Failed") | $PACKAGE_RESULT |" >> $GITHUB_STEP_SUMMARY
-        echo "| GitHub Release | $([[ "$RELEASE_RESULT" == "success" ]] && echo "✅ Success" || echo "❌ Failed") | $RELEASE_RESULT |" >> $GITHUB_STEP_SUMMARY
+        if [[ "$PACKAGE_RESULT" == "success" ]]; then
+          echo "| Package Creation | ✅ Success | Created successfully |" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "| Package Creation | ❌ Failed | Check logs |" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [[ "$RELEASE_RESULT" == "success" ]]; then
+          echo "| GitHub Release | ✅ Success | Created successfully |" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "| GitHub Release | ❌ Failed | Check logs |" >> $GITHUB_STEP_SUMMARY
+        fi
 
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### Platform Upload Status" >> $GITHUB_STEP_SUMMARY
         echo "| Platform | Status | Notes |" >> $GITHUB_STEP_SUMMARY
         echo "|----------|--------|-------|" >> $GITHUB_STEP_SUMMARY
-        echo "| GitHub Releases | $([[ "$RELEASE_RESULT" == "success" ]] && echo "✅ Uploaded" || echo "❌ Failed") | $( [[ "$RELEASE_RESULT" == "success" ]] && echo "Available for download" || echo "Check job logs" ) |" >> $GITHUB_STEP_SUMMARY
+        if [[ "$RELEASE_RESULT" == "success" ]]; then
+          echo "| GitHub Releases | ✅ Uploaded | Available for download |" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "| GitHub Releases | ❌ Failed | Check job logs |" >> $GITHUB_STEP_SUMMARY
+        fi
 
         if [[ "${{ needs.validate-release.outputs.is_prerelease }}" == "true" ]]; then
           echo "| CurseForge | ⏸️ Manual-only | Prereleases not auto-uploaded |" >> $GITHUB_STEP_SUMMARY
           echo "| WoWInterface | ⏸️ Manual-only | Prereleases not auto-uploaded |" >> $GITHUB_STEP_SUMMARY
           echo "| Wago | ⏸️ Manual-only | Prereleases not auto-uploaded |" >> $GITHUB_STEP_SUMMARY
         else
-          echo "| CurseForge | 🔑 Auto-upload (if CF_API_KEY set) | Via BigWigs Packager |" >> $GITHUB_STEP_SUMMARY
-          echo "| WoWInterface | 🔑 Auto-upload (if WOWI_API_TOKEN set) | Via BigWigs Packager |" >> $GITHUB_STEP_SUMMARY
-          echo "| Wago | 🔑 Auto-upload (if WAGO_API_TOKEN set) | Via BigWigs Packager |" >> $GITHUB_STEP_SUMMARY
+          echo "| CurseForge | 🔑 Auto-upload | Via BigWigs Packager (if CF_API_KEY set) |" >> $GITHUB_STEP_SUMMARY
+          echo "| WoWInterface | 🔑 Auto-upload | Via BigWigs Packager (if WOWI_API_TOKEN set) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Wago | 🔑 Auto-upload | Via BigWigs Packager (if WAGO_API_TOKEN set) |" >> $GITHUB_STEP_SUMMARY
         fi
