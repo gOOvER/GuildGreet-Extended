@@ -183,13 +183,19 @@ jobs:
       run: |
         BW_SUCCESS="${{ steps.bigwigs_package.outcome }}"
         BW_ARTIFACTS_EXIST="false"
+        
+        echo "BigWigs packager outcome: $BW_SUCCESS"
+        
         if [[ "$BW_SUCCESS" == "success" ]]; then
           if [ -d ".release" ] && [ "$(find .release -name "*.zip" | wc -l)" -gt 0 ]; then
+            echo "BigWigs created packages:"
+            ls -la .release/
             BW_ARTIFACTS_EXIST="true"
           fi
         fi
 
         if [[ "$BW_ARTIFACTS_EXIST" == "true" ]]; then
+          echo "✓ BigWigs packager succeeded, skipping manual package"
           echo "manual_package_created=false" >> $GITHUB_OUTPUT
           exit 0
         fi
@@ -228,14 +234,16 @@ jobs:
         name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-manual
         path: "*.zip"
         retention-days: 90
+        if-no-files-found: error
 
     - name: Upload BigWigs package artifact
-      if: steps.bigwigs_package.outcome == 'success' && steps.manual_package.outputs.manual_package_created != 'true'
+      if: steps.bigwigs_package.outcome == 'success'
       uses: actions/upload-artifact@v4
       with:
         name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-bigwigs
         path: .release/*.zip
         retention-days: 90
+        if-no-files-found: error
 
     - name: Verify at least one package exists
       id: verify_package
