@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [12.0.0-beta1] - 2026-01-27
+## [12.0.0] - 2026-01-27
 ### Added
-- Expanded `.gitignore` to exclude PowerShell and shell helper scripts plus common OS/editor artifacts and packaging outputs.
 
 ### Changed
 - Raised Retail interface version to 120000 for Patch 12.0.0 compatibility.
 - Replaced deprecated `GetNumPartyMembers`/`GetNumRaidMembers` usage with modern group APIs in guild poll messaging.
+- Improved database initialization to properly bind saved variables before accessing them.
 
+### Fixed
+- Fixed nil value error in Database module by ensuring saved variables are initialized before use.

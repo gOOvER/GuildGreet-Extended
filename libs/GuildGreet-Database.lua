@@ -775,7 +775,10 @@ end
 -------------------------------
 
 function GLDG.Database:Initialize()
-	-- Initialize default values and greetings
+	-- First bind to saved variables
+	self:Init()
+	
+	-- Then initialize default values and greetings
 	self:InitializeDefaults()
 	self:InitializeBooleanDefaults()
 	self:InitializeGreetings()
