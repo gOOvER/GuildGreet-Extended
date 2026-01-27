@@ -204,38 +204,46 @@ jobs:
         VERSION="${{ needs.validate-release.outputs.version }}"
         PACKAGE_NAME="GuildGreet-Extended-$VERSION"
 
-        mkdir -p .release/GuildGreet-Extended
-        cp GuildGreet.toc .release/GuildGreet-Extended/
-        cp GuildGreet.lua .release/GuildGreet-Extended/
-        cp GuildGreet.xml .release/GuildGreet-Extended/ 2>/dev/null || true
-        cp Bindings.xml .release/GuildGreet-Extended/ 2>/dev/null || true
-        cp embeds.xml .release/GuildGreet-Extended/ 2>/dev/null || true
-        cp -r libs .release/GuildGreet-Extended/ 2>/dev/null || true
-        cp -r GUI .release/GuildGreet-Extended/ 2>/dev/null || true
-        cp -r lang .release/GuildGreet-Extended/ 2>/dev/null || true
-        cp README.md .release/GuildGreet-Extended/ 2>/dev/null || true
-        cp LICENCE.md .release/GuildGreet-Extended/ 2>/dev/null || true
+        mkdir -p temp_package/GuildGreet-Extended
+        cp GuildGreet.toc temp_package/GuildGreet-Extended/
+        cp GuildGreet.lua temp_package/GuildGreet-Extended/
+        cp GuildGreet.xml temp_package/GuildGreet-Extended/ 2>/dev/null || true
+        cp Bindings.xml temp_package/GuildGreet-Extended/ 2>/dev/null || true
+        cp embeds.xml temp_package/GuildGreet-Extended/ 2>/dev/null || true
+        cp -r libs temp_package/GuildGreet-Extended/ 2>/dev/null || true
+        cp -r GUI temp_package/GuildGreet-Extended/ 2>/dev/null || true
+        cp -r lang temp_package/GuildGreet-Extended/ 2>/dev/null || true
+        cp README.md temp_package/GuildGreet-Extended/ 2>/dev/null || true
+        cp LICENCE.md temp_package/GuildGreet-Extended/ 2>/dev/null || true
 
-        cd .release
-        zip -r "$PACKAGE_NAME.zip" GuildGreet-Extended/
+        cd temp_package
+        zip -r "../$PACKAGE_NAME.zip" GuildGreet-Extended/
         cd ..
 
-        if [ -f ".release/$PACKAGE_NAME.zip" ]; then
-          echo "✓ Manual package created: .release/$PACKAGE_NAME.zip"
-          ls -la .release/
+        if [ -f "$PACKAGE_NAME.zip" ]; then
+          echo "✓ Manual package created: $PACKAGE_NAME.zip"
+          ls -la
           echo "manual_package_created=true" >> $GITHUB_OUTPUT
         else
           echo "manual_package_created=false" >> $GITHUB_OUTPUT
           exit 1
         fi
 
-    - name: Upload package artifact
+    - name: Upload manual package artifact
+      if: steps.manual_package.outputs.manual_package_created == 'true'
       uses: actions/upload-artifact@v4
       with:
-        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}
-        path: .release/*.zip
+        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-manual
+        path: "*.zip"
         retention-days: 90
-        if-no-files-found: error
+
+    - name: Upload BigWigs package artifact
+      if: steps.bigwigs_package.outcome == 'success' && steps.manual_package.outputs.manual_package_created != 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-bigwigs
+        path: ".release/*.zip"
+        retention-days: 90
 
     - name: Verify at least one package exists
       id: verify_package
@@ -271,18 +279,94 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Download package artifact
+    - name: Download BigWigs package artifact
+      id: download_bigwigs
       uses: actions/download-artifact@v4
       with:
-        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}
+        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-bigwigs
         path: ./artifacts
+      continue-on-error: true
+
+    - name: Download manual package artifact
+      id: download_manual
+      uses: actions/download-artifact@v4
+      with:
+        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-manual
+        path: ./artifacts
+      continue-on-error: true
+
+    - name: Emergency package creation
+      if: always()
+      id: emergency_package
+      run: |
+        BIGWIGS_OUTCOME="${{ steps.download_bigwigs.outcome }}"
+        MANUAL_OUTCOME="${{ steps.download_manual.outcome }}"
+        
+        echo "Download outcomes:"
+        echo "- BigWigs: $BIGWIGS_OUTCOME"
+        echo "- Manual: $MANUAL_OUTCOME"
+        
+        ARTIFACTS_EXIST="false"
+        if [ -d "./artifacts" ] && [ "$(find ./artifacts -name "*.zip" | wc -l)" -gt 0 ]; then
+          echo "✅ Artifacts directory found with ZIP files"
+          ARTIFACTS_EXIST="true"
+        else
+          echo "❌ No artifacts directory or no ZIP files found"
+        fi
+        
+        if [[ "$ARTIFACTS_EXIST" == "true" ]]; then
+          echo "✅ Artifacts available, skipping emergency package creation"
+          echo "emergency_package=false" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+        
+        echo "🚨 No artifacts available - creating emergency package"
+        VERSION="${{ needs.validate-release.outputs.version }}"
+        PACKAGE_NAME="GuildGreet-Extended-$VERSION"
+        
+        sed -i "s/@project-version@/$VERSION/g" GuildGreet.toc
+        
+        mkdir -p "$PACKAGE_NAME"
+        cp GuildGreet.toc "$PACKAGE_NAME/"
+        cp GuildGreet.lua "$PACKAGE_NAME/"
+        cp GuildGreet.xml "$PACKAGE_NAME/" 2>/dev/null || true
+        cp Bindings.xml "$PACKAGE_NAME/" 2>/dev/null || true
+        cp embeds.xml "$PACKAGE_NAME/" 2>/dev/null || true
+        cp -r libs "$PACKAGE_NAME/" 2>/dev/null || true
+        cp -r GUI "$PACKAGE_NAME/" 2>/dev/null || true
+        cp -r lang "$PACKAGE_NAME/" 2>/dev/null || true
+        cp README.md "$PACKAGE_NAME/" 2>/dev/null || true
+        cp LICENCE.md "$PACKAGE_NAME/" 2>/dev/null || true
+        
+        zip -r "$PACKAGE_NAME.zip" "$PACKAGE_NAME/"
+        
+        if [ -f "$PACKAGE_NAME.zip" ]; then
+          echo "✅ Emergency package created: $PACKAGE_NAME.zip"
+          echo "package_file=$PACKAGE_NAME.zip" >> $GITHUB_OUTPUT
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          echo "emergency_package=true" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Failed to create emergency package!"
+          exit 1
+        fi
 
     - name: Find package files
       id: find_package
       run: |
-        echo "Searching for package files..."
-        ls -la ./artifacts/
+        if [[ "${{ steps.emergency_package.outputs.emergency_package }}" == "true" ]]; then
+          echo "📦 Using emergency package"
+          echo "package_file=${{ steps.emergency_package.outputs.package_file }}" >> $GITHUB_OUTPUT
+          echo "package_name=${{ steps.emergency_package.outputs.package_name }}" >> $GITHUB_OUTPUT
+          exit 0
+        fi
         
+        echo "Searching for package files..."
+        if [ ! -d "./artifacts" ]; then
+          echo "❌ No artifacts directory found!"
+          exit 1
+        fi
+        
+        ls -la ./artifacts/
         PACKAGE_FILE=$(find ./artifacts -name "*.zip" | head -1)
         
         if [ -z "$PACKAGE_FILE" ]; then
