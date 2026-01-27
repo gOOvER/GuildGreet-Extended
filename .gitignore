@@ -1,0 +1,29 @@
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor swap/backup files
+*.swp
+*.swo
+*.tmp
+*.bak
+*.orig
+
+# Logs
+*.log
+
+# Packaging/output folders
+pkg/
+release/
+dist/
+
+# Temporary archives
+*.zip
+*.tar
+*.tar.gz
+
+# PowerShell helper scripts (excluded)
+*.ps1
+
+# Shell scripts (excluded)
+*.sh

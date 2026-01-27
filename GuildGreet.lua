@@ -1957,13 +1957,17 @@ end
 ------------------------------------------------------------
 function GLDG_PollBigBrother()
 	C_ChatInfo.SendAddonMessage("GLDG", "QUERY:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
-	local inInstance, instanceType = IsInInstance()
-	if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumPartyMembers() > 0) then
-		C_ChatInfo.SendAddonMessage("GLDG", "QUERY:", "PARTY")
-	end
-	local inInstance, instanceType = IsInInstance()
-	if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumRaidMembers() > 0) then
-		C_ChatInfo.SendAddonMessage("GLDG", "QUERY:", "RAID")
+	local _, instanceType = IsInInstance()
+	if (instanceType ~= "pvp") and (instanceType ~= "arena") then
+		local groupMembers = GetNumGroupMembers()
+		if groupMembers > 0 then
+			if IsInRaid() then
+				C_ChatInfo.SendAddonMessage("GLDG", "QUERY:", "RAID")
+			else
+				-- Party (non-raid) group
+				C_ChatInfo.SendAddonMessage("GLDG", "QUERY:", "PARTY")
+			end
+		end
 	end
 end
 
