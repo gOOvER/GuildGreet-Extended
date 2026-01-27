@@ -133,9 +133,7 @@ jobs:
     needs: validate-release
     outputs:
       manual_package_created: ${{ steps.manual_package.outputs.manual_package_created }}
-      bigwigs_success: ${{ steps.bigwigs_package.outcome }}
       package_available: ${{ steps.verify_package.outputs.package_available }}
-      bigwigs_available: ${{ steps.verify_package.outputs.bigwigs_available }}
 
     steps:
     - name: Checkout code
@@ -347,25 +345,35 @@ EOF
 
     steps:
     - name: Platform upload summary
+      env:
+        IS_PRERELEASE: ${{ needs.validate-release.outputs.is_prerelease }}
+        PACKAGE_RESULT: ${{ needs.package-addon.result }}
+        RELEASE_RESULT: ${{ needs.create-github-release.result }}
+        VERSION: ${{ needs.validate-release.outputs.version }}
+        TAG_NAME: ${{ needs.validate-release.outputs.tag_name }}
       run: |
         echo "## 📦 Release Summary" >> $GITHUB_STEP_SUMMARY
-        echo "**Version:** ${{ needs.validate-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-        echo "**Tag:** ${{ needs.validate-release.outputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
-        echo "**Type:** $(if [[ \"${{ needs.validate-release.outputs.is_prerelease }}\" == \"true\" ]]; then echo \"🧪 Prerelease\"; else echo \"✅ Stable Release\"; fi)" >> $GITHUB_STEP_SUMMARY
-
-        PACKAGE_RESULT="${{ needs.package-addon.result }}"
-        RELEASE_RESULT="${{ needs.create-github-release.result }}"
+        echo "**Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
+        echo "**Tag:** $TAG_NAME" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "$IS_PRERELEASE" = "true" ]; then
+          echo "**Type:** 🧪 Prerelease" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "**Type:** ✅ Stable Release" >> $GITHUB_STEP_SUMMARY
+        fi
 
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### Job Results" >> $GITHUB_STEP_SUMMARY
         echo "| Job | Status | Notes |" >> $GITHUB_STEP_SUMMARY
         echo "|-----|--------|-------|" >> $GITHUB_STEP_SUMMARY
-        if [[ "$PACKAGE_RESULT" == "success" ]]; then
+        
+        if [ "$PACKAGE_RESULT" = "success" ]; then
           echo "| Package Creation | ✅ Success | Created successfully |" >> $GITHUB_STEP_SUMMARY
         else
           echo "| Package Creation | ❌ Failed | Check logs |" >> $GITHUB_STEP_SUMMARY
         fi
-        if [[ "$RELEASE_RESULT" == "success" ]]; then
+        
+        if [ "$RELEASE_RESULT" = "success" ]; then
           echo "| GitHub Release | ✅ Success | Created successfully |" >> $GITHUB_STEP_SUMMARY
         else
           echo "| GitHub Release | ❌ Failed | Check logs |" >> $GITHUB_STEP_SUMMARY
@@ -375,13 +383,14 @@ EOF
         echo "### Platform Upload Status" >> $GITHUB_STEP_SUMMARY
         echo "| Platform | Status | Notes |" >> $GITHUB_STEP_SUMMARY
         echo "|----------|--------|-------|" >> $GITHUB_STEP_SUMMARY
-        if [[ "$RELEASE_RESULT" == "success" ]]; then
+        
+        if [ "$RELEASE_RESULT" = "success" ]; then
           echo "| GitHub Releases | ✅ Uploaded | Available for download |" >> $GITHUB_STEP_SUMMARY
         else
           echo "| GitHub Releases | ❌ Failed | Check job logs |" >> $GITHUB_STEP_SUMMARY
         fi
 
-        if [[ "${{ needs.validate-release.outputs.is_prerelease }}" == "true" ]]; then
+        if [ "$IS_PRERELEASE" = "true" ]; then
           echo "| CurseForge | ⏸️ Manual-only | Prereleases not auto-uploaded |" >> $GITHUB_STEP_SUMMARY
           echo "| WoWInterface | ⏸️ Manual-only | Prereleases not auto-uploaded |" >> $GITHUB_STEP_SUMMARY
           echo "| Wago | ⏸️ Manual-only | Prereleases not auto-uploaded |" >> $GITHUB_STEP_SUMMARY
