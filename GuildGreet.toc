@@ -1,4 +1,4 @@
-## Interface: 120000, 11508, 20504, 30403, 40400
+## Interface: 120000, 120002, 11508, 20504, 30403, 40400
 
 ## Title: GuildGreet-Extended
 ## Notes: Advanced guild greeting system with automated welcome messages, player tracking, and modular architecture
