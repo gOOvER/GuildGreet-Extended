@@ -4,9 +4,6 @@ permissions:
   contents: write
 
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
       version:
@@ -313,7 +310,6 @@ jobs:
       id: release_notes
       run: |
         VERSION="${{ needs.validate-release.outputs.version }}"
-        IS_PRERELEASE="${{ needs.validate-release.outputs.is_prerelease }}"
         PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -v "^${{ needs.validate-release.outputs.tag_name }}$" | head -1)
 
         CHANGELOG_CONTENT=""
@@ -327,7 +323,7 @@ jobs:
           CHANGELOG_CONTENT="**Changes:**\n$COMMITS"
         fi
 
-        cat > release_notes.md << EOF
+        cat <<'EOF' > release_notes.md
 ## GuildGreet-Extended v$VERSION
 
 $CHANGELOG_CONTENT
