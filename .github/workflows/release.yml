@@ -331,9 +331,7 @@ EOF
         tag_name: ${{ needs.validate-release.outputs.tag_name }}
         name: GuildGreet-Extended v${{ needs.validate-release.outputs.version }}
         body_path: release_notes.md
-        files: |
-          .release/*.zip
-          GuildGreet-Extended-*.zip
+        files: ./artifacts/*.zip
         draft: false
         prerelease: ${{ needs.validate-release.outputs.is_prerelease == 'true' }}
       env:
