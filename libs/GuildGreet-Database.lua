@@ -11,7 +11,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 GLDG.Database = {}
 
 -- Import required global variables for compatibility
-local GLDG_Data, GLDG_DataGreet, GLDGL_DataChar
+local GLDG_Data, GLDG_DataGreet, GLDG_DataChar
 local GLDG_unique_GuildName, GLDG_Player, GLDG_Realm, GLDG_GuildLeader
 local GLDG_config_from_guild, GLDG_corrupted_config_from_guild, GLDG_ginfotxt
 local GLDG_CONFIG_STRING, GLDG_CONFIG_STRING_A, GLDG_CONFIG_STRING_B, GLDG_CONFIG_STRING_C, GLDG_CONFIG_STRING_D
@@ -39,6 +39,16 @@ local GLDG_ACHIEVMENT = {}
 -------------------------------
 
 function GLDG.Database:Init()
+	-- Bind to saved variable tables (fallback to empty tables on fresh installs)
+	GLDG_Data = _G.GLDG_Data or {}
+	_G.GLDG_Data = GLDG_Data
+
+	GLDG_DataGreet = _G.GLDG_DataGreet or {}
+	_G.GLDG_DataGreet = GLDG_DataGreet
+
+	GLDG_DataChar = _G.GLDG_DataChar or {}
+	_G.GLDG_DataChar = GLDG_DataChar
+
 	local version = GLDG_GetAddOnMetadata("GuildGreet", "Version");
 	if (version == nil) then
 		version = "unknown";
