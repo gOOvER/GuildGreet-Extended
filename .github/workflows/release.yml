@@ -104,7 +104,7 @@ jobs:
     name: Create Git Tag
     runs-on: ubuntu-latest
     needs: validate-release
-    if: github.event.inputs.create_tag == 'true'
+    if: ${{ github.event.inputs.create_tag == 'true' }}
 
     steps:
     - name: Checkout code
@@ -222,7 +222,7 @@ jobs:
         fi
 
     - name: Upload manual package artifact
-      if: ${{ steps.manual_package.outputs.manual_package_created == 'true' }}
+      if: steps.manual_package.outputs.manual_package_created == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-manual
@@ -230,7 +230,7 @@ jobs:
         retention-days: 90
 
     - name: Upload BigWigs package artifact
-      if: ${{ steps.bigwigs_package.outcome == 'success' && steps.manual_package.outputs.manual_package_created != 'true' }}
+      if: steps.bigwigs_package.outcome == 'success' && steps.manual_package.outputs.manual_package_created != 'true'
       uses: actions/upload-artifact@v4
       with:
         name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-bigwigs
@@ -263,7 +263,7 @@ jobs:
     name: Create GitHub Release
     runs-on: ubuntu-latest
     needs: [validate-release, package-addon]
-    if: always() && needs.validate-release.result == 'success' && needs.package-addon.result == 'success'
+    if: ${{ always() && needs.validate-release.result == 'success' && needs.package-addon.result == 'success' }}
 
     steps:
     - name: Checkout code
@@ -317,7 +317,7 @@ jobs:
           CHANGELOG_CONTENT="**Changes:**\n$COMMITS"
         fi
 
-        cat <<'EOF' > release_notes.md
+        cat <<EOF > release_notes.md
 ## GuildGreet-Extended v$VERSION
 
 $CHANGELOG_CONTENT
@@ -331,9 +331,10 @@ EOF
         tag_name: ${{ needs.validate-release.outputs.tag_name }}
         name: GuildGreet-Extended v${{ needs.validate-release.outputs.version }}
         body_path: release_notes.md
-        files: ${{ steps.find_package.outputs.package_file }}
+        files: |
+          ${{ steps.find_package.outputs.package_file }}
         draft: false
-        prerelease: ${{ needs.validate-release.outputs.is_prerelease == 'true' }}
+        prerelease: ${{ fromJSON(needs.validate-release.outputs.is_prerelease) }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -341,7 +342,7 @@ EOF
     name: Platform Upload Summary
     runs-on: ubuntu-latest
     needs: [validate-release, package-addon, create-github-release]
-    if: always() && needs.validate-release.result == 'success'
+    if: ${{ always() && needs.validate-release.result == 'success' }}
 
     steps:
     - name: Platform upload summary
