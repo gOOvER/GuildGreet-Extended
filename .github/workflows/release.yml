@@ -327,15 +327,15 @@ EOF
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ needs.validate-release.outputs.tag_name }}
         name: GuildGreet-Extended v${{ needs.validate-release.outputs.version }}
         body_path: release_notes.md
-        files: ./artifacts/*.zip
+        files: "./artifacts/*.zip"
         draft: false
         prerelease: ${{ needs.validate-release.outputs.is_prerelease == 'true' }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   platform-upload-summary:
     name: Platform Upload Summary
