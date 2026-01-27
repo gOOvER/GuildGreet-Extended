@@ -222,7 +222,7 @@ jobs:
         fi
 
     - name: Upload manual package artifact
-      if: steps.manual_package.outputs.manual_package_created == 'true'
+      if: ${{ steps.manual_package.outputs.manual_package_created == 'true' }}
       uses: actions/upload-artifact@v4
       with:
         name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-manual
@@ -230,7 +230,7 @@ jobs:
         retention-days: 90
 
     - name: Upload BigWigs package artifact
-      if: steps.bigwigs_package.outcome == 'success' && steps.manual_package.outputs.manual_package_created != 'true'
+      if: ${{ steps.bigwigs_package.outcome == 'success' && steps.manual_package.outputs.manual_package_created != 'true' }}
       uses: actions/upload-artifact@v4
       with:
         name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-bigwigs
