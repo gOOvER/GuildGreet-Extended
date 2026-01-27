@@ -290,12 +290,25 @@ jobs:
     - name: Find package files
       id: find_package
       run: |
+        PACKAGE_FILE=""
+        
         if [ -d "./artifacts" ]; then
+          echo "Artifacts directory exists, searching for ZIP files..."
+          ls -la ./artifacts/
           PACKAGE_FILE=$(find ./artifacts -name "*.zip" | head -1)
+        else
+          echo "⚠️ Artifacts directory does not exist!"
         fi
+        
         if [ -z "$PACKAGE_FILE" ]; then
-          echo "❌ No package file found" && exit 1
+          echo "❌ No package file found in artifacts!"
+          echo "Checking if packages were uploaded:"
+          echo "BigWigs download: ${{ steps.download_bigwigs.outcome }}"
+          echo "Manual download: ${{ steps.download_manual.outcome }}"
+          exit 1
         fi
+        
+        echo "Found package: $PACKAGE_FILE"
         PACKAGE_NAME=$(basename "$PACKAGE_FILE" .zip)
         echo "package_file=$PACKAGE_FILE" >> $GITHUB_OUTPUT
         echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
