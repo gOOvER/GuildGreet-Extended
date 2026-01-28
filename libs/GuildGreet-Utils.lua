@@ -517,6 +517,13 @@ end
 
 function GLDG.Utils:UpdatePlayerCheckboxes()
 	local name = GLDG_GUI.."Players"
+	
+	-- Check if GUI elements exist before trying to update them
+	-- This can be called during initialization before the GUI is created
+	if not _G[name.."IgnoreBox"] then
+		return
+	end
+	
 	_G[name.."IgnoreBox"]:SetChecked(GLDG_Data.ShowIgnore)
 	_G[name.."AltBox"]:SetChecked(GLDG_Data.ShowAlt)
 	_G[name.."Alt2Box"]:SetChecked(GLDG_Data.GroupAlt)

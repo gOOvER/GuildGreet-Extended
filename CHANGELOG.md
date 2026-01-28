@@ -17,3 +17,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed nil value error in Database module by ensuring saved variables are initialized before use.
+- Fixed nil value error in `UpdatePlayerCheckboxes()` when GUI elements don't exist yet during initialization.
