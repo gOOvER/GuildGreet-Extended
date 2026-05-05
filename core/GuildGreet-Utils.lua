@@ -557,69 +557,69 @@ end
 function GLDG.Utils:InitFull()
 	if not GLDG_Data.GuildSettings then GLDG_Data.GuildSettings = {} end
 
-	if GLDG_Data[GLDG_unique_GuildName] then
+	if GLDG_Data[GLDG.unique_GuildName] then
 	-- convert for API 6.0.2 begin
-		if GLDG_Data[GLDG_unique_GuildName].GreetAsMain==1 then GLDG_Data[GLDG_unique_GuildName].GreetAsMain=true end
-		if GLDG_Data[GLDG_unique_GuildName].Randomize==1 then GLDG_Data[GLDG_unique_GuildName].Randomize=true end
-		if GLDG_Data[GLDG_unique_GuildName].Whisper==1 then GLDG_Data[GLDG_unique_GuildName].Whisper=true end
-		if GLDG_Data[GLDG_unique_GuildName].WhisperLevelup==1 then GLDG_Data[GLDG_unique_GuildName].WhisperLevelup=true end
-		if GLDG_Data[GLDG_unique_GuildName].IncludeOwn==1 then GLDG_Data[GLDG_unique_GuildName].IncludeOwn=true end
-		if GLDG_Data[GLDG_unique_GuildName].AutoAssign==1 then GLDG_Data[GLDG_unique_GuildName].AutoAssign=true end
-		if GLDG_Data[GLDG_unique_GuildName].AutoAssignEgp==1 then GLDG_Data[GLDG_unique_GuildName].AutoAssignEgp=true end
-		if GLDG_Data[GLDG_unique_GuildName].AutoAssignAlias==1 then GLDG_Data[GLDG_unique_GuildName].AutoAssignAlias=true end
-		if GLDG_Data[GLDG_unique_GuildName].ListNames==1 then GLDG_Data[GLDG_unique_GuildName].ListNames=true end
-		if GLDG_Data[GLDG_unique_GuildName].ListNamesOff==1 then GLDG_Data[GLDG_unique_GuildName].ListNamesOff=true end
-		if GLDG_Data[GLDG_unique_GuildName].ListLevelUp==1 then GLDG_Data[GLDG_unique_GuildName].ListLevelUp=true end
-		if GLDG_Data[GLDG_unique_GuildName].ListLevelUpOff==1 then GLDG_Data[GLDG_unique_GuildName].ListLevelUpOff=true end
-		if GLDG_Data[GLDG_unique_GuildName].ListAchievments==1 then GLDG_Data[GLDG_unique_GuildName].ListAchievments=true end
-		if GLDG_Data[GLDG_unique_GuildName].ListQuit==1 then GLDG_Data[GLDG_unique_GuildName].ListQuit=true end
-		if GLDG_Data[GLDG_unique_GuildName].ExtendChat==1 then GLDG_Data[GLDG_unique_GuildName].ExtendChat=true end
-		if GLDG_Data[GLDG_unique_GuildName].ExtendIgnored==1 then GLDG_Data[GLDG_unique_GuildName].ExtendIgnored=true end
-		if GLDG_Data[GLDG_unique_GuildName].ExtendMain==1 then GLDG_Data[GLDG_unique_GuildName].ExtendMain=true end
-		if GLDG_Data[GLDG_unique_GuildName].ExtendAlias==1 then GLDG_Data[GLDG_unique_GuildName].ExtendAlias=true end
-		if GLDG_Data[GLDG_unique_GuildName].AddPostfix==1 then GLDG_Data[GLDG_unique_GuildName].AddPostfix=true end
-		if GLDG_Data[GLDG_unique_GuildName].ShowWhoSpam==1 then GLDG_Data[GLDG_unique_GuildName].ShowWhoSpam=true end
-		if GLDG_Data[GLDG_unique_GuildName].SupressGreet==1 then GLDG_Data[GLDG_unique_GuildName].SupressGreet=true end
-		if GLDG_Data[GLDG_unique_GuildName].SupressJoin==1 then GLDG_Data[GLDG_unique_GuildName].SupressJoin=true end
-		if GLDG_Data[GLDG_unique_GuildName].SupressLevel==1 then GLDG_Data[GLDG_unique_GuildName].SupressLevel=true end
-		if GLDG_Data[GLDG_unique_GuildName].SupressRank==1 then GLDG_Data[GLDG_unique_GuildName].SupressRank=true end
-		if GLDG_Data[GLDG_unique_GuildName].SupressAchievment==1 then GLDG_Data[GLDG_unique_GuildName].SupressAchievment=true end
-		if GLDG_Data[GLDG_unique_GuildName].NoGratsOnLogin==1 then GLDG_Data[GLDG_unique_GuildName].NoGratsOnLogin=true end
-		if GLDG_Data[GLDG_unique_GuildName].DeltaPopup==1 then GLDG_Data[GLDG_unique_GuildName].DeltaPopup=true end
-		if GLDG_Data[GLDG_unique_GuildName].RelogTime==1 then GLDG_Data[GLDG_unique_GuildName].RelogTime=true end
-		if GLDG_Data[GLDG_unique_GuildName].MinLevelUp==1 then GLDG_Data[GLDG_unique_GuildName].MinLevelUp=true end
-		if GLDG_Data[GLDG_unique_GuildName].UseGuildDefault==1 then	GLDG_Data[GLDG_unique_GuildName].UseGuildDefault=true end
+		if GLDG_Data[GLDG.unique_GuildName].GreetAsMain==1 then GLDG_Data[GLDG.unique_GuildName].GreetAsMain=true end
+		if GLDG_Data[GLDG.unique_GuildName].Randomize==1 then GLDG_Data[GLDG.unique_GuildName].Randomize=true end
+		if GLDG_Data[GLDG.unique_GuildName].Whisper==1 then GLDG_Data[GLDG.unique_GuildName].Whisper=true end
+		if GLDG_Data[GLDG.unique_GuildName].WhisperLevelup==1 then GLDG_Data[GLDG.unique_GuildName].WhisperLevelup=true end
+		if GLDG_Data[GLDG.unique_GuildName].IncludeOwn==1 then GLDG_Data[GLDG.unique_GuildName].IncludeOwn=true end
+		if GLDG_Data[GLDG.unique_GuildName].AutoAssign==1 then GLDG_Data[GLDG.unique_GuildName].AutoAssign=true end
+		if GLDG_Data[GLDG.unique_GuildName].AutoAssignEgp==1 then GLDG_Data[GLDG.unique_GuildName].AutoAssignEgp=true end
+		if GLDG_Data[GLDG.unique_GuildName].AutoAssignAlias==1 then GLDG_Data[GLDG.unique_GuildName].AutoAssignAlias=true end
+		if GLDG_Data[GLDG.unique_GuildName].ListNames==1 then GLDG_Data[GLDG.unique_GuildName].ListNames=true end
+		if GLDG_Data[GLDG.unique_GuildName].ListNamesOff==1 then GLDG_Data[GLDG.unique_GuildName].ListNamesOff=true end
+		if GLDG_Data[GLDG.unique_GuildName].ListLevelUp==1 then GLDG_Data[GLDG.unique_GuildName].ListLevelUp=true end
+		if GLDG_Data[GLDG.unique_GuildName].ListLevelUpOff==1 then GLDG_Data[GLDG.unique_GuildName].ListLevelUpOff=true end
+		if GLDG_Data[GLDG.unique_GuildName].ListAchievments==1 then GLDG_Data[GLDG.unique_GuildName].ListAchievments=true end
+		if GLDG_Data[GLDG.unique_GuildName].ListQuit==1 then GLDG_Data[GLDG.unique_GuildName].ListQuit=true end
+		if GLDG_Data[GLDG.unique_GuildName].ExtendChat==1 then GLDG_Data[GLDG.unique_GuildName].ExtendChat=true end
+		if GLDG_Data[GLDG.unique_GuildName].ExtendIgnored==1 then GLDG_Data[GLDG.unique_GuildName].ExtendIgnored=true end
+		if GLDG_Data[GLDG.unique_GuildName].ExtendMain==1 then GLDG_Data[GLDG.unique_GuildName].ExtendMain=true end
+		if GLDG_Data[GLDG.unique_GuildName].ExtendAlias==1 then GLDG_Data[GLDG.unique_GuildName].ExtendAlias=true end
+		if GLDG_Data[GLDG.unique_GuildName].AddPostfix==1 then GLDG_Data[GLDG.unique_GuildName].AddPostfix=true end
+		if GLDG_Data[GLDG.unique_GuildName].ShowWhoSpam==1 then GLDG_Data[GLDG.unique_GuildName].ShowWhoSpam=true end
+		if GLDG_Data[GLDG.unique_GuildName].SupressGreet==1 then GLDG_Data[GLDG.unique_GuildName].SupressGreet=true end
+		if GLDG_Data[GLDG.unique_GuildName].SupressJoin==1 then GLDG_Data[GLDG.unique_GuildName].SupressJoin=true end
+		if GLDG_Data[GLDG.unique_GuildName].SupressLevel==1 then GLDG_Data[GLDG.unique_GuildName].SupressLevel=true end
+		if GLDG_Data[GLDG.unique_GuildName].SupressRank==1 then GLDG_Data[GLDG.unique_GuildName].SupressRank=true end
+		if GLDG_Data[GLDG.unique_GuildName].SupressAchievment==1 then GLDG_Data[GLDG.unique_GuildName].SupressAchievment=true end
+		if GLDG_Data[GLDG.unique_GuildName].NoGratsOnLogin==1 then GLDG_Data[GLDG.unique_GuildName].NoGratsOnLogin=true end
+		if GLDG_Data[GLDG.unique_GuildName].DeltaPopup==1 then GLDG_Data[GLDG.unique_GuildName].DeltaPopup=true end
+		if GLDG_Data[GLDG.unique_GuildName].RelogTime==1 then GLDG_Data[GLDG.unique_GuildName].RelogTime=true end
+		if GLDG_Data[GLDG.unique_GuildName].MinLevelUp==1 then GLDG_Data[GLDG.unique_GuildName].MinLevelUp=true end
+		if GLDG_Data[GLDG.unique_GuildName].UseGuildDefault==1 then	GLDG_Data[GLDG.unique_GuildName].UseGuildDefault=true end
 	-- convert for API 6.0.2 end
-		GLDG_Data.GuildSettings.GreetAsMain = GLDG_Data[GLDG_unique_GuildName].GreetAsMain
-		GLDG_Data.GuildSettings.Randomize = GLDG_Data[GLDG_unique_GuildName].Randomize
-		GLDG_Data.GuildSettings.Whisper = GLDG_Data[GLDG_unique_GuildName].Whisper
-		GLDG_Data.GuildSettings.WhisperLevelup = GLDG_Data[GLDG_unique_GuildName].WhisperLevelup
-		GLDG_Data.GuildSettings.IncludeOwn = GLDG_Data[GLDG_unique_GuildName].IncludeOwn
-		GLDG_Data.GuildSettings.AutoAssign = GLDG_Data[GLDG_unique_GuildName].AutoAssign
-		GLDG_Data.GuildSettings.AutoAssignEgp = GLDG_Data[GLDG_unique_GuildName].AutoAssignEgp
-		GLDG_Data.GuildSettings.AutoAssignAlias = GLDG_Data[GLDG_unique_GuildName].AutoAssignAlias
-		GLDG_Data.GuildSettings.ListNames = GLDG_Data[GLDG_unique_GuildName].ListNames
-		GLDG_Data.GuildSettings.ListNamesOff = GLDG_Data[GLDG_unique_GuildName].ListNamesOff
-		GLDG_Data.GuildSettings.ListLevelUp = GLDG_Data[GLDG_unique_GuildName].ListLevelUp
-		GLDG_Data.GuildSettings.ListLevelUpOff = GLDG_Data[GLDG_unique_GuildName].ListLevelUpOff
-		GLDG_Data.GuildSettings.ListAchievments = GLDG_Data[GLDG_unique_GuildName].ListAchievments
-		GLDG_Data.GuildSettings.ListQuit = GLDG_Data[GLDG_unique_GuildName].ListQuit
-		GLDG_Data.GuildSettings.ExtendChat = GLDG_Data[GLDG_unique_GuildName].ExtendChat
-		GLDG_Data.GuildSettings.ExtendIgnored = GLDG_Data[GLDG_unique_GuildName].ExtendIgnored
-		GLDG_Data.GuildSettings.ExtendMain = GLDG_Data[GLDG_unique_GuildName].ExtendMain
-		GLDG_Data.GuildSettings.ExtendAlias = GLDG_Data[GLDG_unique_GuildName].ExtendAlias
-		GLDG_Data.GuildSettings.AddPostfix = GLDG_Data[GLDG_unique_GuildName].AddPostfix
-		GLDG_Data.GuildSettings.ShowWhoSpam = GLDG_Data[GLDG_unique_GuildName].ShowWhoSpam
-		GLDG_Data.GuildSettings.SupressGreet = GLDG_Data[GLDG_unique_GuildName].SupressGreet
-		GLDG_Data.GuildSettings.SupressJoin = GLDG_Data[GLDG_unique_GuildName].SupressJoin
-		GLDG_Data.GuildSettings.SupressLevel = GLDG_Data[GLDG_unique_GuildName].SupressLevel
-		GLDG_Data.GuildSettings.SupressRank = GLDG_Data[GLDG_unique_GuildName].SupressRank
-		GLDG_Data.GuildSettings.SupressAchievment = GLDG_Data[GLDG_unique_GuildName].SupressAchievment
-		GLDG_Data.GuildSettings.NoGratsOnLogin = GLDG_Data[GLDG_unique_GuildName].NoGratsOnLogin
-		GLDG_Data.GuildSettings.DeltaPopup = GLDG_Data[GLDG_unique_GuildName].DeltaPopup
-		GLDG_Data.GuildSettings.RelogTime = GLDG_Data[GLDG_unique_GuildName].RelogTime
-		GLDG_Data.GuildSettings.MinLevelUp = GLDG_Data[GLDG_unique_GuildName].MinLevelUp
-		GLDG_Data.GuildSettings.UseGuildDefault = GLDG_Data[GLDG_unique_GuildName].UseGuildDefault
+		GLDG_Data.GuildSettings.GreetAsMain = GLDG_Data[GLDG.unique_GuildName].GreetAsMain
+		GLDG_Data.GuildSettings.Randomize = GLDG_Data[GLDG.unique_GuildName].Randomize
+		GLDG_Data.GuildSettings.Whisper = GLDG_Data[GLDG.unique_GuildName].Whisper
+		GLDG_Data.GuildSettings.WhisperLevelup = GLDG_Data[GLDG.unique_GuildName].WhisperLevelup
+		GLDG_Data.GuildSettings.IncludeOwn = GLDG_Data[GLDG.unique_GuildName].IncludeOwn
+		GLDG_Data.GuildSettings.AutoAssign = GLDG_Data[GLDG.unique_GuildName].AutoAssign
+		GLDG_Data.GuildSettings.AutoAssignEgp = GLDG_Data[GLDG.unique_GuildName].AutoAssignEgp
+		GLDG_Data.GuildSettings.AutoAssignAlias = GLDG_Data[GLDG.unique_GuildName].AutoAssignAlias
+		GLDG_Data.GuildSettings.ListNames = GLDG_Data[GLDG.unique_GuildName].ListNames
+		GLDG_Data.GuildSettings.ListNamesOff = GLDG_Data[GLDG.unique_GuildName].ListNamesOff
+		GLDG_Data.GuildSettings.ListLevelUp = GLDG_Data[GLDG.unique_GuildName].ListLevelUp
+		GLDG_Data.GuildSettings.ListLevelUpOff = GLDG_Data[GLDG.unique_GuildName].ListLevelUpOff
+		GLDG_Data.GuildSettings.ListAchievments = GLDG_Data[GLDG.unique_GuildName].ListAchievments
+		GLDG_Data.GuildSettings.ListQuit = GLDG_Data[GLDG.unique_GuildName].ListQuit
+		GLDG_Data.GuildSettings.ExtendChat = GLDG_Data[GLDG.unique_GuildName].ExtendChat
+		GLDG_Data.GuildSettings.ExtendIgnored = GLDG_Data[GLDG.unique_GuildName].ExtendIgnored
+		GLDG_Data.GuildSettings.ExtendMain = GLDG_Data[GLDG.unique_GuildName].ExtendMain
+		GLDG_Data.GuildSettings.ExtendAlias = GLDG_Data[GLDG.unique_GuildName].ExtendAlias
+		GLDG_Data.GuildSettings.AddPostfix = GLDG_Data[GLDG.unique_GuildName].AddPostfix
+		GLDG_Data.GuildSettings.ShowWhoSpam = GLDG_Data[GLDG.unique_GuildName].ShowWhoSpam
+		GLDG_Data.GuildSettings.SupressGreet = GLDG_Data[GLDG.unique_GuildName].SupressGreet
+		GLDG_Data.GuildSettings.SupressJoin = GLDG_Data[GLDG.unique_GuildName].SupressJoin
+		GLDG_Data.GuildSettings.SupressLevel = GLDG_Data[GLDG.unique_GuildName].SupressLevel
+		GLDG_Data.GuildSettings.SupressRank = GLDG_Data[GLDG.unique_GuildName].SupressRank
+		GLDG_Data.GuildSettings.SupressAchievment = GLDG_Data[GLDG.unique_GuildName].SupressAchievment
+		GLDG_Data.GuildSettings.NoGratsOnLogin = GLDG_Data[GLDG.unique_GuildName].NoGratsOnLogin
+		GLDG_Data.GuildSettings.DeltaPopup = GLDG_Data[GLDG.unique_GuildName].DeltaPopup
+		GLDG_Data.GuildSettings.RelogTime = GLDG_Data[GLDG.unique_GuildName].RelogTime
+		GLDG_Data.GuildSettings.MinLevelUp = GLDG_Data[GLDG.unique_GuildName].MinLevelUp
+		GLDG_Data.GuildSettings.UseGuildDefault = GLDG_Data[GLDG.unique_GuildName].UseGuildDefault
 	end
 
 
@@ -786,7 +786,7 @@ function GLDG.Utils:InitFull()
 	-- Legacy color migration will be done automatically
 
 
-	-- Set initial pointers to avoid errors (hack!)
+	-- Initialize default data structures
 	GLDG_DataChar = {}
 	GLDG_DataGreet = {}
 
@@ -1013,7 +1013,7 @@ function GLDG.Utils:InitRoster()
 	if not GLDG.Player then GLDG.Player = UnitName("player") end
 	if not GLDG.GuildName or GLDG.GuildName == "" then GLDG.GuildName = GetGuildInfo("player") end
 	if not GLDG.GuildName then GLDG.GuildName = "" end
-	if not GLDG_unique_GuildName or GLDG_unique_GuildName == "" then
+	if not GLDG.unique_GuildName or GLDG.unique_GuildName == "" then
 		local maxMembers = GetNumGuildMembers()
 		if maxMembers == nil then maxMembers = nil end
 		for i = 1, maxMembers do
@@ -1021,20 +1021,20 @@ function GLDG.Utils:InitRoster()
 			if ri == 0 then GLDG_GuildLeader = pl end
 		end
 		if GLDG_GuildLeader then
-			GLDG_unique_GuildName = (GLDG.GuildName.."@"..GLDG_GuildLeader)
+			GLDG.unique_GuildName = (GLDG.GuildName.."@"..GLDG_GuildLeader)
 			GLDG_Init()
 		end
 	end
-	if not GLDG_unique_GuildName then
-		GLDG_unique_GuildName = ""
+	if not GLDG.unique_GuildName then
+		GLDG.unique_GuildName = ""
 	end
-	if (GLDG_unique_GuildName == "") then
+	if (GLDG.unique_GuildName == "") then
 		GLDG_GuildAlias = ""
 	else
-		if not GLDG_Data.GuildAlias[GLDG_unique_GuildName] then
-			GLDG_Data.GuildAlias[GLDG_unique_GuildName] = GLDG_unique_GuildName
+		if not GLDG_Data.GuildAlias[GLDG.unique_GuildName] then
+			GLDG_Data.GuildAlias[GLDG.unique_GuildName] = GLDG.unique_GuildName
 		end
-		GLDG_GuildAlias = GLDG_Data.GuildAlias[GLDG_unique_GuildName]
+		GLDG_GuildAlias = GLDG_Data.GuildAlias[GLDG.unique_GuildName]
 	end
 
 	if not (GLDG.Realm and GLDG.Player) then return end
@@ -1065,10 +1065,10 @@ function GLDG.Utils:InitRoster()
 		GLDG_ChannelName = ""
 	end
 	
-	if (GLDG.Realm and GLDG_unique_GuildName and GLDG_unique_GuildName~="" and GLDG.Player) then
+	if (GLDG.Realm and GLDG.unique_GuildName and GLDG.unique_GuildName~="" and GLDG.Player) then
 		-- Set greetings section pointer
 		if GLDG_InitGreet(GLDG.Realm.."-"..GLDG.Player) and
-		   GLDG_InitGreet(GLDG_unique_GuildName) and
+		   GLDG_InitGreet(GLDG.unique_GuildName) and
 		   GLDG_InitGreet(GLDG.Realm) then
 			-- No custom collections are used
 			GLDG_DataGreet = GLDG_Data
@@ -1082,10 +1082,10 @@ function GLDG.Utils:InitRoster()
 
 	-- Update config dialog (can't be done in InitFrame())
 	local name = GLDG_GUI.."SettingsGreeting"
-	if (GLDG_unique_GuildName~="") then
+	if (GLDG.unique_GuildName~="") then
 
-		_G[name.."GuildAliasHeader"]:SetText(L["Guild alias for:"].." |cFFFFFF7F"..GLDG_unique_GuildName.."|r")
-		if (GLDG_GuildAlias ~= GLDG_unique_GuildName) then
+		_G[name.."GuildAliasHeader"]:SetText(L["Guild alias for:"].." |cFFFFFF7F"..GLDG.unique_GuildName.."|r")
+		if (GLDG_GuildAlias ~= GLDG.unique_GuildName) then
 			_G[name.."GuildAliasEditbox"]:SetText(GLDG_GuildAlias)
 		else
 			_G[name.."GuildAliasEditbox"]:SetText("")
@@ -1096,7 +1096,7 @@ function GLDG.Utils:InitRoster()
 		_G[name.."GuildAliasSet"]:Enable("")
 		_G[name.."GuildAliasClear"]:Enable("")
 	else
-		_G[name.."GuildAliasHeader"]:SetText(L["Guild alias for:"].." |cFFFFFF7F"..GLDG_unique_GuildName.."|r")
+		_G[name.."GuildAliasHeader"]:SetText(L["Guild alias for:"].." |cFFFFFF7F"..GLDG.unique_GuildName.."|r")
 		_G[name.."GuildAliasWarning"]:SetText(L["Can't set guild alias while unguilded"])
 		_G[name.."GuildAliasEditbox"]:SetText("")
 
@@ -1115,7 +1115,6 @@ function GLDG.Utils:InitRoster()
 	if (IsInGuild()) then
 		local offline = GetGuildRosterShowOffline()
 		SetGuildRosterShowOffline(true)
-		-- H.Sch. - ReglohPri - this is deprecated -> GuildRoster() - changed to C_GuildInfo.GuildRoster()
 		C_GuildInfo.GuildRoster();  -- ?
 		if not offline then SetGuildRosterShowOffline(false) end
 
@@ -1133,13 +1132,10 @@ function GLDG.Utils:InitRoster()
 	end
 
 	-- Launch request for friends info
-	-- H.Sch. - ReglohPri - ShowFriends() is deprecated changed to C_FriendList.ShowFriends()
 	C_FriendList.ShowFriends();
 	if not GLDG_InitialFriendsUpdate then
-		-- H.Sch. - ReglohPri - GetNumFriends() is deprecated changed to C_FriendList.GetNumFriends()
 		if GLDG_Data.UseFriends==true and (C_FriendList.GetNumFriends() > 0) and bit.band(GLDG_InitCheck, 2)~=2 then
 			GLDG_InitCheck = bit.bor(GLDG_InitCheck, 2)	-- friends started
-			--GLDG_Print("InitCheck is ["..tostring(GLDG_InitCheck).."] - friends started")
 		end
 	end
 

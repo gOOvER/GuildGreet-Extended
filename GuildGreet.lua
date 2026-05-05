@@ -38,7 +38,7 @@
 -- Global addon object for library access
 -- Using LibStub for AceDB-3.0 to avoid version conflicts with other addons
 -- Get existing addon if created by libraries, otherwise create new one
-GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
+GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 
 -- Global helper function for cross-version API compatibility
@@ -56,30 +56,119 @@ end
 -- Database defaults für AceDB-3.0
 local defaults = {
 	profile = {
-		-- Allgemeine Einstellungen
+		-- Allgemeine Einstellungen (Account-weit konfigurierbar pro Profil)
 		ShowNewerVersions = true,
 		BigBrother = false,
 		ExtendPlayerMenu = true,
 		EnableContextMenu = false,
+		UseFriends = false,
+		ListUp = false,
+		ListVisible = false,
+		ListSize = 5,
+		UpdateTime = 0,
+		CheckedGuildAlert = false,
+		AutoWho = false,
 		
-		-- Guildspezifische Einstellungen
+		-- Guild-spezifische Einstellungen
 		GuildSettings = {
-			UseGuildDefault = true,
-			RelogTime = 5
+			UseGuildDefault = false,
+			RelogTime = 2,
+			MinLevelUp = 0,
+			GreetAsMain = false,
+			Randomize = false,
+			Whisper = false,
+			WhisperLevelup = false,
+			IncludeOwn = false,
+			ListNames = false,
+			ListNamesOff = false,
+			ListLevelUp = false,
+			ListLevelUpOff = false,
+			ListQuit = false,
+			ExtendChat = false,
+			ExtendIgnored = false,
+			ExtendAlias = false,
+			ExtendMain = false,
+			AutoAssign = false,
+			AutoAssignEgp = false,
+			AutoAssignAlias = false,
+			AddPostfix = false,
+			ShowWhoSpam = false,
+			ListAchievments = false,
+			SupressGreet = false,
+			SupressLevel = false,
+			SupressAchievment = false,
 		},
 		
-		-- Farben (legacy System wird später migriert)
+		-- Farben
 		colours = {
-			help = "|cff00ff00"
-		}
+			help = "|cff00ff00",
+			player = "|cffffffff",
+			text = "|cffffffff",
+			channel = "|cffff8040",
+			guild = "|cff40ff40",
+			whisper = "|cffff40ff",
+			emote = "|cffff8040",
+		},
+		
+		-- Filter-Einstellungen
+		ShowIgnore = false,
+		ShowAlt = false,
+		GroupAlt = false,
+		FilterUnassigned = false,
+		FilterOnline = false,
+		FilterMyFriends = false,
+		FilterWithFriends = false,
+		FilterCurrentChannel = false,
+		FilterWithChannel = false,
+		
+		-- Frame-Optionen
+		Frameopts = {},
 	},
+	
 	char = {
-		-- Charakterspezifische Daten
-		main = nil
+		-- Charakterspezifische Daten (automatisch pro Charakter getrennt)
+		main = nil,
+		own = false,
 	},
+	
 	global = {
-		-- Serverweite Daten
-		BigBrother = {}
+		-- Account-weit über alle Charaktere und Realms
+		BigBrother = {},
+		GreetCollections = {},
+		GuildAlias = {},
+	},
+	
+	realm = {
+		-- Realm-spezifisch (alle Charaktere auf diesem Realm)
+		-- Spielerdaten (ersetzt GLDG_DataChar)
+		players = {},
+		
+		-- Begrüßungsnachrichten (ersetzt GLDG_DataGreet)
+		greetings = {
+			Greet = {},
+			GreetBack = {},
+			Welcome = {},
+			NewRank = {},
+			NewLevel = {},
+			Bye = {},
+			Night = {},
+			Guild = {},
+			Channel = {},
+			ByeGuild = {},
+			NightGuild = {},
+			ByeChannel = {},
+			NightChannel = {},
+			LaterGuild = {},
+			LaterChannel = {},
+			Achievment = {},
+		},
+		
+		-- Realm-spezifische Settings
+		PlayerChatFrame = {},
+		ChannelNames = {},
+		Collections = {},
+		Custom = {},
+		Ranks = {},
 	}
 }
 
@@ -92,7 +181,9 @@ BINDING_NAME_GUILDGREETGREETGUILD = L["Greet Guild and Channel"]
 BINDING_NAME_GUILDGREETBYEGUILD = L["Say goodbye to guild and channel"]
 BINDING_NAME_GUILDGREETLATERGUILD = L["Say see you later to guild and channel"]
 
--- Addon constants
+-- Addon constants (now moved to OnInitialize as GLDG instance properties)
+-- GLDG.NAME, GLDG.GUI, GLDG.LIST, GLDG.COLOUR, GLDG.VERSION
+-- Legacy references for backwards compatibility:
 GLDG_NAME 	= "GuildGreet"
 GLDG_GUI	= "GuildGreetFrame"		-- Name of GUI config window
 GLDG_LIST	= "GuildGreetList"		-- Name of GUI player list
@@ -166,7 +257,9 @@ GLDG_LATER_GUILD = {"See you later guild!", "Until next time!"}
 GLDG_LATER_CHANNEL = {"See you later channel!", "Until next time!"}
 GLDG_ACHIEVMENT = {"Congratulations on your achievement %t!", "Nice achievement %t!"}
 
--- Global variables
+-- Global variables - LEGACY (will be replaced by compatibility layer in OnInitialize)
+-- These declarations are kept temporarily, but will be overwritten with metatables
+-- that redirect all access to self.db.profile/realm/global/*
 GLDG_Online = {}
 GLDG_DataChar = {}
 GLDG_DataGreet = {}
@@ -190,13 +283,13 @@ GLDG_CONFIG_STRING_D = nil
 -- _01_ Addon Variables --
 --------------------------
 
--- Stored data (Legacy - wird zu AceDB-3.0 migriert)
-GLDG_Data = {}			        -- Data saved between sessions
-GLDG_DataGreet = nil		    -- Pointer to relevant greeting section in GLDG_Data
-GLDGL_DataChar = nil		    -- Pointer to relevant character section in GLDG_Data
+-- NOTE: The above legacy GLDG_Data* variables are overwritten in OnInitialize()
+-- with metatables that redirect to AceDB structure (self.db.*)
 
--- Legacy globale Variablen (werden schrittweise in Addon-Instanz migriert)
--- Siehe OnInitialize() für die modernen self.* Eigenschaften
+-- Legacy pointers (kept for backwards compatibility during migration)
+GLDGL_DataChar = nil		    -- Legacy pointer (will be handled by metatable)
+
+-- Runtime variables (not saved)
 GLDG_Offline = {}		-- Time of player going offline
 GLDG_RankUpdate = {}	-- Set with time for all players getting promoted during the session
 GLDG_Queue = {}			-- List of players waiting to be greeted
@@ -253,6 +346,14 @@ end
 function GLDG:OnInitialize()
 	-- AceDB-3.0 Database Initialisierung
 	self.db = LibStub("AceDB-3.0"):New("GuildGreetDB", defaults, true)
+	GLDG.db = self.db  -- Make db accessible globally for all modules
+	
+	-- Set addon constants as instance properties
+	self.NAME = "GuildGreet"
+	self.GUI = "GuildGreetFrame"
+	self.LIST = "GuildGreetList"
+	self.COLOUR = "GuildGreetColourFrame"
+	self.VERSION = 100000
 	
 	-- Initialize Libraries (must be done after database initialization)
 	if self.Utils then self.Utils:Initialize() end
@@ -286,6 +387,169 @@ function GLDG:OnInitialize()
 	
 	-- Core variablen
 	self.Online = {}
+	
+	-- Initialize compatibility layer for gradual migration
+	self:InitializeCompatibilityLayer()
+end
+
+------------------------------------------------------------
+-- AceDB Helper Functions
+------------------------------------------------------------
+
+-- Profile data access (user settings)
+function GLDG:GetGuildSetting(key)
+	return self.db.profile.GuildSettings[key]
+end
+
+function GLDG:SetGuildSetting(key, value)
+	self.db.profile.GuildSettings[key] = value
+end
+
+function GLDG:GetProfileData(key)
+	return self.db.profile[key]
+end
+
+function GLDG:SetProfileData(key, value)
+	self.db.profile[key] = value
+end
+
+-- Realm data access (server-specific)
+function GLDG:GetPlayerData(playerName, key)
+	if not self.db.realm.players[playerName] then
+		self.db.realm.players[playerName] = {}
+	end
+	if key then
+		return self.db.realm.players[playerName][key]
+	else
+		return self.db.realm.players[playerName]
+	end
+end
+
+function GLDG:SetPlayerData(playerName, key, value)
+	if not self.db.realm.players[playerName] then
+		self.db.realm.players[playerName] = {}
+	end
+	self.db.realm.players[playerName][key] = value
+end
+
+function GLDG:GetGreetings(category)
+	return self.db.realm.greetings[category] or {}
+end
+
+function GLDG:SetGreetings(category, messages)
+	self.db.realm.greetings[category] = messages
+end
+
+-- Global data access (account-wide)
+function GLDG:GetGlobalData(key)
+	return self.db.global[key]
+end
+
+function GLDG:SetGlobalData(key, value)
+	self.db.global[key] = value
+end
+
+-- Character data access (this character only)
+function GLDG:GetCharData(key)
+	return self.db.char[key]
+end
+
+function GLDG:SetCharData(key, value)
+	self.db.char[key] = value
+end
+
+------------------------------------------------------------
+-- Compatibility Layer (temporary during migration)
+-- Maps legacy global variables to AceDB structure
+------------------------------------------------------------
+function GLDG:InitializeCompatibilityLayer()
+	-- GLDG_Data compatibility (profile + realm mixed)
+	GLDG_Data = setmetatable({}, {
+		__index = function(t, k)
+			-- Profile data
+			if k == "GuildSettings" then
+				return GLDG.db.profile.GuildSettings
+			elseif k == "colours" then
+				return GLDG.db.profile.colours
+			elseif k == "filters" then
+				return GLDG.db.profile.filters
+			elseif k == "ShowNewerVersions" or k == "BigBrother" or k == "ExtendPlayerMenu" 
+				or k == "EnableContextMenu" or k == "UseFriends" or k == "ListUp" 
+				or k == "ListVisible" or k == "ListSize" or k == "UpdateTime" 
+				or k == "CheckedGuildAlert" or k == "AutoWho" or k == "Frameopts" then
+				return GLDG.db.profile[k]
+			-- Realm data
+			elseif k == "PlayerChatFrame" or k == "ChannelNames" or k == "Collections" 
+				or k == "Custom" or k == "Ranks" then
+				return GLDG.db.realm[k]
+			-- Global data
+			elseif k == "GreetCollections" or k == "GuildAlias" then
+				return GLDG.db.global[k]
+			else
+				-- Default: try profile first, then realm
+				return GLDG.db.profile[k] or GLDG.db.realm[k]
+			end
+		end,
+		__newindex = function(t, k, v)
+			-- Profile data
+			if k == "GuildSettings" then
+				GLDG.db.profile.GuildSettings = v
+			elseif k == "colours" or k == "filters" then
+				GLDG.db.profile[k] = v
+			elseif k == "ShowNewerVersions" or k == "BigBrother" or k == "ExtendPlayerMenu" 
+				or k == "EnableContextMenu" or k == "UseFriends" or k == "ListUp" 
+				or k == "ListVisible" or k == "ListSize" or k == "UpdateTime" 
+				or k == "CheckedGuildAlert" or k == "AutoWho" or k == "Frameopts" then
+				GLDG.db.profile[k] = v
+			-- Realm data
+			elseif k == "PlayerChatFrame" or k == "ChannelNames" or k == "Collections" 
+				or k == "Custom" or k == "Ranks" then
+				GLDG.db.realm[k] = v
+			-- Global data
+			elseif k == "GreetCollections" or k == "GuildAlias" then
+				GLDG.db.global[k] = v
+			else
+				-- Default: store in profile
+				GLDG.db.profile[k] = v
+			end
+		end
+	})
+	
+	-- GLDG_DataChar compatibility (realm.players)
+	GLDG_DataChar = setmetatable({}, {
+		__index = function(t, k)
+			return GLDG.db.realm.players[k]
+		end,
+		__newindex = function(t, k, v)
+			GLDG.db.realm.players[k] = v
+		end
+	})
+	
+	-- GLDG_DataGreet compatibility (realm.greetings)
+	GLDG_DataGreet = setmetatable({}, {
+		__index = function(t, k)
+			return GLDG.db.realm.greetings[k]
+		end,
+		__newindex = function(t, k, v)
+			GLDG.db.realm.greetings[k] = v
+		end
+	})
+	
+	-- GLDG_BigBrother compatibility (global.BigBrother)
+	GLDG_BigBrother = setmetatable({}, {
+		__index = function(t, k)
+			if not GLDG.db.global.BigBrother then
+				GLDG.db.global.BigBrother = {}
+			end
+			return GLDG.db.global.BigBrother[k]
+		end,
+		__newindex = function(t, k, v)
+			if not GLDG.db.global.BigBrother then
+				GLDG.db.global.BigBrother = {}
+			end
+			GLDG.db.global.BigBrother[k] = v
+		end
+	})
 end
 
 ------------------------------------------------------------
@@ -1054,7 +1318,6 @@ end
 ------------------------------------------------------------
 function GLDG_ClickWho()
 	if GLDG_SelPlrName then
-		-- H.Sch. - ReglohPri - SendWho is deprecated, changed to C_FriendList.SendWho
 		C_FriendList.SendWho('n-"'..GLDG_SelPlrName..'"')
 	end
 end
@@ -1071,12 +1334,10 @@ end
 
 ------------------------------------------------------------
 function GLDG_ParseWho()
-	-- H.Sch. - ReglohPri - GetNumWhoResults() is deprecated, changed to C_FriendList.GetNumWhoResults()
 	local _, totalCount = C_FriendList.GetNumWhoResults()
-	local charname, guildname, level, _, class, _, _ -- race, zone, classFileName are not used
+	local charname, guildname, level, _, class, _, _
 
 	for i=1,totalCount do
-		-- H.Sch. - ReglohPri - GetWhoInfo is deprecated, changed to C_FriendList.GetWhoInfo
 		charname, guildname, level, _, class, _, _ = C_FriendList.GetWhoInfo(i)
 		if (GLDG_DataChar[charname]) then
 			GLDG_TreatWhoInfo(charname, guildname, level, class)
@@ -1282,17 +1543,7 @@ end
 
 ------------------------------------------------------------
 function GLDG_AddPopUpButtons()
-	-- TODO: Migrate to new Menu API in future update
-	-- The old UnitPopupButtons/UnitPopupMenus system has been deprecated
-	-- For now, this functionality is disabled to prevent errors
-	-- UnitPopupMenus["GLDG"] = {"GLDG_LOOKUP", "GLDG_BYE", "CANCEL"};
-	-- UnitPopupButtons["GLDG"] = { text = L["GuildGreet"], dist = 0, nested = 1};
-	-- UnitPopupButtons["GLDG_LOOKUP"] = { text = L["Lookup"], dist = 0,};
-	-- UnitPopupButtons["GLDG_BYE"] = { text = L["Good bye"], dist = 0 };
-
-	-- table.insert(UnitPopupMenus["PLAYER"], #UnitPopupMenus["PLAYER"]-1, "GLDG");
-	-- table.insert(UnitPopupMenus["FRIEND"], #UnitPopupMenus["FRIEND"]-1, "GLDG");
-	-- table.insert(UnitPopupMenus["PARTY"], #UnitPopupMenus["PARTY"]-1, "GLDG");
+	-- Legacy UnitPopup system deprecated - disabled to prevent errors
 
 	-- hooksecurefunc("UnitPopup_OnClick", GLDG_UnitPopupOnClick);
 	-- hooksecurefunc("UnitPopup_HideButtons", GLDG_UnitPopupHideButtons);
@@ -1301,18 +1552,7 @@ end
 ------------------------------------------------------------
 -- Hooked function for a unit popup
 function GLDG_UnitPopupOnClick(self)
-	-- This function is disabled due to UnitPopup system deprecation
-	-- TODO: Migrate to new Menu API in future update
-	--local dropdownFrame = _G[UIDROPDOWNMENU_INIT_MENU];
-	--local dropdownFrame = UIDROPDOWNMENU_INIT_MENU
-	--local button = self.value;
-	--local name = dropdownFrame.name;
-
-	--if button == "GLDG_LOOKUP" then
-	--	GLDG_ListForPlayer(name, false);
-	--	ToggleDropDownMenu(1, nil, dropdownFrame, "cursor");
-	--elseif button == "GLDG_BYE" then
-	--	GLDG_SendBye(name);
+	-- Legacy UnitPopup system deprecated - functionality disabled
 	--	ToggleDropDownMenu(1, nil, dropdownFrame, "cursor");
 	--end
 
@@ -1322,17 +1562,7 @@ end
 ------------------------------------------------------------
 -- Hooked function to hide buttons for non-friendly players
 function GLDG_UnitPopupHideButtons()
-	-- This function is disabled due to UnitPopup system deprecation
-	-- TODO: Migrate to new Menu API in future update
-	--local dropdownFrame = _G[UIDROPDOWNMENU_INIT_MENU];
-	--local dropdownFrame = UIDROPDOWNMENU_INIT_MENU
-	--local coop = dropdownFrame.unit and UnitCanCooperate("player", dropdownFrame.unit)
-	--for index, value in ipairs(UnitPopupMenus[dropdownFrame.which]) do
-	--	if (((value == "GLDG_LOOKUP") or (value == "GLDG_BYE")) and not coop) then
-	--		UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
-	--		return;
-	--	end
-	--end
+	-- Legacy UnitPopup system deprecated - functionality disabled
 end
 
 ---------------------
@@ -2351,7 +2581,6 @@ function GLDG_CleanupExecute(entry)
 
 	-- retrigger channel and friends update (guild not needed, is done periodically)
 	GLDG_CheckChannel()
-	-- H.Sch. - ReglohPri - ShowFriends() is deprecated changed to C_FriendList.ShowFriends()
 	C_FriendList.ShowFriends()
 
 	GLDG_CleanupList = nil

@@ -39,8 +39,6 @@ externals:
         url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
     libs/LibStub:
         url: https://repos.wowace.com/wow/libstub/trunk
-    libs/LibAlts-1.0:
-        url: https://repos.wowace.com/wow/libalts-1-0/trunk
         
-manual-changelog: CHANGELOG.txt
-license-output: LICENSE.txt
+manual-changelog: CHANGELOG.md
+license-output: LICENSE.md

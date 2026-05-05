@@ -294,20 +294,6 @@ This addon was started based on an idea from Skint on Bloodhoof (EU) by Greya
 Since then taken over and extended by Urbin on Dun Morogh (EU)
 Code for level dependent message filtering was submitted by lebanoncyberspace
 
-
-Todo and request list
----------------------
-See todo.lua for a fairly readble version, or check the Information tab in game.
-
-
-From Curse
-----------
-- option to suppress original login/logoff messages (requested by AZMAK)
-
--- detect if officer note contains "<main name>'s alt[ <discardable text]"
-	elseif (string.find(on, "'s alt")~=nil) then
-	local altstart, altend = string.find(on, "'s alt")
-	local main = string.sub(on, 1, altstart-1)
 	alts[pl] = main
 	-- detect if officer note contains "<main name>' alt[ <discardable text]"
 	-- For names like "Darias" which might be "Darias' alt"

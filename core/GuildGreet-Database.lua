@@ -10,82 +10,57 @@ local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 -- Database Library Namespace
 GLDG.Database = {}
 
--- Import required global variables for compatibility
-local GLDG_Data, GLDG_DataGreet, GLDG_DataChar
-local GLDG_unique_GuildName, GLDG_Player, GLDG_Realm, GLDG_GuildLeader
-local GLDG_config_from_guild, GLDG_corrupted_config_from_guild, GLDG_ginfotxt
-local GLDG_CONFIG_STRING, GLDG_CONFIG_STRING_A, GLDG_CONFIG_STRING_B, GLDG_CONFIG_STRING_C, GLDG_CONFIG_STRING_D
-
--- Default greeting messages (moved from main file)
-local GLDG_GREET = {}
-local GLDG_GREETBACK = {}
-local GLDG_WELCOME = {}
-local GLDG_RANK = {}
-local GLDG_LEVEL = {}
-local GLDG_BYE = {}
-local GLDG_NIGHT = {}
-local GLDG_GUILD = {}
-local GLDG_CHANNEL = {}
-local GLDG_BYE_GUILD = {}
-local GLDG_NIGHT_GUILD = {}
-local GLDG_BYE_CHANNEL = {}
-local GLDG_NIGHT_CHANNEL = {}
-local GLDG_LATER_GUILD = {}
-local GLDG_LATER_CHANNEL = {}
-local GLDG_ACHIEVMENT = {}
+-- NOTE: AceDB-3.0 Migration - Global variables now accessed through compatibility layer
+-- Global variables (GLDG_Data, GLDG_DataChar, GLDG_DataGreet, etc.) are accessed
+-- through Metatables initialized in GuildGreet.lua InitializeCompatibilityLayer().
+-- 
+-- Actual data storage in AceDB:
+-- - GLDG.db.profile: account-wide settings (per profile)
+-- - GLDG.db.realm: realm-specific data (per realm per account)
+-- - GLDG.db.global: true global data (per account)
+-- - GLDG.db.char: character-specific data (per character)
 
 -------------------------------
 -- Database Initialization --
 -------------------------------
 
-function GLDG.Database:Init()
-	-- Bind to saved variable tables (fallback to empty tables on fresh installs)
-	GLDG_Data = _G.GLDG_Data or {}
-	_G.GLDG_Data = GLDG_Data
-
-	GLDG_DataGreet = _G.GLDG_DataGreet or {}
-	_G.GLDG_DataGreet = GLDG_DataGreet
-
-	GLDG_DataChar = _G.GLDG_DataChar or {}
-	_G.GLDG_DataChar = GLDG_DataChar
-
+function GLDG.Database:Initialize()
+	-- AceDB ist bereits in GLDG:OnInitialize() initialisiert
+	-- Diese Funktion führt nur noch Legacy-Migrationen und Greeting-Initialisierung durch
+	
 	local version = GLDG_GetAddOnMetadata("GuildGreet", "Version");
 	if (version == nil) then
 		version = "unknown";
 	end
 
-	-- store realm and player names
+	-- store realm and player names (falls noch nicht gesetzt)
 	if not GLDG.Realm then GLDG.Realm = GetRealmName() end
 	if not GLDG.Player then GLDG.Player = UnitName("player") end
+	if not GLDG.GuildName then GLDG.GuildName = GetGuildInfo("player") or "NoGuild" end
+	GLDG.unique_GuildName = GLDG.GuildName.."-"..GLDG.Realm
 
-	-- Clear obsolete options
-	GLDG_Data.EnableContextMenu = nil
-
-	-- Set defaults for missing settings
-	if GLDG_unique_GuildName then
-		if not GLDG_Data[GLDG_unique_GuildName] then
-			GLDG_Data[GLDG_unique_GuildName] = {}
-			GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = true
-		end
+	-- Clear obsolete options from profile
+	if GLDG.db.profile.EnableContextMenu then 
+		GLDG.db.profile.EnableContextMenu = nil 
 	end
 
-	if not GLDG_Data.GuildSettings then GLDG_Data.GuildSettings = {} end
-
-	-- Convert legacy boolean values for API 6.0.2 compatibility
+	-- Convert legacy boolean values for API 6.0.2 compatibility (nur für alte Daten)
 	self:ConvertLegacyBooleans()
 
-	-- Initialize default values
-	self:InitializeDefaults()
-
-	-- Initialize greeting collections
+	-- Initialize greeting collections from constants if empty
 	self:InitializeGreetings()
 
 	-- Update player checkboxes
 	GLDG_UpdatePlayerCheckboxes()
 
-	GLDG_InitComplete = true
+	GLDG.InitComplete = true
 	
 	GLDG:Print(GLDG.Database:GetColors().help..GLDG_NAME..":|r "..L["Database initialized successfully"])
+end
+
+-- Legacy compatibility function (mapped to new Initialize)
+function GLDG.Database:Init()
+	self:Initialize()
 end
 
 -------------------------------
@@ -93,9 +68,16 @@ end
 -------------------------------
 
 function GLDG.Database:ConvertLegacyBooleans()
-	if GLDG_Data[GLDG_unique_GuildName] then
+	-- Safety check: ensure db is initialized
+	if not GLDG.db or not GLDG.db.profile then
+		GLDG:Print("[Database] Warning: db not initialized in ConvertLegacyBooleans")
+		return
+	end
+	
+	-- Compatibility: GLDG_Data is now a metatable that maps to self.db
+	if GLDG_Data and GLDG_Data[GLDG.unique_GuildName] then
 		-- convert for API 6.0.2 begin
-		local settings = GLDG_Data[GLDG_unique_GuildName]
+		local settings = GLDG_Data[GLDG.unique_GuildName]
 		if settings.GreetAsMain==1 then settings.GreetAsMain=true end
 		if settings.Randomize==1 then settings.Randomize=true end
 		if settings.Whisper==1 then settings.Whisper=true end
@@ -133,7 +115,7 @@ function GLDG.Database:ConvertLegacyBooleans()
 	end
 
 	-- Convert GuildSettings booleans as well
-	local guildSettings = GLDG_Data.GuildSettings
+	local guildSettings = GLDG.db.profile.GuildSettings
 	if guildSettings.GreetAsMain==1 then guildSettings.GreetAsMain=true end
 	if guildSettings.Randomize==1 then guildSettings.Randomize=true end
 	if guildSettings.Whisper==1 then guildSettings.Whisper=true end
@@ -145,97 +127,65 @@ end
 -------------------------------
 
 function GLDG.Database:CopyToGuildSettings(settings)
-	GLDG_Data.GuildSettings.GreetAsMain = settings.GreetAsMain
-	GLDG_Data.GuildSettings.Randomize = settings.Randomize
-	GLDG_Data.GuildSettings.Whisper = settings.Whisper
-	GLDG_Data.GuildSettings.WhisperLevelup = settings.WhisperLevelup
-	GLDG_Data.GuildSettings.IncludeOwn = settings.IncludeOwn
-	GLDG_Data.GuildSettings.AutoAssign = settings.AutoAssign
-	GLDG_Data.GuildSettings.AutoAssignEgp = settings.AutoAssignEgp
-	GLDG_Data.GuildSettings.AutoAssignAlias = settings.AutoAssignAlias
-	GLDG_Data.GuildSettings.ListNames = settings.ListNames
-	GLDG_Data.GuildSettings.ListNamesOff = settings.ListNamesOff
-	GLDG_Data.GuildSettings.ListLevelUp = settings.ListLevelUp
-	GLDG_Data.GuildSettings.ListLevelUpOff = settings.ListLevelUpOff
-	GLDG_Data.GuildSettings.ListAchievments = settings.ListAchievments
-	GLDG_Data.GuildSettings.ListQuit = settings.ListQuit
-	GLDG_Data.GuildSettings.ExtendChat = settings.ExtendChat
-	GLDG_Data.GuildSettings.ExtendIgnored = settings.ExtendIgnored
-	GLDG_Data.GuildSettings.ExtendMain = settings.ExtendMain
-	GLDG_Data.GuildSettings.ExtendAlias = settings.ExtendAlias
-	GLDG_Data.GuildSettings.AddPostfix = settings.AddPostfix
-	GLDG_Data.GuildSettings.ShowWhoSpam = settings.ShowWhoSpam
-	GLDG_Data.GuildSettings.SupressGreet = settings.SupressGreet
-	GLDG_Data.GuildSettings.SupressJoin = settings.SupressJoin
-	GLDG_Data.GuildSettings.SupressLevel = settings.SupressLevel
-	GLDG_Data.GuildSettings.SupressRank = settings.SupressRank
-	GLDG_Data.GuildSettings.SupressAchievment = settings.SupressAchievment
-	GLDG_Data.GuildSettings.NoGratsOnLogin = settings.NoGratsOnLogin
-	GLDG_Data.GuildSettings.DeltaPopup = settings.DeltaPopup
-	GLDG_Data.GuildSettings.RelogTime = settings.RelogTime
-	GLDG_Data.GuildSettings.MinLevelUp = settings.MinLevelUp
-	GLDG_Data.GuildSettings.UseGuildDefault = settings.UseGuildDefault
+	-- Copy legacy settings to AceDB GuildSettings via compatibility layer
+	local guildSettings = GLDG.db.profile.GuildSettings
+	guildSettings.GreetAsMain = settings.GreetAsMain
+	guildSettings.Randomize = settings.Randomize
+	guildSettings.Whisper = settings.Whisper
+	guildSettings.WhisperLevelup = settings.WhisperLevelup
+	guildSettings.IncludeOwn = settings.IncludeOwn
+	guildSettings.AutoAssign = settings.AutoAssign
+	guildSettings.AutoAssignEgp = settings.AutoAssignEgp
+	guildSettings.AutoAssignAlias = settings.AutoAssignAlias
+	guildSettings.ListNames = settings.ListNames
+	guildSettings.ListNamesOff = settings.ListNamesOff
+	guildSettings.ListLevelUp = settings.ListLevelUp
+	guildSettings.ListLevelUpOff = settings.ListLevelUpOff
+	guildSettings.ListAchievments = settings.ListAchievments
+	guildSettings.ListQuit = settings.ListQuit
+	guildSettings.ExtendChat = settings.ExtendChat
+	guildSettings.ExtendIgnored = settings.ExtendIgnored
+	guildSettings.ExtendMain = settings.ExtendMain
+	guildSettings.ExtendAlias = settings.ExtendAlias
+	guildSettings.AddPostfix = settings.AddPostfix
+	guildSettings.ShowWhoSpam = settings.ShowWhoSpam
+	guildSettings.SupressGreet = settings.SupressGreet
+	guildSettings.SupressJoin = settings.SupressJoin
+	guildSettings.SupressLevel = settings.SupressLevel
+	guildSettings.SupressRank = settings.SupressRank
+	guildSettings.SupressAchievment = settings.SupressAchievment
+	guildSettings.NoGratsOnLogin = settings.NoGratsOnLogin
+	guildSettings.DeltaPopup = settings.DeltaPopup
+	guildSettings.RelogTime = settings.RelogTime
+	guildSettings.MinLevelUp = settings.MinLevelUp
+	guildSettings.UseGuildDefault = settings.UseGuildDefault
 end
 
 -------------------------------
 -- Initialize Default Values --
+-- NOTE: Diese Funktion wird nicht mehr benötigt, da AceDB die defaults
+-- automatisch aus der defaults-Tabelle in GuildGreet.lua anwendet.
+-- Wird nur noch für Legacy-Migration behalten.
 -------------------------------
 
 function GLDG.Database:InitializeDefaults()
-	-- Set default values for missing settings
-	if not GLDG_Data.GuildSettings.RelogTime then GLDG_Data.GuildSettings.RelogTime = 2 end
-	if not GLDG_Data.GuildSettings.MinLevelUp then GLDG_Data.GuildSettings.MinLevelUp = 0 end
-	GLDG_Data.UpdateTime = 0
-	if not GLDG_Data.GuildSettings.UseGuildDefault then GLDG_Data.GuildSettings.UseGuildDefault = false end
-	if not GLDG_Data.ListSize then GLDG_Data.ListSize = 5 end
-	if not GLDG_Data.PlayerChatFrame then GLDG_Data.PlayerChatFrame = {} end
-	if not GLDG_Data.PlayerChatFrame[GLDG.Player.."-"..GLDG.Realm] then 
-		GLDG_Data.PlayerChatFrame[GLDG.Player.."-"..GLDG.Realm] = 0 
+	-- DEPRECATED: Defaults werden jetzt über AceDB in GuildGreet.lua verwaltet
+	-- Diese Funktion bleibt nur für Legacy-Kompatibilität erhalten
+	
+	-- PlayerChatFrame Migration (falls alte Daten vorhanden)
+	if GLDG_Data and GLDG_Data.PlayerChatFrame then
+		GLDG.db.realm.PlayerChatFrame = GLDG_Data.PlayerChatFrame
 	end
-
-	-- Initialize collections and settings tables
-	if not GLDG_Data.Collections then GLDG_Data.Collections = {} end
-	if not GLDG_Data.Custom then GLDG_Data.Custom = {} end
-	if not GLDG_Data.Ranks then GLDG_Data.Ranks = {} end
-	if not GLDG_Data.ChannelNames then GLDG_Data.ChannelNames = {} end
-	if not GLDG_Data.Frameopts then GLDG_Data.Frameopts = {} end
-	if not GLDG_Data.GuildAlias then GLDG_Data.GuildAlias = {} end
-	if not GLDG_Data.CheckedGuildAlert then GLDG_Data.CheckedGuildAlert = false end
-
-	-- Initialize boolean settings with defaults
-	self:InitializeBooleanDefaults()
 end
 
 -------------------------------
 -- Initialize Boolean Defaults --
+-- NOTE: Nicht mehr benötigt - AceDB handled alle defaults
 -------------------------------
 
 function GLDG.Database:InitializeBooleanDefaults()
-	local settings = GLDG_Data.GuildSettings
-	
-	if not settings.GreetAsMain then settings.GreetAsMain = false end
-	if not settings.Randomize then settings.Randomize = false end
-	if not settings.Whisper then settings.Whisper = false end
-	if not settings.WhisperLevelup then settings.WhisperLevelup = false end
-	if not settings.IncludeOwn then settings.IncludeOwn = false end
-	if not settings.ListNames then settings.ListNames = false end
-	if not settings.ListNamesOff then settings.ListNamesOff = false end
-	if not settings.ListLevelUp then settings.ListLevelUp = false end
-	if not settings.ListLevelUpOff then settings.ListLevelUpOff = false end
-	if not settings.ListQuit then settings.ListQuit = false end
-	if not settings.ExtendChat then settings.ExtendChat = false end
-	if not settings.ExtendIgnored then settings.ExtendIgnored = false end
-	if not settings.ExtendAlias then settings.ExtendAlias = false end
-	if not settings.ExtendMain then settings.ExtendMain = false end
-	if not settings.AutoAssign then settings.AutoAssign = false end
-	if not settings.AutoAssignEgp then settings.AutoAssignEgp = false end
-	if not settings.AutoAssignAlias then settings.AutoAssignAlias = false end
-	if not GLDG_Data.UseFriends then GLDG_Data.UseFriends = false end
-	if not GLDG_Data.ListUp then GLDG_Data.ListUp = false end
-	if not GLDG_Data.ListVisible then GLDG_Data.ListVisible = false end
-	if not settings.AddPostfix then settings.AddPostfix = false end
-	if not settings.ShowWhoSpam then settings.ShowWhoSpam = false end
-	if not settings.ListAchievments then settings.ListAchievments = false end
+	-- DEPRECATED: Alle boolean defaults sind jetzt in der AceDB defaults-Tabelle
+	-- in GuildGreet.lua definiert
 end
 
 -------------------------------
@@ -243,22 +193,10 @@ end
 -------------------------------
 
 function GLDG.Database:InitializeGreetings()
-	if not GLDG_Data.Greet then GLDG_Data.Greet = GLDG_GREET end
-	if not GLDG_Data.GreetBack then GLDG_Data.GreetBack = GLDG_GREETBACK end
-	if not GLDG_Data.Welcome then GLDG_Data.Welcome = GLDG_WELCOME end
-	if not GLDG_Data.NewRank then GLDG_Data.NewRank = GLDG_RANK end
-	if not GLDG_Data.NewLevel then GLDG_Data.NewLevel = GLDG_LEVEL end
-	if not GLDG_Data.Bye then GLDG_Data.Bye = GLDG_BYE end
-	if not GLDG_Data.Night then GLDG_Data.Night = GLDG_NIGHT end
-	if not GLDG_Data.Guild then GLDG_Data.Guild = GLDG_GUILD end
-	if not GLDG_Data.Channel then GLDG_Data.Channel = GLDG_CHANNEL end
-	if not GLDG_Data.ByeGuild then GLDG_Data.ByeGuild = GLDG_BYE_GUILD end
-	if not GLDG_Data.NightGuild then GLDG_Data.NightGuild = GLDG_NIGHT_GUILD end
-	if not GLDG_Data.ByeChannel then GLDG_Data.ByeChannel = GLDG_BYE_CHANNEL end
-	if not GLDG_Data.NightChannel then GLDG_Data.NightChannel = GLDG_NIGHT_CHANNEL end
-	if not GLDG_Data.LaterGuild then GLDG_Data.LaterGuild = GLDG_LATER_GUILD end
-	if not GLDG_Data.LaterChannel then GLDG_Data.LaterChannel = GLDG_LATER_CHANNEL end
-	if not GLDG_Data.Achievment then GLDG_Data.Achievment = GLDG_ACHIEVMENT end
+	-- NOTE: Greetings are now stored in AceDB at GLDG.db.realm.greetings
+	-- This function is now largely unnecessary since AceDB handles defaults
+	-- Kept for legacy compatibility in case direct GLDG_Data accesses still exist
+	-- Actual initialization is done via the defaults structure in GuildGreet.lua
 end
 
 ------------------------------------
@@ -266,19 +204,26 @@ end
 ------------------------------------
 
 function GLDG.Database:ReadConfigString()
-	GLDG_ginfotxt = GetGuildInfoText()
-	if (GLDG_CONFIG_STRING ~= nil) and (GLDG_CONFIG_STRING ~= GLDG_config_from_guild) and IsGuildLeader() then
-		_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Enable()
+	local ginfotxt = GetGuildInfoText() or ""
+	local config_string = GLDG.db.global.CONFIG_STRING
+	
+	-- Enable/Disable Write Guild String button based on changes
+	if (config_string ~= nil) and (config_string ~= GLDG_config_from_guild) and IsGuildLeader() then
+		if _G[GLDG_GUI.."SettingsGeneralWriteGuildString"] then
+			_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Enable()
+		end
 	else
-		_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Disable()
+		if _G[GLDG_GUI.."SettingsGeneralWriteGuildString"] then
+			_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Disable()
+		end
 	end
 	
-	local gstringstart = string.find(GLDG_ginfotxt, "{GG", 1)
+	local gstringstart = string.find(ginfotxt, "{GG", 1)
 	local gstring1, gstring2, gstring3, gstring4
 	
 	if (gstringstart ~= nil) then
 		gstringstart = gstringstart + 4
-		local a,b,c = strfind(GLDG_ginfotxt, "(%S+)", gstringstart)
+		local a, b, c = string.find(ginfotxt, "(%S+)", gstringstart)
 		gstring1,gstring2,gstring3,gstring4 = string.split(":",c)
 		
 		if gstring4 == nil then
@@ -312,6 +257,8 @@ end
 ------------------------------------
 
 function GLDG.Database:ApplyGuildConfigString(gstring1, gstring2, gstring3)
+	-- Apply guild settings from config string
+	-- Access via compatibility layer (GLDG_Data) which maps to self.db.profile.GuildSettings
 	local settings = GLDG_Data.GuildSettings
 	
 	-- Parse bitwise flags from gstring1
@@ -347,14 +294,14 @@ function GLDG.Database:ApplyGuildConfigString(gstring1, gstring2, gstring3)
 	settings.RelogTime = tonumber(gstring2, 16)
 	settings.MinLevelUp = tonumber(gstring3, 16)
 
-	-- Copy settings to guild-specific data
-	GLDG_Data[GLDG_unique_GuildName] = GLDG_Data.GuildSettings
+	-- Copy settings to guild-specific data (via compatibility layer)
+	GLDG_Data[GLDG.unique_GuildName] = GLDG_Data.GuildSettings
 
 	-- Print success message
-	if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 1) then
+	if (GLDG_Data[GLDG.unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG.unique_GuildName.." lastmessage"] ~= 1) then
 		GLDG:PrintHelp(string.format(L["ChatMsg/Config string found. GuildGreet using default settings from %s!"], Ambiguate(GLDG_GuildLeader, "guild")))
-		GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-		GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 1
+		GLDG_Data[GLDG.unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+		GLDG_Data[GLDG.unique_GuildName.." lastmessage"] = 1
 	end
 end
 
@@ -363,7 +310,7 @@ end
 ------------------------------------
 
 function GLDG.Database:ApplyDefaultGuildSettings()
-	if GLDG_Data.GuildSettings.UseGuildDefault==true and GLDG_unique_GuildName then
+	if GLDG_Data.GuildSettings.UseGuildDefault==true and GLDG.unique_GuildName then
 		local settings = GLDG_Data.GuildSettings
 		
 		-- Set default values
@@ -397,7 +344,7 @@ function GLDG.Database:ApplyDefaultGuildSettings()
 		settings.RelogTime = 2
 		settings.MinLevelUp = 20
 		
-		GLDG_Data[GLDG_unique_GuildName] = settings
+		GLDG_Data[GLDG.unique_GuildName] = settings
 
 		-- Handle different config string states
 		self:HandleConfigStringMessages()
@@ -411,27 +358,27 @@ end
 function GLDG.Database:HandleConfigStringMessages()
 	if GLDG_config_from_guild == "not found" then
 		if IsGuildLeader() then
-			if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 3) then
+			if (GLDG_Data[GLDG.unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG.unique_GuildName.." lastmessage"] ~= 3) then
 				GLDG:PrintHelp(L["ChatMsg/Config string not found."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
 				GLDG:PrintHelp(L["ChatMsg/Note to the guild master to create the config string"].." \r\n"..L["ChatMsg/To set the config string ..."])
-				GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-				GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 3
+				GLDG_Data[GLDG.unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+				GLDG_Data[GLDG.unique_GuildName.." lastmessage"] = 3
 			end
 		else
-			if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 2) then
+			if (GLDG_Data[GLDG.unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG.unique_GuildName.." lastmessage"] ~= 2) then
 				GLDG:PrintHelp(L["ChatMsg/Config string not found."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
-				GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-				GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 2
+				GLDG_Data[GLDG.unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+				GLDG_Data[GLDG.unique_GuildName.." lastmessage"] = 2
 			end
 		end
 	elseif GLDG_config_from_guild == "corrupted" then
 		if IsGuildLeader() then
 			GLDG:PrintHelp(L["ChatMsg/The config string seems to be corrupted. Please generating a new one."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
 		else
-			if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 5) then
+			if (GLDG_Data[GLDG.unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG.unique_GuildName.." lastmessage"] ~= 5) then
 				GLDG:PrintHelp(string.format(L["ChatMsg/The config string seems to be corrupted. Please inform %s!"], Ambiguate(GLDG_GuildLeader, "guild")).." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
-				GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-				GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 5
+				GLDG_Data[GLDG.unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
+				GLDG_Data[GLDG.unique_GuildName.." lastmessage"] = 5
 			end
 		end
 	end
@@ -442,39 +389,40 @@ end
 ------------------------------------
 
 function GLDG.Database:WriteGuildString()
-	GLDG_ginfotxt = GetGuildInfoText()
+	local ginfotxt = GetGuildInfoText()
+	local config_string = GLDG.db.global.CONFIG_STRING
 
-	if not GLDG_CONFIG_STRING then self:GenerateConfigString() end
+	if not config_string then self:GenerateConfigString() end
 	local new_ginfotxt = nil
 
 	if GLDG_config_from_guild == nil then self:ReadConfigString() end
 
-	if GLDG_ginfotxt == nil then GLDG_ginfotxt = " " end
+	if ginfotxt == nil then ginfotxt = " " end
 
 	if GLDG_config_from_guild ~= nil and GLDG_config_from_guild =="not found" then
-		new_ginfotxt = GLDG_ginfotxt.."\r"..GLDG_CONFIG_STRING
+		new_ginfotxt = ginfotxt.."\r"..config_string
 	end
 
 	if GLDG_config_from_guild ~= nil and GLDG_config_from_guild =="corrupted" then
-		new_ginfotxt = string.gsub(GLDG_ginfotxt, GLDG_corrupted_config_from_guild, GLDG_CONFIG_STRING)
+		new_ginfotxt = string.gsub(ginfotxt, GLDG_corrupted_config_from_guild, config_string)
 	end
 
 	if (GLDG_config_from_guild ~= nil) and (GLDG_config_from_guild ~="not found") and (GLDG_config_from_guild ~="corrupted")then
-		new_ginfotxt = string.gsub(GLDG_ginfotxt, GLDG_config_from_guild, GLDG_CONFIG_STRING)
+		new_ginfotxt = string.gsub(ginfotxt, GLDG_config_from_guild, config_string)
 	end
 
 	if strlen(new_ginfotxt or "")<=499 then
-		GLDG_config_from_guild = GLDG_CONFIG_STRING
+		GLDG_config_from_guild = config_string
 		GLDG_corrupted_config_from_guild = nil
 		SetGuildInfoText(new_ginfotxt or "")
-		_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Disable()
+		if _G[GLDG_GUI.."SettingsGeneralWriteGuildString"] then
+			_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Disable()
+		end
 		GLDG.UIHelpers:Print(L["ChatMsg/Guild info written successfully!"])
-		GLDG_ginfotxt = nil
 		new_ginfotxt = nil
 	else
 		local tolong = strlen(new_ginfotxt or "")-499
 		GLDG.UIHelpers:Print(string.format(L["ChatMsg/The guild info is too long..."], tolong))
-		GLDG_ginfotxt = nil
 		new_ginfotxt = nil
 	end
 end
@@ -520,16 +468,22 @@ function GLDG.Database:GenerateConfigString()
 	if settings.NoGratsOnLogin then gstring1 = gstring1 + 33554432 end
 	if settings.DeltaPopup then gstring1 = gstring1 + 67108864 end
 
-	-- Convert to hex
-	GLDG_CONFIG_STRING_A = string.format("%x", gstring1)
-	GLDG_CONFIG_STRING_B = string.format("%x", gstring2)
-	GLDG_CONFIG_STRING_C = string.format("%x", gstring3)
+	-- Convert to hex and store in AceDB
+	local config_string_a = string.format("%x", gstring1)
+	local config_string_b = string.format("%x", gstring2)
+	local config_string_c = string.format("%x", gstring3)
 
 	-- Generate checksum
 	gstring4 = mod((gstring1+1) * (gstring2+1) * (gstring3+1), 33)
-	GLDG_CONFIG_STRING_D = tostring(gstring4)
+	local config_string_d = tostring(gstring4)
 
-	GLDG_CONFIG_STRING = "{GG:"..GLDG_CONFIG_STRING_A..":"..GLDG_CONFIG_STRING_B..":"..GLDG_CONFIG_STRING_C..":"..GLDG_CONFIG_STRING_D.."}"
+	-- Store in AceDB (global data for guild-wide access)
+	GLDG.db.global.CONFIG_STRING_A = config_string_a
+	GLDG.db.global.CONFIG_STRING_B = config_string_b
+	GLDG.db.global.CONFIG_STRING_C = config_string_c
+	GLDG.db.global.CONFIG_STRING_D = config_string_d
+	GLDG.db.global.CONFIG_STRING = "{GG:"..config_string_a..":"..config_string_b..":"..config_string_c..":"..config_string_d.."}"
+	-- Save config strings to global scope for persistence
 end
 
 ------------------------------------
@@ -539,12 +493,12 @@ end
 function GLDG.Database:SetUseGuildDefault(value)
 	if value==true then
 		GLDG_Data.GuildSettings.UseGuildDefault=true
-		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault=true
+		GLDG_Data[GLDG.unique_GuildName].UseGuildDefault=true
 		GLDG_SetCheckboxes()
 		GLDG_QueryReloadUI()
 	else
 		GLDG_Data.GuildSettings.UseGuildDefault=false
-		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault=false
+		GLDG_Data[GLDG.unique_GuildName].UseGuildDefault=false
 		GLDG_SetCheckboxes()
 		GLDG_QueryReloadUI()
 	end
@@ -709,16 +663,16 @@ function GLDG.Database:RosterImportFull()
 	if maxGuildMembers <= 0 then maxGuildMembers = GetNumGuildMembers() or 0 end
 
 	-- Create GLDG_GuildUID
-	GLDG_unique_GuildName = "Guild:"..GLDG.GuildName.."-"..GLDG.Realm
+	GLDG.unique_GuildName = "Guild:"..GLDG.GuildName.."-"..GLDG.Realm
 
 	if GLDG_debug then GLDG_SystemMsg("Importing "..maxGuildMembers.." players, please wait...") end
 	
-	-- Initialize data structures  
-	if not GLDG_Data[GLDG_unique_GuildName] then GLDG_Data[GLDG_unique_GuildName] = {} end
+	-- Initialize data structures (via compatibility layer)
+	if not GLDG_Data[GLDG.unique_GuildName] then GLDG_Data[GLDG.unique_GuildName] = {} end
 	if not GLDG_Data["Realm:"..GLDG.Realm] then GLDG_Data["Realm:"..GLDG.Realm] = {} end
 
 	local GLDG_PlayerTable = GLDG_Data["Realm:"..GLDG.Realm]
-	local GLDG_GuildTable = GLDG_Data[GLDG_unique_GuildName]
+	local GLDG_GuildTable = GLDG_Data[GLDG.unique_GuildName]
 	
 	-- Import guild members
 	for i = 1, maxGuildMembers do
@@ -768,21 +722,4 @@ end
 
 function GLDG_RosterImportFull()
 	GLDG.Database:RosterImportFull()
-end
-
--------------------------------
--- Database Initialization --
--------------------------------
-
-function GLDG.Database:Initialize()
-	-- First bind to saved variables
-	self:Init()
-	
-	-- Then initialize default values and greetings
-	self:InitializeDefaults()
-	self:InitializeBooleanDefaults()
-	self:InitializeGreetings()
-	
-	-- Use simple print during initialization to avoid circular dependency with Colors
-	print("GuildGreet: Database module initialized")
 end

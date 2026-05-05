@@ -10,18 +10,17 @@ local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 -- Message System Library Namespace
 GLDG.Messages = {}
 
--- Import required global variables for compatibility
-local GLDG_Data, GLDG_DataGreet, GLDG_DataChar
-local GLDG_unique_GuildName, GLDG_Player, GLDG_Realm, GLDG_GuildAlias
-local GLDG_ChannelName, GLDG_Online, GLDG_Offline, GLDG_Queue
+-- NOTE: AceDB-3.0 Migration - Global variables now accessed through compatibility layer
+-- GLDG_Data, GLDG_DataChar, GLDG_DataGreet are accessed via Metatables
+-- initialized in GuildGreet.lua InitializeCompatibilityLayer()
 
 -------------------------------
 -- Message System Initialization --
 -------------------------------
 
 function GLDG.Messages:Initialize()
-	-- Initialize message queues
-	if not GLDG_Queue then GLDG_Queue = {} end
+	-- Initialize message queues (use addon instance for storage)
+	if not GLDG.Queue then GLDG.Queue = {} end
 	
 	-- Set up message filters
 	self:SetupMessageFilters()
@@ -48,6 +47,11 @@ end
 
 function GLDG.Messages:ChatFilter(chatFrame, event, ...)
 	local msg, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...
+
+	-- Return early if data is not initialized yet (can happen during addon loading)
+	if not GLDG_Data or not GLDG_Data.GuildSettings then
+		return false, msg, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13
+	end
 
 	if not GLDG_Data.GuildSettings.ExtendChat then
 		return false, msg, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13
@@ -159,9 +163,9 @@ function GLDG.Messages:ParseCustomMessage(cname, name, msg)
 	
 	local p_g = ""     -- %g = guild alias if available, else guild if available, else empty
 	local p_G = ""     -- %G = guild name if available, else empty
-	if GLDG_unique_GuildName and GLDG_unique_GuildName ~= "" then
-		p_g = GLDG_unique_GuildName
-		p_G = GLDG_unique_GuildName
+	if GLDG.unique_GuildName and GLDG.unique_GuildName ~= "" then
+		p_g = GLDG.unique_GuildName
+		p_G = GLDG.unique_GuildName
 	end
 	if GLDG_GuildAlias and GLDG_GuildAlias ~= "" then
 		p_g = GLDG_GuildAlias
@@ -389,7 +393,7 @@ function GLDG.Messages:SendMessage(message, forceWhisper, player, targetName)
 	if forceWhisper then
 		-- Manual whisper setting overrides all
 		SendChatMessage(message, "WHISPER", nil, targetName)
-	elseif player and player.guild and player.guild == GLDG_unique_GuildName then
+	elseif player and player.guild and player.guild == GLDG.unique_GuildName then
 		-- In same guild as this character
 		SendChatMessage(message, "GUILD")
 	elseif GLDG_ChannelName and player and player.channels and player.channels[GLDG_ChannelName] then
@@ -411,7 +415,7 @@ end
 -------------------------------
 
 function GLDG.Messages:GreetGuild()
-	if not GLDG_unique_GuildName or GLDG_unique_GuildName == "" then return end
+	if not GLDG.unique_GuildName or GLDG.unique_GuildName == "" then return end
 
 	local list = GLDG_DataGreet.Guild
 	list = self:FilterMessages(nil, list)
@@ -423,7 +427,7 @@ function GLDG.Messages:GreetGuild()
 	msg = self:ParseCustomMessage("", "", msg)
 
 	-- Send greeting (still parse for %s for backwards compatibility)
-	SendChatMessage(string.format(msg, GLDG_GuildAlias or GLDG_unique_GuildName), "GUILD")
+	SendChatMessage(string.format(msg, GLDG_GuildAlias or GLDG.unique_GuildName), "GUILD")
 end
 
 function GLDG.Messages:GreetChannel()
@@ -446,7 +450,7 @@ function GLDG.Messages:GreetChannel()
 end
 
 function GLDG.Messages:ByeGuild()
-	if not GLDG_unique_GuildName or GLDG_unique_GuildName == "" then return end
+	if not GLDG.unique_GuildName or GLDG.unique_GuildName == "" then return end
 
 	local list = GLDG_DataGreet.ByeGuild
 	
@@ -464,7 +468,7 @@ function GLDG.Messages:ByeGuild()
 	msg = self:ParseCustomMessage("", "", msg)
 
 	-- Send goodbye
-	SendChatMessage(string.format(msg, GLDG_GuildAlias or GLDG_unique_GuildName), "GUILD")
+	SendChatMessage(string.format(msg, GLDG_GuildAlias or GLDG.unique_GuildName), "GUILD")
 end
 
 function GLDG.Messages:ByeChannel()
@@ -493,7 +497,7 @@ function GLDG.Messages:ByeChannel()
 end
 
 function GLDG.Messages:LaterGuild()
-	if not GLDG_unique_GuildName or GLDG_unique_GuildName == "" then return end
+	if not GLDG.unique_GuildName or GLDG.unique_GuildName == "" then return end
 
 	local list = GLDG_DataGreet.LaterGuild
 	list = self:FilterMessages(nil, list)
@@ -505,7 +509,7 @@ function GLDG.Messages:LaterGuild()
 	msg = self:ParseCustomMessage("", "", msg)
 
 	-- Send "see you later" message
-	SendChatMessage(string.format(msg, GLDG_GuildAlias or GLDG_unique_GuildName), "GUILD")
+	SendChatMessage(string.format(msg, GLDG_GuildAlias or GLDG.unique_GuildName), "GUILD")
 end
 
 function GLDG.Messages:LaterChannel()
@@ -576,7 +580,7 @@ function GLDG.Messages:TreatAchievement(message, playerName)
 		-- Queue for achievement greeting if enabled
 		if GLDG_Data.GuildSettings.ListAchievments and not GLDG_Data.GuildSettings.SupressAchievment then
 			-- Add to greeting queue
-			table.insert(GLDG_Queue, {
+			table.insert(GLDG.Queue, {
 				name = playerName,
 				type = "achievement",
 				timestamp = GetTime()
@@ -597,13 +601,13 @@ end
 -------------------------------
 
 function GLDG.Messages:ProcessQueue()
-	if not GLDG_Queue or #GLDG_Queue == 0 then return end
+	if not GLDG.Queue or #GLDG.Queue == 0 then return end
 	
 	local now = GetTime()
 	local processed = {}
 	
 	-- Process greeting queue
-	for i, entry in ipairs(GLDG_Queue) do
+	for i, entry in ipairs(GLDG.Queue) do
 		if entry and entry.timestamp and (now - entry.timestamp > 2.0) then -- Wait 2 seconds before greeting
 			if entry.type == "greet" then
 				self:SendGreet(entry.name)
@@ -618,7 +622,7 @@ function GLDG.Messages:ProcessQueue()
 	
 	-- Remove processed entries (in reverse order to maintain indices)
 	for i = #processed, 1, -1 do
-		table.remove(GLDG_Queue, processed[i])
+		table.remove(GLDG.Queue, processed[i])
 	end
 end
 
@@ -700,7 +704,7 @@ function GLDG.Messages:HandlePlayerOnline(playerName)
 	if GLDG_DataChar[playerName] and not GLDG_DataChar[playerName].ignore then
 		-- Add to greeting queue if not suppressed
 		if not GLDG_Data.GuildSettings.SupressGreet then
-			table.insert(GLDG_Queue, {
+			table.insert(GLDG.Queue, {
 				name = playerName,
 				type = "greet",
 				timestamp = GetTime()
@@ -747,11 +751,11 @@ function GLDG.Messages:HandleGuildJoin(playerName)
 		GLDG_DataChar[playerName] = {}
 	end
 	GLDG_DataChar[playerName].new = true
-	GLDG_DataChar[playerName].guild = GLDG_unique_GuildName
+	GLDG_DataChar[playerName].guild = GLDG.unique_GuildName
 	
 	-- Add to greeting queue if not suppressed
 	if not GLDG_Data.GuildSettings.SupressJoin then
-		table.insert(GLDG_Queue, {
+		table.insert(GLDG.Queue, {
 			name = playerName,
 			type = "greet",
 			timestamp = GetTime()
@@ -770,7 +774,7 @@ function GLDG.Messages:HandlePromotion(playerName, oldRank, newRank)
 		
 		-- Add to greeting queue if not suppressed
 		if not GLDG_Data.GuildSettings.SupressRank then
-			table.insert(GLDG_Queue, {
+			table.insert(GLDG.Queue, {
 				name = playerName,
 				type = "greet",
 				timestamp = GetTime()
@@ -869,13 +873,13 @@ function GLDG.Messages:OnEvent(mainObj, event, ...)
 
 	elseif (event == "GUILD_ROSTER_UPDATE") then
 		if IsInGuild() then
-			if (GLDG_unique_GuildName and GLDG.Realm and GLDG_unique_GuildName~="") then
+			if (GLDG.unique_GuildName and GLDG.Realm and GLDG.unique_GuildName~="") then
 				-- guild name known -> treat guild info
 				if (GLDG_ginfotxt) and (GLDG_ginfotxt ~= GetGuildInfoText()) then GLDG_ginfotxt = GetGuildInfoText(); GLDG_config_from_guild = nil end
 				if GLDG_Data.GuildSettings.UseGuildDefault==true and GLDG_config_from_guild == nil then
 					GLDG_ginfotxt = GetGuildInfoText()
 					if GLDG_ginfotxt >= " " then
-						if not GLDG_Data[GLDG_unique_GuildName] then GLDG_Data[GLDG_unique_GuildName] = {} end
+						if not GLDG_Data[GLDG.unique_GuildName] then GLDG_Data[GLDG.unique_GuildName] = {} end
 						if not GLDG_Data.GuildSettings then GLDG_Data.GuildSettings = {} end
 						GLDG_Data.GuildSettings.UseGuildDefault=true
 						GLDG_readConfigString()
@@ -1201,9 +1205,9 @@ function GLDG.Messages:ParseCustomMessage(cname, name, msg)
 	end
 	local p_g = ""	-- %g = guild alias if available, else guild if available, else empty
 	local p_G = ""	-- %G = guild name if available, else empty
-	if (GLDG_unique_GuildName ~= "") then
-		p_g = GLDG_unique_GuildName
-		p_G = GLDG_unique_GuildName
+	if (GLDG.unique_GuildName ~= "") then
+		p_g = GLDG.unique_GuildName
+		p_G = GLDG.unique_GuildName
 	end
 	if (GLDG_GuildAlias ~= "") then
 		p_g = GLDG_GuildAlias

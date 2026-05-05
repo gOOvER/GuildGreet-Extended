@@ -60,7 +60,6 @@ function CleanupUtils:GuildlessCleanup()
 
 	-- Check for channels/friends 
 	GLDG_CheckChannel()
-	-- H.Sch. - ReglohPri - ShowFriends() is deprecated changed to C_FriendList.ShowFriends()
 	C_FriendList.ShowFriends()
 
 	GLDG_CleanupList = nil

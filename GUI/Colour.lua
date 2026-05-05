@@ -353,8 +353,8 @@ end
 	Get rank colour
 ]]
 function ColourGUI:GetRankColour(rankIndex)
-	if GLDG_Data and GLDG_Data.colours and GLDG_Data.colours.ranks then
-		return GLDG_Data.colours.ranks[rankIndex] or self:GetDefaultRankColour(rankIndex)
+	if GLDG.db and GLDG.db.profile and GLDG.db.profile.colours and GLDG.db.profile.colours.ranks then
+		return GLDG.db.profile.colours.ranks[rankIndex] or self:GetDefaultRankColour(rankIndex)
 	end
 	return self:GetDefaultRankColour(rankIndex)
 end
@@ -363,11 +363,10 @@ end
 	Set rank colour
 ]]
 function ColourGUI:SetRankColour(rankIndex, colour)
-	if not GLDG_Data then GLDG_Data = {} end
-	if not GLDG_Data.colours then GLDG_Data.colours = {} end
-	if not GLDG_Data.colours.ranks then GLDG_Data.colours.ranks = {} end
+	if not GLDG.db.profile.colours then GLDG.db.profile.colours = {} end
+	if not GLDG.db.profile.colours.ranks then GLDG.db.profile.colours.ranks = {} end
 	
-	GLDG_Data.colours.ranks[rankIndex] = colour
+	GLDG.db.profile.colours.ranks[rankIndex] = colour
 end
 
 --[[
@@ -393,8 +392,8 @@ end
 	Get special colour
 ]]
 function ColourGUI:GetSpecialColour(key)
-	if GLDG_Data and GLDG_Data.colours and GLDG_Data.colours.special then
-		return GLDG_Data.colours.special[key] or self:GetDefaultSpecialColour(key)
+	if GLDG.db and GLDG.db.profile and GLDG.db.profile.colours and GLDG.db.profile.colours.special then
+		return GLDG.db.profile.colours.special[key] or self:GetDefaultSpecialColour(key)
 	end
 	return self:GetDefaultSpecialColour(key)
 end
@@ -403,11 +402,10 @@ end
 	Set special colour
 ]]
 function ColourGUI:SetSpecialColour(key, colour)
-	if not GLDG_Data then GLDG_Data = {} end
-	if not GLDG_Data.colours then GLDG_Data.colours = {} end
-	if not GLDG_Data.colours.special then GLDG_Data.colours.special = {} end
+	if not GLDG.db.profile.colours then GLDG.db.profile.colours = {} end
+	if not GLDG.db.profile.colours.special then GLDG.db.profile.colours.special = {} end
 	
-	GLDG_Data.colours.special[key] = colour
+	GLDG.db.profile.colours.special[key] = colour
 end
 
 --[[
@@ -429,8 +427,8 @@ end
 	Get chat colour
 ]]
 function ColourGUI:GetChatColour(key)
-	if GLDG_Data and GLDG_Data.colours and GLDG_Data.colours.chat then
-		return GLDG_Data.colours.chat[key] or self:GetDefaultChatColour(key)
+	if GLDG.db and GLDG.db.profile and GLDG.db.profile.colours and GLDG.db.profile.colours.chat then
+		return GLDG.db.profile.colours.chat[key] or self:GetDefaultChatColour(key)
 	end
 	return self:GetDefaultChatColour(key)
 end
@@ -439,11 +437,10 @@ end
 	Set chat colour
 ]]
 function ColourGUI:SetChatColour(key, colour)
-	if not GLDG_Data then GLDG_Data = {} end
-	if not GLDG_Data.colours then GLDG_Data.colours = {} end
-	if not GLDG_Data.colours.chat then GLDG_Data.colours.chat = {} end
+	if not GLDG.db.profile.colours then GLDG.db.profile.colours = {} end
+	if not GLDG.db.profile.colours.chat then GLDG.db.profile.colours.chat = {} end
 	
-	GLDG_Data.colours.chat[key] = colour
+	GLDG.db.profile.colours.chat[key] = colour
 end
 
 --[[
@@ -462,8 +459,7 @@ end
 	Reset all colours to defaults
 ]]
 function ColourGUI:ResetAllColours()
-	if not GLDG_Data then GLDG_Data = {} end
-	GLDG_Data.colours = {
+	GLDG.db.profile.colours = {
 		ranks = {},
 		special = {},
 		chat = {}
@@ -524,7 +520,7 @@ function ColourGUI:ExportColourScheme()
 	exportText:SetFullWidth(true)
 	exportText:SetHeight(200)
 	
-	local exportData = GLDG_Data.colours or {}
+	local exportData = (GLDG.db and GLDG.db.profile and GLDG.db.profile.colours) or {}
 	local serialized = self:SerializeColours(exportData)
 	exportText:SetText(serialized)
 	
@@ -540,6 +536,15 @@ end
 	Colour text with hex colour
 ]]
 function ColourGUI:ColourText(text, hexColour)
+	if not hexColour or hexColour == "" then
+		hexColour = "FFFFFF"
+	end
+	-- Remove # if present
+	hexColour = hexColour:gsub("#", "")
+	-- Ensure hex is 6 characters
+	if #hexColour < 6 then
+		hexColour = string.rep("0", 6 - #hexColour) .. hexColour
+	end
 	return "|cFF" .. hexColour .. text .. "|r"
 end
 

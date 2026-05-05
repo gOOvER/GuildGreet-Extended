@@ -22,7 +22,8 @@ GUI.tabs = {
 	{name = "Greetings", text = L["Greetings"], module = "GreetingsGUI"},
 	{name = "Players", text = L["Players"], module = "PlayersGUI"},
 	{name = "Cleanup", text = L["Cleanup"], module = "CleanupGUI"},
-	{name = "Colour", text = L["Colour"], module = "ColourGUI"}
+	{name = "Colour", text = L["Colour"], module = "ColourGUI"},
+	{name = "Profiles", text = L["Profiles"], module = "ProfilesGUI"}
 }
 
 --[[
@@ -57,11 +58,20 @@ end
 --[[
 	Create and show the main window
 ]]
-function GUI:ShowMainWindow()
+function GUI:ShowMainWindow(tabName)
 	if self.mainFrame then
 		self.mainFrame:Show()
 		self.isOpen = true
+		-- Switch to specified tab if provided
+		if tabName and self.tabGroup then
+			self.tabGroup:SelectTab(tabName)
+		end
 		return
+	end
+
+	-- Store tab to open after creation
+	if tabName then
+		self.currentTab = tabName
 	end
 
 	-- Create main frame with version-safe metadata access

@@ -1,0 +1,18 @@
+ joined the channel
+Are you sure you want to delete profile '%s'?
+Backup not found: 
+Cannot delete the currently active profile
+Delete Profile
+Editbox/Achievment
+Enter a name for the copy of '%s'
+Even re-add main name for main char (if the above option is enabled)
+Invalid profile name
+Invalid profile names
+Migration tasks needed: 
+New Profile Name
+Please enter a profile name
+Profile '%s' copied to '%s'
+Profile name cannot be empty
+Roster import started
+Switched to profile '%s'
+You have version

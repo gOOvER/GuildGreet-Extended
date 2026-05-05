@@ -21,8 +21,8 @@ function GLDG.Settings:UpdateRelog(self)
 	else 
 		text:SetText(string.format(L["Only show relogs after more then %d min"], GLDG_Data.GuildSettings.RelogTime)) 
 	end
-	if GLDG_unique_GuildName then 
-		GLDG_generateConfigString() 
+	if GLDG.unique_GuildName then 
+		GLDG.Core:generateConfigString() 
 	end
 end
 
@@ -36,8 +36,8 @@ function GLDG.Settings:UpdateMinLevelUp(self)
 	else 
 		text:SetText(string.format(L["Only show level-up for levels above %d"], GLDG_Data.GuildSettings.MinLevelUp).."*") 
 	end
-	if GLDG_unique_GuildName then 
-		GLDG_generateConfigString() 
+	if GLDG.unique_GuildName then 
+		GLDG.Core:generateConfigString() 
 	end
 end
 

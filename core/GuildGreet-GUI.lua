@@ -10,9 +10,8 @@ local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 -- GUI System Library Namespace
 GLDG.GUI = {}
 
--- Import required global variables for compatibility
-local GLDG_Data, GLDG_DataChar, GLDG_guildFilterDropDownData, GLDG_rankFilterDropDownData
-local GLDG_GUI, GLDG_SortedList, GLDG_PlayerOffset, GLDG_NumSelRows
+-- Global variables are accessed via Metatables (compatibility layer)
+-- GLDG_Data, GLDG_DataChar, GLDG_GUI, GLDG_SortedList, etc.
 
 -------------------------------
 -- GUI System Initialization --
@@ -464,7 +463,6 @@ function GLDG.GUI:ShowPlayerButtons()
 	-- Officernote button
 	button = _G[frame.."OfficerNote"]
 	button:Show()
-	-- H.Sch. - ReglohPri- CanEditOfficerNote() is deprecated, changed to C_GuildInfo.CanEditOfficerNote()
 	if (p.guild and p.guild == GLDG_unique_GuildName and C_GuildInfo.CanEditOfficerNote()) then
 		button:Enable()
 	else
@@ -498,8 +496,6 @@ end
 -------------------------------
 
 function GLDG.GUI:CreatePasteListFrame()
--- H.Sch. - ReglohPri - changes for Patch 9.0.1 Shadowlands
---GLDG_PasteList.List = CreateFrame("Frame", nil, UIParent)
 GLDG_PasteList.List = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
 GLDG_PasteList.List:SetMovable(true)
 GLDG_PasteList.List:SetResizable(true)
@@ -555,7 +551,6 @@ GLDG_PasteList.List:SetFrameStrata("DIALOG")
 GLDG_PasteList.List:SetHeight(GLDG_Data.Frameopts[GLDG.Realm.." - "..GLDG.Player].Height)
 GLDG_PasteList.List:SetWidth(GLDG_Data.Frameopts[GLDG.Realm.." - "..GLDG.Player].Width)
 
--- H.Sch. - ReglohPri - changes for Patch 9.0.1 Shadowlands
 GLDG_PasteList.List.backdropInfo = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -563,7 +558,6 @@ GLDG_PasteList.List.backdropInfo = {
 	insets = { left = 9, right = 9, top = 9, bottom = 9 }
 }
 GLDG_PasteList.List:ApplyBackdrop()
--- H.Sch. End for Patch 9.0.1
 
 GLDG_PasteList.List:SetBackdropColor(0,0,0, 0.8)
 GLDG_PasteList.List:SetScript("OnShow", GLDG_PasteList.Show)
@@ -610,12 +604,10 @@ function GLDG.GUI:FriendsUpdate()
 	-- parse friends list
 	local cnt = 0
 	local complete = false
-	-- H.Sch. - ReglohPri - GetNumFriends() is deprecated changed to C_FriendList.GetNumFriends
 	local numTotal = C_FriendList.GetNumFriends()
 	local myFriends = nil
 	local name, level, class, loc, connected, status, note
 
-	-- H.Sch. - ReglohPri - GetFriendInfo(index) is deprecated changed to C_FriendList.GetFriendInfoByIndex(index)
 	for i = 1, numTotal do
 		--local name, level, class, loc, connected, status, note = GetFriendInfo(i);
 		myFriends = C_FriendList.GetFriendInfoByIndex(i)

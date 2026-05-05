@@ -43,9 +43,9 @@ function GLDG.Core:generateConfigString()
 	GLDG_CONFIG_STRING_A = string.format("%x",a+b+c+d+e+f+g+h+i+j+k+l+m+n+o+p+q+r+s+t+u+v+w+x+y+z+az)
 	GLDG_CONFIG_STRING_D = mod((tonumber("0x"..GLDG_CONFIG_STRING_A, 16)+1) * (tonumber("0x"..GLDG_CONFIG_STRING_B, 16)+1) * (tonumber("0x"..GLDG_CONFIG_STRING_C, 16)+1),33)
 	GLDG_CONFIG_STRING = "{GG:"..GLDG_CONFIG_STRING_A..":"..GLDG_CONFIG_STRING_B..":"..GLDG_CONFIG_STRING_C..":"..GLDG_CONFIG_STRING_D.."}"
-	if GLDG_unique_GuildName then
-		GLDG_Data[GLDG_unique_GuildName] = GLDG_Data.GuildSettings
-		GLDG_Data[GLDG_unique_GuildName].GLDG_CONFIG_STRING = GLDG_CONFIG_STRING
+	if GLDG.unique_GuildName then
+		GLDG_Data[GLDG.unique_GuildName] = GLDG_Data.GuildSettings
+		GLDG_Data[GLDG.unique_GuildName].GLDG_CONFIG_STRING = GLDG_CONFIG_STRING
 	end
 	if (GLDG_CONFIG_STRING ~= GLDG_config_from_guild) and IsGuildLeader() then
 		_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Enable()
@@ -70,15 +70,15 @@ end
 function GLDG.Core:ClickGuildAliasSet()
 	local name = GLDG_GUI.."SettingsGreeting"
 	GLDG_GuildAlias = _G[name.."GuildAliasEditbox"]:GetText()
-	GLDG_Data.GuildAlias[GLDG_unique_GuildName] = GLDG_GuildAlias
+	GLDG_Data.GuildAlias[GLDG.unique_GuildName] = GLDG_GuildAlias
 
 	_G[name.."GuildAliasEditbox"]:ClearFocus()
 end
 
 ------------------------------------------------------------
 function GLDG.Core:ClickGuildAliasClear()
-	GLDG_GuildAlias = GLDG_unique_GuildName
-	GLDG_Data.GuildAlias[GLDG_unique_GuildName] = GLDG_GuildAlias
+	GLDG_GuildAlias = GLDG.unique_GuildName
+	GLDG_Data.GuildAlias[GLDG.unique_GuildName] = GLDG_GuildAlias
 
 	local name = GLDG_GUI.."SettingsGreeting"
 	_G[name.."GuildAliasEditbox"]:SetText("")
@@ -123,7 +123,7 @@ end
 
 ------------------------------------------------------------
 function GLDG.Core:GreetGuild()
-	if (GLDG_unique_GuildName=="") then return end
+	if (GLDG.unique_GuildName=="") then return end
 
 	local list = GLDG_DataGreet.Guild
 	list = GLDG_FilterMessages(nil, list)
@@ -171,7 +171,7 @@ end
 ------------------------------------------------------------
 -- Goodbye greeting functions
 function GLDG.Core:ByeGuild()
-	if (GLDG_unique_GuildName=="") then return end
+	if (GLDG.unique_GuildName=="") then return end
 
 	local list = GLDG_DataGreet.ByeGuild
 	-- if time is between 20:00 and 06:00 use night mode
@@ -227,7 +227,7 @@ end
 
 ------------------------------------------------------------
 function GLDG.Core:LaterGuild()
-	if (GLDG_unique_GuildName=="") then return end
+	if (GLDG.unique_GuildName=="") then return end
 
 	local list = GLDG_DataGreet.LaterGuild
 	list = GLDG_FilterMessages(nil, list)

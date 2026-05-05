@@ -43,7 +43,11 @@ function PlayersGUI:CreateTabContent(container)
 	-- Players list and details
 	local contentGroup = AceGUI:Create("SimpleGroup")
 	contentGroup:SetFullWidth(true)
-	contentGroup:SetRelativeHeight(0.8)
+	if contentGroup.SetRelativeHeight then
+		contentGroup:SetRelativeHeight(0.8)
+	else
+		contentGroup:SetHeight(400)
+	end
 	contentGroup:SetLayout("Flow")
 	
 	-- Players list (left side)
@@ -76,6 +80,11 @@ function PlayersGUI:CreateTabContent(container)
 	
 	-- Load data
 	self:RefreshPlayersList()
+	
+	-- Auto-select first player if list not empty
+	if self.sortedPlayers and #self.sortedPlayers > 0 then
+		self:SelectPlayer(self.sortedPlayers[1].name)
+	end
 end
 
 --[[
@@ -372,11 +381,18 @@ function PlayersGUI:CreatePlayerEntry(playerData)
 		playerData.level, 
 		playerData.class)
 	
+	-- Add visual selection indicator
+	if self.selectedPlayer == playerData.name then
+		text = "> " .. text
+	end
+	
 	if playerData.ignored then
-		text = "|cFF808080" .. text .. "|r"
+		text = text .. " |cFF808080(ignored)|r"
 	elseif playerData.main then
-		text = "|cFFFFFF00" .. text .. " -> " .. playerData.main .. "|r"
-	elseif playerData.online then
+		text = text .. " |cFFFFFF00-> " .. playerData.main .. "|r"
+	end
+	
+	if playerData.online then
 		text = "|cFF00FF00" .. text .. "|r"
 	end
 	
@@ -394,6 +410,7 @@ end
 ]]
 function PlayersGUI:SelectPlayer(playerName)
 	self.selectedPlayer = playerName
+	self:RefreshPlayersList()
 	self:UpdatePlayerDetails()
 end
 
@@ -419,9 +436,11 @@ function PlayersGUI:UpdatePlayerDetails()
 	
 	-- Update labels
 	self.nameLabel:SetText(playerData.name)
-	self.nameLabel:SetColor(RAID_CLASS_COLORS[playerData.class] and RAID_CLASS_COLORS[playerData.class].r or 1,
-						   RAID_CLASS_COLORS[playerData.class] and RAID_CLASS_COLORS[playerData.class].g or 1,
-						   RAID_CLASS_COLORS[playerData.class] and RAID_CLASS_COLORS[playerData.class].b or 1)
+	if RAID_CLASS_COLORS[playerData.class] then
+		self.nameLabel:SetColor(RAID_CLASS_COLORS[playerData.class].r,
+								RAID_CLASS_COLORS[playerData.class].g,
+								RAID_CLASS_COLORS[playerData.class].b)
+	end
 	
 	self.levelLabel:SetText(string.format(L["Level %d %s"] or "Level %d %s", playerData.level, playerData.class))
 	self.rankLabel:SetText(string.format(L["Guild Rank: %s"] or "Guild Rank: %s", playerData.rank))

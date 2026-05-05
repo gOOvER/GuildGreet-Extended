@@ -121,7 +121,11 @@ function CleanupGUI:CreateTabContent(container)
 	local resultsGroup = AceGUI:Create("InlineGroup")
 	resultsGroup:SetTitle(L["Cleanup Results"] or "Cleanup Results")
 	resultsGroup:SetFullWidth(true)
-	resultsGroup:SetRelativeHeight(0.4)
+	if resultsGroup.SetRelativeHeight then
+		resultsGroup:SetRelativeHeight(0.4)
+	else
+		resultsGroup:SetHeight(200)
+	end
 	resultsGroup:SetLayout("Fill")
 	
 	local resultsFrame = AceGUI:Create("ScrollFrame")

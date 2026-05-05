@@ -10,13 +10,13 @@ local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 -- Initialize GUI system after addon is fully loaded
 function GLDG:InitializeGUI()
 	-- Ensure all GUI modules are loaded
-	if not self:GetModule("CoreGUI", true) then
-		self:Print("Error: CoreGUI module not loaded!")
+	if not self:GetModule("GUI", true) then
+		self:Print("Error: GUI module not loaded!")
 		return
 	end
 	
 	-- Initialize the core GUI module
-	local coreGUI = self:GetModule("CoreGUI")
+	local coreGUI = self:GetModule("GUI")
 	if coreGUI.Initialize then
 		coreGUI:Initialize()
 	end
@@ -45,6 +45,8 @@ function GLDG:InitializeGUI()
 			coreGUI:ShowMainWindow("Cleanup")
 		elseif msg == "colours" or msg == "colors" then
 			coreGUI:ShowMainWindow("Colour")
+		elseif msg == "profiles" then
+			coreGUI:ShowMainWindow("Profiles")
 		elseif msg == "help" then
 			self:ShowSlashHelp()
 		else
@@ -101,22 +103,22 @@ end
 
 -- Show main frame (legacy compatibility)
 function GLDG_MainFrame_Show()
-	if GLDG and GLDG:GetModule("CoreGUI", true) then
-		GLDG:GetModule("CoreGUI"):ShowMainWindow()
+	if GLDG and GLDG:GetModule("GUI", true) then
+		GLDG:GetModule("GUI"):ShowMainWindow()
 	end
 end
 
 -- Hide main frame (legacy compatibility)  
 function GLDG_MainFrame_Hide()
-	if GLDG and GLDG:GetModule("CoreGUI", true) then
-		GLDG:GetModule("CoreGUI"):HideMainWindow()
+	if GLDG and GLDG:GetModule("GUI", true) then
+		GLDG:GetModule("GUI"):CloseMainWindow()
 	end
 end
 
 -- Toggle main frame (legacy compatibility)
 function GLDG_MainFrame_Toggle()
-	if GLDG and GLDG:GetModule("CoreGUI", true) then
-		GLDG:GetModule("CoreGUI"):ToggleMainWindow()
+	if GLDG and GLDG:GetModule("GUI", true) then
+		GLDG:GetModule("GUI"):ToggleMainWindow()
 	end
 end
 
@@ -136,8 +138,8 @@ end
 
 -- Open settings (legacy compatibility)
 function GLDG_OpenSettings()
-	if GLDG and GLDG:GetModule("CoreGUI", true) then
-		GLDG:GetModule("CoreGUI"):ShowMainWindow("Settings")
+	if GLDG and GLDG:GetModule("GUI", true) then
+		GLDG:GetModule("GUI"):ShowMainWindow("Settings")
 	end
 end
 

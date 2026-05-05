@@ -51,7 +51,10 @@
         "RAID_CLASS_COLORS",
         "ColorPickerFrame",
         "Settings",
-        "AddonCompartmentFrame"
+        "AddonCompartmentFrame",
+        "GetUnitName",
+        "SetItemRef",
+        "ChatFrame_OpenChat"
     ],
     "Lua.diagnostics.disable": [
         "assign-type-mismatch"

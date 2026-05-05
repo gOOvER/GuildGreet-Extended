@@ -10,12 +10,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
 -- Player Management Library Namespace
 GLDG.PlayerManager = {}
 
--- Import required global variables for compatibility
-local GLDG_Data, GLDG_DataChar, GLDG_DataGreet
-local GLDG_unique_GuildName, GLDG_Player, GLDG_Realm, GLDG_GuildName, GLDG_GuildLeader
-local GLDG_Online, GLDG_Offline, GLDG_Queue
-local GLDG_SortedList, GLDG_NumMain, GLDG_NumAlts
-local GLDG_RosterImportRunning, GLDG_ReadNotes
+-- NOTE: AceDB-3.0 Migration - Global variables now accessed through compatibility layer
+-- GLDG_Data, GLDG_DataChar, GLDG_DataGreet are accessed via Metatables
+-- initialized in GuildGreet.lua InitializeCompatibilityLayer()
 
 -------------------------------
 -- Roster Import Functions --
@@ -26,7 +23,7 @@ function GLDG.PlayerManager:RosterImport()
 		return
 	end
 
-	GLDG_RosterImportRunning = 1
+	GLDG.RosterImportRunning = 1
 
 	-- Build new roster
 	local newRoster = {}
@@ -52,7 +49,7 @@ function GLDG.PlayerManager:RosterImport()
 				class = class or "WARRIOR",
 				classDisplayName = classDisplayName or L["Unknown"],
 				achievementPoints = achievementPoints or 0,
-				guild = GLDG_unique_GuildName,
+				guild = GLDG.unique_GuildName,
 				online = isOnline or false,
 				status = status or 0,
 				isMobile = isMobile or false
@@ -77,7 +74,7 @@ function GLDG.PlayerManager:RosterImport()
 	-- Update guild information
 	self:UpdateGuildInfo()
 
-	GLDG_RosterImportRunning = 0
+	GLDG.RosterImportRunning = 0
 	
 	GLDG:Print(GLDG.Database:GetColors().help..GLDG_NAME..":|r "..L["Roster import completed"])
 end
@@ -166,7 +163,7 @@ function GLDG.PlayerManager:UpdateCharacterData(newRoster)
 	
 	-- Mark characters no longer in guild
 	for playerName, playerData in pairs(GLDG_DataChar) do
-		if playerData.guild == GLDG_unique_GuildName and not newRoster[playerName] then
+		if playerData.guild == GLDG.unique_GuildName and not newRoster[playerName] then
 			GLDG_DataChar[playerName].guild = nil
 			GLDG_DataChar[playerName].rank = nil
 			GLDG_DataChar[playerName].rankname = nil
@@ -191,7 +188,7 @@ function GLDG.PlayerManager:ProcessMainAltRelationships()
 	GLDG_NumAlts = 0
 	
 	for playerName, playerData in pairs(GLDG_DataChar) do
-		if playerData.guild == GLDG_unique_GuildName then
+		if playerData.guild == GLDG.unique_GuildName then
 			if playerData.main then
 				GLDG_NumMain = GLDG_NumMain + 1
 			elseif playerData.alt then
@@ -210,7 +207,7 @@ function GLDG.PlayerManager:AutoAssignMainAlt()
 	-- and other heuristics
 	
 	for playerName, playerData in pairs(GLDG_DataChar) do
-		if playerData.guild == GLDG_unique_GuildName and not playerData.main and not playerData.alt then
+		if playerData.guild == GLDG.unique_GuildName and not playerData.main and not playerData.alt then
 			-- Look for naming patterns that suggest main/alt relationships
 			local baseName = self:GetBaseName(playerName)
 			
@@ -255,7 +252,7 @@ function GLDG.PlayerManager:FindPotentialMain(baseName, excludeName)
 	local bestScore = 0
 	
 	for playerName, playerData in pairs(GLDG_DataChar) do
-		if playerName ~= excludeName and playerData.guild == GLDG_unique_GuildName then
+		if playerName ~= excludeName and playerData.guild == GLDG.unique_GuildName then
 			local score = self:CalculateMainScore(baseName, playerName, playerData)
 			if score > bestScore then
 				bestScore = score
@@ -307,8 +304,8 @@ function GLDG.PlayerManager:UpdateGuildInfo()
 	if not IsInGuild() then return end
 	
 	-- Update guild name and leader
-	GLDG_GuildName = GetGuildInfo("player") or ""
-	GLDG_unique_GuildName = GLDG_GuildName
+	GLDG.GuildName = GetGuildInfo("player") or ""
+	GLDG.unique_GuildName = GLDG.GuildName
 	
 	-- Get guild leader
 	for i = 1, GetNumGuildMembers() do

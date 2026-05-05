@@ -1,5 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<!-- GuildGreet Libraries -->
+	<!-- GuildGreet Core Libraries -->
 	<Script file="GuildGreet-Utils.lua"/>
 	<Script file="GuildGreet-Database.lua"/>
 	<Script file="GuildGreet-Colors.lua"/>
@@ -14,4 +14,12 @@
 	<Script file="GuildGreet-HelpUtils.lua"/>
 	<Script file="GuildGreet-UIHelpers.lua"/>
 	<Script file="GuildGreet-CleanupUtils.lua"/>
+	
+	<!-- Ace Framework Extensions -->
+	<Script file="GuildGreet-ConfigCmd.lua"/>
+	<Script file="GuildGreet-Serializer.lua"/>
+	<Script file="GuildGreet-Hooks.lua"/>
+	<Script file="GuildGreet-Communication.lua"/>
+	<Script file="GuildGreet-Namespaces.lua"/>
+	<Script file="GuildGreet-Media.lua"/>
 </Ui>
