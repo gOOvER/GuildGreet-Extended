@@ -53,7 +53,7 @@ externals:
     libs/LibDBIcon-1.0:
         url: https://repos.wowace.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
     libs/LibSharedMedia-3.0:
-        url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3-0
+        url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
 
 manual-changelog: CHANGELOG.md
 license-output: LICENSE.md
