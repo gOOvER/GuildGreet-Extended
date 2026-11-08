@@ -12,7 +12,7 @@
   [![Wago.io](https://img.shields.io/badge/Wago.io-GuildGreet%20Extended-c1272d?logo=wagtail&logoColor=white)](https://addons.wago.io/addons/WL6JA9Nv)
   [![WoWInterface](https://img.shields.io/badge/WoWInterface-21709-0078d7)](https://www.wowinterface.com/downloads/info21709-GuildGreetExtended.html)
   [![WoW Versions](https://img.shields.io/badge/WoW-Retail%20%7C%20MoP%20%7C%20Cata%20%7C%20Wrath%20%7C%20TBC%20%7C%20Classic%20%7C%20Forever-f8b700?logo=battle.net&logoColor=white)](#-supported-wow-versions)
-  [![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-blue.svg)](LICENSE)
+  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
   [![Support](https://img.shields.io/badge/Support-donate.goover.dev-ff69b4?logo=ko-fi&logoColor=white)](https://donate.goover.dev)
 </div>
 
@@ -134,4 +134,5 @@ Supports **all World of Warcraft flavors** from a single unified codebase:
 - **TBC Update**: Mordikaiin & Rozak (v0.52b – v2.2)
 - **GuildGreet Extended**: Urbin, Dun-Morogh (EU)
 - **Complete Ace3 Rewrite & Modern Dark-Slate UI (v11.x – v13.x)**: **gOOvER** ([goover.dev](https://www.goover.dev))
+- **License**: [GNU General Public License v3.0 (GPL-3.0)](LICENSE)
 - **Support Development**: [donate.goover.dev](https://donate.goover.dev) • [Ko-fi](https://ko-fi.com/oldnoob) • [Buy Me a Coffee](https://www.buymeacoffee.com/goover)
