@@ -26,6 +26,9 @@ local function CollectStats()
     local channels = {}
     local friends = {}
 
+    if GLDG.SyncDatabaseReferences then
+        GLDG:SyncDatabaseReferences()
+    end
     if GLDG_DataChar then
         for _, p in pairs(GLDG_DataChar) do
             if type(p) == "table" then
@@ -52,6 +55,17 @@ local function CollectStats()
                 local hasChannels = p.channels and (GLDG_TableSize(p.channels) > 0)
                 if not p.guild and not p.main and not p.alt and not p.alias and not hasFriends and not hasChannels then
                     orphans = orphans + 1
+                end
+            end
+        end
+    end
+    if GLDG.db and GLDG.db.realm and type(GLDG.db.realm.guildPlayers) == "table" then
+        for gName, gTbl in pairs(GLDG.db.realm.guildPlayers) do
+            if type(gTbl) == "table" then
+                local cnt = 0
+                for _ in pairs(gTbl) do cnt = cnt + 1 end
+                if cnt > 0 then
+                    guilds[gName] = cnt
                 end
             end
         end
@@ -197,10 +211,16 @@ function GLDG:CreateCleanupTab(container)
     removeGuildBtn:SetRelativeWidth(0.35)
     removeGuildBtn:SetCallback("OnClick", function()
         if not selectedGuildToRemove then return end
+        if GLDG.db and GLDG.db.realm and type(GLDG.db.realm.guildPlayers) == "table" then
+            GLDG.db.realm.guildPlayers[selectedGuildToRemove] = nil
+        end
         GLDG_CleanupList = { selectedGuildToRemove }
         GLDG_CleanupMode = "guild"
         GLDG_CleanupExecute(selectedGuildToRemove)
         selectedGuildToRemove = nil
+        if GLDG.SyncDatabaseReferences then
+            GLDG:SyncDatabaseReferences()
+        end
         GLDG:RefreshConfigUI()
     end)
     refGroup:AddChild(removeGuildBtn)

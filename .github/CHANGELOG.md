@@ -31,6 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replaced text-based close button labels (`X`) with native crisp cross textures (`Interface\Buttons\UI-StopButton`) across the main window and floating greeting queue.
 
 ### Fixed
+- **Per-Guild Player Storage & Active Guild Isolation (`GuildGreet.lua`, `GUI/Players.lua`, `GUI/Core.lua`, `GUI/Cleanup.lua`, `core/GuildGreet-Messages.lua`, `core/GuildGreet-PlayerManager.lua`)**:
+  - Stored player roster data per guild (`self.db.realm.guildPlayers[guildName][playerName]`) with automatic migration from legacy flat `self.db.realm.players` tables.
+  - Scoped `GLDG_DataChar`, the `Players` (`Spieler`) tab, and sidebar statistics strictly to the current character's active guild (`GetCurrentGuildName()`), showing `0` players and a localized notice (`"Du bist aktuell in keiner Gilde."` / `"Keine Gilde"`) when logged in on a guildless character.
 - Fixed invisible `AceGUI-3.0` checkbox tick marks when **ElvUI** or **AddOnSkins** strips default button textures by rendering an explicit gold checkmark texture (`Interface\Buttons\UI-CheckBox-Check`).
 - Fixed legacy saved-variables migration order so fresh installs and upgrades from older GuildGreet versions initialize cleanly without `nil` errors.
 

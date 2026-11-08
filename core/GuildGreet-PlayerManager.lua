@@ -59,17 +59,26 @@ function GLDG.PlayerManager:NormalizeStoredPlayers()
 end
 
 function GLDG.PlayerManager:RosterImport(silent)
+	if GLDG.SyncDatabaseReferences then
+		GLDG:SyncDatabaseReferences()
+	end
 	self:NormalizeStoredPlayers()
 
 	if (not IsInGuild()) then
+		GLDG.GuildName = ""
+		GLDG.unique_GuildName = ""
+		GLDG_unique_GuildName = ""
 		return
 	end
 
 	GLDG.Realm = GLDG.Realm or (GetRealmName and GetRealmName()) or ""
 	GLDG.Player = GLDG.Player or (UnitName and UnitName("player")) or ""
-	GLDG.GuildName = GetGuildInfo("player") or GLDG.GuildName or ""
+	GLDG.GuildName = (GLDG.GetCurrentGuildName and GLDG:GetCurrentGuildName()) or GetGuildInfo("player") or GLDG.GuildName or ""
 	GLDG.unique_GuildName = GLDG.GuildName
 	GLDG_unique_GuildName = GLDG.GuildName
+	if GLDG.SyncDatabaseReferences then
+		GLDG:SyncDatabaseReferences()
+	end
 
 	GLDG.RosterImportRunning = 1
 

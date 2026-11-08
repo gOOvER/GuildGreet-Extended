@@ -17,7 +17,6 @@ local UIStyle = GLDG.UIStyle
 
 local searchFilter = ""
 local roleFilter = "all"
-local guildFilter = "__ALL__"
 local currentPage = 1
 local PAGE_SIZE = 25
 local selectedPlayer = nil
@@ -67,50 +66,37 @@ local function CleanGuildName(guildStr)
     return (string.gsub(guildStr, "^Guild:", ""))
 end
 
-local function GetAvailableGuildsMap()
-    local curGuild = CleanGuildName(GLDG.GuildName or (GetGuildInfo and GetGuildInfo("player")) or "")
-    local guilds = {
-        ["__ALL__"]     = L["No guild filter"] or "All Guilds",
-        ["__CURRENT__"] = (L["Guild"] or "Current Guild") .. " (" .. (curGuild ~= "" and curGuild or "None") .. ")",
-        ["__NOGUILD__"] = L["Guildless"] or "Guildless Characters",
-    }
-    if GLDG_DataChar then
-        for _, p in pairs(GLDG_DataChar) do
-            if p and p.guild and p.guild ~= "" then
-                local gClean = CleanGuildName(p.guild)
-                if gClean ~= "" then
-                    guilds[gClean] = gClean
-                end
-            end
-        end
+local function GetActiveGuildName()
+    if GLDG and GLDG.GetCurrentGuildName then
+        return GLDG:GetCurrentGuildName()
     end
-    return guilds
+    if IsInGuild and not IsInGuild() then
+        return ""
+    end
+    return CleanGuildName((GetGuildInfo and GetGuildInfo("player")) or GLDG.GuildName or "")
 end
 
 local function GetFilteredPlayers()
     local results = {}
-    if not GLDG_DataChar then return results end
+    if GLDG and GLDG.SyncDatabaseReferences then
+        GLDG:SyncDatabaseReferences()
+    end
+    local curGuild = GetActiveGuildName()
+    if curGuild == "" or not GLDG_DataChar then
+        return results
+    end
 
-    local curGuild = CleanGuildName(GLDG.GuildName or (GetGuildInfo and GetGuildInfo("player")) or GLDG_unique_GuildName or "")
     local q = string.lower(strtrim(searchFilter or ""))
     for name, p in pairs(GLDG_DataChar) do
         if type(p) == "table" then
             local pass = true
             local pGuild = CleanGuildName(p.guild)
-
-            if not GLDG_Data.GuildSettings.IncludeOwn and p.own then
+            if pGuild ~= "" and pGuild ~= curGuild then
                 pass = false
             end
 
-            -- Guild filter
-            if pass then
-                if guildFilter == "__CURRENT__" then
-                    pass = (pGuild ~= "" and pGuild == curGuild)
-                elseif guildFilter == "__NOGUILD__" then
-                    pass = (pGuild == "")
-                elseif guildFilter ~= "__ALL__" then
-                    pass = (pGuild == guildFilter)
-                end
+            if not GLDG_Data.GuildSettings.IncludeOwn and p.own then
+                pass = false
             end
 
             -- Role filter
@@ -160,6 +146,9 @@ local function GetFilteredPlayers()
 end
 
 function GLDG:CreatePlayersTab(container)
+    if self.SyncDatabaseReferences then
+        self:SyncDatabaseReferences()
+    end
     if self.PlayerManager and self.PlayerManager.RosterImport then
         self.PlayerManager:RosterImport(true)
     end
@@ -182,7 +171,7 @@ function GLDG:CreatePlayersTab(container)
     local searchBox = AceGUI:Create("EditBox")
     searchBox:SetLabel(L["Search Character / Alias / Main / Note"] or "Search Character / Alias / Main / Note")
     searchBox:SetText(searchFilter)
-    searchBox:SetRelativeWidth(0.33)
+    searchBox:SetRelativeWidth(0.55)
     searchBox:SetCallback("OnEnterPressed", function(_, _, text)
         searchFilter = text or ""
         currentPage = 1
@@ -201,25 +190,13 @@ function GLDG:CreatePlayersTab(container)
         ignored    = L["Ignored"] or "Ignored Characters",
     })
     roleDrop:SetValue(roleFilter)
-    roleDrop:SetRelativeWidth(0.33)
+    roleDrop:SetRelativeWidth(0.45)
     roleDrop:SetCallback("OnValueChanged", function(_, _, val)
         roleFilter = val or "all"
         currentPage = 1
         GLDG:RefreshConfigUI()
     end)
     filterGroup:AddChild(roleDrop)
-
-    local guildDrop = AceGUI:Create("Dropdown")
-    guildDrop:SetLabel(L["Guild"] or "Guild Filter")
-    guildDrop:SetList(GetAvailableGuildsMap())
-    guildDrop:SetValue(guildFilter)
-    guildDrop:SetRelativeWidth(0.32)
-    guildDrop:SetCallback("OnValueChanged", function(_, _, val)
-        guildFilter = val or "__ALL__"
-        currentPage = 1
-        GLDG:RefreshConfigUI()
-    end)
-    filterGroup:AddChild(guildDrop)
 
     local importRosterBtn = AceGUI:Create("Button")
     importRosterBtn:SetText(L["Refresh"] or "Rescan Guild Roster")
@@ -459,7 +436,11 @@ function GLDG:CreatePlayersTab(container)
     if totalPlayers == 0 then
         local empty = AceGUI:Create("Label")
         empty:SetFullWidth(true)
-        empty:SetText(UIStyle.Hex.textMuted .. (L["No characters match the current filters."] or "No characters match the current filters.") .. UIStyle.Hex.reset)
+        local activeG = GetActiveGuildName()
+        local emptyMsg = (activeG == "")
+            and (L["You are currently not in a guild."] or "You are currently not in a guild.")
+            or (L["No characters match the current filters."] or "No characters match the current filters.")
+        empty:SetText(UIStyle.Hex.textMuted .. emptyMsg .. UIStyle.Hex.reset)
         listGroup:AddChild(empty)
     else
         for i = startIdx, endIdx do

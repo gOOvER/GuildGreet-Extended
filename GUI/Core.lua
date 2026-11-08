@@ -77,9 +77,15 @@ local CATEGORIES = {
 local function UpdateSidebarStats()
     if not sidebarStatsText then return end
     UIStyle:ApplyFont(sidebarStatsText, -1)
+    if GLDG.SyncDatabaseReferences then
+        GLDG:SyncDatabaseReferences()
+    end
+    local curGuild = (GLDG.GetCurrentGuildName and GLDG:GetCurrentGuildName())
+        or ((not IsInGuild or IsInGuild()) and ((GLDG.GuildName and GLDG.GuildName ~= "") and GLDG.GuildName or GetGuildInfo("player")) or "")
+        or ""
     local playerCount = 0
     local mainCount = 0
-    if GLDG_DataChar then
+    if curGuild ~= "" and GLDG_DataChar then
         for _, p in pairs(GLDG_DataChar) do
             playerCount = playerCount + 1
             if p and p.main then
@@ -93,7 +99,7 @@ local function UpdateSidebarStats()
             queueCount = queueCount + 1
         end
     end
-    local guildLabel = (GLDG.GuildName and GLDG.GuildName ~= "") and GLDG.GuildName or (GetGuildInfo("player") or "No Guild")
+    local guildLabel = (curGuild ~= "") and curGuild or (L["No Guild"] or L["Guildless"] or "No Guild")
     sidebarStatsText:SetText(string.format(
         "%s%s:|r %s\n%s%s:|r %d (%d %s)\n%sQueue:|r %d",
         UIStyle.Hex.gold, L["Guild"] or "Guild", guildLabel,

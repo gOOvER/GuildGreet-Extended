@@ -894,7 +894,31 @@ function GLDG.Messages:OnEvent(mainObj, event, ...)
 		mainObj:RegisterEvent("BN_FRIEND_ACCOUNT_ONLINE", "OnEvent")
 		mainObj:RegisterEvent("BN_FRIEND_INFO_CHANGED", "OnEvent")
 
+	elseif (event == "PLAYER_GUILD_UPDATE") then
+		if GLDG.SyncDatabaseReferences then
+			GLDG:SyncDatabaseReferences()
+		end
+		if IsInGuild() then
+			GLDG_InitRoster()
+			if GLDG_RosterImportRunning == 0 then
+				GLDG_RosterImport()
+			end
+		else
+			GLDG.GuildName = ""
+			GLDG.unique_GuildName = ""
+			GLDG_unique_GuildName = ""
+			if GLDG_Online then
+				for k in pairs(GLDG_Online) do GLDG_Online[k] = nil end
+			end
+		end
+		if GLDG.RefreshConfigUI then
+			GLDG:RefreshConfigUI()
+		end
+
 	elseif (event == "GUILD_ROSTER_UPDATE") then
+		if GLDG.SyncDatabaseReferences then
+			GLDG:SyncDatabaseReferences()
+		end
 		if IsInGuild() then
 			if (GLDG.unique_GuildName and GLDG.Realm and GLDG.unique_GuildName~="") then
 				-- guild name known -> treat guild info safely without calling protected GetGuildInfoText()
@@ -931,7 +955,12 @@ function GLDG.Messages:OnEvent(mainObj, event, ...)
 				GLDG_InitRoster()
 			end
 		else
-			-- nothing to do if not in guild
+			GLDG.GuildName = ""
+			GLDG.unique_GuildName = ""
+			GLDG_unique_GuildName = ""
+			if GLDG.SyncDatabaseReferences then
+				GLDG:SyncDatabaseReferences()
+			end
 		end
 
 	elseif (event == "CHAT_MSG_GUILD_ACHIEVEMENT") then

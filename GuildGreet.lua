@@ -180,7 +180,9 @@ local defaults = {
 	
 	realm = {
 		-- Realm-spezifisch (alle Charaktere auf diesem Realm)
-		-- Spielerdaten (ersetzt GLDG_DataChar)
+		-- Spielerdaten pro Gilde gespeichert (guildPlayers[guildName][playerName])
+		guildPlayers = {},
+		-- Legacy-Spielerdaten (wird automatisch in guildPlayers[guildName] migriert)
 		players = {},
 		
 		-- Begrüßungsnachrichten (ersetzt GLDG_DataGreet)
@@ -465,6 +467,7 @@ function GLDG:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnEvent")
 	self:RegisterEvent("VARIABLES_LOADED", "OnEvent")
 	self:RegisterEvent("GUILD_ROSTER_UPDATE", "OnEvent")
+	self:RegisterEvent("PLAYER_GUILD_UPDATE", "OnEvent")
 	self:RegisterEvent("FRIENDLIST_UPDATE", "OnEvent")
 	self:RegisterEvent("CHAT_MSG_SYSTEM", "OnEvent")
 	self:RegisterEvent("CHAT_MSG_CHANNEL_JOIN", "OnEvent")
@@ -528,23 +531,50 @@ function GLDG:SetProfileData(key, value)
 	self.db.profile[key] = value
 end
 
--- Realm data access (server-specific)
+-- Realm data access (per-guild on current realm)
 function GLDG:GetPlayerData(playerName, key)
-	if not self.db.realm.players[playerName] then
-		self.db.realm.players[playerName] = {}
+	local tbl = GLDG_DataChar or self.db.realm.players
+	if not tbl[playerName] then
+		tbl[playerName] = {}
 	end
 	if key then
-		return self.db.realm.players[playerName][key]
+		return tbl[playerName][key]
 	else
-		return self.db.realm.players[playerName]
+		return tbl[playerName]
 	end
 end
 
 function GLDG:SetPlayerData(playerName, key, value)
-	if not self.db.realm.players[playerName] then
-		self.db.realm.players[playerName] = {}
+	local tbl = GLDG_DataChar or self.db.realm.players
+	if not tbl[playerName] then
+		tbl[playerName] = {}
 	end
-	self.db.realm.players[playerName][key] = value
+	tbl[playerName][key] = value
+end
+
+function GLDG:GetCurrentGuildName()
+	if IsInGuild and not IsInGuild() then
+		self.GuildName = ""
+		self.unique_GuildName = ""
+		GLDG_unique_GuildName = ""
+		return ""
+	end
+	local gName = (GetGuildInfo and GetGuildInfo("player")) or self.GuildName or ""
+	if self.FormatGuildDisplay then
+		gName = self:FormatGuildDisplay(gName)
+	else
+		gName = string.gsub(gName, "^Guild:", "")
+		gName = string.gsub(gName, "@.*$", "")
+	end
+	self.GuildName = gName
+	if gName == "" then
+		self.unique_GuildName = ""
+		GLDG_unique_GuildName = ""
+	elseif not self.unique_GuildName or self.unique_GuildName == "" then
+		self.unique_GuildName = gName
+		GLDG_unique_GuildName = gName
+	end
+	return gName
 end
 
 function GLDG:GetGreetings(category)
@@ -587,6 +617,7 @@ function GLDG:SyncDatabaseReferences()
 	self.db.profile.GreetGuild = self.db.profile.GreetGuild or {}
 	self.db.profile.GreetChannel = self.db.profile.GreetChannel or {}
 
+	self.db.realm.guildPlayers = self.db.realm.guildPlayers or {}
 	self.db.realm.players = self.db.realm.players or {}
 	self.db.realm.greetings = self.db.realm.greetings or {}
 	self.db.realm.PlayerChatFrame = self.db.realm.PlayerChatFrame or {}
@@ -608,9 +639,75 @@ function GLDG:SyncDatabaseReferences()
 	self.db.profile.GreetCollections = self.db.global.GreetCollections
 	self.db.profile.GuildAlias = self.db.global.GuildAlias
 
+	-- Migrate any flat self.db.realm.players entries into per-guild self.db.realm.guildPlayers[guildName]
+	local gp = self.db.realm.guildPlayers
+	if type(self.db.realm.players) == "table" then
+		local isSubTable = false
+		for _, gTbl in pairs(gp) do
+			if gTbl == self.db.realm.players then
+				isSubTable = true
+				break
+			end
+		end
+		if not isSubTable then
+			for playerName, pData in pairs(self.db.realm.players) do
+				if type(pData) == "table" then
+					local pGuild = (type(pData.guild) == "string" and pData.guild ~= "")
+						and (self.FormatGuildDisplay and self:FormatGuildDisplay(pData.guild) or pData.guild)
+						or nil
+					if pGuild and pGuild ~= "" then
+						pData.guild = pGuild
+						gp[pGuild] = gp[pGuild] or {}
+						if not gp[pGuild][playerName] then
+							gp[pGuild][playerName] = pData
+						end
+					end
+				end
+				self.db.realm.players[playerName] = nil
+			end
+		end
+	end
+
+	-- Normalize any legacy guild keys in self.db.realm.guildPlayers
+	if self.FormatGuildDisplay then
+		local keysToNormalize = {}
+		for gKey in pairs(gp) do
+			if type(gKey) == "string" then
+				local cleanKey = self:FormatGuildDisplay(gKey)
+				if cleanKey ~= "" and cleanKey ~= gKey then
+					table.insert(keysToNormalize, { old = gKey, clean = cleanKey })
+				end
+			end
+		end
+		for _, item in ipairs(keysToNormalize) do
+			gp[item.clean] = gp[item.clean] or {}
+			if type(gp[item.old]) == "table" then
+				for pName, pData in pairs(gp[item.old]) do
+					if type(pData) == "table" then
+						pData.guild = item.clean
+						gp[item.clean][pName] = gp[item.clean][pName] or pData
+					end
+				end
+			end
+			gp[item.old] = nil
+		end
+	end
+
+	-- Point GLDG_DataChar strictly to the current character's guild table (or an empty table when guildless)
+	local curGuild = self:GetCurrentGuildName()
+	if curGuild ~= "" then
+		gp[curGuild] = gp[curGuild] or {}
+		GLDG_DataChar = gp[curGuild]
+	else
+		self._emptyGuildlessDataChar = self._emptyGuildlessDataChar or {}
+		for k in pairs(self._emptyGuildlessDataChar) do
+			self._emptyGuildlessDataChar[k] = nil
+		end
+		GLDG_DataChar = self._emptyGuildlessDataChar
+	end
+
 	-- Direct table pointers (Lua 5.1 pairs() compatible!)
 	GLDG_Data = self.db.profile
-	GLDG_DataChar = self.db.realm.players
 	GLDG_DataGreet = self.db.realm.greetings
 	GLDG_BigBrother = self.db.global.BigBrother
 
