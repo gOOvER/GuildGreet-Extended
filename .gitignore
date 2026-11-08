@@ -27,6 +27,7 @@ Libs/
 
 # Changelog (do not include in AddOns folder / repo)
 CHANGELOG.md
+!.github/CHANGELOG.md
 
 # Temporary archives
 *.zip
