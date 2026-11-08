@@ -7,6 +7,32 @@
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
+local function Ambiguate(name)
+	if type(name) ~= "string" then return tostring(name or "") end
+	return string.match(name, "^([^%-]+)") or name
+end
+
+function GLDG:GetSafeGuildInfoText()
+	-- Never call GetGuildInfoText() directly because it is a protected C function in modern WoW / Forever clients
+	-- and triggers ADDON_ACTION_BLOCKED even inside pcall().
+	if _G.GuildInfoEditBox and _G.GuildInfoEditBox.GetText then
+		local txt = _G.GuildInfoEditBox:GetText()
+		if type(txt) == "string" and txt ~= "" then
+			return txt
+		end
+	end
+	if _G.CommunitiesFrame and _G.CommunitiesFrame.GuildDetailsFrame and _G.CommunitiesFrame.GuildDetailsFrame.Info then
+		local infoFrame = _G.CommunitiesFrame.GuildDetailsFrame.Info
+		if infoFrame.DetailsFrame and infoFrame.DetailsFrame.ScrollFrame and infoFrame.DetailsFrame.ScrollFrame.Child and infoFrame.DetailsFrame.ScrollFrame.Child.Description then
+			local txt = infoFrame.DetailsFrame.ScrollFrame.Child.Description:GetText()
+			if type(txt) == "string" and txt ~= "" then
+				return txt
+			end
+		end
+	end
+	return type(GLDG_ginfotxt) == "string" and GLDG_ginfotxt or ""
+end
+
 -- Database Library Namespace
 GLDG.Database = {}
 
@@ -241,7 +267,8 @@ end
 ------------------------------------
 
 function GLDG.Database:ReadConfigString()
-	local ginfotxt = GetGuildInfoText() or ""
+	local ginfotxt = GLDG:GetSafeGuildInfoText()
+	GLDG_ginfotxt = ginfotxt
 	local config_string = GLDG.db.global.CONFIG_STRING
 	
 	-- Enable/Disable Write Guild String button based on changes
@@ -278,7 +305,9 @@ function GLDG.Database:ReadConfigString()
 		end
 	else
 		GLDG_config_from_guild = "not found"
-		GLDG_InitRoster()
+		if not GLDG.unique_GuildName or GLDG.unique_GuildName == "" then
+			GLDG_InitRoster()
+		end
 	end
 	
 	-- Apply guild settings if using guild defaults
@@ -426,36 +455,39 @@ end
 ------------------------------------
 
 function GLDG.Database:WriteGuildString()
-	local ginfotxt = GetGuildInfoText()
+	local ginfotxt = GLDG:GetSafeGuildInfoText()
 	local config_string = GLDG.db.global.CONFIG_STRING
 
-	if not config_string then self:GenerateConfigString() end
+	if not config_string then self:GenerateConfigString(); config_string = GLDG.db.global.CONFIG_STRING end
 	local new_ginfotxt = nil
 
 	if GLDG_config_from_guild == nil then self:ReadConfigString() end
 
-	if ginfotxt == nil then ginfotxt = " " end
+	if ginfotxt == nil or ginfotxt == "" then ginfotxt = " " end
 
 	if GLDG_config_from_guild ~= nil and GLDG_config_from_guild =="not found" then
-		new_ginfotxt = ginfotxt.."\r"..config_string
+		new_ginfotxt = ginfotxt.."\r"..(config_string or "")
 	end
 
 	if GLDG_config_from_guild ~= nil and GLDG_config_from_guild =="corrupted" then
-		new_ginfotxt = string.gsub(ginfotxt, GLDG_corrupted_config_from_guild, config_string)
+		new_ginfotxt = string.gsub(ginfotxt, GLDG_corrupted_config_from_guild, config_string or "")
 	end
 
 	if (GLDG_config_from_guild ~= nil) and (GLDG_config_from_guild ~="not found") and (GLDG_config_from_guild ~="corrupted")then
-		new_ginfotxt = string.gsub(ginfotxt, GLDG_config_from_guild, config_string)
+		new_ginfotxt = string.gsub(ginfotxt, GLDG_config_from_guild, config_string or "")
 	end
 
 	if strlen(new_ginfotxt or "")<=499 then
 		GLDG_config_from_guild = config_string
 		GLDG_corrupted_config_from_guild = nil
-		SetGuildInfoText(new_ginfotxt or "")
+		GLDG_ginfotxt = new_ginfotxt or ""
+		if _G.GuildInfoEditBox and _G.GuildInfoEditBox.SetText then
+			_G.GuildInfoEditBox:SetText(new_ginfotxt or "")
+		end
 		if _G[GLDG_GUI.."SettingsGeneralWriteGuildString"] then
 			_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Disable()
 		end
-		GLDG.UIHelpers:Print(L["ChatMsg/Guild info written successfully!"])
+		GLDG.UIHelpers:Print((L["ChatMsg/Guild info written successfully!"] or "Guild config string generated:") .. " " .. tostring(config_string or ""))
 		new_ginfotxt = nil
 	else
 		local tolong = strlen(new_ginfotxt or "")-499
@@ -696,55 +728,13 @@ function GLDG.Database:RosterImportFull()
 		end
 	end
 	
-	local maxGuildMembers = GetGuildRosterInfo and GetNumGuildMembers() or 0
-	if maxGuildMembers <= 0 then maxGuildMembers = GetNumGuildMembers() or 0 end
+	-- Normalize guild name and delegate roster import to PlayerManager (updates GLDG_DataChar)
+	GLDG.GuildName = GetGuildInfo("player") or GLDG.GuildName or ""
+	GLDG.unique_GuildName = GLDG.GuildName
+	GLDG_unique_GuildName = GLDG.GuildName
 
-	-- Create GLDG_GuildUID
-	GLDG.unique_GuildName = "Guild:"..GLDG.GuildName.."-"..GLDG.Realm
-
-	if GLDG_debug then GLDG_SystemMsg("Importing "..maxGuildMembers.." players, please wait...") end
-	
-	-- Initialize data structures (via compatibility layer)
-	if not GLDG_Data[GLDG.unique_GuildName] then GLDG_Data[GLDG.unique_GuildName] = {} end
-	if not GLDG_Data["Realm:"..GLDG.Realm] then GLDG_Data["Realm:"..GLDG.Realm] = {} end
-
-	local GLDG_PlayerTable = GLDG_Data["Realm:"..GLDG.Realm]
-	local GLDG_GuildTable = GLDG_Data[GLDG.unique_GuildName]
-	
-	-- Import guild members
-	for i = 1, maxGuildMembers do
-		local fullName, rank, rankIndex, level, class, zone, note, officernote, online, status, classFileName = GetGuildRosterInfo(i)
-		if fullName then
-			local name, realm = string.split("-", fullName)
-			if not realm then realm = GLDG.Realm end
-			local uName = name.."-"..realm
-			
-			if not GLDG_GuildTable[uName] then GLDG_GuildTable[uName] = {} end
-			if not GLDG_PlayerTable[uName] then GLDG_PlayerTable[uName] = {} end
-
-			-- Update guild member data
-			GLDG_GuildTable[uName].class = classFileName
-			GLDG_GuildTable[uName].rank = rank
-			GLDG_GuildTable[uName].ranknr = rankIndex
-			GLDG_GuildTable[uName].level = level
-			GLDG_GuildTable[uName].zone = zone
-			GLDG_GuildTable[uName].note = note
-			GLDG_GuildTable[uName].pnote = officernote
-			GLDG_GuildTable[uName].online = online
-			GLDG_GuildTable[uName].status = status
-			GLDG_GuildTable[uName].lastguild = time()
-
-			-- Update player data
-			GLDG_PlayerTable[uName].class = classFileName
-			GLDG_PlayerTable[uName].level = level
-			GLDG_PlayerTable[uName].rank = rank
-			GLDG_PlayerTable[uName].ranknr = rankIndex
-			GLDG_PlayerTable[uName].zone = zone
-			GLDG_PlayerTable[uName].online = online
-			GLDG_PlayerTable[uName].status = status
-			GLDG_PlayerTable[uName].guildName = GLDG.GuildName
-			GLDG_PlayerTable[uName].lastupdate = time()
-		end
+	if GLDG.PlayerManager and GLDG.PlayerManager.RosterImport then
+		GLDG.PlayerManager:RosterImport(true)
 	end
 
 	-- Auto-greet functionality
@@ -754,7 +744,6 @@ function GLDG.Database:RosterImportFull()
 			GLDG_autoGreeted = 1
 		end
 	end
-	-- Note: GLDG_RosterImportRunning is now managed by PlayerManager Library
 end
 
 function GLDG_RosterImportFull()

@@ -114,7 +114,7 @@ function GLDG:CreateGreetingsTab(container)
     catDropdown:SetLabel(L["Greeting Category"] or "Greeting Category")
     catDropdown:SetList(CATEGORY_LABELS, CATEGORY_ORDER)
     catDropdown:SetValue(selectedCategory)
-    catDropdown:SetRelativeWidth(0.50)
+    catDropdown:SetRelativeWidth(0.49)
     catDropdown:SetCallback("OnValueChanged", function(_, _, val)
         selectedCategory = val
         selectedMsgIndex = nil
@@ -133,7 +133,7 @@ function GLDG:CreateGreetingsTab(container)
     colDropdown:SetLabel(L["Available custom collections"] or "Target Collection")
     colDropdown:SetList(colList)
     colDropdown:SetValue(selectedCollection or "")
-    colDropdown:SetRelativeWidth(0.50)
+    colDropdown:SetRelativeWidth(0.49)
     colDropdown:SetCallback("OnValueChanged", function(_, _, val)
         selectedCollection = val or ""
         selectedMsgIndex = nil
@@ -143,7 +143,7 @@ function GLDG:CreateGreetingsTab(container)
 
     local newColEdit = AceGUI:Create("EditBox")
     newColEdit:SetLabel(L["Create new collection"] or "Create New Collection Name")
-    newColEdit:SetRelativeWidth(0.45)
+    newColEdit:SetRelativeWidth(0.44)
     newColEdit:SetCallback("OnEnterPressed", function(widget, _, text)
         text = strtrim(text or "")
         if text == "" then return end
@@ -164,7 +164,7 @@ function GLDG:CreateGreetingsTab(container)
     if selectedCollection ~= "" then
         local assignGuildBtn = AceGUI:Create("Button")
         assignGuildBtn:SetText(L["Set guild"] or "Use for Current Guild")
-        assignGuildBtn:SetRelativeWidth(0.28)
+        assignGuildBtn:SetRelativeWidth(0.27)
         assignGuildBtn:SetCallback("OnClick", function()
             if GLDG_unique_GuildName and GLDG_unique_GuildName ~= "" then
                 GLDG_Data.Custom = GLDG_Data.Custom or {}
@@ -193,7 +193,7 @@ function GLDG:CreateGreetingsTab(container)
     -- 2. Add / Edit Template Group
     --------------------------------------------------------
     local editGroup = AceGUI:Create("InlineGroup")
-    local currentDesc = L["Editbox/" .. selectedCategory] or CATEGORY_LABELS[selectedCategory] or selectedCategory
+    local currentDesc = CATEGORY_LABELS[selectedCategory] or selectedCategory
     editGroup:SetTitle((L["Add New Message"] or "Add or Edit Template") .. " — " .. currentDesc)
     editGroup:SetFullWidth(true)
     editGroup:SetLayout("Flow")
@@ -205,7 +205,7 @@ function GLDG:CreateGreetingsTab(container)
     local msgEdit = AceGUI:Create("EditBox")
     msgEdit:SetLabel(selectedMsgIndex and ((L["EditSelected"] or "Editing Message") .. " #" .. selectedMsgIndex) or (L["Add New Message"] or "New Greeting Message (Press Enter to Save)"))
     msgEdit:SetText(currentEditValue)
-    msgEdit:SetRelativeWidth(0.65)
+    msgEdit:SetRelativeWidth(0.50)
     msgEdit:SetCallback("OnEnterPressed", function(widget, _, text)
         text = strtrim(text or "")
         if text == "" then return end
@@ -223,7 +223,7 @@ function GLDG:CreateGreetingsTab(container)
 
     local saveBtn = AceGUI:Create("Button")
     saveBtn:SetText(selectedMsgIndex and (L["update"] or "Update") or (L["add"] or "Add Message"))
-    saveBtn:SetRelativeWidth(0.18)
+    saveBtn:SetRelativeWidth(0.20)
     saveBtn:SetCallback("OnClick", function()
         local text = strtrim(msgEdit:GetText() or "")
         if text == "" then return end
@@ -240,7 +240,7 @@ function GLDG:CreateGreetingsTab(container)
 
     local clearSelBtn = AceGUI:Create("Button")
     clearSelBtn:SetText(selectedMsgIndex and (L["Remove selection"] or "Cancel Edit") or (L["Restore default"] or "Restore Defaults"))
-    clearSelBtn:SetRelativeWidth(0.17)
+    clearSelBtn:SetRelativeWidth(0.28)
     clearSelBtn:SetCallback("OnClick", function()
         if selectedMsgIndex then
             selectedMsgIndex = nil
@@ -280,7 +280,7 @@ function GLDG:CreateGreetingsTab(container)
 
             local lbl = AceGUI:Create("InteractiveLabel")
             lbl:SetText(string.format("%s#%d:|r %s%s|r", UIStyle.Hex.goldDim, idx, prefixColor, msgText))
-            lbl:SetRelativeWidth(0.66)
+            lbl:SetRelativeWidth(0.62)
             lbl:SetCallback("OnClick", function()
                 if selectedMsgIndex == idx then
                     selectedMsgIndex = nil
@@ -293,7 +293,7 @@ function GLDG:CreateGreetingsTab(container)
 
             local testBtn = AceGUI:Create("Button")
             testBtn:SetText(L["Test"] or "Preview")
-            testBtn:SetRelativeWidth(0.17)
+            testBtn:SetRelativeWidth(0.18)
             testBtn:SetCallback("OnClick", function()
                 local player = (GLDG.Player or UnitName("player") or "Player")
                 local fullPlayer = player .. "-" .. string.gsub(GLDG.Realm or GetRealmName() or "Realm", " ", "")
@@ -305,7 +305,7 @@ function GLDG:CreateGreetingsTab(container)
 
             local delBtn = AceGUI:Create("Button")
             delBtn:SetText(L["remove"] or "Delete")
-            delBtn:SetRelativeWidth(0.17)
+            delBtn:SetRelativeWidth(0.18)
             delBtn:SetCallback("OnClick", function()
                 table.remove(list, idx)
                 if selectedMsgIndex == idx then
@@ -332,18 +332,23 @@ function GLDG:CreateGreetingsTab(container)
     local helpLabel = AceGUI:Create("Label")
     helpLabel:SetFullWidth(true)
     helpLabel:SetText(
-        UIStyle.Hex.gold .. "%s / %n|r = Selected greet name (Char, Main, or Alias)    " ..
-        UIStyle.Hex.gold .. "%c|r = Character name    " ..
-        UIStyle.Hex.gold .. "%m|r = Main name\n" ..
-        UIStyle.Hex.gold .. "%a|r = Character alias    " ..
-        UIStyle.Hex.gold .. "%A|r = Main's alias    " ..
-        UIStyle.Hex.gold .. "%l|r = Level    " ..
-        UIStyle.Hex.gold .. "%L|r = Levels left to cap\n" ..
-        UIStyle.Hex.gold .. "%C|r = Character class    " ..
-        UIStyle.Hex.gold .. "%r|r = Guild rank    " ..
-        UIStyle.Hex.gold .. "%v|r = Achievement link    " ..
-        UIStyle.Hex.gold .. "%g / %G|r = Guild alias / Guild name\n" ..
-        UIStyle.Hex.cyan .. "Filters:|r Prefix message with " .. UIStyle.Hex.gold .. "{min:max}|r for level range (NewLevel) or " .. UIStyle.Hex.gold .. "{HH:MM:HH:MM}|r for time of day."
+        UIStyle.Hex.gold .. "%s / %n|r = " .. (L["Selected greet name (Char, Main, or Alias)"] or "Selected greet name (Char, Main, or Alias)") .. "    " ..
+        UIStyle.Hex.gold .. "%c|r = " .. (L["Character name"] or "Character name") .. "    " ..
+        UIStyle.Hex.gold .. "%m|r = " .. (L["Main name"] or "Main name") .. "\n" ..
+        UIStyle.Hex.gold .. "%a|r = " .. (L["Character alias"] or "Character alias") .. "    " ..
+        UIStyle.Hex.gold .. "%A|r = " .. (L["Main's alias"] or "Main's alias") .. "    " ..
+        UIStyle.Hex.gold .. "%l|r = " .. (L["Level"] or "Level") .. "    " ..
+        UIStyle.Hex.gold .. "%L|r = " .. (L["Levels left to cap"] or "Levels left to cap") .. "\n" ..
+        UIStyle.Hex.gold .. "%C|r = " .. (L["Character class"] or "Character class") .. "    " ..
+        UIStyle.Hex.gold .. "%r|r = " .. (L["Guild rank"] or "Guild rank") .. "    " ..
+        UIStyle.Hex.gold .. "%v|r = " .. (L["Achievement link"] or "Achievement link") .. "    " ..
+        UIStyle.Hex.gold .. "%g / %G|r = " .. (L["Guild alias / Guild name"] or "Guild alias / Guild name") .. "\n" ..
+        UIStyle.Hex.cyan .. (L["Filters:"] or "Filters:") .. "|r " ..
+        string.format(
+            L["Prefix message with %s for level range (NewLevel) or %s for time of day."] or "Prefix message with %s for level range (NewLevel) or %s for time of day.",
+            UIStyle.Hex.gold .. "{min:max}|r",
+            UIStyle.Hex.gold .. "{HH:MM:HH:MM}|r"
+        )
     )
     helpGroup:AddChild(helpLabel)
 end

@@ -7,6 +7,11 @@
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
+local function Ambiguate(name)
+	if type(name) ~= "string" then return tostring(name or "") end
+	return string.match(name, "^([^%-]+)") or name
+end
+
 -- Player Management Library Namespace
 GLDG.PlayerManager = {}
 
@@ -18,50 +23,121 @@ GLDG.PlayerManager = {}
 -- Roster Import Functions --
 -------------------------------
 
-function GLDG.PlayerManager:RosterImport()
+function GLDG:FormatGuildDisplay(guildStr)
+	if type(guildStr) ~= "string" or guildStr == "" then return "" end
+	local clean = string.gsub(guildStr, "^Guild:", "")
+	clean = string.gsub(clean, "@.*$", "")
+	local realm = self.Realm or (GetRealmName and GetRealmName()) or ""
+	if realm ~= "" then
+		local escapedRealm = string.gsub(realm, "([%%%^%$%(%)%.%[%]%*%+%-%?])", "%%%1")
+		clean = string.gsub(clean, "%-" .. escapedRealm .. "$", "")
+		local compactRealm = string.gsub(realm, " ", "")
+		local escapedCompact = string.gsub(compactRealm, "([%%%^%$%(%)%.%[%]%*%+%-%?])", "%%%1")
+		clean = string.gsub(clean, "%-" .. escapedCompact .. "$", "")
+	end
+	return clean
+end
+
+function GLDG.PlayerManager:NormalizeStoredPlayers()
+	if not GLDG_DataChar then return end
+	local localizedMale = LOCALIZED_CLASS_NAMES_MALE or {}
+	local localizedFemale = LOCALIZED_CLASS_NAMES_FEMALE or {}
+	for _, p in pairs(GLDG_DataChar) do
+		if type(p) == "table" then
+			if type(p.guild) == "string" and p.guild ~= "" then
+				p.guild = GLDG:FormatGuildDisplay(p.guild)
+			end
+			if not p.enClass and type(p.class) == "string" then
+				local upper = string.upper(p.class)
+				if RAID_CLASS_COLORS and RAID_CLASS_COLORS[upper] then
+					p.enClass = upper
+					p.class = p.classDisplayName or localizedMale[upper] or localizedFemale[upper] or p.class
+				end
+			end
+		end
+	end
+end
+
+function GLDG.PlayerManager:RosterImport(silent)
+	self:NormalizeStoredPlayers()
+
 	if (not IsInGuild()) then
 		return
 	end
+
+	GLDG.Realm = GLDG.Realm or (GetRealmName and GetRealmName()) or ""
+	GLDG.Player = GLDG.Player or (UnitName and UnitName("player")) or ""
+	GLDG.GuildName = GetGuildInfo("player") or GLDG.GuildName or ""
+	GLDG.unique_GuildName = GLDG.GuildName
+	GLDG_unique_GuildName = GLDG.GuildName
 
 	GLDG.RosterImportRunning = 1
 
 	-- Build new roster
 	local newRoster = {}
-	local numTotal = GetNumGuildMembers()
-	
+	local numTotal = GetNumGuildMembers() or 0
+	if numTotal <= 0 then
+		if C_GuildInfo and C_GuildInfo.GuildRoster then
+			C_GuildInfo.GuildRoster()
+		elseif GuildRoster then
+			GuildRoster()
+		end
+		GLDG.RosterImportRunning = 0
+		return
+	end
+
+	local cleanRealm = string.gsub(GLDG.Realm or "", " ", "")
+	local localizedMale = LOCALIZED_CLASS_NAMES_MALE or {}
+	GLDG_Online = GLDG_Online or {}
+
 	for index = 1, numTotal do
 		local name, rank, rankIndex, level, classDisplayName, zone, publicNote, officerNote, isOnline, status, class, achievementPoints, achievementRank, isMobile = GetGuildRosterInfo(index)
 		
 		if (name) then
 			local shortName, realm = string.split("-", name)
-			if not realm then 
-				name = shortName.."-"..string.gsub(GLDG.Realm, " ", "") 
+			if not realm or realm == "" then
+				name = shortName .. "-" .. cleanRealm
+			else
+				name = shortName .. "-" .. string.gsub(realm, " ", "")
 			end
+
+			local enClass = class or "WARRIOR"
+			local dispClass = (classDisplayName and classDisplayName ~= "") and classDisplayName or localizedMale[enClass] or enClass
 
 			-- Store player information
 			newRoster[name] = {
-				lvl = level or 1,
+				lvl = (level and level > 0) and level or nil,
 				rank = rankIndex or 10,
-				rankname = rank or L["Guild Member"],
-				zone = zone or L["Unknown"],
+				rankname = (rank and rank ~= "") and rank or (L["Guild Member"] or "Guild Member"),
+				zone = (zone and zone ~= "") and zone or (L["Unknown"] or "Unknown"),
 				pNote = publicNote or "",
 				oNote = officerNote or "",
-				class = class or "WARRIOR",
-				classDisplayName = classDisplayName or L["Unknown"],
+				enClass = enClass,
+				class = dispClass,
+				classDisplayName = dispClass,
 				achievementPoints = achievementPoints or 0,
-				guild = GLDG.unique_GuildName,
-				online = isOnline or false,
+				guild = GLDG.GuildName,
+				online = isOnline and true or false,
 				status = status or 0,
 				isMobile = isMobile or false
 			}
 
+			if isOnline then
+				GLDG_Online[name] = GLDG_Online[name] or GetTime()
+			else
+				GLDG_Online[name] = nil
+			end
+
 			-- Mark own character
-			if (name == GLDG.Player.."-"..string.gsub(GLDG.Realm, " ", "")) then
+			if (name == GLDG.Player .. "-" .. cleanRealm) then
 				newRoster[name].own = true
 			end
 
-			-- Process notes for main/alt relationships
-			self:ProcessPlayerNotes(name, newRoster[name])
+			-- Process notes for main/alt relationships if enabled or requested
+			local gs = GLDG_Data and GLDG_Data.GuildSettings
+			if (gs and (gs.AutoAssign or gs.AutoAssignEgp or gs.AutoAssignAlias)) or GLDG_ReadNotes == 1 then
+				self:ProcessPlayerNotes(name, newRoster[name])
+			end
 		end
 	end
 
@@ -74,9 +150,12 @@ function GLDG.PlayerManager:RosterImport()
 	-- Update guild information
 	self:UpdateGuildInfo()
 
+	GLDG_ReadNotes = nil
 	GLDG.RosterImportRunning = 0
 	
-	GLDG:PrintHelp(L["Roster import completed"])
+	if not silent then
+		GLDG:PrintHelp(L["Roster import completed"])
+	end
 end
 
 -------------------------------
@@ -137,6 +216,7 @@ function GLDG.PlayerManager:UpdateCharacterData(newRoster)
 		GLDG_DataChar[playerName].zone = playerData.zone
 		GLDG_DataChar[playerName].pNote = playerData.pNote
 		GLDG_DataChar[playerName].oNote = playerData.oNote
+		GLDG_DataChar[playerName].enClass = playerData.enClass
 		GLDG_DataChar[playerName].class = playerData.class
 		GLDG_DataChar[playerName].classDisplayName = playerData.classDisplayName
 		GLDG_DataChar[playerName].achievementPoints = playerData.achievementPoints

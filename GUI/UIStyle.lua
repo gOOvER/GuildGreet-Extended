@@ -85,6 +85,9 @@ end
 
 function UIStyle:ApplyBox(frame, bgColor, borderColor)
     if not frame or not frame.SetBackdrop then return end
+    frame.callbackBackdropColor = nil
+    if frame.iborder and frame.iborder.Hide then frame.iborder:Hide() end
+    if frame.oborder and frame.oborder.Hide then frame.oborder:Hide() end
     frame:SetBackdrop(self.FlatBackdrop)
     local bg = bgColor or self.Colors.bgPanel
     local br = borderColor or self.Colors.border
@@ -159,10 +162,35 @@ function UIStyle:StyleAceWidget(widget)
     local wtype = widget.type
     local fontSize = self:GetFontSize()
 
-    if wtype == "InlineGroup" or wtype == "TabGroup" then
+    -- Guard against IEEE-754 floating-point sums (e.g. 0.65 + 0.18 + 0.17 > 1.0) wrapping rows in AceGUI Flow layout
+    if widget.width == "relative" and type(widget.relWidth) == "number" and widget.relWidth > 0.01 then
+        if not widget._ggOrigRelWidth or math.abs(widget.relWidth - widget._ggAdjustedRelWidth) > 0.001 then
+            widget._ggOrigRelWidth = widget.relWidth
+            widget._ggAdjustedRelWidth = math.floor(widget.relWidth * 10000 - 2) / 10000
+            widget.relWidth = widget._ggAdjustedRelWidth
+        end
+    end
+
+    if wtype == "ScrollFrame" then
+        if not widget._ggWidthHooked and widget.OnWidthSet then
+            widget._ggWidthHooked = true
+            hooksecurefunc(widget, "OnWidthSet", function(selfWidget)
+                if selfWidget.DoLayout then
+                    pcall(function() selfWidget:DoLayout() end)
+                end
+            end)
+        end
+    elseif wtype == "InlineGroup" or wtype == "TabGroup" then
         local border = widget.border or widget.content and widget.content:GetParent()
-        if border and border.SetBackdrop then
-            self:ApplyBox(border, self.Colors.bgPanel, self.Colors.borderSubtle)
+        if border then
+            if wtype == "InlineGroup" then
+                border:ClearAllPoints()
+                border:SetPoint("TOPLEFT", 0, -17)
+                border:SetPoint("BOTTOMRIGHT", 0, 3)
+            end
+            if border.SetBackdrop then
+                self:ApplyBox(border, self.Colors.bgPanel, self.Colors.borderSubtle)
+            end
         end
         if widget.titletext then
             self:ApplyFont(widget.titletext, 1)
@@ -199,6 +227,10 @@ function UIStyle:StyleAceWidget(widget)
             if r and r > 0.95 and g and g > 0.95 and b and b > 0.95 then
                 widget.label:SetTextColor(unpack(self.Colors.textLight))
             end
+            if widget.OnWidthSet then
+                local w = (widget.frame and (widget.frame.width or widget.frame:GetWidth())) or 200
+                pcall(widget.OnWidthSet, widget, w)
+            end
         end
     elseif wtype == "CheckBox" then
         if widget.frame and widget.checkbg then
@@ -222,7 +254,10 @@ function UIStyle:StyleAceWidget(widget)
                     local ic = w.frame._ggCheckIcon
                     if w.check then w.check:SetAlpha(0) end
                     if w.checkbg then w.checkbg:SetAlpha(0) end
-                    if w.checkbg and w.checkbg.backdrop then w.checkbg.backdrop:SetAlpha(0) end
+                    if w.checkbg and w.checkbg.backdrop then
+                        w.checkbg.backdrop:SetAlpha(0)
+                        if w.checkbg.backdrop.Hide then w.checkbg.backdrop:Hide() end
+                    end
                     if w.checked then
                         ic:Show()
                         UIStyle:ApplyBox(b, { 0.13, 0.23, 0.19, 1 }, UIStyle.Colors.borderHighlight)
@@ -256,11 +291,19 @@ function UIStyle:StyleAceWidget(widget)
         end
         if widget.frame and widget.text then
             local h = math.max(26, (widget.text:GetStringHeight() or fontSize) + 10)
-            widget.frame:SetHeight(h)
+            if widget.SetHeight then
+                widget:SetHeight(h)
+            else
+                widget.frame:SetHeight(h)
+                widget.frame.height = h
+            end
         end
     elseif wtype == "Button" then
         local frame = widget.frame
         if frame then
+            if frame.backdrop and frame.backdrop.Hide then
+                frame.backdrop:Hide()
+            end
             if not frame._ggStyled then
                 frame._ggStyled = true
                 if frame.Left then frame.Left:SetAlpha(0) end
@@ -289,16 +332,21 @@ function UIStyle:StyleAceWidget(widget)
                 end
             end
             if widget.text then
+                widget.text:ClearAllPoints()
+                widget.text:SetPoint("TOPLEFT", 6, -1)
+                widget.text:SetPoint("BOTTOMRIGHT", -6, 1)
+                widget.text:SetJustifyH("CENTER")
+                widget.text:SetJustifyV("MIDDLE")
                 self:ApplyFont(widget.text, 0)
                 widget.text:SetTextColor(unpack(self.Colors.textLight))
                 widget.text:SetWordWrap(false)
             end
-            frame:SetHeight(math.max(28, fontSize + 15))
-            if widget.text and widget.width ~= "fill" then
-                local neededW = math.ceil((widget.text:GetStringWidth() or 0) + 28)
-                if frame:GetWidth() < neededW then
-                    frame:SetWidth(neededW)
-                end
+            local btnHeight = math.max(26, fontSize + 13)
+            if widget.SetHeight then
+                widget:SetHeight(btnHeight)
+            else
+                frame:SetHeight(btnHeight)
+                frame.height = btnHeight
             end
         end
     elseif wtype == "EditBox" then
@@ -327,6 +375,7 @@ function UIStyle:StyleAceWidget(widget)
         end
         if widget.text then
             self:ApplyFont(widget.text, 0)
+            if widget.text.SetJustifyH then widget.text:SetJustifyH("LEFT") end
         end
     elseif wtype == "Slider" then
         if widget.label then
@@ -339,15 +388,36 @@ function UIStyle:StyleAceWidget(widget)
     end
 end
 
-function UIStyle:StyleAceWidgetsRecursive(widget)
+local function StyleAceTreeOnly(self, widget)
     if not widget then return end
     self:StyleAceWidget(widget)
     if widget.children then
         for i = 1, #widget.children do
-            self:StyleAceWidgetsRecursive(widget.children[i])
+            StyleAceTreeOnly(self, widget.children[i])
+        end
+    end
+end
+
+local function LayoutAceTreeTopDown(widget)
+    if not widget then return end
+    if widget.DoLayout then
+        pcall(function() widget:DoLayout() end)
+    end
+    if widget.children then
+        for i = 1, #widget.children do
+            LayoutAceTreeTopDown(widget.children[i])
         end
     end
     if widget.DoLayout then
         pcall(function() widget:DoLayout() end)
     end
+    if widget.FixScroll then
+        pcall(function() widget:FixScroll() end)
+    end
+end
+
+function UIStyle:StyleAceWidgetsRecursive(widget)
+    if not widget then return end
+    StyleAceTreeOnly(self, widget)
+    LayoutAceTreeTopDown(widget)
 end

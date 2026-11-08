@@ -1,330 +1,123 @@
-# GuildGreet Extended - Advanced WoW Guild Management Tool
+# GuildGreet Extended
 
-[![GitHub Actions CI](https://github.com/gOOvER/GuildGreet-Extended/actions/workflows/test.yml/badge.svg)](https://github.com/gOOvER/GuildGreet-Extended/actions)
-[![Code Quality](https://github.com/gOOvER/GuildGreet-Extended/actions/workflows/quality.yml/badge.svg)](https://github.com/gOOvER/GuildGreet-Extended/actions)
+[![Code Quality](https://github.com/gOOvER/GuildGreet-Extended/actions/workflows/quality.yml/badge.svg)](https://github.com/gOOvER/GuildGreet-Extended/actions/workflows/quality.yml)
+[![Release](https://github.com/gOOvER/GuildGreet-Extended/actions/workflows/release.yml/badge.svg)](https://github.com/gOOvER/GuildGreet-Extended/actions/workflows/release.yml)
+[![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-blue.svg)](LICENSE)
 
-A comprehensive World of Warcraft addon for advanced guild greeting and social management with a completely modularized architecture.
+**GuildGreet Extended** is a comprehensive World of Warcraft social guild, friends, and channel greeting assistant with full **Main / Alt (Twink) & Alias management**, customizable greeting collections, an interactive floating greeting queue, and a modern **Dark-Slate & Gold UI** with live font scaling (`10pt – 18pt`).
 
-## ✨ **2025 Major Update - Complete Modularization**
-
-**🎯 Achievement: 70.09% Size Reduction** (7,754 → 2,319 lines in main file)
-
-This addon has been completely redesigned with a **modern modular architecture**:
-- **15 specialized library modules** for focused functionality
-- **Professional CI/CD pipeline** with automated testing
-- **Comprehensive documentation** for developers
-- **Backwards compatibility** maintained for all existing features
-
-### 🏗️ **New Modular Architecture**
-
-The addon now consists of focused, maintainable modules:
-- `GuildGreet-Utils.lua` - Core utility functions
-- `GuildGreet-Database.lua` - Data management and persistence
-- `GuildGreet-PlayerManager.lua` - Player tracking and roster operations
-- `GuildGreet-Messages.lua` - Chat automation and greeting logic
-- `GuildGreet-GUI.lua` - User interface components
-- And 10 more specialized modules...
-
-See `MODULARIZATION_REPORT.md` for complete technical details.
-
-## 🚀 **Features**
-
-- **Automated Guild Greetings** - Welcome new members automatically
-- **Player Tracking** - Monitor guild member activity and status  
-- **Custom Messages** - Personalized greeting and farewell messages
-- **Multi-Language Support** - Localized for multiple regions
-- **Advanced Configuration** - Extensive customization options
-- **Clean Architecture** - Modern, maintainable codebase
-
-## 📦 **Installation**
-
-1. Download from [CurseForge](https://www.curseforge.com/wow/addons/guildgreet-extended) or [WoWInterface](https://www.wowinterface.com/downloads/info21709.html)
-2. Extract to `World of Warcraft/_retail_/Interface/AddOns/`
-3. Enable in-game via the AddOns menu
-
-## ⚙️ **Configuration**
-
-Access the configuration through:
-- `/gldg config` - Open main configuration panel
-- ESC → Interface → AddOns → GuildGreet Extended
-- Minimap button (if enabled)
-
-## 🔧 **For Developers**
-
-### Building & Testing
-```bash
-# Run tests
-luacheck --config .luacheckrc .
-
-# Package addon
-# Uses BigWigs Packager via GitHub Actions
-```
-
-### Release Process
-The addon uses automated releases via GitHub Actions:
-
-```bash
-# Create and push a version tag
-git tag 11.0.0-alpha3
-git push origin 11.0.0-alpha3
-
-# This automatically triggers:
-# 1. GitHub Release creation (with prerelease detection)
-# 2. BigWigs Packager build
-# 3. Automatic upload to CurseForge and Wago.io
-# 4. Archive attachment to GitHub Release
-```
-
-**Tag Patterns Supported:**
-- `11.0.0-alpha1` - Prerelease (alpha/beta/rc auto-detected)
-- `11.1.0` - Stable release
-- `v11.0.0` - Traditional v-prefixed tags
-
-### Architecture
-- **Namespace**: Global `GLDG` object with modular organization
-- **Dependencies**: Ace3 framework for professional addon development
-- **Loading Order**: libs.xml → embeds.xml → GuildGreet.xml → GuildGreet.lua
-
-See the comprehensive `MODULARIZATION_REPORT.md` for detailed technical documentation.
+Supports **all World of Warcraft flavors** from a single unified codebase:
+- **Retail (Midnight `12.x`)**
+- **Mists of Pandaria Classic (`5.5.x`)**
+- **Cataclysm Classic (`4.4.x`)**
+- **Wrath of the Lich King Classic (`3.4.x`)**
+- **The Burning Crusade Classic (`2.5.x`)**
+- **Classic Era (`1.15.x`) & Classic Forever (`1.6.x`)**
 
 ---
 
-## 📜 **History**
-This Addon was originally written by Greya, his last release was 0.52.
-I had contributed to the German localisation of that version. Greya has
-not updated this addon for WoW 2.0.1 (TBC)
+## ✨ Key Features
 
-Mordikaiin and Rozak took over the addon and modified the interface for 11000,
-his first version was 0.52b and he consequently released v2.2 which was adapted
-to the LUA changes Blizzard implemented with patch 2.0.1.
+### 🎨 Modern Dark-Slate & Gold Interface (v13.0.0)
+- **Unified Configuration Window (`/gg` or `/guildgreet`)**: Clean sidebar navigation (`Settings`, `Greetings`, `Players`, `Cleanup`, `Colours`, `Profiles`), header bar with live status & quick test trigger, and a quick-action footer bar (`Greet Guild`, `Say Goodbye`, `See You Later`, `Clear Queue`).
+- **Live UI Font Scaling (`10pt – 18pt`)**: Instant `A-` / `A+` buttons in the window header (plus a slider in `Settings -> Other`) dynamically scale all text, buttons, inputs, and the floating in-game greeting queue.
+- **Draggable & Resizable**: Both the main configuration window and the floating greeting queue remember their screen positions and dimensions across sessions.
+- **ElvUI & AddOnSkins Compatible**: Custom backdrop and widget styling works cleanly alongside ElvUI and AddOnSkins without double borders or clipped text.
+- **Minimap Button & Addon Compartment**: Built-in `LibDBIcon-1.0` minimap launcher and Retail Addon Compartment integration.
 
-I had already extended the original GuildGreet but never submitted those to
-Greya. I copied them over to the new v2.2 and added some features. I sent
-my extensions to v2.2 to Mordikaiin but didn't get a reply for quite some
-time. I therefore decided to upload my extension to curse independently.
-I got a reply from Mordikaiin and he is happy for me to take over the addon
-as he is short on time anyway.
+### 📋 Interactive Floating Greeting Queue (`GuildGreetList`)
+- Displays guild members, friends, and channel members who just logged in, relogged, joined the guild, leveled up, earned an achievement, or got promoted.
+- **Left-Click** an entry to send a context-aware greeting, welcome, or congratulation message; **Right-Click** to dismiss the entry from the queue.
+- **Rich Hover Tooltips**: Shows Main/Alt associations, aliases, level, class, guild rank, public/officer notes, online/offline timestamps, and event badges (`NEW`, `LVL`, `RANK`, `ACHV`).
+- Configurable growth direction (upward or downward), maximum visible entries (`1–15`), and persistent drag position.
 
-Urbin, Dun-Morogh (EU)
+### 👥 Main / Alt (Twink) & Alias Management
+- Link any number of alt characters to a player's **Main** character and assign custom **Aliases** (nicknames) and personal notes.
+- **Automatic Guild Note Parsing**: Optionally auto-assigns Main/Alt links and aliases from public and officer guild notes (supports standard notations as well as EGP / GuildAds tags).
+- **Chat Enhancement**: Optionally prepends `{Main}` or `{Alias}` tags to guild, officer, whisper, and channel messages so you always know who you are talking to.
+- **Roster Inspector & Filters**: Search and filter your character database by name, alias, main, note, guild, online status, unassigned characters, or ignored players.
 
+### 💬 16 Greeting Categories & Custom Collections
+- **16 Specialized Message Categories**:
+  - `Greet` (Login), `GreetBack` (Relog), `Welcome` (Joined Guild), `NewRank` (Promotion), `NewLevel` (Level-Up), `Achievment` (Achievement), `Bye` (Logout Day), `Night` (Logout Night), `Guild` / `Channel` (Self Login), `ByeGuild` / `ByeChannel`, `NightGuild` / `NightChannel`, `LaterGuild` / `LaterChannel`.
+- **Custom Collections**: Create reusable message collections and assign them globally, per **Realm**, per **Guild**, or per **Character**.
+- **Dynamic Placeholders & Conditional Filters**: Use `%s`, `%c`, `%m`, `%a`, `%A`, `%l`, `%L`, `%C`, `%r`, `%v`, `%g`, `%G` and restrict messages by level range (`<min:max>`) or time of day (`<HH:MM:HH:MM>`).
 
-Extended features
------------------
-This extension includes all features of the base version (v2.2).
+### 🧹 Database Maintenance, Plausibility Checks & Safe Backups
+- **Consistency & Plausibility Checker**: Detects and automatically repairs orphaned alt links, circular references, and missing main flags.
+- **Database Cleanup Tools**: Prune orphaned characters, guildless characters, or stale guild/channel/friend references.
+- **Safe Export & Import**: Share or back up your configuration and color schemes safely using `AceSerializer-3.0`.
 
-In addition, it includes an option (which can be enabled/disabled in the
-configuration frame) to print all alt chars and the main char of the person
-that logged in to the chat frame. I added this feature because while GuildGreet
-helped me to properly greet people, I found it very hard to keep track of who
-was who later during playing and seeing people in guild chat, not being certain
-who they were. By printing this line, I regularly see which characters belong
-to the same player (whenever they log in) and could therefore learn to know
-who is who better.
+---
 
-As we wanted to keep a list of the main chars and all their alts on our
-guild web page as well, I added the options to list them not only at the
-time of logging in but also from a slash command. The following commands
-are supported:
+## 🔤 Message Placeholders & Filters
 
-/gg guild [show]	This lists the main and alt chars of all people in the
-			guild who are currently logged in
-/gg guild all		This lists the main and alt chars of the whole guild,
-			no matter whether they are currently online or offline
-/gg guild list		This opens a list frame into which the output of
-			/gg guild all is listed.
-			From here you can select the text and copy it to some
-			other place using Ctrl-C.
-/gg [show] <charname>	This prints the main and alt chars for the given
-			character name.
-/gg full <charname>	This prints the main and alt chars for the given
-			character name including all level and class infos.
+| Placeholder | Description |
+| :--- | :--- |
+| `%s` / `%n` | Selected greeting name (Character, Main, or Alias depending on your settings) |
+| `%c` | Character name (without realm suffix) |
+| `%m` | Main character name (falls back to `%c` if unassigned) |
+| `%a` | Character alias (falls back to `%c` if no alias is set) |
+| `%A` | Main's alias (falls back to `%m`, then `%c`) |
+| `%l` | Current character level |
+| `%L` | Remaining levels to level cap |
+| `%C` | Localized character class name |
+| `%r` | Guild rank name (or rank number) |
+| `%v` | Achievement link (for `Achievment` messages) |
+| `%g` | Guild alias if configured, otherwise guild name |
+| `%G` | Guild name |
 
-The following is a sample output line:
-	/gg Urbin
-	GuildGreet: Sunh [Urbin: Hunter, 70] Juran Mymule
+### Conditional Message Prefixes
+- **Level Filter (`<min:max>`)**: Prefix a message (e.g. `<1:20>Gratz on level %l, %n!`) to only use it when the player's level is between `min` and `max`.
+- **Time-of-Day Filter (`<HH:MM:HH:MM>`)**: Prefix a message (e.g. `<06:00:11:59>Good morning %n!`) to restrict it to a specific time window. Both prefixes can be combined.
 
-	/gg Sunh
-	GuildGreet: (Sunh: Priest, 65) [Urbin] Juran Mymule
+---
 
-The character name in square brackets is the main char, the others are alt
-chars. The name in round braces is the name passed as argument if it's not the
-main name. If one of the chars is currently online, its name will be printed in
-a different colour.
+## ⌨️ Slash Commands & Keybindings
 
-For normal features, please refer to the Readme block below (for Greya's 0.52
-version)
+### Slash Commands (`/gg` or `/guildgreet`)
+| Command | Action |
+| :--- | :--- |
+| `/gg` or `/guildgreet` | Toggle the main **GuildGreet Extended** configuration window |
+| `/gg test` | Add sample characters to the floating greeting queue to test layout and messages |
+| `/gg clear` | Clear all pending players from the greeting queue |
+| `/gg <charname>` | Print the Main and all known Alt characters for `<charname>` in chat |
+| `/gg full <charname>` | Print the Main and all Alts for `<charname>` including level and class details |
+| `/gg guild [show\|all\|list]` | List Main/Alt groups of online guild members (`show`), all members (`all`), or open a copyable window (`list`) |
+| `/gg friends [show\|all\|list]` | List Main/Alt groups of your friends |
+| `/gg channel [show\|all\|list]` | List Main/Alt groups of members in your tracked custom channel |
+| `/gg check` / `/gg fix` | Check or automatically repair Main/Alt database inconsistencies |
 
+### Keybindings (`ESC -> Options -> Keybindings -> GuildGreet`)
+- **Open Config Window**
+- **Clear Greet List**
+- **Greet Guild and Channel**
+- **Say Goodbye to Guild and Channel**
+- **Say See You Later to Guild and Channel**
+- **Test Trigger**
 
-Friends support
----------------
-I have added tentative friend support (very untested). There is a new tab in
-the configuration dialog to assign main and alt chars just like for guild
-members.
-The following commands work similar as the guild variants:
-/gg friends [show]	Lists main and alts of friends that are online
-/gg friends all		Lists main and alts of all friends
-/gg friends list	Show copy-pastable list of all friends
+---
 
+## 📦 Installation
 
-User channel support
---------------------
-Many guilds that have co-operations with other guilds have a common
-user channel. I added support for such a channel to 20100.4, you can
-enable this in the "General" tab and define the channel name to use.
-You must join the channel before you can enter it in the configuration.
-The channel members (except for guild members) will be managed in a
-separate list and their own tab.
+1. Install via the **CurseForge App**, **Wago App**, **WowUp**, or download the latest release from [GitHub Releases](https://github.com/gOOvER/GuildGreet-Extended/releases).
+2. Extract the `GuildGreet` folder into your client's `Interface/AddOns/` directory:
+   - Retail: `_retail_/Interface/AddOns/`
+   - Mists Classic: `_classic_/` or `_classic_ptr_/Interface/AddOns/`
+   - Classic Era: `_classic_era_/Interface/AddOns/`
+3. Enable **GuildGreet-Extended** in the character selection AddOns menu.
 
-/gg channel [show]	Lists main and alts of channel members that are online
-/gg channel all		Lists main and alts of all channel members
-/gg channel list	Show copy-pastable list of all channel members
+---
 
+## 📜 Credits & History
 
-Auto assigning of main/alt from guild notes
--------------------------------------------
-This is a feature requested by Dhugal
+- **Original Author**: Greya (up to v0.52)
+- **TBC Update**: Mordikaiin & Rozak (v0.52b – v2.2)
+- **GuildGreet Extended**: Urbin, Dun-Morogh (EU)
+- **Modernization, Ace3 Architecture & Dark-Slate UI (v11.x – v13.x)**: **gOOvER** ([goover.dev](https://www.goover.dev))
 
-> Scan the guild roster player notes for a standard alt notation in order to
-> Auto-config Guild Greet and, optionally, maintain the alt/main associations.
->
-> For example, I have my main Jimbob and alts Joebob and Bobbob:
->
-> My roster note for my main, Jimbob, says "Main". My roster note for Joebob
-> and Bobbob says "alt-Jimbob"
->
-> The above was a feature of an addon called AltMinder that I've been trying
-> to maintain for my guild, but I am not a LUA coder. I used to use Guild
-> Greet's main/alt mapping until I had to reset my addons one day, then
-> realized I'd have to do it for our 400+ guild members again. So now I just
-> use it for the login and leveling notifications.
->
-> Another case for doing this is that WoWroster can scan those roster notes as
-> well to make the same determination of alt/main associations. If a consistent
-> format is followed, it would work for those using WoWroster as well.
-
-If this feature is enabled (checkbox on general tab) *AND* no manual main/alt
-information has yet been added, then the guild note and officer note will be
-parsed.
-
-The following keywords will be understood:
-
-  "Main[ <any other text>]"
-    It is important to note that if <any other text> follows, there must be a
-    space after the "Main" keyword. Any other text will be discarded.
-    --> this marks the character with this guild note as a "main" char
-
-  "alt-<main name>[ <any other text>]"
-    It is important to note that if <any other text> follows, there must be a
-    space after the <main name>. Any other text will be discarded.
-    --> this marks the character with this guild note as an "alt" char to the
-        indicated "main" char
-
-
-Flexible message definitions
-----------------------------
-In your greet/congratulation messages you can use flexible codes
-  %c = char name
-  %n = name as used today (depending on settings) = %s in old format
-  %a = alias
-  %m = main if available, %c else
-  %A = main alias if available, %m else if available, %c else
-  %l = level if available, empty else
-  %C = class if available, empty else
-  %r = rankname if available, rank number else if available, empty else
-  %v = achievment if available, empty else
-  %g = guild alias if available, else guild if available, else empty
-  %G = guild name if available, else empty
-  (suggested by Sentinelum, Keith, AcmeHeroesInc and lebanoncyberspace)
-  The old %s entries still work (i.e. the extension is backwards compatible
-  to the old greetings you probably have stored)
-
-Also use <levels:##:##> or <time:##.##:##.##> to limit a greeting to a certain
-level range or time frame. Combinations of <levles> and <time> are allowed.
-
-
-Greeting guild and channel members
-----------------------------------
-This feature was requested by Yongpeng
-
-There are two key bindings that can be used to send a greeting to your guild
-chat and your selected channel and to say goodbye to the two channels. You can
-also greet selectively using slash commands. You can configure a guild name
-alias which can be used in the guild greetings instead of the full guild name.
-
-/gg greet guild		Sends a greeting to the guild chat
-/gg greet channel	Sends a greeting to the channel
-/gg greet all		Sends a greeting to both the guild chat and the channel
-
-/gg bye guild		Says goodbye to the guild chat
-/gg bye channel		Says goodbye to the channel
-/gg bye all		Says goodbye to both the build chat and the channel
-
-/gg later guild		Says goodbye to the guild chat (intending to come back)
-/gg later channel	Says goodbye to the channel (intending to come back)
-/gg later all		Says goodbye to both the build chat and the channel
-			(intending to come back)
-
-
-Temporarily supressing certain greetings
-----------------------------------------
-This feature was requested by Oakayam
-
-If a category (log-in, relog, joining of guild, level up, guild rank promotion)
-has no greetings defined, a character will not be placed in the greet list upon
-a corresponding event.
-However, you might want to supress a certain category without deleting all its
-greetings. This is now possible in the Settings->Greeting dialog, where you
-can supress the corresponding events for each category (meaning a player who
-levels up will not be placed in the greet list if the level-up category is
-being suppressed)
-
-
-Troubleshooting
----------------
-If your guild mates coming online and going offline are not detected, check
-the advanced interface options and make sure the "Guild member alert" setting
-in the chat section is enabled.
-
-
-Credits
--------
-This addon was started based on an idea from Skint on Bloodhoof (EU) by Greya
-(greya@synema.be) and then taken over by Mordikaiin and Rozak of Dragonblight
-(US) (Michaelquickel@comcast.net).
-Since then taken over and extended by Urbin on Dun Morogh (EU)
-Code for level dependent message filtering was submitted by lebanoncyberspace
-
-	alts[pl] = main
-	-- detect if officer note contains "<main name>' alt[ <discardable text]"
-	-- For names like "Darias" which might be "Darias' alt"
-	elseif (string.find(on, "' alt")~=nil) then
-	local altstart, altend = string.find(on, "' alt")
-	local main = string.sub(on, 1, altstart-1)
-	alts[pl] = main
-
-	Mind you, I have a bit of work to do on my own because I got a bunch of officers
-	who use "Alt" vs "alt" a lot, and the code is case sensitive. If there's a away
-	that strfind and sub can be made to be case irrelevant, then it'd make life easier.
-	(code supplied by Darias)
-
-- I just noticed that the key-bindings for "later guild and "goodnight guild" in
-  the keybindings area isn't working for me. When I use the keybindings, nothing
-  happens and I do have messages created for those. (reported by AZMAK)
-
-- (kusinagii) Anyway my question is this:
-	I use the GG's notes to keep track of join dates, promotions and whose (using
-	their main) invited them. But after I promoted them I go through and parse the
-	notes of the Promotion dates and add a letter (x) that lets me know when i scan
-	over that they've been promoted and are now on a different type of promotion
-	status.
-	a guild note would look like this: P01B23feb (recruiter)
-	then change to this after the first rolled around: x23feb (recruiter)
-
-	Basically what I want to know is, is there a way to change your gg notes through
-	some /gg setnote <name> note or some variation, I've tried a few but am not sure
-	what it might be if it exists, I'm not LUA savi so I'm not sure what to search
-	for. or... would it be feasible for me to update gg notes in the GuildGreet.lua
-	file? But I would be perfectly content with a /gg setnote thing so i could
-	update via macro.
-
-- Collections are (partially) broken - reported by several people
+### 💝 Support Development
+If you enjoy **GuildGreet Extended**, consider supporting continued maintenance and updates:
+- ☕ [Donate via goover.dev](https://donate.goover.dev)
+- ☕ [Ko-fi (oldnoob)](https://ko-fi.com/oldnoob)
+- ☕ [Buy Me a Coffee (goover)](https://www.buymeacoffee.com/goover)

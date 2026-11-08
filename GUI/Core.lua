@@ -231,6 +231,30 @@ function GLDG:ApplyUIFontSize()
     end
 end
 
+local function SaveMainFramePosition(f)
+    if not f or not GLDG.db or not GLDG.db.profile then return end
+    local point, _, relativePoint, xOfs, yOfs = f:GetPoint(1)
+    if point then
+        GLDG.db.profile.ConfigFramePos = {
+            point = point,
+            relativePoint = relativePoint or point,
+            x = math.floor((xOfs or 0) + 0.5),
+            y = math.floor((yOfs or 0) + 0.5),
+        }
+    end
+end
+
+local function RestoreMainFramePosition(f)
+    if not f then return end
+    local pos = GLDG.db and GLDG.db.profile and GLDG.db.profile.ConfigFramePos
+    f:ClearAllPoints()
+    if type(pos) == "table" and pos.point then
+        f:SetPoint(pos.point, UIParent, pos.relativePoint or pos.point, tonumber(pos.x) or 0, tonumber(pos.y) or 20)
+    else
+        f:SetPoint("CENTER", UIParent, "CENTER", 0, 20)
+    end
+end
+
 local function CreateMainFrame()
     if mainWindow then
         return mainWindow
@@ -239,7 +263,7 @@ local function CreateMainFrame()
     local frame = CreateFrame("Frame", "GuildGreetConfigFrame", UIParent, "BackdropTemplate")
     local initW, initH = GetRecommendedWindowSize(UIStyle:GetFontSize())
     frame:SetSize(initW, initH)
-    frame:SetPoint("CENTER", UIParent, "CENTER", 0, 20)
+    RestoreMainFramePosition(frame)
     frame:SetFrameStrata("HIGH")
     frame:SetToplevel(true)
     frame:SetClampedToScreen(true)
@@ -254,7 +278,10 @@ local function CreateMainFrame()
     end
     frame:RegisterForDrag("LeftButton")
     frame:SetScript("OnDragStart", function(f) f:StartMoving() end)
-    frame:SetScript("OnDragStop", function(f) f:StopMovingOrSizing() end)
+    frame:SetScript("OnDragStop", function(f)
+        f:StopMovingOrSizing()
+        SaveMainFramePosition(f)
+    end)
     UIStyle:ApplyBox(frame, UIStyle.Colors.bgMain, UIStyle.Colors.border)
 
     -- Allow closing with ESC
@@ -271,7 +298,10 @@ local function CreateMainFrame()
     header:EnableMouse(true)
     header:RegisterForDrag("LeftButton")
     header:SetScript("OnDragStart", function() frame:StartMoving() end)
-    header:SetScript("OnDragStop", function() frame:StopMovingOrSizing() end)
+    header:SetScript("OnDragStop", function()
+        frame:StopMovingOrSizing()
+        SaveMainFramePosition(frame)
+    end)
     headerFrame = header
 
     local icon = header:CreateTexture(nil, "ARTWORK")
@@ -293,7 +323,7 @@ local function CreateMainFrame()
     headerSubText = subtitle
 
     -- Version Badge
-    local ver = GLDG_GetAddOnMetadata and GLDG_GetAddOnMetadata("GuildGreet", "Version") or "12.1.0"
+    local ver = GLDG_GetAddOnMetadata and GLDG_GetAddOnMetadata("GuildGreet", "Version") or "13.0.0"
     local verBadge = CreateFrame("Frame", nil, header, "BackdropTemplate")
     verBadge:SetSize(64, 20)
     verBadge:SetPoint("LEFT", title, "RIGHT", 10, 0)
@@ -429,8 +459,15 @@ local function CreateMainFrame()
     end)
 
     frame:SetScript("OnSizeChanged", function()
-        if contentGroup and contentGroup.DoLayout then
-            pcall(function() contentGroup:DoLayout() end)
+        if contentGroup then
+            if contentHost then
+                local w, h = contentHost:GetWidth(), contentHost:GetHeight()
+                if w and w > 0 then contentGroup:SetWidth(w) end
+                if h and h > 0 then contentGroup:SetHeight(h) end
+            end
+            if contentGroup.DoLayout then
+                pcall(function() contentGroup:DoLayout() end)
+            end
         end
     end)
 
@@ -618,6 +655,13 @@ function GLDG:SelectTab(tab)
     contentGroup.frame:ClearAllPoints()
     contentGroup.frame:SetAllPoints(contentHost)
     contentGroup.frame:Show()
+    local hostW, hostH = contentHost:GetWidth(), contentHost:GetHeight()
+    if hostW and hostW > 0 then
+        contentGroup:SetWidth(hostW)
+    end
+    if hostH and hostH > 0 then
+        contentGroup:SetHeight(hostH)
+    end
     contentGroup:SetLayout("Fill")
 
     if tab == "settings" and self.CreateSettingsTab then

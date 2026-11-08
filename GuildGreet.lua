@@ -41,6 +41,15 @@ GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon
 GuildGreet = GLDG
 local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
+local function Ambiguate(name)
+	if type(name) ~= "string" then return tostring(name or "") end
+	return string.match(name, "^([^%-]+)") or name
+end
+
+function GLDG:ShortName(name)
+	return Ambiguate(name)
+end
+
 -- Global helper function for cross-version API compatibility
 function GLDG_GetAddOnMetadata(addonName, field)
 	-- Use modern C_AddOns API if available (WoW 10.0+), fallback to legacy GetAddOnMetadata
@@ -766,6 +775,32 @@ end
 -- _07_ Display Greetlist --
 ----------------------------
 
+local function SaveQueueFramePosition(f)
+	if not f or not GLDG.db or not GLDG.db.profile then return end
+	local point, _, relativePoint, xOfs, yOfs = f:GetPoint(1)
+	if point then
+		GLDG.db.profile.QueueFramePos = {
+			point = point,
+			relativePoint = relativePoint or point,
+			x = math.floor((xOfs or 0) + 0.5),
+			y = math.floor((yOfs or 0) + 0.5),
+		}
+		f._posRestored = true
+	end
+end
+
+local function RestoreQueueFramePosition(f)
+	if not f then return end
+	local pos = GLDG.db and GLDG.db.profile and GLDG.db.profile.QueueFramePos
+	f:ClearAllPoints()
+	if type(pos) == "table" and pos.point then
+		f:SetPoint(pos.point, UIParent, pos.relativePoint or pos.point, tonumber(pos.x) or 24, tonumber(pos.y) or 120)
+		f._posRestored = true
+	else
+		f:SetPoint("LEFT", UIParent, "LEFT", 24, 120)
+	end
+end
+
 function GLDG:CreateQueueFrame()
 	if _G[GLDG_LIST] then
 		return _G[GLDG_LIST]
@@ -773,7 +808,7 @@ function GLDG:CreateQueueFrame()
 
 	local listFrame = CreateFrame("Frame", GLDG_LIST, UIParent, "BackdropTemplate")
 	listFrame:SetSize(230, 22)
-	listFrame:SetPoint("LEFT", UIParent, "LEFT", 24, 120)
+	RestoreQueueFramePosition(listFrame)
 	listFrame:SetFrameStrata("MEDIUM")
 	listFrame:SetToplevel(true)
 	listFrame:SetClampedToScreen(true)
@@ -781,17 +816,24 @@ function GLDG:CreateQueueFrame()
 	listFrame:SetMovable(true)
 	listFrame:RegisterForDrag("LeftButton")
 	listFrame:SetScript("OnDragStart", function(f) f:StartMoving() end)
-	listFrame:SetScript("OnDragStop", function(f) f:StopMovingOrSizing() end)
+	listFrame:SetScript("OnDragStop", function(f)
+		f:StopMovingOrSizing()
+		SaveQueueFramePosition(f)
+	end)
 	listFrame:Hide()
 
-	-- Title bar
+	-- Title bar (anchored TOPLEFT & TOPRIGHT so it always matches listFrame width)
 	local titleFrame = CreateFrame("Frame", GLDG_LIST.."Title", listFrame, "BackdropTemplate")
-	titleFrame:SetSize(230, 22)
-	titleFrame:SetPoint("TOP", listFrame, "TOP", 0, 0)
+	titleFrame:SetHeight(22)
+	titleFrame:SetPoint("TOPLEFT", listFrame, "TOPLEFT", 0, 0)
+	titleFrame:SetPoint("TOPRIGHT", listFrame, "TOPRIGHT", 0, 0)
 	titleFrame:EnableMouse(true)
 	titleFrame:RegisterForDrag("LeftButton")
 	titleFrame:SetScript("OnDragStart", function() listFrame:StartMoving() end)
-	titleFrame:SetScript("OnDragStop", function() listFrame:StopMovingOrSizing() end)
+	titleFrame:SetScript("OnDragStop", function()
+		listFrame:StopMovingOrSizing()
+		SaveQueueFramePosition(listFrame)
+	end)
 	titleFrame:SetBackdrop({
 		bgFile = "Interface\\Buttons\\WHITE8x8",
 		edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -846,7 +888,7 @@ function GLDG:CreateQueueFrame()
 
 	local function createQueueLine(name, anchorTo, anchorPoint, relativePoint)
 		local btn = CreateFrame("Button", name, listFrame, "BackdropTemplate")
-		btn:SetSize(230, 18)
+		btn:SetSize(230, 20)
 		btn:SetPoint(anchorPoint, anchorTo, relativePoint, 0, 0)
 		btn:RegisterForClicks("LeftButtonDown", "RightButtonDown")
 		btn:SetBackdrop({
@@ -857,13 +899,15 @@ function GLDG:CreateQueueFrame()
 		btn:SetBackdropColor(0.06, 0.07, 0.09, 0.92)
 		btn:SetBackdropBorderColor(0.20, 0.22, 0.28, 0.85)
 
-		local text1 = btn:CreateFontString(name.."Text", "OVERLAY", "GameFontHighlightSmall")
-		text1:SetPoint("LEFT", btn, "LEFT", 6, 0)
-		text1:SetJustifyH("LEFT")
-
 		local text2 = btn:CreateFontString(name.."Text2", "OVERLAY", "GameFontHighlightSmall")
-		text2:SetPoint("RIGHT", btn, "RIGHT", -6, 0)
+		text2:SetPoint("RIGHT", btn, "RIGHT", -8, 0)
 		text2:SetJustifyH("RIGHT")
+		text2:SetWordWrap(false)
+
+		local text1 = btn:CreateFontString(name.."Text", "OVERLAY", "GameFontHighlightSmall")
+		text1:SetPoint("LEFT", btn, "LEFT", 8, 0)
+		text1:SetJustifyH("LEFT")
+		text1:SetWordWrap(false)
 
 		btn:SetScript("OnEnter", function(selfBtn)
 			selfBtn:SetBackdropColor(0.16, 0.18, 0.24, 0.98)
@@ -876,6 +920,10 @@ function GLDG:CreateQueueFrame()
 			GameTooltip:Hide()
 		end)
 		btn:SetScript("OnClick", function(selfBtn, mouseBtn)
+			if selfBtn.queueKey then
+				GLDG_ClickName(mouseBtn, selfBtn.queueKey)
+				return
+			end
 			local t = _G[selfBtn:GetName().."Text"]
 			if t then
 				GLDG_ClickName(mouseBtn, t:GetText())
@@ -899,20 +947,22 @@ end
 
 function GLDG_ShowToolTip(self, element)
 	if not element then return end
-	local txtObj = _G[element.."Text"]
-	if not txtObj then return end
-	local raw = txtObj:GetText()
-	if not raw or raw == "" then return end
-
-	local name = string.sub(raw, 9)
-	local _, uRealm = string.split("-", name)
-	if not uRealm then
-		local prefix = name.."-"
-		local len = string.len(prefix)
-		for k in pairs(GLDG_DataChar) do
-			if string.sub(k, 1, len) == prefix then
-				name = k
-				break
+	local name = self and self.queueKey
+	if not name or name == "" then
+		local txtObj = _G[element.."Text"]
+		if not txtObj then return end
+		local raw = txtObj:GetText()
+		if not raw or raw == "" then return end
+		name = string.sub(raw, 9)
+		local _, uRealm = string.split("-", name)
+		if not uRealm then
+			local prefix = name.."-"
+			local len = string.len(prefix)
+			for k in pairs(GLDG_DataChar) do
+				if string.sub(k, 1, len) == prefix then
+					name = k
+					break
+				end
 			end
 		end
 	end
@@ -951,13 +1001,16 @@ end
 function GLDG:ShowQueue()
 	local listFrame = self:CreateQueueFrame()
 	if not listFrame or not GLDG_Data then return end
+	if not listFrame._posRestored and self.db and self.db.profile and self.db.profile.QueueFramePos then
+		RestoreQueueFramePosition(listFrame)
+	end
 
 	-- Hide all lines first
 	for i = 1, 15 do
 		local dLine = _G[GLDG_LIST.."Line"..i]
 		local uLine = _G[GLDG_LIST.."ULine"..i]
-		if dLine then dLine:Hide() end
-		if uLine then uLine:Hide() end
+		if dLine then dLine:Hide(); dLine.queueKey = nil end
+		if uLine then uLine:Hide(); uLine.queueKey = nil end
 	end
 
 	-- Collect and sort queued players
@@ -974,6 +1027,7 @@ function GLDG:ShowQueue()
 	end
 
 	listFrame:Show()
+	local titleFrame = _G[GLDG_LIST.."Title"]
 	local titleText = _G[GLDG_LIST.."TitleText"]
 	if titleText then
 		if self.UIStyle then self.UIStyle:ApplyFont(titleText, 0) end
@@ -985,31 +1039,31 @@ function GLDG:ShowQueue()
 	end
 
 	local maxLines = math.min(math.max(tonumber(GLDG_Data.ListSize) or 5, 1), 15)
+	local visibleCount = math.min(count, maxLines)
 	local prefix = GLDG_Data.ListUp and (GLDG_LIST.."ULine") or (GLDG_LIST.."Line")
 	local fontSize = self.UIStyle and self.UIStyle:GetFontSize() or 13
 	local lineHeight = math.max(20, fontSize + 7)
-	local lineWidth = math.max(190, math.floor(190 * (fontSize / 12)))
-	listFrame:SetWidth(lineWidth)
+	local titleHeight = math.max(22, lineHeight + 2)
+	local baseWidth = math.max(210, math.floor(200 * (fontSize / 12)))
+	local headerNeeded = titleText and math.ceil((titleText:GetStringWidth() or 100) + 40) or baseWidth
+	local maxRowWidth = math.max(baseWidth, headerNeeded)
 
-	for i = 1, math.min(count, maxLines) do
+	-- First pass: populate texts and measure required row widths so text1 and text2 never overlap
+	for i = 1, visibleCount do
 		local name = sorted[i]
 		local lineBtn = _G[prefix..i]
 		local text1 = _G[prefix..i.."Text"]
 		local text2 = _G[prefix..i.."Text2"]
 		if lineBtn and text1 and text2 then
+			lineBtn.queueKey = name
 			if self.UIStyle then
 				self.UIStyle:ApplyFont(text1, -1)
 				self.UIStyle:ApplyFont(text2, -1)
 			end
-			lineBtn:SetSize(lineWidth, lineHeight)
-			lineBtn:ClearAllPoints()
-			if GLDG_Data.ListUp then
-				lineBtn:SetPoint("BOTTOMLEFT", listFrame, "TOPLEFT", 0, (i - 1) * (lineHeight - 1))
-			else
-				lineBtn:SetPoint("TOPLEFT", listFrame, "BOTTOMLEFT", 0, -(i - 1) * (lineHeight - 1))
-			end
 			local logTime = GLDG_Queue[name] or "[00:00] "
 			local shortName = Ambiguate(name, "guild")
+			text1:ClearAllPoints()
+			text1:SetPoint("LEFT", lineBtn, "LEFT", 8, 0)
 			text1:SetText(logTime..shortName)
 
 			local p = GLDG_DataChar and GLDG_DataChar[name]
@@ -1054,9 +1108,43 @@ function GLDG:ShowQueue()
 				end
 			end
 
+			text2:ClearAllPoints()
+			text2:SetPoint("RIGHT", lineBtn, "RIGHT", -8, 0)
 			text2:SetText(rightInfo)
 			GLDG_SetTextColor(prefix..i.."Text", setType, colourKey)
 			GLDG_SetTextColor(prefix..i.."Text2", setType, "alias")
+
+			local w1 = text1:GetStringWidth() or 120
+			local w2 = (rightInfo ~= "") and ((text2:GetStringWidth() or 30) + 14) or 0
+			local needed = math.ceil(w1 + w2 + 20)
+			if needed > maxRowWidth then
+				maxRowWidth = needed
+			end
+		end
+	end
+
+	local lineWidth = math.min(maxRowWidth, 460)
+	listFrame:SetSize(lineWidth, titleHeight)
+	if titleFrame then
+		titleFrame:SetHeight(titleHeight)
+	end
+
+	-- Second pass: apply unified width and non-overlapping anchors to all visible rows
+	for i = 1, visibleCount do
+		local lineBtn = _G[prefix..i]
+		local text1 = _G[prefix..i.."Text"]
+		local text2 = _G[prefix..i.."Text2"]
+		if lineBtn and text1 and text2 then
+			lineBtn:SetSize(lineWidth, lineHeight)
+			lineBtn:ClearAllPoints()
+			if GLDG_Data.ListUp then
+				lineBtn:SetPoint("BOTTOMLEFT", listFrame, "TOPLEFT", 0, (i - 1) * (lineHeight - 1))
+			else
+				lineBtn:SetPoint("TOPLEFT", listFrame, "BOTTOMLEFT", 0, -(i - 1) * (lineHeight - 1))
+			end
+			text1:ClearAllPoints()
+			text1:SetPoint("LEFT", lineBtn, "LEFT", 8, 0)
+			text1:SetPoint("RIGHT", text2, "LEFT", -8, 0)
 			lineBtn:Show()
 		end
 	end
@@ -3118,209 +3206,7 @@ end
 
 
 function GLDG_readConfigString()
-	GLDG_ginfotxt = GetGuildInfoText()
-	local writeBtn = _G[GLDG_GUI.."SettingsGeneralWriteGuildString"]
-	if writeBtn then
-		if (GLDG_CONFIG_STRING ~= nil) and (GLDG_CONFIG_STRING ~= GLDG_config_from_guild) and IsGuildLeader() then
-			writeBtn:Enable()
-		else
-			writeBtn:Disable()
-		end
-	end
-	local gstringstart = string.find(GLDG_ginfotxt, "{GG", 1)
-	local gstring1, gstring2, gstring3, gstring4
-	if (gstringstart ~= nil) then
-		gstringstart = gstringstart + 4
-		local a,b,c = strfind(GLDG_ginfotxt, "(%S+)", gstringstart)
-		gstring1,gstring2,gstring3,gstring4 = string.split(":",c)
-		if gstring4 == nil then
-			GLDG_corrupted_config_from_guild = "{GG:"..c
-			GLDG_config_from_guild = "corrupted"
-		else
-			gstring4 = string.split("}",gstring4)
-			if mod((tonumber("0x"..gstring1, 16)+1) * (tonumber("0x"..gstring2, 16)+1) * (tonumber("0x"..gstring3, 16)+1),33) == tonumber(gstring4, 10) then
-				GLDG_config_from_guild = "{GG:"..c
-				GLDG_corrupted_config_from_guild = nil
-			else
-				GLDG_corrupted_config_from_guild = "{GG:"..c
-				GLDG_config_from_guild = "corrupted"
-				--GLDG_InitRoster()
-			end
-		end
-	else
-		GLDG_config_from_guild = "not found"
-		GLDG_InitRoster()
-	end
-	if (GLDG_Data.GuildSettings.UseGuildDefault==true) and (GLDG_config_from_guild ~= "not found") and (GLDG_config_from_guild ~= "corrupted") then
-		if bit.band("0x"..gstring1, 1) >0 then GLDG_Data.GuildSettings.GreetAsMain=true else GLDG_Data.GuildSettings.GreetAsMain=false end
-		if bit.band("0x"..gstring1, 2) >0 then GLDG_Data.GuildSettings.Randomize=true else GLDG_Data.GuildSettings.Randomize=false end
-		if bit.band("0x"..gstring1, 2^2) >0 then GLDG_Data.GuildSettings.Whisper=true else GLDG_Data.GuildSettings.Whisper=false end
-		if bit.band("0x"..gstring1, 2^3) >0 then GLDG_Data.GuildSettings.WhisperLevelup=true else GLDG_Data.GuildSettings.WhisperLevelup=false end
-		if bit.band("0x"..gstring1, 2^4) >0 then GLDG_Data.GuildSettings.IncludeOwn=true else GLDG_Data.GuildSettings.IncludeOwn=false end
-		if bit.band("0x"..gstring1, 2^5) >0 then GLDG_Data.GuildSettings.AutoAssign=true else GLDG_Data.GuildSettings.AutoAssign=false end
-		if bit.band("0x"..gstring1, 2^6) >0 then GLDG_Data.GuildSettings.AutoAssignEgp=true else GLDG_Data.GuildSettings.AutoAssignEgp=false end
-		if bit.band("0x"..gstring1, 2^7) >0 then GLDG_Data.GuildSettings.AutoAssignAlias=true else GLDG_Data.GuildSettings.AutoAssignAlias=false end
-		if bit.band("0x"..gstring1, 2^8) >0 then GLDG_Data.GuildSettings.ListNames=true else GLDG_Data.GuildSettings.ListNames=false end
-		if bit.band("0x"..gstring1, 2^9) >0 then GLDG_Data.GuildSettings.ListNamesOff=true else GLDG_Data.GuildSettings.ListNamesOff=false end
-		if bit.band("0x"..gstring1, 2^10) >0 then GLDG_Data.GuildSettings.ListLevelUp=true else GLDG_Data.GuildSettings.ListLevelUp=false end
-		if bit.band("0x"..gstring1, 2^11) >0 then GLDG_Data.GuildSettings.ListLevelUpOff=true else GLDG_Data.GuildSettings.ListLevelUpOff=false end
-		if bit.band("0x"..gstring1, 2^12) >0 then GLDG_Data.GuildSettings.ListAchievments=true else GLDG_Data.GuildSettings.ListAchievments=false end
-		if bit.band("0x"..gstring1, 2^13) >0 then GLDG_Data.GuildSettings.ListQuit=true else GLDG_Data.GuildSettings.ListQuit=false end
-		if bit.band("0x"..gstring1, 2^14) >0 then GLDG_Data.GuildSettings.ExtendChat=true else GLDG_Data.GuildSettings.ExtendChat=false end
-		if bit.band("0x"..gstring1, 2^15) >0 then GLDG_Data.GuildSettings.ExtendIgnored=true else GLDG_Data.GuildSettings.ExtendIgnored=false end
-		if bit.band("0x"..gstring1, 2^16) >0 then GLDG_Data.GuildSettings.ExtendMain=true else GLDG_Data.GuildSettings.ExtendMain=false end
-		if bit.band("0x"..gstring1, 2^17) >0 then GLDG_Data.GuildSettings.ExtendAlias=true else GLDG_Data.GuildSettings.ExtendAlias=false end
-		if bit.band("0x"..gstring1, 2^18) >0 then GLDG_Data.GuildSettings.AddPostfix=true else GLDG_Data.GuildSettings.AddPostfix=false end
-		if bit.band("0x"..gstring1, 2^19) >0 then GLDG_Data.GuildSettings.ShowWhoSpam=true else GLDG_Data.GuildSettings.ShowWhoSpam=false end
-		if bit.band("0x"..gstring1, 2^20) >0 then GLDG_Data.GuildSettings.SupressGreet=true else GLDG_Data.GuildSettings.SupressGreet=false end
-		if bit.band("0x"..gstring1, 2^21) >0 then GLDG_Data.GuildSettings.SupressJoin=true else GLDG_Data.GuildSettings.SupressJoin=false end
-		if bit.band("0x"..gstring1, 2^22) >0 then GLDG_Data.GuildSettings.SupressLevel=true else GLDG_Data.GuildSettings.SupressLevel=false end
-		if bit.band("0x"..gstring1, 2^23) >0 then GLDG_Data.GuildSettings.SupressRank=true else GLDG_Data.GuildSettings.SupressRank=false end
-		if bit.band("0x"..gstring1, 2^24) >0 then GLDG_Data.GuildSettings.SupressAchievment=true else GLDG_Data.GuildSettings.SupressAchievment=false end
-		if bit.band("0x"..gstring1, 2^25) >0 then GLDG_Data.GuildSettings.NoGratsOnLogin=true else GLDG_Data.GuildSettings.NoGratsOnLogin=false end
-		if bit.band("0x"..gstring1, 2^26) >0 then GLDG_Data.GuildSettings.DeltaPopup=true else GLDG_Data.GuildSettings.DeltaPopup=false end
-		GLDG_Data.GuildSettings.RelogTime = tonumber(gstring2, 16)
-		GLDG_Data.GuildSettings.MinLevelUp= tonumber(gstring3, 16)
-
-		GLDG_Data[GLDG_unique_GuildName].GreetAsMain = GLDG_Data.GuildSettings.GreetAsMain
-		GLDG_Data[GLDG_unique_GuildName].Randomize = GLDG_Data.GuildSettings.Randomize
-		GLDG_Data[GLDG_unique_GuildName].Whisper = GLDG_Data.GuildSettings.Whisper
-		GLDG_Data[GLDG_unique_GuildName].WhisperLevelup = GLDG_Data.GuildSettings.WhisperLevelup
-		GLDG_Data[GLDG_unique_GuildName].IncludeOwn = GLDG_Data.GuildSettings.IncludeOwn
-		GLDG_Data[GLDG_unique_GuildName].AutoAssign = GLDG_Data.GuildSettings.AutoAssign
-		GLDG_Data[GLDG_unique_GuildName].AutoAssignEgp = GLDG_Data.GuildSettings.AutoAssignEgp
-		GLDG_Data[GLDG_unique_GuildName].AutoAssignAlias = GLDG_Data.GuildSettings.AutoAssignAlias
-		GLDG_Data[GLDG_unique_GuildName].ListNames = GLDG_Data.GuildSettings.ListNames
-		GLDG_Data[GLDG_unique_GuildName].ListNamesOff = GLDG_Data.GuildSettings.ListNamesOff
-		GLDG_Data[GLDG_unique_GuildName].ListLevelUp = GLDG_Data.GuildSettings.ListLevelUp
-		GLDG_Data[GLDG_unique_GuildName].ListLevelUpOff = GLDG_Data.GuildSettings.ListLevelUpOff
-		GLDG_Data[GLDG_unique_GuildName].ListAchievments = GLDG_Data.GuildSettings.ListAchievments
-		GLDG_Data[GLDG_unique_GuildName].ListQuit = GLDG_Data.GuildSettings.ListQuit
-		GLDG_Data[GLDG_unique_GuildName].ExtendChat = GLDG_Data.GuildSettings.ExtendChat
-		GLDG_Data[GLDG_unique_GuildName].ExtendIgnored = GLDG_Data.GuildSettings.ExtendIgnored
-		GLDG_Data[GLDG_unique_GuildName].ExtendMain = GLDG_Data.GuildSettings.ExtendMain
-		GLDG_Data[GLDG_unique_GuildName].ExtendAlias = GLDG_Data.GuildSettings.ExtendAlias
-		GLDG_Data[GLDG_unique_GuildName].AddPostfix = GLDG_Data.GuildSettings.AddPostfix
-		GLDG_Data[GLDG_unique_GuildName].ShowWhoSpam = GLDG_Data.GuildSettings.ShowWhoSpam
-		GLDG_Data[GLDG_unique_GuildName].SupressGreet = GLDG_Data.GuildSettings.SupressGreet
-		GLDG_Data[GLDG_unique_GuildName].SupressJoin = GLDG_Data.GuildSettings.SupressJoin
-		GLDG_Data[GLDG_unique_GuildName].SupressLevel = GLDG_Data.GuildSettings.SupressLevel
-		GLDG_Data[GLDG_unique_GuildName].SupressRank = GLDG_Data.GuildSettings.SupressRank
-		GLDG_Data[GLDG_unique_GuildName].SupressAchievment = GLDG_Data.GuildSettings.SupressAchievment
-		GLDG_Data[GLDG_unique_GuildName].NoGratsOnLogin = GLDG_Data.GuildSettings.NoGratsOnLogin
-		GLDG_Data[GLDG_unique_GuildName].DeltaPopup = GLDG_Data.GuildSettings.DeltaPopup
-		GLDG_Data[GLDG_unique_GuildName].RelogTime = GLDG_Data.GuildSettings.RelogTime
-		GLDG_Data[GLDG_unique_GuildName].MinLevelUp = GLDG_Data.GuildSettings.MinLevelUp
-		GLDG_Data[GLDG_unique_GuildName].UseGuildDefault = true
-
-		if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 1) then
-			GLDG:PrintHelp(string.format(L["ChatMsg/Config string found. GuildGreet using default settings from %s!"],Ambiguate(GLDG_GuildLeader, "guild")))
-			GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-			GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 1
-		end
-		--GLDG_Init()
-	else
-		if GLDG_Data.GuildSettings.UseGuildDefault==true and GLDG_unique_GuildName then
-			GLDG_Data.GuildSettings.GreetAsMain=false
-			GLDG_Data.GuildSettings.Randomize=false
-			GLDG_Data.GuildSettings.Whisper=false
-			GLDG_Data.GuildSettings.WhisperLevelup=false
-			GLDG_Data.GuildSettings.IncludeOwn=true
-			GLDG_Data.GuildSettings.AutoAssign=false
-			GLDG_Data.GuildSettings.AutoAssignEgp=false
-			GLDG_Data.GuildSettings.AutoAssignAlias=false
-			GLDG_Data.GuildSettings.ListNames=true
-			GLDG_Data.GuildSettings.ListNamesOff=true
-			GLDG_Data.GuildSettings.ListLevelUp=true
-			GLDG_Data.GuildSettings.ListLevelUpOff=true
-			GLDG_Data.GuildSettings.ListAchievments=true
-			GLDG_Data.GuildSettings.ListQuit=true
-			GLDG_Data.GuildSettings.ExtendChat=true
-			GLDG_Data.GuildSettings.ExtendIgnored=true
-			GLDG_Data.GuildSettings.ExtendMain=true
-			GLDG_Data.GuildSettings.ExtendAlias=true
-			GLDG_Data.GuildSettings.AddPostfix=true
-			GLDG_Data.GuildSettings.ShowWhoSpam=false
-			GLDG_Data.GuildSettings.SupressGreet=false
-			GLDG_Data.GuildSettings.SupressJoin=false
-			GLDG_Data.GuildSettings.SupressLevel=false
-			GLDG_Data.GuildSettings.SupressRank=false
-			GLDG_Data.GuildSettings.SupressAchievment=false
-			GLDG_Data.GuildSettings.NoGratsOnLogin=true
-			GLDG_Data.GuildSettings.DeltaPopup=true
-			GLDG_Data.GuildSettings.RelogTime = 2
-			GLDG_Data.GuildSettings.MinLevelUp= 20
-			GLDG_Data[GLDG_unique_GuildName] = GLDG_Data.GuildSettings
-
-			if GLDG_config_from_guild == "not found" then
-				if IsGuildLeader() then
-					if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 3) then
-						GLDG:PrintHelp(L["ChatMsg/Config string not found."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
-						GLDG:PrintHelp(L["ChatMsg/Note to the guild master to create the config string"].." \r\n"..L["ChatMsg/To set the config string ..."])
-						GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-						GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 3
-					end
-				else
-					if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 2) then
-						GLDG:PrintHelp(L["ChatMsg/Config string not found."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
-						GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-						GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 2
-					end
-				end
-			end
-			if GLDG_config_from_guild == "corrupted" then
-				if IsGuildLeader() then
-						GLDG:PrintHelp(L["ChatMsg/The config string seems to be corrupted. Please generating a new one."].." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
-					else
-					if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 5) then
-						GLDG:PrintHelp(string.format(L["ChatMsg/The config string seems to be corrupted. Please inform %s!"],Ambiguate(GLDG_GuildLeader, "guild")).." \r\n"..L["ChatMsg/GuildGreet using default settings!"])
-						GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-						GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 5
-					end
-				end
-			end
-		end
-	end
-	if (GLDG_Data.GuildSettings.UseGuildDefault==nil) then
-		if GLDG_config_from_guild then
-			if GLDG_config_from_guild == "not found" then
-				if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 6) then
-					GLDG:PrintHelp(L["ChatMsg/GuildGreet using your own settings!"])
-					GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-					GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 6
-				end
-				if IsGuildLeader() then
-					if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 7) then
-						GLDG:PrintHelp(L["ChatMsg/Note to the guild master to create the config string"].." \r\n"..L["ChatMsg/To set the config string ..."])
-						GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-						GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 7
-					end
-				end
-			end
-			if GLDG_config_from_guild == "corrupted" then
-				if IsGuildLeader() then
-					--if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 8) then
-						GLDG:PrintHelp(L["ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please generating a new one."])
-					--	GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-					--	GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 8
-					--end
-				else
-					if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 9) then
-						GLDG:PrintHelp(string.format(L["ChatMsg/GuildGreet using your own Settings. But the config string seems to be corrupted. Please inform %s!"],Ambiguate(GLDG_GuildLeader, "guild")))
-						GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-						GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 9
-					end
-				end
-			end
-			if (GLDG_config_from_guild ~= "corrupted") and (GLDG_config_from_guild ~= "not found") then
-				if (GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] ~= date("%m/%d/%y")) or (GLDG_Data[GLDG_unique_GuildName.." lastmessage"] ~= 10) then
-					GLDG:PrintHelp(L["ChatMsg/GuildGreet using your own settings (But a config string is in the guild info available)."])
-					GLDG_Data[GLDG_unique_GuildName.." lastmessagedate"] = date("%m/%d/%y")
-					GLDG_Data[GLDG_unique_GuildName.." lastmessage"] = 10
-				end
-			end
-		end
-	end
+	return GLDG.Database:ReadConfigString()
 end
 
 function GLDG_WriteGuildString()

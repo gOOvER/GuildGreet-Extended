@@ -8,6 +8,11 @@ local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet")
 GuildGreet = GLDG
 
+local function Ambiguate(name)
+	if type(name) ~= "string" then return tostring(name or "") end
+	return string.match(name, "^([^%-]+)") or name
+end
+
 local UIStyle = GLDG.UIStyle
 
 local searchFilter = ""
@@ -54,16 +59,28 @@ local function GetAllMainsMap()
     return mains
 end
 
+local function CleanGuildName(guildStr)
+    if GLDG and GLDG.FormatGuildDisplay then
+        return GLDG:FormatGuildDisplay(guildStr)
+    end
+    if type(guildStr) ~= "string" then return "" end
+    return (string.gsub(guildStr, "^Guild:", ""))
+end
+
 local function GetAvailableGuildsMap()
+    local curGuild = CleanGuildName(GLDG.GuildName or (GetGuildInfo and GetGuildInfo("player")) or "")
     local guilds = {
         ["__ALL__"]     = L["No guild filter"] or "All Guilds",
-        ["__CURRENT__"] = (L["Guild"] or "Current Guild") .. " (" .. tostring(GLDG.GuildName or GetGuildInfo("player") or "None") .. ")",
+        ["__CURRENT__"] = (L["Guild"] or "Current Guild") .. " (" .. (curGuild ~= "" and curGuild or "None") .. ")",
         ["__NOGUILD__"] = L["Guildless"] or "Guildless Characters",
     }
     if GLDG_DataChar then
         for _, p in pairs(GLDG_DataChar) do
             if p and p.guild and p.guild ~= "" then
-                guilds[p.guild] = p.guild
+                local gClean = CleanGuildName(p.guild)
+                if gClean ~= "" then
+                    guilds[gClean] = gClean
+                end
             end
         end
     end
@@ -74,10 +91,12 @@ local function GetFilteredPlayers()
     local results = {}
     if not GLDG_DataChar then return results end
 
+    local curGuild = CleanGuildName(GLDG.GuildName or (GetGuildInfo and GetGuildInfo("player")) or GLDG_unique_GuildName or "")
     local q = string.lower(strtrim(searchFilter or ""))
     for name, p in pairs(GLDG_DataChar) do
         if type(p) == "table" then
             local pass = true
+            local pGuild = CleanGuildName(p.guild)
 
             if not GLDG_Data.GuildSettings.IncludeOwn and p.own then
                 pass = false
@@ -86,11 +105,11 @@ local function GetFilteredPlayers()
             -- Guild filter
             if pass then
                 if guildFilter == "__CURRENT__" then
-                    pass = (p.guild and p.guild == GLDG_unique_GuildName)
+                    pass = (pGuild ~= "" and pGuild == curGuild)
                 elseif guildFilter == "__NOGUILD__" then
-                    pass = (not p.guild or p.guild == "")
+                    pass = (pGuild == "")
                 elseif guildFilter ~= "__ALL__" then
-                    pass = (p.guild == guildFilter)
+                    pass = (pGuild == guildFilter)
                 end
             end
 
@@ -141,6 +160,10 @@ local function GetFilteredPlayers()
 end
 
 function GLDG:CreatePlayersTab(container)
+    if self.PlayerManager and self.PlayerManager.RosterImport then
+        self.PlayerManager:RosterImport(true)
+    end
+
     local scroll = AceGUI:Create("ScrollFrame")
     scroll:SetLayout("Flow")
     scroll:SetFullWidth(true)
@@ -159,7 +182,7 @@ function GLDG:CreatePlayersTab(container)
     local searchBox = AceGUI:Create("EditBox")
     searchBox:SetLabel(L["Search Character / Alias / Main / Note"] or "Search Character / Alias / Main / Note")
     searchBox:SetText(searchFilter)
-    searchBox:SetRelativeWidth(0.34)
+    searchBox:SetRelativeWidth(0.33)
     searchBox:SetCallback("OnEnterPressed", function(_, _, text)
         searchFilter = text or ""
         currentPage = 1
@@ -190,7 +213,7 @@ function GLDG:CreatePlayersTab(container)
     guildDrop:SetLabel(L["Guild"] or "Guild Filter")
     guildDrop:SetList(GetAvailableGuildsMap())
     guildDrop:SetValue(guildFilter)
-    guildDrop:SetRelativeWidth(0.33)
+    guildDrop:SetRelativeWidth(0.32)
     guildDrop:SetCallback("OnValueChanged", function(_, _, val)
         guildFilter = val or "__ALL__"
         currentPage = 1
@@ -200,10 +223,14 @@ function GLDG:CreatePlayersTab(container)
 
     local importRosterBtn = AceGUI:Create("Button")
     importRosterBtn:SetText(L["Refresh"] or "Rescan Guild Roster")
-    importRosterBtn:SetRelativeWidth(0.34)
+    importRosterBtn:SetRelativeWidth(0.33)
     importRosterBtn:SetCallback("OnClick", function()
         GLDG_ReadNotes = 1
-        GLDG_RosterImport()
+        if GLDG.PlayerManager and GLDG.PlayerManager.RosterImport then
+            GLDG.PlayerManager:RosterImport(false)
+        else
+            GLDG_RosterImport()
+        end
         GLDG:RefreshConfigUI()
     end)
     filterGroup:AddChild(importRosterBtn)
@@ -218,7 +245,7 @@ function GLDG:CreatePlayersTab(container)
 
     local fixBtn = AceGUI:Create("Button")
     fixBtn:SetText(L["Fix inconsistencies"] or "Auto-Fix Inconsistencies")
-    fixBtn:SetRelativeWidth(0.33)
+    fixBtn:SetRelativeWidth(0.32)
     fixBtn:SetCallback("OnClick", function()
         GLDG_fixCount = 0
         GLDG_Convert_Plausibility_Fix(false)
@@ -238,25 +265,71 @@ function GLDG:CreatePlayersTab(container)
         editGroup:SetLayout("Flow")
         scroll:AddChild(editGroup)
 
-        local roleTag = p.ignore and (UIStyle.Hex.red .. "IGNORED|r")
-            or p.main and (UIStyle.Hex.green .. "MAIN (" .. CountAltsOf(selectedPlayer) .. " Alts)|r")
-            or p.alt and (UIStyle.Hex.cyan .. "ALT of " .. Ambiguate(p.alt, "guild") .. "|r")
-            or (UIStyle.Hex.textMuted .. "Unassigned|r")
+        local roleTag = p.ignore and (UIStyle.Hex.red .. (L["Ignored"] or "IGNORED") .. "|r")
+            or p.main and (UIStyle.Hex.green .. string.format(L["MAIN (%d Alts)"] or "MAIN (%d Alts)", CountAltsOf(selectedPlayer)) .. "|r")
+            or p.alt and (UIStyle.Hex.cyan .. string.format(L["ALT of %s"] or "ALT of %s", Ambiguate(p.alt, "guild")) .. "|r")
+            or (UIStyle.Hex.textMuted .. (L["Not assigned"] or "Unassigned") .. "|r")
+
+        local cleanGuild = CleanGuildName(p.guild)
+        local dispClass = p.classDisplayName or p.class or ""
 
         local infoLabel = AceGUI:Create("Label")
         infoLabel:SetFullWidth(true)
         infoLabel:SetText(string.format(
-            "%sStatus:|r %s    %sLevel:|r %s %s    %sRank:|r %s    %sGuild:|r %s\n%sPublic Note:|r %s    %sOfficer Note:|r %s",
-            UIStyle.Hex.gold, roleTag,
-            UIStyle.Hex.gold, tostring(p.lvl or "?"), tostring(p.class or ""),
-            UIStyle.Hex.gold, tostring(p.rankname or "---"),
-            UIStyle.Hex.gold, tostring(p.guild or "---"),
-            UIStyle.Hex.goldDim, tostring(p.pNote or "---"),
-            UIStyle.Hex.goldDim, tostring(p.oNote or "---")
+            "%s%s:|r %s    %s%s:|r %s %s    %s%s:|r %s    %s%s:|r %s\n%s%s:|r %s    %s%s:|r %s",
+            UIStyle.Hex.gold, L["Status"] or "Status", roleTag,
+            UIStyle.Hex.gold, L["Level"] or "Level", tostring(p.lvl or "?"), tostring(dispClass),
+            UIStyle.Hex.gold, L["Rank"] or "Rank", tostring((p.rankname and p.rankname ~= "") and p.rankname or "---"),
+            UIStyle.Hex.gold, L["Guild"] or "Guild", tostring(cleanGuild ~= "" and cleanGuild or "---"),
+            UIStyle.Hex.goldDim, L["Public Note"] or "Public Note", tostring((p.pNote and p.pNote ~= "") and p.pNote or "---"),
+            UIStyle.Hex.goldDim, L["Officer Note"] or "Officer Note", tostring((p.oNote and p.oNote ~= "") and p.oNote or "---")
         ))
         editGroup:AddChild(infoLabel)
 
-        -- Set/Promote/Unset Main Button
+        -- Row 1: Labelled inputs (Assign to Main Dropdown, Alias EditBox, Custom Note EditBox)
+        local altDrop = AceGUI:Create("Dropdown")
+        altDrop:SetLabel(L["Assign as Alt of Main"] or "Assign as Alt of Main")
+        altDrop:SetList(GetAllMainsMap())
+        altDrop:SetValue(p.alt or "__NONE__")
+        altDrop:SetDisabled(p.main == true)
+        altDrop:SetRelativeWidth(0.34)
+        altDrop:SetCallback("OnValueChanged", function(_, _, val)
+            if val == "__NONE__" or not val then
+                p.alt = nil
+            elseif val ~= selectedPlayer then
+                p.main = nil
+                p.alt = val
+                if GLDG_DataChar[val] then
+                    p.ignore = GLDG_DataChar[val].ignore
+                end
+            end
+            GLDG:RefreshConfigUI()
+        end)
+        editGroup:AddChild(altDrop)
+
+        local aliasEdit = AceGUI:Create("EditBox")
+        aliasEdit:SetLabel(L["Alias"] or "Alias (Press Enter)")
+        aliasEdit:SetText(p.alias or "")
+        aliasEdit:SetRelativeWidth(0.32)
+        aliasEdit:SetCallback("OnEnterPressed", function(_, _, text)
+            text = strtrim(text or "")
+            p.alias = (text ~= "") and text or nil
+            GLDG:RefreshConfigUI()
+        end)
+        editGroup:AddChild(aliasEdit)
+
+        local noteEdit = AceGUI:Create("EditBox")
+        noteEdit:SetLabel(L["Note"] or "Custom Note (Press Enter)")
+        noteEdit:SetText(p.note or "")
+        noteEdit:SetRelativeWidth(0.32)
+        noteEdit:SetCallback("OnEnterPressed", function(_, _, text)
+            text = strtrim(text or "")
+            p.note = (text ~= "") and text or nil
+            GLDG:RefreshConfigUI()
+        end)
+        editGroup:AddChild(noteEdit)
+
+        -- Row 2: Action Buttons (Set/Promote/Unset Main, Ignore/Unignore, Greet Now, Remove)
         local mainBtn = AceGUI:Create("Button")
         if p.alt then
             mainBtn:SetText(L["Promote to main"] or "Promote to Main")
@@ -266,7 +339,7 @@ function GLDG:CreatePlayersTab(container)
         else
             mainBtn:SetText(L["Set as main"] or "Set as Main")
         end
-        mainBtn:SetRelativeWidth(0.25)
+        mainBtn:SetRelativeWidth(0.24)
         mainBtn:SetCallback("OnClick", function()
             GLDG_SelPlrName = selectedPlayer
             if p.alt then
@@ -293,55 +366,9 @@ function GLDG:CreatePlayersTab(container)
         end)
         editGroup:AddChild(mainBtn)
 
-        -- Assign to Main Dropdown (Alt Assignment)
-        local altDrop = AceGUI:Create("Dropdown")
-        altDrop:SetLabel(L["Assign as Alt of Main"] or "Assign as Alt of Main")
-        altDrop:SetList(GetAllMainsMap())
-        altDrop:SetValue(p.alt or "__NONE__")
-        altDrop:SetDisabled(p.main == true)
-        altDrop:SetRelativeWidth(0.35)
-        altDrop:SetCallback("OnValueChanged", function(_, _, val)
-            if val == "__NONE__" or not val then
-                p.alt = nil
-            elseif val ~= selectedPlayer then
-                p.main = nil
-                p.alt = val
-                if GLDG_DataChar[val] then
-                    p.ignore = GLDG_DataChar[val].ignore
-                end
-            end
-            GLDG:RefreshConfigUI()
-        end)
-        editGroup:AddChild(altDrop)
-
-        -- Alias EditBox
-        local aliasEdit = AceGUI:Create("EditBox")
-        aliasEdit:SetLabel(L["Alias"] or "Alias (Press Enter)")
-        aliasEdit:SetText(p.alias or "")
-        aliasEdit:SetRelativeWidth(0.40)
-        aliasEdit:SetCallback("OnEnterPressed", function(_, _, text)
-            text = strtrim(text or "")
-            p.alias = (text ~= "") and text or nil
-            GLDG:RefreshConfigUI()
-        end)
-        editGroup:AddChild(aliasEdit)
-
-        -- Custom Note EditBox
-        local noteEdit = AceGUI:Create("EditBox")
-        noteEdit:SetLabel(L["Note"] or "Custom Note (Press Enter)")
-        noteEdit:SetText(p.note or "")
-        noteEdit:SetRelativeWidth(0.40)
-        noteEdit:SetCallback("OnEnterPressed", function(_, _, text)
-            text = strtrim(text or "")
-            p.note = (text ~= "") and text or nil
-            GLDG:RefreshConfigUI()
-        end)
-        editGroup:AddChild(noteEdit)
-
-        -- Ignore / Unignore Button
         local ignoreBtn = AceGUI:Create("Button")
         ignoreBtn:SetText(p.ignore and (L["Unignore"] or "Unignore") or (L["Ignore"] or "Ignore"))
-        ignoreBtn:SetRelativeWidth(0.20)
+        ignoreBtn:SetRelativeWidth(0.24)
         ignoreBtn:SetCallback("OnClick", function()
             p.ignore = not p.ignore and true or nil
             if p.main then
@@ -355,19 +382,17 @@ function GLDG:CreatePlayersTab(container)
         end)
         editGroup:AddChild(ignoreBtn)
 
-        -- Greet Now Button
         local greetBtn = AceGUI:Create("Button")
         greetBtn:SetText(L["Greeting"] or "Greet Now")
-        greetBtn:SetRelativeWidth(0.20)
+        greetBtn:SetRelativeWidth(0.24)
         greetBtn:SetCallback("OnClick", function()
             GLDG_SendGreet(selectedPlayer)
         end)
         editGroup:AddChild(greetBtn)
 
-        -- Delete Character Button
         local removeBtn = AceGUI:Create("Button")
         removeBtn:SetText(L["Remove"] or "Remove")
-        removeBtn:SetRelativeWidth(0.20)
+        removeBtn:SetRelativeWidth(0.24)
         removeBtn:SetDisabled(p.main == true or p.alt ~= nil)
         removeBtn:SetCallback("OnClick", function()
             local removed = selectedPlayer
@@ -405,7 +430,7 @@ function GLDG:CreatePlayersTab(container)
 
         local prevBtn = AceGUI:Create("Button")
         prevBtn:SetText("< " .. (L["Previous"] or "Previous"))
-        prevBtn:SetRelativeWidth(0.30)
+        prevBtn:SetRelativeWidth(0.29)
         prevBtn:SetDisabled(currentPage <= 1)
         prevBtn:SetCallback("OnClick", function()
             currentPage = math.max(1, currentPage - 1)
@@ -420,7 +445,7 @@ function GLDG:CreatePlayersTab(container)
 
         local nextBtn = AceGUI:Create("Button")
         nextBtn:SetText((L["Next"] or "Next") .. " >")
-        nextBtn:SetRelativeWidth(0.30)
+        nextBtn:SetRelativeWidth(0.29)
         nextBtn:SetDisabled(currentPage >= totalPages)
         nextBtn:SetCallback("OnClick", function()
             currentPage = math.min(totalPages, currentPage + 1)
@@ -446,32 +471,37 @@ function GLDG:CreatePlayersTab(container)
                 row:SetLayout("Flow")
 
                 local isOnline = GLDG_Online and GLDG_Online[name]
-                local statusDot = isOnline and (UIStyle.Hex.green .. "●|r ") or (UIStyle.Hex.textMuted .. "○|r ")
+                local statusDot = isOnline
+                    and "|TInterface\\FriendsFrame\\StatusIcon-Online:14:14:0:0|t "
+                    or "|TInterface\\FriendsFrame\\StatusIcon-Offline:14:14:0:0|t "
                 local cHex = GetClassHex(p.enClass)
                 local shortName = Ambiguate(name, "guild")
                 local selMarker = (selectedPlayer == name) and (UIStyle.Hex.gold .. "» |r") or ""
 
                 local roleText = ""
                 if p.ignore then
-                    roleText = UIStyle.Hex.red .. "[IGN]|r "
+                    roleText = UIStyle.Hex.red .. "[" .. (L["Ignored"] or "IGN") .. "]|r "
                 elseif p.main then
-                    roleText = UIStyle.Hex.green .. "[MAIN]|r "
+                    roleText = UIStyle.Hex.green .. "[" .. (L["Main"] or "MAIN") .. "]|r "
                 elseif p.alt then
-                    roleText = UIStyle.Hex.cyan .. "[ALT -> " .. Ambiguate(p.alt, "guild") .. "]|r "
+                    roleText = UIStyle.Hex.cyan .. "[" .. (L["Alt"] or "ALT") .. " -> " .. Ambiguate(p.alt, "guild") .. "]|r "
                 end
 
                 local aliasText = (p.alias and p.alias ~= "") and (UIStyle.Hex.gold .. " (" .. p.alias .. ")|r") or ""
+                local dispClass = p.classDisplayName or p.class or ""
+                local cleanGuild = CleanGuildName(p.guild)
+                local rankOrGuild = (p.rankname and p.rankname ~= "") and (cleanGuild ~= "" and (p.rankname .. " (" .. cleanGuild .. ")") or p.rankname) or (cleanGuild ~= "" and cleanGuild or "---")
                 local lvlRank = string.format(
-                    "%sLv%s %s — %s|r",
+                    "%sLv%s%s — %s|r",
                     UIStyle.Hex.textMuted,
                     tostring(p.lvl or "?"),
-                    tostring(p.class or ""),
-                    tostring(p.rankname or p.guild or "---")
+                    dispClass ~= "" and (" " .. dispClass) or "",
+                    tostring(rankOrGuild)
                 )
 
                 local charLabel = AceGUI:Create("InteractiveLabel")
                 charLabel:SetText(selMarker .. statusDot .. cHex .. shortName .. "|r" .. aliasText .. "  " .. roleText .. lvlRank)
-                charLabel:SetRelativeWidth(0.80)
+                charLabel:SetRelativeWidth(0.78)
                 charLabel:SetCallback("OnClick", function()
                     if selectedPlayer == name then
                         selectedPlayer = nil

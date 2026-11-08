@@ -71,6 +71,10 @@ local function CollectStats()
 end
 
 function GLDG:CreateCleanupTab(container)
+    if self.PlayerManager and self.PlayerManager.NormalizeStoredPlayers then
+        self.PlayerManager:NormalizeStoredPlayers()
+    end
+
     local scroll = AceGUI:Create("ScrollFrame")
     scroll:SetLayout("Flow")
     scroll:SetFullWidth(true)

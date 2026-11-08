@@ -7,6 +7,11 @@
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
+local function Ambiguate(name)
+	if type(name) ~= "string" then return tostring(name or "") end
+	return string.match(name, "^([^%-]+)") or name
+end
+
 -- Message System Library Namespace
 GLDG.Messages = {}
 
@@ -118,29 +123,31 @@ function GLDG.Messages:ParseCustomMessage(cname, name, msg)
 	if not player then player = {} end
 
 	-- Replace custom placeholders
-	local p_c = cname  -- %c = character name
-	local p_n = name   -- %n = display name (alias or character name)
-	local p_a = ""     -- %a = alias if available, character name else
+	local shortCName = Ambiguate(cname, "guild")
+	local shortName = Ambiguate(name, "guild")
+	local p_c = shortCName  -- %c = character name
+	local p_n = shortName   -- %n = display name (alias or character name)
+	local p_a = ""          -- %a = alias if available, character name else
 	if player.alias then
 		p_a = player.alias
 	else
-		p_a = cname
+		p_a = shortCName
 	end
 	
 	local p_m = ""     -- %m = main name if available, character name else
 	local p_A = ""     -- %A = main alias if available, main name else, character name else
 	if player.alt and GLDG_DataChar[player.alt] then
-		p_m = player.alt
+		p_m = Ambiguate(player.alt, "guild")
 		if GLDG_DataChar[player.alt].alias then
 			p_A = GLDG_DataChar[player.alt].alias
 		else
-			p_A = player.alt
+			p_A = Ambiguate(player.alt, "guild")
 		end
 	elseif player.main then
-		p_m = cname
+		p_m = shortCName
 		p_A = p_a
 	else
-		p_m = cname
+		p_m = shortCName
 		p_A = p_a
 	end
 	
@@ -175,9 +182,12 @@ function GLDG.Messages:ParseCustomMessage(cname, name, msg)
 	
 	local p_g = ""     -- %g = guild alias if available, else guild if available, else empty
 	local p_G = ""     -- %G = guild name if available, else empty
-	if GLDG.unique_GuildName and GLDG.unique_GuildName ~= "" then
-		p_g = GLDG.unique_GuildName
-		p_G = GLDG.unique_GuildName
+	local cleanGuild = (GLDG.GuildName and GLDG.GuildName ~= "" and GLDG.GuildName) or GLDG.unique_GuildName or ""
+	cleanGuild = string.gsub(cleanGuild, "^Guild:", "")
+	cleanGuild = string.match(cleanGuild, "^([^%-]+)") or cleanGuild
+	if cleanGuild ~= "" then
+		p_g = cleanGuild
+		p_G = cleanGuild
 	end
 	if GLDG_GuildAlias and GLDG_GuildAlias ~= "" then
 		p_g = GLDG_GuildAlias
@@ -887,22 +897,30 @@ function GLDG.Messages:OnEvent(mainObj, event, ...)
 	elseif (event == "GUILD_ROSTER_UPDATE") then
 		if IsInGuild() then
 			if (GLDG.unique_GuildName and GLDG.Realm and GLDG.unique_GuildName~="") then
-				-- guild name known -> treat guild info
-				if (GLDG_ginfotxt) and (GLDG_ginfotxt ~= GetGuildInfoText()) then GLDG_ginfotxt = GetGuildInfoText(); GLDG_config_from_guild = nil end
-				if GLDG_Data.GuildSettings.UseGuildDefault==true and GLDG_config_from_guild == nil then
-					GLDG_ginfotxt = GetGuildInfoText()
-					if GLDG_ginfotxt >= " " then
+				-- guild name known -> treat guild info safely without calling protected GetGuildInfoText()
+				local currentInfoTxt = (GLDG.GetSafeGuildInfoText and GLDG:GetSafeGuildInfoText()) or ""
+				if (GLDG_ginfotxt) and (GLDG_ginfotxt ~= currentInfoTxt) then
+					GLDG_ginfotxt = currentInfoTxt
+					GLDG_config_from_guild = nil
+				end
+				if GLDG_Data.GuildSettings.UseGuildDefault == true and GLDG_config_from_guild == nil then
+					GLDG_ginfotxt = currentInfoTxt
+					if type(GLDG_ginfotxt) == "string" and GLDG_ginfotxt >= " " then
 						if not GLDG_Data[GLDG.unique_GuildName] then GLDG_Data[GLDG.unique_GuildName] = {} end
 						if not GLDG_Data.GuildSettings then GLDG_Data.GuildSettings = {} end
-						GLDG_Data.GuildSettings.UseGuildDefault=true
+						GLDG_Data.GuildSettings.UseGuildDefault = true
 						GLDG_readConfigString()
 						GLDG_SetCheckboxes()
+					else
+						GLDG_config_from_guild = "not found"
 					end
 				end
 				if GLDG_Data.GuildSettings.UseGuildDefault == false and GLDG_config_from_guild == nil then
-					GLDG_ginfotxt = GetGuildInfoText()
-					if GLDG_ginfotxt >= " " then
+					GLDG_ginfotxt = currentInfoTxt
+					if type(GLDG_ginfotxt) == "string" and GLDG_ginfotxt >= " " then
 						GLDG_readConfigString()
+					else
+						GLDG_config_from_guild = "not found"
 					end
 				end
 				if GLDG_RosterImportRunning==0 then

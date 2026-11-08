@@ -7,6 +7,11 @@
 GLDG = GLDG or {}
 GLDG.ChatSystem = {}
 
+local function Ambiguate(name)
+	if type(name) ~= "string" then return tostring(name or "") end
+	return string.match(name, "^([^%-]+)") or name
+end
+
 ------------------------------------------------------------
 -- Check if player is in configured channel
 function GLDG.ChatSystem:CheckChannel()

@@ -3,14 +3,14 @@
 ## Title: GuildGreet-Extended
 ## Notes: Advanced guild greeting system with automated welcome messages, player tracking, and modular architecture
 ## Author: gOOvER
-## Version: 12.1.0
+## Version: 13.0.0
 ## IconTexture: Interface\Icons\Achievement_GuildPerk_EverybodysFriend
 ## AddonCompartmentFunc: GuildGreet_OnAddonCompartmentClick
 ## AddonCompartmentFuncOnEnter: GuildGreet_OnAddonCompartmentEnter
 ## AddonCompartmentFuncOnLeave: GuildGreet_OnAddonCompartmentLeave
 
 ## SavedVariables: GuildGreetDB
-## OptionalDeps: Ace3, LibSharedMedia-3.0, LibDBIcon-1.0, LibChatAnims, LibStub
+## OptionalDeps: Ace3, LibSharedMedia-3.0, LibDBIcon-1.0, LibChatAnims, LibStub, ElvUI
 
 ## Category: Guild
 ## X-Category: Guild
