@@ -1,636 +1,235 @@
---[[
-	GuildGreet Colour GUI Module
-	Handles the Colour tab interface
-]]--
+------------------------------------------------------------
+-- GuildGreet Modern GUI - Colours Configuration Tab
+-- Directly edits GLDG.Colors (guild, friends, channel, help, header)
+------------------------------------------------------------
 
-local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet")
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
+local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet")
+GuildGreet = GLDG
 
-local ColourGUI = GLDG:NewModule("ColourGUI")
+local UIStyle = GLDG.UIStyle
+local activeColourSet = "guild"
 
--- Current state
-ColourGUI.currentColours = {}
+local COLOUR_KEYS = {
+    { key = "online",     label = "Coming Online (Chat)" },
+    { key = "goOff",      label = "Going Offline (Chat)" },
+    { key = "isOff",      label = "Is Offline (Chat List)" },
+    { key = "alias",      label = "Alias & Main Tag" },
+    { key = "list",       label = "Queue: Default Online" },
+    { key = "relog",      label = "Queue: Relog" },
+    { key = "new",        label = "Queue: New Guild Member" },
+    { key = "lvl",        label = "Queue: Level-Up" },
+    { key = "rank",       label = "Queue: Promotion" },
+    { key = "achievment", label = "Queue: Achievement" },
+}
 
---[[
-	Create the Colour tab content
-]]
-function ColourGUI:CreateTabContent(container)
-	-- Main scroll frame
-	local scrollFrame = AceGUI:Create("ScrollFrame")
-	scrollFrame:SetFullWidth(true)
-	scrollFrame:SetFullHeight(true)
-	scrollFrame:SetLayout("Flow")
-	
-	-- Information section
-	local infoGroup = AceGUI:Create("InlineGroup")
-	infoGroup:SetTitle(L["Colour Settings"] or "Colour Settings")
-	infoGroup:SetFullWidth(true)
-	infoGroup:SetHeight(80)
-	infoGroup:SetLayout("Flow")
-	
-	local infoText = AceGUI:Create("Label")
-	infoText:SetText(L["Configure colours for different guild ranks and roles. Click on a colour button to change it."] or "Configure colours for different guild ranks and roles. Click on a colour button to change it.")
-	infoText:SetFullWidth(true)
-	infoGroup:AddChild(infoText)
-	
-	scrollFrame:AddChild(infoGroup)
-	
-	-- Guild Rank Colours
-	local rankGroup = AceGUI:Create("InlineGroup")
-	rankGroup:SetTitle(L["Guild Rank Colours"] or "Guild Rank Colours")
-	rankGroup:SetFullWidth(true)
-	rankGroup:SetHeight(300)
-	rankGroup:SetLayout("Flow")
-	
-	-- Get guild ranks if in guild
-	local guildRanks = {}
-	if IsInGuild() then
-		for i = 0, 9 do
-			local rankName = GuildControlGetRankName(i)
-			if rankName and rankName ~= "" then
-				table.insert(guildRanks, {index = i, name = rankName})
-			end
-		end
-	else
-		-- Default ranks for demonstration
-		for i = 0, 9 do
-			table.insert(guildRanks, {index = i, name = "Rank " .. i})
-		end
-	end
-	
-	-- Create colour pickers for each rank
-	for _, rank in ipairs(guildRanks) do
-		local rankLabel = AceGUI:Create("Label")
-		rankLabel:SetText(rank.name .. ":")
-		rankLabel:SetWidth(150)
-		rankGroup:AddChild(rankLabel)
-		
-		local colourButton = AceGUI:Create("Button")
-		colourButton:SetText("■ ■ ■")
-		colourButton:SetWidth(100)
-		
-		-- Get current colour
-		local currentColour = self:GetRankColour(rank.index)
-		colourButton:SetText(self:ColourText("■ ■ ■", currentColour))
-		
-		colourButton:SetCallback("OnClick", function()
-			self:ShowColourPicker(rank.index, rank.name, currentColour, function(newColour)
-				self:SetRankColour(rank.index, newColour)
-				colourButton:SetText(self:ColourText("■ ■ ■", newColour))
-			end)
-		end)
-		rankGroup:AddChild(colourButton)
-		
-		-- Reset button
-		local resetBtn = AceGUI:Create("Button")
-		resetBtn:SetText(L["Reset"] or "Reset")
-		resetBtn:SetWidth(80)
-		resetBtn:SetCallback("OnClick", function()
-			local defaultColour = self:GetDefaultRankColour(rank.index)
-			self:SetRankColour(rank.index, defaultColour)
-			colourButton:SetText(self:ColourText("■ ■ ■", defaultColour))
-		end)
-		rankGroup:AddChild(resetBtn)
-	end
-	
-	scrollFrame:AddChild(rankGroup)
-	
-	-- Special Role Colours
-	local roleGroup = AceGUI:Create("InlineGroup")
-	roleGroup:SetTitle(L["Special Role Colours"] or "Special Role Colours")
-	roleGroup:SetFullWidth(true)
-	roleGroup:SetHeight(200)
-	roleGroup:SetLayout("Flow")
-	
-	-- Special roles
-	local specialRoles = {
-		{key = "guild_master", name = L["Guild Master"] or "Guild Master"},
-		{key = "officer", name = L["Officer"] or "Officer"},
-		{key = "veteran", name = L["Veteran"] or "Veteran"},
-		{key = "member", name = L["Member"] or "Member"},
-		{key = "recruit", name = L["Recruit"] or "Recruit"},
-		{key = "alt", name = L["Alt Character"] or "Alt Character"}
-	}
-	
-	for _, role in ipairs(specialRoles) do
-		local roleLabel = AceGUI:Create("Label")
-		roleLabel:SetText(role.name .. ":")
-		roleLabel:SetWidth(150)
-		roleGroup:AddChild(roleLabel)
-		
-		local colourButton = AceGUI:Create("Button")
-		colourButton:SetText("■ ■ ■")
-		colourButton:SetWidth(100)
-		
-		-- Get current colour
-		local currentColour = self:GetSpecialColour(role.key)
-		colourButton:SetText(self:ColourText("■ ■ ■", currentColour))
-		
-		colourButton:SetCallback("OnClick", function()
-			self:ShowColourPicker(role.key, role.name, currentColour, function(newColour)
-				self:SetSpecialColour(role.key, newColour)
-				colourButton:SetText(self:ColourText("■ ■ ■", newColour))
-			end)
-		end)
-		roleGroup:AddChild(colourButton)
-		
-		-- Reset button
-		local resetBtn = AceGUI:Create("Button")
-		resetBtn:SetText(L["Reset"] or "Reset")
-		resetBtn:SetWidth(80)
-		resetBtn:SetCallback("OnClick", function()
-			local defaultColour = self:GetDefaultSpecialColour(role.key)
-			self:SetSpecialColour(role.key, defaultColour)
-			colourButton:SetText(self:ColourText("■ ■ ■", defaultColour))
-		end)
-		roleGroup:AddChild(resetBtn)
-	end
-	
-	scrollFrame:AddChild(roleGroup)
-	
-	-- Chat Message Colours
-	local chatGroup = AceGUI:Create("InlineGroup")
-	chatGroup:SetTitle(L["Chat Message Colours"] or "Chat Message Colours")
-	chatGroup:SetFullWidth(true)
-	chatGroup:SetHeight(150)
-	chatGroup:SetLayout("Flow")
-	
-	-- Chat colour types
-	local chatTypes = {
-		{key = "greeting", name = L["Greeting Messages"] or "Greeting Messages"},
-		{key = "whisper", name = L["Whisper Messages"] or "Whisper Messages"},
-		{key = "system", name = L["System Messages"] or "System Messages"}
-	}
-	
-	for _, chatType in ipairs(chatTypes) do
-		local typeLabel = AceGUI:Create("Label")
-		typeLabel:SetText(chatType.name .. ":")
-		typeLabel:SetWidth(150)
-		chatGroup:AddChild(typeLabel)
-		
-		local colourButton = AceGUI:Create("Button")
-		colourButton:SetText("■ ■ ■")
-		colourButton:SetWidth(100)
-		
-		-- Get current colour
-		local currentColour = self:GetChatColour(chatType.key)
-		colourButton:SetText(self:ColourText("■ ■ ■", currentColour))
-		
-		colourButton:SetCallback("OnClick", function()
-			self:ShowColourPicker(chatType.key, chatType.name, currentColour, function(newColour)
-				self:SetChatColour(chatType.key, newColour)
-				colourButton:SetText(self:ColourText("■ ■ ■", newColour))
-			end)
-		end)
-		chatGroup:AddChild(colourButton)
-		
-		-- Reset button
-		local resetBtn = AceGUI:Create("Button")
-		resetBtn:SetText(L["Reset"] or "Reset")
-		resetBtn:SetWidth(80)
-		resetBtn:SetCallback("OnClick", function()
-			local defaultColour = self:GetDefaultChatColour(chatType.key)
-			self:SetChatColour(chatType.key, defaultColour)
-			colourButton:SetText(self:ColourText("■ ■ ■", defaultColour))
-		end)
-		chatGroup:AddChild(resetBtn)
-	end
-	
-	scrollFrame:AddChild(chatGroup)
-	
-	-- Control buttons
-	local controlGroup = AceGUI:Create("InlineGroup")
-	controlGroup:SetTitle(L["Colour Controls"] or "Colour Controls")
-	controlGroup:SetFullWidth(true)
-	controlGroup:SetHeight(100)
-	controlGroup:SetLayout("Flow")
-	
-	-- Reset all colours
-	local resetAllBtn = AceGUI:Create("Button")
-	resetAllBtn:SetText(L["Reset All Colours"] or "Reset All Colours")
-	resetAllBtn:SetWidth(200)
-	resetAllBtn:SetCallback("OnClick", function()
-		self:ResetAllColours()
-		-- Refresh the interface
-		container:ReleaseChildren()
-		self:CreateTabContent(container)
-	end)
-	controlGroup:AddChild(resetAllBtn)
-	
-	-- Import colour scheme
-	local importBtn = AceGUI:Create("Button")
-	importBtn:SetText(L["Import Scheme"] or "Import Scheme")
-	importBtn:SetWidth(150)
-	importBtn:SetCallback("OnClick", function()
-		self:ImportColourScheme()
-	end)
-	controlGroup:AddChild(importBtn)
-	
-	-- Export colour scheme
-	local exportBtn = AceGUI:Create("Button")
-	exportBtn:SetText(L["Export Scheme"] or "Export Scheme")
-	exportBtn:SetWidth(150)
-	exportBtn:SetCallback("OnClick", function()
-		self:ExportColourScheme()
-	end)
-	controlGroup:AddChild(exportBtn)
-	
-	scrollFrame:AddChild(controlGroup)
-	container:AddChild(scrollFrame)
+local function HexToRGBA(hexStr)
+    if GLDG.Colors and GLDG.Colors.ColourToRGB_perc then
+        local a, r, g, b = GLDG.Colors:ColourToRGB_perc(hexStr)
+        return r or 1, g or 1, b or 1, a or 1
+    end
+    return 1, 1, 1, 1
 end
 
---[[
-	Show colour picker dialog
-]]
-function ColourGUI:ShowColourPicker(key, name, currentColour, callback)
-	-- Create colour picker dialog using AceGUI
-	local dialog = AceGUI:Create("Window")
-	dialog:SetTitle(string.format(L["Choose colour for %s"] or "Choose colour for %s", name))
-	dialog:SetWidth(400)
-	dialog:SetHeight(300)
-	dialog:SetLayout("Flow")
-	
-	-- Current colour preview
-	local previewGroup = AceGUI:Create("InlineGroup")
-	previewGroup:SetTitle(L["Current Colour"] or "Current Colour")
-	previewGroup:SetFullWidth(true)
-	previewGroup:SetHeight(80)
-	previewGroup:SetLayout("Flow")
-	
-	local previewLabel = AceGUI:Create("Label")
-	previewLabel:SetText(self:ColourText("Sample Text", currentColour))
-	previewLabel:SetFullWidth(true)
-	previewGroup:AddChild(previewLabel)
-	
-	dialog:AddChild(previewGroup)
-	
-	-- RGB sliders
-	local rgbGroup = AceGUI:Create("InlineGroup")
-	rgbGroup:SetTitle(L["RGB Values"] or "RGB Values")
-	rgbGroup:SetFullWidth(true)
-	rgbGroup:SetHeight(120)
-	rgbGroup:SetLayout("Flow")
-	
-	local r, g, b = self:HexToRGB(currentColour)
-	
-	-- Red slider
-	local redSlider = AceGUI:Create("Slider")
-	redSlider:SetLabel(L["Red"] or "Red")
-	redSlider:SetSliderValues(0, 255, 1)
-	redSlider:SetValue(r)
-	redSlider:SetFullWidth(true)
-	redSlider:SetCallback("OnValueChanged", function(widget, event, value)
-		local newR, newG, newB = value, g, b
-		g = newG or g
-		b = newB or b
-		local newColour = self:RGBToHex(newR, newG, newB)
-		previewLabel:SetText(self:ColourText("Sample Text", newColour))
-		currentColour = newColour
-	end)
-	rgbGroup:AddChild(redSlider)
-	
-	-- Green slider
-	local greenSlider = AceGUI:Create("Slider")
-	greenSlider:SetLabel(L["Green"] or "Green")
-	greenSlider:SetSliderValues(0, 255, 1)
-	greenSlider:SetValue(g)
-	greenSlider:SetFullWidth(true)
-	greenSlider:SetCallback("OnValueChanged", function(widget, event, value)
-		local newR, newG, newB = r, value, b
-		r = newR or r
-		b = newB or b
-		local newColour = self:RGBToHex(newR, newG, newB)
-		previewLabel:SetText(self:ColourText("Sample Text", newColour))
-		currentColour = newColour
-	end)
-	rgbGroup:AddChild(greenSlider)
-	
-	-- Blue slider
-	local blueSlider = AceGUI:Create("Slider")
-	blueSlider:SetLabel(L["Blue"] or "Blue")
-	blueSlider:SetSliderValues(0, 255, 1)
-	blueSlider:SetValue(b)
-	blueSlider:SetFullWidth(true)
-	blueSlider:SetCallback("OnValueChanged", function(widget, event, value)
-		local newR, newG, newB = r, g, value
-		r = newR or r
-		g = newG or g
-		local newColour = self:RGBToHex(newR, newG, newB)
-		previewLabel:SetText(self:ColourText("Sample Text", newColour))
-		currentColour = newColour
-	end)
-	rgbGroup:AddChild(blueSlider)
-	
-	dialog:AddChild(rgbGroup)
-	
-	-- Buttons
-	local buttonGroup = AceGUI:Create("SimpleGroup")
-	buttonGroup:SetFullWidth(true)
-	buttonGroup:SetLayout("Flow")
-	
-	local okBtn = AceGUI:Create("Button")
-	okBtn:SetText(L["OK"] or "OK")
-	okBtn:SetWidth(100)
-	okBtn:SetCallback("OnClick", function()
-		callback(currentColour)
-		dialog:Release()
-	end)
-	buttonGroup:AddChild(okBtn)
-	
-	local cancelBtn = AceGUI:Create("Button")
-	cancelBtn:SetText(L["Cancel"] or "Cancel")
-	cancelBtn:SetWidth(100)
-	cancelBtn:SetCallback("OnClick", function()
-		dialog:Release()
-	end)
-	buttonGroup:AddChild(cancelBtn)
-	
-	dialog:AddChild(buttonGroup)
+local function RGBAToHex(r, g, b, a)
+    if GLDG.Colors and GLDG.Colors.RGBToColour_perc then
+        return GLDG.Colors:RGBToColour_perc(a or 1, r or 1, g or 1, b or 1)
+    end
+    return string.format("|c%02X%02X%02X%02X", (a or 1) * 255, (r or 1) * 255, (g or 1) * 255, (b or 1) * 255)
 end
 
---[[
-	Get rank colour
-]]
-function ColourGUI:GetRankColour(rankIndex)
-	if GLDG.db and GLDG.db.profile and GLDG.db.profile.colours and GLDG.db.profile.colours.ranks then
-		return GLDG.db.profile.colours.ranks[rankIndex] or self:GetDefaultRankColour(rankIndex)
-	end
-	return self:GetDefaultRankColour(rankIndex)
+local function SyncColorGlobals()
+    local colors = GLDG:GetColors()
+    if colors and colors.guild then
+        GLDG_ONLINE_COLOUR = colors.guild.online or GLDG_DEFAULT_ONLINE_COLOUR
+        GLDG_IS_OFFLINE_COLOUR = colors.guild.isOff or GLDG_DEFAULT_IS_OFFLINE_COLOUR
+        GLDG_GOES_OFFLINE_COLOUR = colors.guild.goOff or GLDG_DEFAULT_GOES_OFFLINE_COLOUR
+        GLDG_ALIAS_COLOUR = colors.guild.alias or GLDG_DEFAULT_ALIAS_COLOUR
+    end
+    if GLDG.db and GLDG.db.profile then
+        GLDG.db.profile.colours = colors
+        GLDG_Data.colours = colors
+    end
+    GLDG:ShowQueue()
 end
 
---[[
-	Set rank colour
-]]
-function ColourGUI:SetRankColour(rankIndex, colour)
-	if not GLDG.db.profile.colours then GLDG.db.profile.colours = {} end
-	if not GLDG.db.profile.colours.ranks then GLDG.db.profile.colours.ranks = {} end
-	
-	GLDG.db.profile.colours.ranks[rankIndex] = colour
-end
+function GLDG:CreateColourTab(container)
+    if self.Colors and self.Colors.Initialize then
+        self.Colors:Initialize()
+    end
+    local colors = self:GetColors()
 
---[[
-	Get default rank colour
-]]
-function ColourGUI:GetDefaultRankColour(rankIndex)
-	local defaultColours = {
-		[0] = "FFD700", -- Guild Master - Gold
-		[1] = "FF6600", -- Officer - Orange  
-		[2] = "9966CC", -- Veteran - Purple
-		[3] = "66CC66", -- Member - Green
-		[4] = "6699FF", -- Recruit - Blue
-		[5] = "CCCCCC", -- Rank 5 - Light Gray
-		[6] = "999999", -- Rank 6 - Gray
-		[7] = "666666", -- Rank 7 - Dark Gray
-		[8] = "333333", -- Rank 8 - Very Dark Gray
-		[9] = "FFFFFF"  -- Rank 9 - White
-	}
-	return defaultColours[rankIndex] or "FFFFFF"
-end
+    local scroll = AceGUI:Create("ScrollFrame")
+    scroll:SetLayout("Flow")
+    scroll:SetFullWidth(true)
+    scroll:SetFullHeight(true)
+    container:AddChild(scroll)
 
---[[
-	Get special colour
-]]
-function ColourGUI:GetSpecialColour(key)
-	if GLDG.db and GLDG.db.profile and GLDG.db.profile.colours and GLDG.db.profile.colours.special then
-		return GLDG.db.profile.colours.special[key] or self:GetDefaultSpecialColour(key)
-	end
-	return self:GetDefaultSpecialColour(key)
-end
+    local COLOUR_KEYS = {
+        { key = "online",     label = L["Comes online"] or "Coming Online (Chat)" },
+        { key = "goOff",      label = L["Going offline"] or "Going Offline (Chat)" },
+        { key = "isOff",      label = L["Is offline"] or "Is Offline (Chat List)" },
+        { key = "alias",      label = L["Alias"] or "Alias & Main Tag" },
+        { key = "list",       label = L["Greeting"] or "Queue: Default Online" },
+        { key = "relog",      label = L["Relog"] or "Queue: Relog" },
+        { key = "new",        label = L["New member"] or "Queue: New Guild Member" },
+        { key = "lvl",        label = L["Level up"] or "Queue: Level-Up" },
+        { key = "rank",       label = L["Promotion"] or "Queue: Promotion" },
+        { key = "achievment", label = L["Achievment"] or "Queue: Achievement" },
+    }
 
---[[
-	Set special colour
-]]
-function ColourGUI:SetSpecialColour(key, colour)
-	if not GLDG.db.profile.colours then GLDG.db.profile.colours = {} end
-	if not GLDG.db.profile.colours.special then GLDG.db.profile.colours.special = {} end
-	
-	GLDG.db.profile.colours.special[key] = colour
-end
+    --------------------------------------------------------
+    -- 1. Colour Set Selector (Guild / Friends / Channel)
+    --------------------------------------------------------
+    local setGroup = AceGUI:Create("InlineGroup")
+    setGroup:SetTitle(L["Colour Settings"] or "Select Target Colour Set")
+    setGroup:SetFullWidth(true)
+    setGroup:SetLayout("Flow")
+    scroll:AddChild(setGroup)
 
---[[
-	Get default special colour
-]]
-function ColourGUI:GetDefaultSpecialColour(key)
-	local defaultColours = {
-		guild_master = "FFD700", -- Gold
-		officer = "FF6600",      -- Orange
-		veteran = "9966CC",      -- Purple
-		member = "66CC66",       -- Green
-		recruit = "6699FF",      -- Blue
-		alt = "FFCC99"          -- Light Orange
-	}
-	return defaultColours[key] or "FFFFFF"
-end
+    local setDropdown = AceGUI:Create("Dropdown")
+    setDropdown:SetLabel(L["Colour"] or "Colour Set")
+    setDropdown:SetList({
+        guild   = L["Guild"] or "Guild Members",
+        friends = L["Friends"] or "Friends List",
+        channel = L["Channel"] or "Custom Channel",
+    })
+    setDropdown:SetValue(activeColourSet)
+    setDropdown:SetRelativeWidth(0.40)
+    setDropdown:SetCallback("OnValueChanged", function(_, _, val)
+        activeColourSet = val or "guild"
+        if GLDG.Colors and GLDG.Colors.SetActiveColourSet then
+            GLDG.Colors:SetActiveColourSet(activeColourSet)
+        end
+        GLDG:RefreshConfigUI()
+    end)
+    setGroup:AddChild(setDropdown)
 
---[[
-	Get chat colour
-]]
-function ColourGUI:GetChatColour(key)
-	if GLDG.db and GLDG.db.profile and GLDG.db.profile.colours and GLDG.db.profile.colours.chat then
-		return GLDG.db.profile.colours.chat[key] or self:GetDefaultChatColour(key)
-	end
-	return self:GetDefaultChatColour(key)
-end
+    local copyToAllBtn = AceGUI:Create("Button")
+    copyToAllBtn:SetText(L["Copy Set to Friends & Channel"] or "Copy Set to Friends & Channel")
+    copyToAllBtn:SetRelativeWidth(0.32)
+    copyToAllBtn:SetCallback("OnClick", function()
+        local src = colors[activeColourSet]
+        if src then
+            for _, targetSet in ipairs({ "guild", "friends", "channel" }) do
+                colors[targetSet] = colors[targetSet] or {}
+                for k, v in pairs(src) do
+                    colors[targetSet][k] = v
+                end
+            end
+            SyncColorGlobals()
+            GLDG:PrintInfo("Copied '" .. activeColourSet .. "' colours to all sets.")
+            GLDG:RefreshConfigUI()
+        end
+    end)
+    setGroup:AddChild(copyToAllBtn)
 
---[[
-	Set chat colour
-]]
-function ColourGUI:SetChatColour(key, colour)
-	if not GLDG.db.profile.colours then GLDG.db.profile.colours = {} end
-	if not GLDG.db.profile.colours.chat then GLDG.db.profile.colours.chat = {} end
-	
-	GLDG.db.profile.colours.chat[key] = colour
-end
+    local resetBtn = AceGUI:Create("Button")
+    resetBtn:SetText(L["Restore default"] or "Restore Defaults")
+    resetBtn:SetRelativeWidth(0.28)
+    resetBtn:SetCallback("OnClick", function()
+        if GLDG.Colors and GLDG.Colors.SetDefaults then
+            GLDG.Colors:SetDefaults()
+            SyncColorGlobals()
+            GLDG:PrintInfo("Default colours restored.")
+            GLDG:RefreshConfigUI()
+        end
+    end)
+    setGroup:AddChild(resetBtn)
 
---[[
-	Get default chat colour
-]]
-function ColourGUI:GetDefaultChatColour(key)
-	local defaultColours = {
-		greeting = "FFFF00", -- Yellow
-		whisper = "FF69B4",  -- Hot Pink
-		system = "FFFFFF"    -- White
-	}
-	return defaultColours[key] or "FFFFFF"
-end
+    --------------------------------------------------------
+    -- 2. Set Specific Colors (Chat & Greeting Queue)
+    --------------------------------------------------------
+    local activeTable = colors[activeColourSet] or {}
+    colors[activeColourSet] = activeTable
 
---[[
-	Reset all colours to defaults
-]]
-function ColourGUI:ResetAllColours()
-	GLDG.db.profile.colours = {
-		ranks = {},
-		special = {},
-		chat = {}
-	}
-	
-	GLDG:Print(L["All colours reset to defaults"] or "All colours reset to defaults")
-end
+    local pickGroup = AceGUI:Create("InlineGroup")
+    pickGroup:SetTitle((L["Character Colours"] or "Chat & Queue Colours") .. " — " .. string.upper(activeColourSet))
+    pickGroup:SetFullWidth(true)
+    pickGroup:SetLayout("Flow")
+    scroll:AddChild(pickGroup)
 
---[[
-	Import colour scheme
-]]
-function ColourGUI:ImportColourScheme()
-	-- Create import dialog
-	local dialog = AceGUI:Create("Window")
-	dialog:SetTitle(L["Import Colour Scheme"] or "Import Colour Scheme")
-	dialog:SetWidth(500)
-	dialog:SetHeight(300)
-	dialog:SetLayout("Flow")
-	
-	local importText = AceGUI:Create("MultiLineEditBox")
-	importText:SetLabel(L["Paste colour scheme data here"] or "Paste colour scheme data here")
-	importText:SetFullWidth(true)
-	importText:SetHeight(200)
-	dialog:AddChild(importText)
-	
-	local importBtn = AceGUI:Create("Button")
-	importBtn:SetText(L["Import"] or "Import")
-	importBtn:SetCallback("OnClick", function()
-		local text = importText:GetText()
-		if self:ImportColourData(text) then
-			GLDG:Print(L["Colour scheme imported successfully"] or "Colour scheme imported successfully")
-			dialog:Release()
-		else
-			GLDG:Print(L["Failed to import colour scheme"] or "Failed to import colour scheme")
-		end
-	end)
-	dialog:AddChild(importBtn)
-	
-	local closeBtn = AceGUI:Create("Button")
-	closeBtn:SetText(L["Close"] or "Close")
-	closeBtn:SetCallback("OnClick", function() dialog:Release() end)
-	dialog:AddChild(closeBtn)
-end
+    for _, item in ipairs(COLOUR_KEYS) do
+        local cp = AceGUI:Create("ColorPicker")
+        cp:SetLabel(item.label)
+        cp:SetHasAlpha(false)
+        local r, g, b, a = HexToRGBA(activeTable[item.key] or "|cFFFFFFFF")
+        cp:SetColor(r, g, b, a)
+        cp:SetRelativeWidth(0.50)
+        cp:SetCallback("OnValueConfirmed", function(_, _, nr, ng, nb, na)
+            activeTable[item.key] = RGBAToHex(nr, ng, nb, na or 1)
+            SyncColorGlobals()
+            GLDG:RefreshConfigUI()
+        end)
+        pickGroup:AddChild(cp)
+    end
 
---[[
-	Export colour scheme
-]]
-function ColourGUI:ExportColourScheme()
-	-- Create export dialog
-	local dialog = AceGUI:Create("Window")
-	dialog:SetTitle(L["Export Colour Scheme"] or "Export Colour Scheme")
-	dialog:SetWidth(500)
-	dialog:SetHeight(300)
-	dialog:SetLayout("Flow")
-	
-	local exportText = AceGUI:Create("MultiLineEditBox")
-	exportText:SetLabel(L["Copy this text to save your colour scheme"] or "Copy this text to save your colour scheme")
-	exportText:SetFullWidth(true)
-	exportText:SetHeight(200)
-	
-	local exportData = (GLDG.db and GLDG.db.profile and GLDG.db.profile.colours) or {}
-	local serialized = self:SerializeColours(exportData)
-	exportText:SetText(serialized)
-	
-	dialog:AddChild(exportText)
-	
-	local closeBtn = AceGUI:Create("Button")
-	closeBtn:SetText(L["Close"] or "Close")
-	closeBtn:SetCallback("OnClick", function() dialog:Release() end)
-	dialog:AddChild(closeBtn)
-end
+    --------------------------------------------------------
+    -- 3. Global Addon Colors (Help Text & Queue Header)
+    --------------------------------------------------------
+    local globalGroup = AceGUI:Create("InlineGroup")
+    globalGroup:SetTitle(L["System Messages"] or "Global AddOn Colours")
+    globalGroup:SetFullWidth(true)
+    globalGroup:SetLayout("Flow")
+    scroll:AddChild(globalGroup)
 
---[[
-	Colour text with hex colour
-]]
-function ColourGUI:ColourText(text, hexColour)
-	if not hexColour or hexColour == "" then
-		hexColour = "FFFFFF"
-	end
-	-- Remove # if present
-	hexColour = hexColour:gsub("#", "")
-	-- Ensure hex is 6 characters
-	if #hexColour < 6 then
-		hexColour = string.rep("0", 6 - #hexColour) .. hexColour
-	end
-	return "|cFF" .. hexColour .. text .. "|r"
-end
+    local helpPicker = AceGUI:Create("ColorPicker")
+    helpPicker:SetLabel(L["Help"] or "Chat Help & Notification Accent")
+    helpPicker:SetHasAlpha(false)
+    local hr, hg, hb, ha = HexToRGBA(colors.help or GLDG_DEFAULT_HELP_COLOUR)
+    helpPicker:SetColor(hr, hg, hb, ha)
+    helpPicker:SetRelativeWidth(0.50)
+    helpPicker:SetCallback("OnValueConfirmed", function(_, _, nr, ng, nb, na)
+        colors.help = RGBAToHex(nr, ng, nb, na or 1)
+        SyncColorGlobals()
+        GLDG:RefreshConfigUI()
+    end)
+    globalGroup:AddChild(helpPicker)
 
---[[
-	Convert hex to RGB
-]]
-function ColourGUI:HexToRGB(hex)
-	hex = hex:gsub("#", "")
-	if #hex == 6 then
-		return tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
-	end
-	return 255, 255, 255
-end
+    local headerPicker = AceGUI:Create("ColorPicker")
+    headerPicker:SetLabel(L["Header"] or "Queue Header Tint")
+    headerPicker:SetHasAlpha(true)
+    local tr, tg, tb, ta = HexToRGBA(colors.header or GLDG_DEFAULT_HEADER_COLOUR)
+    headerPicker:SetColor(tr, tg, tb, ta)
+    headerPicker:SetRelativeWidth(0.50)
+    headerPicker:SetCallback("OnValueConfirmed", function(_, _, nr, ng, nb, na)
+        colors.header = RGBAToHex(nr, ng, nb, na or 0.5)
+        SyncColorGlobals()
+        GLDG:RefreshConfigUI()
+    end)
+    globalGroup:AddChild(headerPicker)
 
---[[
-	Convert RGB to hex
-]]
-function ColourGUI:RGBToHex(r, g, b)
-	return string.format("%02X%02X%02X", r, g, b)
-end
+    --------------------------------------------------------
+    -- 4. Live Preview Card
+    --------------------------------------------------------
+    local previewGroup = AceGUI:Create("InlineGroup")
+    previewGroup:SetTitle((L["Current Colour"] or "Live Colour Preview") .. " (" .. string.upper(activeColourSet) .. ")")
+    previewGroup:SetFullWidth(true)
+    previewGroup:SetLayout("Flow")
+    scroll:AddChild(previewGroup)
 
---[[
-	Serialize colours to string
-]]
-function ColourGUI:SerializeColours(colourData)
-	-- Simple serialization
-	local result = "-- GuildGreet Colour Scheme\n-- " .. date() .. "\n\n"
-	result = result .. "local colours = {\n"
-	
-	if colourData.ranks then
-		result = result .. "  ranks = {\n"
-		for rank, colour in pairs(colourData.ranks) do
-			result = result .. "    [" .. rank .. "] = \"" .. colour .. "\",\n"
-		end
-		result = result .. "  },\n"
-	end
-	
-	if colourData.special then
-		result = result .. "  special = {\n"
-		for key, colour in pairs(colourData.special) do
-			result = result .. "    [\"" .. key .. "\"] = \"" .. colour .. "\",\n"
-		end
-		result = result .. "  },\n"
-	end
-	
-	if colourData.chat then
-		result = result .. "  chat = {\n"
-		for key, colour in pairs(colourData.chat) do
-			result = result .. "    [\"" .. key .. "\"] = \"" .. colour .. "\",\n"
-		end
-		result = result .. "  },\n"
-	end
-	
-	result = result .. "}\n\nreturn colours"
-	return result
-end
-
---[[
-	Import colour data from string
-]]
-function ColourGUI:ImportColourData(text)
-	local func, err = loadstring(text)
-	if not func then
-		return false
-	end
-	
-	local success, colourData = pcall(func)
-	if not success or type(colourData) ~= "table" then
-		return false
-	end
-	
-	-- Apply imported colours
-	if not GLDG_Data then GLDG_Data = {} end
-	if not GLDG_Data.colours then GLDG_Data.colours = {} end
-	
-	if colourData.ranks then
-		GLDG_Data.colours.ranks = colourData.ranks
-	end
-	
-	if colourData.special then
-		GLDG_Data.colours.special = colourData.special
-	end
-	
-	if colourData.chat then
-		GLDG_Data.colours.chat = colourData.chat
-	end
-	
-	return true
+    local previewText = AceGUI:Create("Label")
+    previewText:SetFullWidth(true)
+    previewText:SetText(string.format(
+        "%s[Online]|r PlayerName: Lv80 Paladin %s(Alias)|r\n" ..
+        "%s[Going Offline]|r PlayerName %s(Alias)|r\n" ..
+        "%s[Queue Default]|r [12:00] PlayerName    " ..
+        "%s[Queue Relog]|r [12:05] PlayerName    " ..
+        "%s[Queue New]|r [12:10] NewMember\n" ..
+        "%s[Queue Level-Up]|r [12:15] PlayerName    " ..
+        "%s[Queue Promotion]|r [12:20] Officer    " ..
+        "%s[Queue Achievement]|r [12:25] Achiever",
+        activeTable.online or "|cFFA0FFA0",
+        activeTable.alias or "|cFFFFA0A0",
+        activeTable.goOff or "|cFF7F7F7F",
+        activeTable.alias or "|cFFFFA0A0",
+        activeTable.list or "|cFFFF7F00",
+        activeTable.relog or "|cFF3FFF3F",
+        activeTable.new or "|cFFFF3F3F",
+        activeTable.lvl or "|cFF7F7F7F",
+        activeTable.rank or "|cFFCC00CC",
+        activeTable.achievment or "|cFF001FFF"
+    ))
+    previewGroup:AddChild(previewText)
 end

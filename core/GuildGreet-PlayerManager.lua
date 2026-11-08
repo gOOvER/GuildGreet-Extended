@@ -5,7 +5,7 @@
 
 -- Get or create the GuildGreet addon instance
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- Player Management Library Namespace
 GLDG.PlayerManager = {}
@@ -76,7 +76,7 @@ function GLDG.PlayerManager:RosterImport()
 
 	GLDG.RosterImportRunning = 0
 	
-	GLDG:Print(GLDG.Database:GetColors().help..GLDG_NAME..":|r "..L["Roster import completed"])
+	GLDG:PrintHelp(L["Roster import completed"])
 end
 
 -------------------------------
@@ -682,7 +682,7 @@ function GLDG.PlayerManager:RosterPurge()
 		end
 	end
 	
-	GLDG:Print(GLDG.Database:GetColors().help..GLDG_NAME..":|r "..string.format(L["Purged %d characters"], purged))
+	GLDG:PrintHelp(string.format(L["Purged %d characters"], purged))
 	
 	return purged
 end
@@ -779,243 +779,6 @@ end
 
 function GLDG_MainOrAltInCurrentGuild(name)
 	return GLDG.PlayerManager:MainOrAltInCurrentGuild(name)
-end
-
-function GLDG.PlayerManager:ListForPlayer(playerName, allDetails, onList, print, guildOnly)
-	local result = "";
-
-	if (print == nil) then
-		print = true;
-	end
-	if (allDetails == nil) then
-		allDetails = false
-	end
-	if (guildOnly == nil) then
-		guildOnly = false
-	end
-	if (playerName ~= nil) then
-		if GLDG_DataChar[playerName] ~= nil then
-			GLDG_SetActiveColourSet("guild")
-
-			if ( onList == nil) then
-				onList = self:getOnlineList();
-			end
-
-			local mainName;
-			if ( GLDG_DataChar[playerName].main ) then
-				mainName = playerName
-			elseif ( GLDG_DataChar[playerName].alt ~= nil ) then
-				mainName = GLDG_DataChar[playerName].alt;
-			else
-				mainName = "-";
-			end
-
-			local details = self:findPlayerDetails(playerName);
-			local playerDetails = "";
-
-			for player in pairs(GLDG_DataChar) do
-
-				if (not guildOnly or (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_unique_GuildName)) then
-					local color = "";
-					local endcolor = "";
-					if (print) then
-						color = GLDG_IS_OFFLINE_COLOUR;
-						endcolor = "|r";
-					end
-					if ( onList[player] and print) then
-						color = GLDG_ONLINE_COLOUR;
-						endcolor = "|r";
-					end
-
-					if (allDetails) then
-						playerDetails = self:findPlayerDetails(player)
-					end
-
-					local postfix = ""
-					if (GLDG_Data.GuildSettings.AddPostfix==true) then
-						if (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_unique_GuildName) then
-							-- no postfix for guild members
-						elseif (GLDG_DataChar[player].channels and GLDG_DataChar[player].channels[GLDG_ChannelName]) then
-							postfix = " {c}"
-						elseif (GLDG_DataChar[player].friends and GLDG_DataChar[player].friends[GLDG.Player]) then
-							postfix = " {f}"
-						else
-							postfix = " {?}"
-						end
-					end
-
-					if ( GLDG_DataChar[player].main and (player == mainName) ) then
-						if ((player == playerName) and print and details ~= "") then
-							result = result..color.."["..Ambiguate(player, "guild")..": "..details..postfix.."]"..endcolor.." ";
-						elseif (player == playerName) then
-							result = result..color.."["..Ambiguate(player, "guild")..postfix.."]"..endcolor.." ";
-						elseif (playerDetails~="" and print) then
-							result = result..color.."["..Ambiguate(player, "guild")..": "..playerDetails..postfix.."]"..endcolor.." ";
-						else
-							result = result..color.."["..Ambiguate(player, "guild")..postfix.."]"..endcolor.." ";
-						end
-					elseif ( GLDG_DataChar[player].alt == mainName ) then
-						if ((player == playerName) and print and details ~= "") then
-							result = result..color.."("..Ambiguate(player, "guild")..": "..details..postfix..")"..endcolor.." ";
-						elseif (player == playerName) then
-							result = result..color..Ambiguate(player, "guild")..endcolor.." ";
-						elseif (playerDetails~="" and print) then
-							result = result..color.."("..Ambiguate(player, "guild")..": "..playerDetails..postfix..")"..endcolor.." ";
-						else
-							result = result..color..Ambiguate(player, "guild")..postfix..endcolor.." ";
-						end
-					elseif ((player == playerName) and print and details ~= "") then
-						result = result..color.."("..Ambiguate(player, "guild")..": "..details..postfix..")"..endcolor.." ";
-					elseif (player == playerName) then
-						result = result..color..Ambiguate(player, "guild")..postfix..endcolor.." ";
-					end
-				end
-			end
-
-			if (result ~= "") then
-				if (print) then
-					result = result..self:findAlias(playerName, 1);
-				else
-					result = result..self:findAlias(playerName, 2);
-				end
-			else
-				result = result..L["No characters found"]
-			end
-		else
-			result = playerName.." "..L["is not in guild"];
-			if GLDG_Data.UseFriends==true then
-				result = result.." "..L["or a friend"];
-			end
-			if GLDG_inChannel then
-				result = result.." "..L["or in channel"];
-			end
-		end
-		if (print) then
-			GLDG:PrintHelp(result);
-		end
-	end
-
-	return result;
-end
-
-function GLDG.PlayerManager:ListAllPlayers(offline, print, guildOnly)
-	local onList = self:getOnlineList();
-	local line = "";
-	local result = {};
-	local i = 0;
-
-	if (guildOnly == nil) then
-		guildOnly = false
-	end
-
-	GLDG_SetActiveColourSet("guild")
-
-	if offline then
-		if (print) then
-			GLDG:PrintHelp(L["Listing all characters (also offline)"])
-		end
-		for player in pairs(GLDG_DataChar) do
-			if (not guildOnly and (GLDG_DataChar[player].main or not GLDG_DataChar[player].alt)) or
-			   (guildOnly and ((not GLDG_DataChar[player].main and (not GLDG_DataChar[player].alt) and GLDG_DataChar[player].guild==GLDG_unique_GuildName) or
-			                   (GLDG_DataChar[player].main and GLDG_MainOrAltInCurrentGuild(player)))) then
-					line = self:ListForPlayer(player, false, onList, print);
-					result[i] = line;
-					i = i+1;
-			end
-		end
-	else
-		if (print) then
-			GLDG:PrintHelp(L["Listing online characters only"])
-		end
-		for player in pairs(onList) do
-			if (not guildOnly or (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_unique_GuildName)) then
-				line = self:ListForPlayer(player, false, onList, print);
-				result[i] = line;
-				i = i+1;
-			end
-		end
-	end
-
-	return result;
-end
-
-function GLDG.PlayerManager:MainOrAltInCurrentGuild(name)
-	local result = false
-
-	if name then
-		for p in pairs(GLDG_DataChar) do
-			if (p == name) and (GLDG_DataChar[p].guild and GLDG_DataChar[p].guild == GLDG_unique_GuildName) or				-- is this main, and in guild?
-			   (GLDG_DataChar[p].alt == name) and (GLDG_DataChar[p].guild and GLDG_DataChar[p].guild == GLDG_unique_GuildName) then	-- is this an alt, and in guild?
-			   	result = true
-			end
-		end
-	end
-
-	return result
-end
-
-function GLDG.PlayerManager:FindAlts(mainName, playerName, colourise)
-	local altList = "";
-
-	local details = self:findPlayerDetails(playerName)
-
-	for player in pairs(GLDG_DataChar) do
-		local color = GLDG_IS_OFFLINE_COLOUR;
-		local endcolor = "|r";
-		if (colourise == 0) then
-			color = GLDG_GOES_OFFLINE_COLOUR;
-		elseif ( player == playerName) then
-			color = GLDG_ONLINE_COLOUR;
-			endcolor = "|r";
-		end
-
-		local postfix = ""
-		if (GLDG_Data.GuildSettings.AddPostfix==true) then
-			if (GLDG_DataChar[player].guild and GLDG_DataChar[player].guild==GLDG_unique_GuildName) then
-				-- no postfix for guild members
-			elseif (GLDG_DataChar[player].channels and GLDG_DataChar[player].channels[GLDG_ChannelName]) then
-				postfix = " {c}"
-			elseif (GLDG_DataChar[player].friends and GLDG_DataChar[player].friends[GLDG.Player]) then
-				postfix = " {f}"
-			else
-				postfix = " {?}"
-			end
-		end
-
-		if ( GLDG_DataChar[player].main and (player == mainName) ) then
-			if (player == playerName and details~="") then
-				altList = altList..color.."["..Ambiguate(player, "guild")..": "..details..postfix.."]"..endcolor.." ";
-			else
-				altList = altList..color.."["..Ambiguate(player, "guild")..postfix.."]"..endcolor.." ";
-			end
-		elseif ( GLDG_DataChar[player].alt == mainName ) then
-			if (player == playerName and details~="") then
-				altList = altList..color.."("..Ambiguate(player, "guild")..": "..details..postfix..")"..endcolor.." ";
-			else
-				altList = altList..color..Ambiguate(player, "guild")..postfix..endcolor.." ";
-			end
-		end
-	end
-
-	altList = altList..self:findAlias(playerName, colourise);
-
-	return altList
-end
-
-function GLDG_FindAlts(mainName, playerName, colourise)
-	return GLDG.PlayerManager:FindAlts(mainName, playerName, colourise)
-end
-
-function GLDG_MainOrAltInCurrentGuild(name)
-	return GLDG.PlayerManager:MainOrAltInCurrentGuild(name)
-end
-
-function GLDG_ListForPlayer(playerName, allDetails, onList, print, guildOnly)
-	return GLDG.PlayerManager:ListForPlayer(playerName, allDetails, onList, print, guildOnly)
-end
-
-function GLDG_ListAllPlayers(offline, print, guildOnly)
-	return GLDG.PlayerManager:ListAllPlayers(offline, print, guildOnly)
 end
 
 function GLDG_RosterPurge()
@@ -1315,14 +1078,12 @@ end
 -------------------------------
 
 function GLDG.PlayerManager:Initialize()
-	-- Initialize player tracking variables
-	GLDG_RosterImportRunning = false
-	GLDG_ReadNotes = false
+	-- Initialize player tracking variables (numeric 0/1 expected by legacy checks)
+	GLDG_RosterImportRunning = 0
+	GLDG_ReadNotes = 1
 	
 	-- Initialize player lists
 	if not GLDG_Online then GLDG_Online = {} end
 	if not GLDG_Offline then GLDG_Offline = {} end
 	if not GLDG_SortedList then GLDG_SortedList = {} end
-	
-	print("GuildGreet: Player Manager module initialized")
 end

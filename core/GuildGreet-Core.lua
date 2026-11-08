@@ -47,10 +47,13 @@ function GLDG.Core:generateConfigString()
 		GLDG_Data[GLDG.unique_GuildName] = GLDG_Data.GuildSettings
 		GLDG_Data[GLDG.unique_GuildName].GLDG_CONFIG_STRING = GLDG_CONFIG_STRING
 	end
-	if (GLDG_CONFIG_STRING ~= GLDG_config_from_guild) and IsGuildLeader() then
-		_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Enable()
-	else
-		_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Disable()
+	local writeBtn = _G[GLDG_GUI.."SettingsGeneralWriteGuildString"]
+	if writeBtn then
+		if (GLDG_CONFIG_STRING ~= GLDG_config_from_guild) and IsGuildLeader() then
+			writeBtn:Enable()
+		else
+			writeBtn:Disable()
+		end
 	end
 end
 
@@ -59,30 +62,42 @@ end
 function GLDG.Core:InitGreet(section)
 	-- Set greetings section pointer if section exists
 	local t = GLDG_Data.Custom
-	if not t[section] then return true
-	elseif (t[section] == "") then GLDG_DataGreet = GLDG_Data
+	if not t or not t[section] then return true
+	elseif (t[section] == "") then GLDG_DataGreet = GLDG.db and GLDG.db.realm.greetings or GLDG_DataGreet
 	else	GLDG_SelColName = t[section]
-		GLDG_DataGreet = GLDG_Data.Collections[t[section]] end
+		if GLDG_Data.Collections and GLDG_Data.Collections[t[section]] then
+			GLDG_DataGreet = GLDG_Data.Collections[t[section]]
+		end
+	end
 end
 
 ------------------------------------------------------------
 -- Guild alias management functions
 function GLDG.Core:ClickGuildAliasSet()
 	local name = GLDG_GUI.."SettingsGreeting"
-	GLDG_GuildAlias = _G[name.."GuildAliasEditbox"]:GetText()
-	GLDG_Data.GuildAlias[GLDG.unique_GuildName] = GLDG_GuildAlias
-
-	_G[name.."GuildAliasEditbox"]:ClearFocus()
+	local box = _G[name.."GuildAliasEditbox"]
+	if box then
+		GLDG_GuildAlias = box:GetText()
+		box:ClearFocus()
+	end
+	if GLDG.unique_GuildName and GLDG_Data.GuildAlias then
+		GLDG_Data.GuildAlias[GLDG.unique_GuildName] = GLDG_GuildAlias
+	end
 end
 
 ------------------------------------------------------------
 function GLDG.Core:ClickGuildAliasClear()
 	GLDG_GuildAlias = GLDG.unique_GuildName
-	GLDG_Data.GuildAlias[GLDG.unique_GuildName] = GLDG_GuildAlias
+	if GLDG.unique_GuildName and GLDG_Data.GuildAlias then
+		GLDG_Data.GuildAlias[GLDG.unique_GuildName] = GLDG_GuildAlias
+	end
 
 	local name = GLDG_GUI.."SettingsGreeting"
-	_G[name.."GuildAliasEditbox"]:SetText("")
-	_G[name.."GuildAliasEditbox"]:ClearFocus()
+	local box = _G[name.."GuildAliasEditbox"]
+	if box then
+		box:SetText("")
+		box:ClearFocus()
+	end
 end
 
 ------------------------------------------------------------
@@ -140,32 +155,65 @@ end
 
 ------------------------------------------------------------
 function GLDG.Core:GreetChannel()
+	if not GLDG_ChannelName then return end
 	local list = GLDG_DataGreet.Channel
 	list = GLDG_FilterMessages(nil, list)
 
 	local greetSize = GLDG_TableSize(list)
-	if (greetSize ==0 ) then return end
+	if (greetSize == 0) then return end
 
 	local msg = list[math.random(greetSize)]
 	msg = GLDG_ParseCustomMessage("", "", msg)
 
-	-- Send greeting (still parse for %s for backwards compatibility)
-	SendChatMessage(string.format(msg, GLDG_GuildAlias), GLDG_ChannelName)
+	-- Send greeting
+	local channel = GetChannelName(GLDG_ChannelName)
+	if channel and channel > 0 then
+		SendChatMessage(string.format(msg, GLDG_GuildAlias or ""), "CHANNEL", nil, tostring(channel))
+	end
 end
 
 ------------------------------------------------------------
 -- Player interaction functions
 function GLDG.Core:ClickName(button, name)
-	-- Strip timestamp from name
-	name = string.sub(name, 9)
-	local _, uRealm = string.split("-", name)
-
-	name = string.split("-", name)
-	if (button == "LeftButton") then
-		GLDG_SendGreet(name, false)
-	elseif (button == "RightButton") then
-		GLDG_SendBye(name, false)
+	if not name or name == "" then return end
+	-- Strip timestamp "[HH:MM] " from name if present
+	if string.sub(name, 1, 1) == "[" then
+		name = string.sub(name, 9)
 	end
+	local _, uRealm = string.split("-", name)
+	if not uRealm then
+		local prefix = name.."-"
+		local len = string.len(prefix)
+		local matched = nil
+		for i in pairs(GLDG_DataChar) do
+			if string.sub(i, 1, len) == prefix and GLDG_DataChar[i].guild == GLDG_unique_GuildName then
+				matched = i
+				break
+			end
+		end
+		if not matched then
+			for i in pairs(GLDG_Queue) do
+				if string.sub(i, 1, len) == prefix then
+					matched = i
+					break
+				end
+			end
+		end
+		if matched then
+			name = matched
+		elseif GLDG.Realm then
+			name = prefix..string.gsub(GLDG.Realm, " ", "")
+		end
+	end
+	-- Greet the player if left click
+	if (button == "LeftButton") then
+		GLDG_SendGreet(name)
+	end
+	-- Cleanup where needed
+	GLDG_CleanupPlayer(name)
+	-- Remove name from queue and refresh
+	GLDG_Queue[name] = nil
+	GLDG_ShowQueue()
 end
 
 ------------------------------------------------------------

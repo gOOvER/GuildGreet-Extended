@@ -4,7 +4,7 @@ Provides inter-addon communication for guild synchronization and data sharing
 ]]--
 
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- Initialize Communication module
 function GLDG:InitializeCommunication()
@@ -184,7 +184,7 @@ end
 -- Handle incoming message
 function GLDG:HandleIncomingMessage(data)
 	if data.priority == "HIGH" then
-		self:Print("[GuildGreet] Message from " .. data.sender .. ": " .. data.content)
+		self:Print("Message from " .. data.sender .. ": " .. data.content)
 	end
 end
 
@@ -253,9 +253,9 @@ end
 -- Serialize message data using AceSerializer
 function GLDG:SerializeMessage(data)
 	if not data then return "" end
-	
-	-- Simple JSON-like serialization for AceComm compatibility
-	-- This is intentionally simple to avoid size issues
+	if self.Serialize then
+		return self:Serialize(data)
+	end
 	local serialized = ""
 	for key, value in pairs(data) do
 		if type(value) == "string" then
@@ -272,7 +272,12 @@ function GLDG:DeserializeMessage(serialized)
 	if not serialized or serialized == "" then
 		return false
 	end
-	
+	if self.Deserialize then
+		local ok, res = self:Deserialize(serialized)
+		if ok and type(res) == "table" then
+			return true, res
+		end
+	end
 	local data = {}
 	for pair in string.gmatch(serialized, "[^;]+") do
 		local key, value = string.match(pair, "([^=]+)=(.+)")
@@ -280,7 +285,6 @@ function GLDG:DeserializeMessage(serialized)
 			data[key] = value
 		end
 	end
-	
 	return true, data
 end
 

@@ -1,372 +1,206 @@
---[[
-	GuildGreet Profiles GUI Module
-	Handles profile management (create, copy, delete, load, save)
-]]--
+------------------------------------------------------------
+-- GuildGreet Modern GUI - Profiles Management Tab
+-- Full AceDB-3.0 profile switching, creation, copying,
+-- deletion, and reset with confirmation dialogs
+------------------------------------------------------------
 
-local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet")
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
+local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet")
+GuildGreet = GLDG
 
-local ProfilesGUI = GLDG:NewModule("ProfilesGUI")
+local UIStyle = GLDG.UIStyle
 
---[[
-	Create the Profiles tab content
-]]
-function ProfilesGUI:CreateTabContent(container)
-	-- Main scroll frame
-	local scrollFrame = AceGUI:Create("ScrollFrame")
-	scrollFrame:SetFullWidth(true)
-	scrollFrame:SetFullHeight(true)
-	scrollFrame:SetLayout("Flow")
-	
-	-- Information section
-	local infoGroup = AceGUI:Create("InlineGroup")
-	infoGroup:SetTitle(L["Profile Management"] or "Profile Management")
-	infoGroup:SetFullWidth(true)
-	infoGroup:SetHeight(100)
-	infoGroup:SetLayout("Flow")
-	
-	local infoText = AceGUI:Create("Label")
-	infoText:SetText(L["Create and manage multiple setting profiles. Profiles allow you to save different configurations and switch between them easily."] or "Create and manage multiple setting profiles. Profiles allow you to save different configurations and switch between them easily.")
-	infoText:SetFullWidth(true)
-	infoGroup:AddChild(infoText)
-	
-	scrollFrame:AddChild(infoGroup)
-	
-	-- Current Profile Display
-	local currentGroup = AceGUI:Create("InlineGroup")
-	currentGroup:SetTitle(L["Current Profile"] or "Current Profile")
-	currentGroup:SetFullWidth(true)
-	currentGroup:SetHeight(60)
-	currentGroup:SetLayout("Flow")
-	
-	local currentLabel = AceGUI:Create("Label")
-	local currentProfile = GLDG.db:GetCurrentProfile()
-	currentLabel:SetText(L["Active Profile"] .. ": |cffffff00" .. currentProfile .. "|r")
-	currentLabel:SetFullWidth(true)
-	currentGroup:AddChild(currentLabel)
-	
-	scrollFrame:AddChild(currentGroup)
-	
-	-- Profile Creation Section
-	local createGroup = AceGUI:Create("InlineGroup")
-	createGroup:SetTitle(L["Create New Profile"] or "Create New Profile")
-	createGroup:SetFullWidth(true)
-	createGroup:SetHeight(80)
-	createGroup:SetLayout("Flow")
-	
-	local profileNameEdit = AceGUI:Create("EditBox")
-	profileNameEdit:SetLabel(L["Profile Name"] or "Profile Name")
-	profileNameEdit:SetRelativeWidth(0.7)
-	createGroup:AddChild(profileNameEdit)
-	
-	local createBtn = AceGUI:Create("Button")
-	createBtn:SetText(L["Create"] or "Create")
-	createBtn:SetWidth(80)
-	createBtn:SetCallback("OnClick", function()
-		local name = profileNameEdit:GetText()
-		if name and name:trim() ~= "" then
-			self:CreateProfile(name)
-			profileNameEdit:SetText("")
-			self:RefreshProfileList(scrollFrame, currentLabel)
-		else
-			GLDG:Print(L["Please enter a profile name"] or "Please enter a profile name")
-		end
-	end)
-	createGroup:AddChild(createBtn)
-	
-	scrollFrame:AddChild(createGroup)
-	
-	-- Profiles Dropdown Section
-	local dropdownGroup = AceGUI:Create("InlineGroup")
-	dropdownGroup:SetTitle(L["Existing Profiles"] or "Existing Profiles")
-	dropdownGroup:SetFullWidth(true)
-	dropdownGroup:SetHeight(120)
-	dropdownGroup:SetLayout("Flow")
-	
-	-- Profile Dropdown
-	local profileDropdown = AceGUI:Create("Dropdown")
-	profileDropdown:SetLabel(L["Select Profile"] or "Select Profile")
-	profileDropdown:SetWidth(200)
-	
-	-- Populate dropdown
-	local profiles = GLDG.db:GetProfiles()
-	local currentProfile = GLDG.db:GetCurrentProfile()
-	local dropdownValues = {}
-	
-	if profiles and #profiles > 0 then
-		for _, profileName in ipairs(profiles) do
-			if profileName == currentProfile then
-				dropdownValues[profileName] = profileName .. " (Active)"
-			else
-				dropdownValues[profileName] = profileName
-			end
-		end
-	end
-	
-	profileDropdown:SetList(dropdownValues)
-	profileDropdown:SetValue(currentProfile)
-	profileDropdown:SetCallback("OnValueChanged", function(widget, event, value)
-		self:LoadProfile(value, currentLabel)
-	end)
-	dropdownGroup:AddChild(profileDropdown)
-	
-	-- Load Button
-	local loadBtn = AceGUI:Create("Button")
-	loadBtn:SetText(L["Load"] or "Load")
-	loadBtn:SetWidth(80)
-	loadBtn:SetCallback("OnClick", function()
-		self:LoadProfile(profileDropdown:GetValue(), currentLabel)
-	end)
-	dropdownGroup:AddChild(loadBtn)
-	
-	-- Copy Button
-	local copyBtn = AceGUI:Create("Button")
-	copyBtn:SetText(L["Copy"] or "Copy")
-	copyBtn:SetWidth(80)
-	copyBtn:SetCallback("OnClick", function()
-		self:ShowCopyDialog(profileDropdown:GetValue())
-	end)
-	dropdownGroup:AddChild(copyBtn)
-	
-	-- Delete Button
-	local deleteBtn = AceGUI:Create("Button")
-	deleteBtn:SetText(L["Delete"] or "Delete")
-	deleteBtn:SetWidth(80)
-	if profileDropdown:GetValue() == currentProfile then
-		deleteBtn:SetDisabled(true)
-	end
-	deleteBtn:SetCallback("OnClick", function()
-		local selectedProfile = profileDropdown:GetValue()
-		if selectedProfile == currentProfile then
-			GLDG:Print(L["Cannot delete the currently active profile"] or "Cannot delete the currently active profile")
-			return
-		end
-		StaticPopup_Show("GUILDGREET_CONFIRM_DELETE_PROFILE", selectedProfile)
-	end)
-	dropdownGroup:AddChild(deleteBtn)
-	
-	scrollFrame:AddChild(dropdownGroup)
-	
-	-- Store references
-	self.scrollFrame = scrollFrame
-	self.currentLabel = currentLabel
-	self.profileNameEdit = profileNameEdit
-	self.profileDropdown = profileDropdown
-	self.deleteBtn = deleteBtn
-	
-	container:AddChild(scrollFrame)
+local selectedCopySource = nil
+local selectedDeleteTarget = nil
+
+StaticPopupDialogs["GUILDGREET_CONFIRM_DELETE_PROFILE"] = {
+    text = "Are you sure you want to delete the profile '%s'?",
+    button1 = YES or "Yes",
+    button2 = NO or "No",
+    OnAccept = function(_, data)
+        if data and GLDG.db and data ~= GLDG.db:GetCurrentProfile() then
+            GLDG.db:DeleteProfile(data, true)
+            selectedDeleteTarget = nil
+            GLDG:PrintInfo("Deleted profile: " .. tostring(data))
+            GLDG:RefreshConfigUI()
+        end
+    end,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+}
+
+StaticPopupDialogs["GUILDGREET_CONFIRM_RESET_PROFILE"] = {
+    text = "Are you sure you want to reset the current profile '%s' to default values?",
+    button1 = YES or "Yes",
+    button2 = NO or "No",
+    OnAccept = function()
+        if GLDG.db then
+            GLDG.db:ResetProfile()
+            GLDG:OnProfileChanged()
+            GLDG:PrintInfo("Current profile reset to defaults.")
+            GLDG:RefreshConfigUI()
+        end
+    end,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+}
+
+local function GetAllProfilesMap(excludeCurrent)
+    local map = {}
+    if not GLDG.db then return map end
+    local current = GLDG.db:GetCurrentProfile()
+    local list = GLDG.db:GetProfiles({})
+    for _, name in ipairs(list) do
+        if not excludeCurrent or name ~= current then
+            map[name] = name
+        end
+    end
+    return map
 end
 
---[[
-	Refresh the profile list
-]]
-function ProfilesGUI:RefreshProfileList(scrollFrame, currentLabel, listGroup)
-	if not self.profileDropdown then
-		return
-	end
-	
-	local profiles = GLDG.db:GetProfiles()
-	local currentProfile = GLDG.db:GetCurrentProfile()
-	
-	-- Update dropdown
-	local dropdownValues = {}
-	if profiles and #profiles > 0 then
-		for _, profileName in ipairs(profiles) do
-			if profileName == currentProfile then
-				dropdownValues[profileName] = profileName .. " (Active)"
-			else
-				dropdownValues[profileName] = profileName
-			end
-		end
-	end
-	
-	self.profileDropdown:SetList(dropdownValues)
-	self.profileDropdown:SetValue(currentProfile)
-	
-	-- Update delete button state
-	if self.deleteBtn then
-		if currentProfile == currentProfile then
-			self.deleteBtn:SetDisabled(true)
-		else
-			self.deleteBtn:SetDisabled(false)
-		end
-	end
-end
+function GLDG:CreateProfilesTab(container)
+    local scroll = AceGUI:Create("ScrollFrame")
+    scroll:SetLayout("Flow")
+    scroll:SetFullWidth(true)
+    scroll:SetFullHeight(true)
+    container:AddChild(scroll)
 
---[[
-	Create a new profile
-]]
-function ProfilesGUI:CreateProfile(name)
-	if not name or name:trim() == "" then
-		GLDG:Print(L["Profile name cannot be empty"] or "Profile name cannot be empty")
-		return
-	end
-	
-	-- Check if profile already exists
-	local profiles = GLDG.db:GetProfiles()
-	for _, profile in ipairs(profiles) do
-		if profile == name then
-			GLDG:Print(string.format(L["Profile '%s' already exists"] or "Profile '%s' already exists", name))
-			return
-		end
-	end
-	
-	-- Create profile by setting it as current
-	GLDG.db:SetProfile(name)
-	GLDG:Print(string.format(L["Profile '%s' created successfully"] or "Profile '%s' created successfully", name))
-	
-	-- Refresh UI
-	self:RefreshProfileList()
-end
+    local currentProfile = self.db and self.db:GetCurrentProfile() or "Default"
+    local allProfiles = GetAllProfilesMap(false)
+    local otherProfiles = GetAllProfilesMap(true)
 
---[[
-	Load a profile
-]]
-function ProfilesGUI:LoadProfile(profileName, currentLabel)
-	if not profileName or profileName:trim() == "" then
-		GLDG:Print(L["Invalid profile name"] or "Invalid profile name")
-		return
-	end
-	
-	GLDG.db:SetProfile(profileName)
-	GLDG:Print(string.format(L["Switched to profile '%s'"] or "Switched to profile '%s'", profileName))
-	
-	-- Update current profile display
-	if self.currentLabel then
-		self.currentLabel:SetText(L["Active Profile"] .. ": |cffffff00" .. profileName .. "|r")
-	end
-	
-	-- Refresh profile list
-	self:RefreshProfileList()
-end
+    --------------------------------------------------------
+    -- 1. Active Profile Selection & Reset
+    --------------------------------------------------------
+    local activeGroup = AceGUI:Create("InlineGroup")
+    activeGroup:SetTitle(L["Active Profile"] or "Active Configuration Profile")
+    activeGroup:SetFullWidth(true)
+    activeGroup:SetLayout("Flow")
+    scroll:AddChild(activeGroup)
 
---[[
-	Show copy profile dialog
-]]
-function ProfilesGUI:ShowCopyDialog(sourceProfile)
-	local dialog = AceGUI:Create("Window")
-	dialog:SetTitle(L["Copy Profile"] or "Copy Profile")
-	dialog:SetWidth(400)
-	dialog:SetHeight(150)
-	dialog:SetLayout("Flow")
-	
-	local infoText = AceGUI:Create("Label")
-	infoText:SetText(string.format(L["Enter a name for the copy of '%s'"] or "Enter a name for the copy of '%s'", sourceProfile))
-	infoText:SetFullWidth(true)
-	dialog:AddChild(infoText)
-	
-	local nameEdit = AceGUI:Create("EditBox")
-	nameEdit:SetLabel(L["New Profile Name"] or "New Profile Name")
-	nameEdit:SetRelativeWidth(1.0)
-	dialog:AddChild(nameEdit)
-	
-	-- Button group
-	local buttonGroup = AceGUI:Create("SimpleGroup")
-	buttonGroup:SetFullWidth(true)
-	buttonGroup:SetLayout("Flow")
-	
-	local copyBtn = AceGUI:Create("Button")
-	copyBtn:SetText(L["Copy"] or "Copy")
-	copyBtn:SetWidth(100)
-	copyBtn:SetCallback("OnClick", function()
-		local newName = nameEdit:GetText()
-		if newName and newName:trim() ~= "" then
-			self:CopyProfile(sourceProfile, newName)
-			dialog:Release()
-			self:RefreshProfileList()
-		else
-			GLDG:Print(L["Please enter a profile name"] or "Please enter a profile name")
-		end
-	end)
-	buttonGroup:AddChild(copyBtn)
-	
-	local cancelBtn = AceGUI:Create("Button")
-	cancelBtn:SetText(L["Cancel"] or "Cancel")
-	cancelBtn:SetWidth(100)
-	cancelBtn:SetCallback("OnClick", function()
-		dialog:Release()
-	end)
-	buttonGroup:AddChild(cancelBtn)
-	
-	dialog:AddChild(buttonGroup)
-	dialog:BringToFront()
-end
+    local descLabel = AceGUI:Create("Label")
+    descLabel:SetFullWidth(true)
+    descLabel:SetText(
+        (L["Create and manage multiple setting profiles. Profiles allow you to save different configurations and switch between them easily."] or
+        "Profiles store your settings, filters, and colour schemes.") .. "\n" ..
+        UIStyle.Hex.gold .. (L["Current Profile"] or "Current Active Profile") .. ":|r " .. UIStyle.Hex.green .. currentProfile .. UIStyle.Hex.reset
+    )
+    activeGroup:AddChild(descLabel)
 
---[[
-	Copy a profile
-]]
-function ProfilesGUI:CopyProfile(sourceProfile, newName)
-	if not sourceProfile or not newName or newName:trim() == "" then
-		GLDG:Print(L["Invalid profile names"] or "Invalid profile names")
-		return
-	end
-	
-	-- Check if new profile already exists
-	local profiles = GLDG.db:GetProfiles()
-	for _, profile in ipairs(profiles) do
-		if profile == newName then
-			GLDG:Print(string.format(L["Profile '%s' already exists"] or "Profile '%s' already exists", newName))
-			return
-		end
-	end
-	
-	-- Copy profile data using AceDB copy functionality
-	GLDG.db:CopyProfile(sourceProfile, newName)
-	GLDG:Print(string.format(L["Profile '%s' copied to '%s'"] or "Profile '%s' copied to '%s'", sourceProfile, newName))
-end
+    local switchDrop = AceGUI:Create("Dropdown")
+    switchDrop:SetLabel(L["Choose Profile"] or "Switch Active Profile")
+    switchDrop:SetList(allProfiles)
+    switchDrop:SetValue(currentProfile)
+    switchDrop:SetRelativeWidth(0.65)
+    switchDrop:SetCallback("OnValueChanged", function(_, _, newProfile)
+        if newProfile and newProfile ~= currentProfile then
+            self.db:SetProfile(newProfile)
+            self:OnProfileChanged()
+            self:PrintInfo("Switched to profile: " .. newProfile)
+            self:RefreshConfigUI()
+        end
+    end)
+    activeGroup:AddChild(switchDrop)
 
---[[
-	Delete a profile
-]]
-function ProfilesGUI:DeleteProfile(profileName, currentLabel)
-	if not profileName or profileName:trim() == "" then
-		GLDG:Print(L["Invalid profile name"] or "Invalid profile name")
-		return
-	end
-	
-	local currentProfile = GLDG.db:GetCurrentProfile()
-	if profileName == currentProfile then
-		GLDG:Print(L["Cannot delete the currently active profile"] or "Cannot delete the currently active profile")
-		return
-	end
-	
-	-- Show confirmation dialog
-	local dialog = AceGUI:Create("Window")
-	dialog:SetTitle(L["Delete Profile"] or "Delete Profile")
-	dialog:SetWidth(400)
-	dialog:SetHeight(120)
-	dialog:SetLayout("Flow")
-	
-	local confirmText = AceGUI:Create("Label")
-	confirmText:SetText(string.format(L["Are you sure you want to delete profile '%s'?"] or "Are you sure you want to delete profile '%s'?", profileName))
-	confirmText:SetFullWidth(true)
-	dialog:AddChild(confirmText)
-	
-	-- Button group
-	local buttonGroup = AceGUI:Create("SimpleGroup")
-	buttonGroup:SetFullWidth(true)
-	buttonGroup:SetLayout("Flow")
-	
-	local deleteBtn = AceGUI:Create("Button")
-	deleteBtn:SetText(L["Delete"] or "Delete")
-	deleteBtn:SetWidth(100)
-	deleteBtn:SetCallback("OnClick", function()
-		GLDG.db:DeleteProfile(profileName)
-		GLDG:Print(string.format(L["Profile '%s' deleted successfully"] or "Profile '%s' deleted successfully", profileName))
-		dialog:Release()
-		self:RefreshProfileList()
-	end)
-	buttonGroup:AddChild(deleteBtn)
-	
-	local cancelBtn = AceGUI:Create("Button")
-	cancelBtn:SetText(L["Cancel"] or "Cancel")
-	cancelBtn:SetWidth(100)
-	cancelBtn:SetCallback("OnClick", function()
-		dialog:Release()
-	end)
-	buttonGroup:AddChild(cancelBtn)
-	
-	dialog:AddChild(buttonGroup)
-	dialog:BringToFront()
+    local resetBtn = AceGUI:Create("Button")
+    resetBtn:SetText(L["Restore default"] or "Reset Current Profile")
+    resetBtn:SetRelativeWidth(0.35)
+    resetBtn:SetCallback("OnClick", function()
+        StaticPopup_Show("GUILDGREET_CONFIRM_RESET_PROFILE", currentProfile)
+    end)
+    activeGroup:AddChild(resetBtn)
+
+    --------------------------------------------------------
+    -- 2. Create New Profile
+    --------------------------------------------------------
+    local createGroup = AceGUI:Create("InlineGroup")
+    createGroup:SetTitle(L["Create New Profile"] or "Create New Profile")
+    createGroup:SetFullWidth(true)
+    createGroup:SetLayout("Flow")
+    scroll:AddChild(createGroup)
+
+    local newProfileEdit = AceGUI:Create("EditBox")
+    newProfileEdit:SetLabel(L["New Profile Name"] or "New Profile Name (Press Enter to Create & Activate)")
+    newProfileEdit:SetFullWidth(true)
+    newProfileEdit:SetCallback("OnEnterPressed", function(widget, _, name)
+        name = strtrim(name or "")
+        if name == "" then return end
+        self.db:SetProfile(name)
+        self:OnProfileChanged()
+        widget:SetText("")
+        self:PrintInfo("Created and activated profile: " .. name)
+        self:RefreshConfigUI()
+    end)
+    createGroup:AddChild(newProfileEdit)
+
+    --------------------------------------------------------
+    -- 3. Copy From Existing Profile
+    --------------------------------------------------------
+    local copyGroup = AceGUI:Create("InlineGroup")
+    copyGroup:SetTitle(L["Copy Profile"] or "Copy Settings From Another Profile")
+    copyGroup:SetFullWidth(true)
+    copyGroup:SetLayout("Flow")
+    scroll:AddChild(copyGroup)
+
+    local copyDrop = AceGUI:Create("Dropdown")
+    copyDrop:SetLabel(L["Copy Profile"] or "Source Profile to Copy From")
+    copyDrop:SetList(otherProfiles)
+    copyDrop:SetValue(selectedCopySource)
+    copyDrop:SetRelativeWidth(0.65)
+    copyDrop:SetCallback("OnValueChanged", function(_, _, val)
+        selectedCopySource = val
+    end)
+    copyGroup:AddChild(copyDrop)
+
+    local copyBtn = AceGUI:Create("Button")
+    copyBtn:SetText(L["Copy"] or "Copy Into Current")
+    copyBtn:SetRelativeWidth(0.35)
+    copyBtn:SetCallback("OnClick", function()
+        if not selectedCopySource or selectedCopySource == currentProfile then
+            self:PrintError("Please select a source profile to copy from.")
+            return
+        end
+        self.db:CopyProfile(selectedCopySource)
+        self:OnProfileChanged()
+        self:PrintInfo("Copied settings from '" .. selectedCopySource .. "' into '" .. currentProfile .. "'.")
+        self:RefreshConfigUI()
+    end)
+    copyGroup:AddChild(copyBtn)
+
+    --------------------------------------------------------
+    -- 4. Delete Existing Profile
+    --------------------------------------------------------
+    local deleteGroup = AceGUI:Create("InlineGroup")
+    deleteGroup:SetTitle(L["Delete Profile"] or "Delete Inactive Profile")
+    deleteGroup:SetFullWidth(true)
+    deleteGroup:SetLayout("Flow")
+    scroll:AddChild(deleteGroup)
+
+    local delDrop = AceGUI:Create("Dropdown")
+    delDrop:SetLabel(L["Delete Profile"] or "Select Inactive Profile to Delete")
+    delDrop:SetList(otherProfiles)
+    delDrop:SetValue(selectedDeleteTarget)
+    delDrop:SetRelativeWidth(0.65)
+    delDrop:SetCallback("OnValueChanged", function(_, _, val)
+        selectedDeleteTarget = val
+    end)
+    deleteGroup:AddChild(delDrop)
+
+    local delBtn = AceGUI:Create("Button")
+    delBtn:SetText(L["Delete"] or "Delete Profile")
+    delBtn:SetRelativeWidth(0.35)
+    delBtn:SetCallback("OnClick", function()
+        if not selectedDeleteTarget or selectedDeleteTarget == currentProfile then
+            self:PrintError("Please select an inactive profile to delete.")
+            return
+        end
+        local dialog = StaticPopup_Show("GUILDGREET_CONFIRM_DELETE_PROFILE", selectedDeleteTarget)
+        if dialog then
+            dialog.data = selectedDeleteTarget
+        end
+    end)
+    deleteGroup:AddChild(delBtn)
 end

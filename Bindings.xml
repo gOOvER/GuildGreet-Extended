@@ -1,10 +1,8 @@
 <Bindings>
 	<Binding name="GUILDGREETCONFIG" header="GUILDGREET" runOnUp="true">
 		if ( keystate == "down" ) then
-			if _G[GLDG_GUI]:IsVisible() then
-				_G[GLDG_GUI]:Hide();
-			else
-				_G[GLDG_GUI]:Show();
+			if GLDG and GLDG.ToggleConfigWindow then
+				GLDG:ToggleConfigWindow()
 			end
 		end
 	</Binding>

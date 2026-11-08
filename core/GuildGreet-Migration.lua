@@ -12,7 +12,7 @@ else
 	GLDG = GLDG or {}
 end
 
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- Migration Library Namespace
 GLDG.Migration = {}
@@ -27,8 +27,6 @@ local GLDG_fixCount = 0
 function GLDG.Migration:Initialize()
 	-- Check if migration is needed
 	self:CheckMigrationNeeded()
-	
-	print("GuildGreet: Migration system initialized")
 end
 
 -------------------------------
@@ -38,8 +36,6 @@ end
 function GLDG.Migration:Convert()
 	local toConvert = {}
 	local i = 0
-
-	GLDG:PrintHelp(L["Starting data conversion..."])
 
 	-- Find channels, guilds and friends for all realms
 	for p in pairs(GLDG_Data) do
@@ -81,6 +77,11 @@ function GLDG.Migration:Convert()
 		end
 	end
 
+	local hasLegacyEntries = next(toConvert) ~= nil
+	if hasLegacyEntries then
+		GLDG:PrintHelp(L["Starting data conversion..."])
+	end
+
 	-- Process marked entries
 	for r in pairs(toConvert) do
 		if toConvert[r].guilds then
@@ -105,7 +106,9 @@ function GLDG.Migration:Convert()
 	self:ConvertChannelNames()
 	self:ConvertColours()
 
-	GLDG:PrintHelp(L["Data conversion completed"])
+	if hasLegacyEntries then
+		GLDG:PrintHelp(L["Data conversion completed"])
+	end
 end
 
 -------------------------------

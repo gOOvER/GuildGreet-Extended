@@ -1,9 +1,13 @@
-## Interface: 120000, 120002, 11508, 20504, 30403, 40400
+## Interface: 120105, 120002, 120000, 50504, 50500, 40402, 40400, 30403, 20505, 20504, 16001, 11508
 
 ## Title: GuildGreet-Extended
 ## Notes: Advanced guild greeting system with automated welcome messages, player tracking, and modular architecture
 ## Author: gOOvER
-## Version: @project-version@
+## Version: 12.1.0
+## IconTexture: Interface\Icons\Achievement_GuildPerk_EverybodysFriend
+## AddonCompartmentFunc: GuildGreet_OnAddonCompartmentClick
+## AddonCompartmentFuncOnEnter: GuildGreet_OnAddonCompartmentEnter
+## AddonCompartmentFuncOnLeave: GuildGreet_OnAddonCompartmentLeave
 
 ## SavedVariables: GuildGreetDB
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, LibDBIcon-1.0, LibChatAnims, LibStub
@@ -30,7 +34,8 @@ core\libs.xml
 # Core Lua file (loaded AFTER libraries are available)
 GuildGreet.lua
 
-# New GUI Modules
+# Modern Dark-Slate & Gold GUI Modules
+GUI\UIStyle.lua
 GUI\Core.lua
 GUI\Settings.lua
 GUI\Greetings.lua

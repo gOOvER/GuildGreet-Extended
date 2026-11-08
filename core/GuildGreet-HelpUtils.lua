@@ -8,26 +8,27 @@ GLDG.HelpUtils = {}
 ------------------------------------------------------------
 -- Display comprehensive help information
 function GLDG.HelpUtils:Help()
+	local helpCol = (GLDG.GetColors and GLDG:GetColors().help) or "|cFFFFFF7F"
 	GLDG:Print(" ")
-	GLDG:Print(self:GetColors().help..GLDG_NAME..":|r "..L["A tool to manage mains and alts in the guild and greet them"])
-	GLDG:Print(self:GetColors().help..L["Usage"]..":|r /gg guild "..self:GetColors().help.."[|rshow"..self:GetColors().help.."] | |rguild all "..self:GetColors().help.."| |rguild list")
-	GLDG:Print(self:GetColors().help..L["Usage"]..":|r /gg char "..self:GetColors().help.."[|rshow"..self:GetColors().help.."] | |rchar all "..self:GetColors().help.."| |rchar list")
-	GLDG:Print(self:GetColors().help..L["Usage"]..":|r /gg "..self:GetColors().help.."[|rshow"..self:GetColors().help.."] <|r"..L["name"]..self:GetColors().help.."> | |rfull "..self:GetColors().help.."<|r"..L["name"]..self:GetColors().help.."> | |rdetail "..self:GetColors().help.."<|r"..L["name"]..self:GetColors().help..">|r")
-	GLDG_Print(self:GetColors().help..L["Usage"]..":|r /gg help "..self:GetColors().help.."| |rabout "..self:GetColors().help.."| |rconfig "..self:GetColors().help.."| |rtest", true)
-	GLDG_Print(self:GetColors().help..L["Usage"]..":|r /gg clear", true)
-	GLDG_Print(self:GetColors().help..L["Usage"]..":|r /gg check", true)
-	GLDG_Print(self:GetColors().help..L["Usage"]..":|r /gg alert", true)
-	GLDG_Print(self:GetColors().help..L["Usage"]..":|r /gg aliasreset", true)
-	GLDG_Print(self:GetColors().help..L["Usage"]..":|r /gg greet "..self:GetColors().help.."| |rbye "..self:GetColors().help.."| |rlater "..self:GetColors().help.."[|r guild "..self:GetColors().help.."| |rchannel "..self:GetColors().help.."| |rall "..self:GetColors().help.."| <|rname"..self:GetColors().help.."> ]|r", true)
-	GLDG_Print(" - "..self:GetColors().help.."guild/all [show]:|r "..L["List alts of all members to chat"], true);
-	GLDG_Print(" - "..self:GetColors().help.."guild/all all:|r "..L["List alts of members that are online to chat"], true);
-	GLDG_Print(" - "..self:GetColors().help.."guild/all list:|r "..L["List alts of all members for copying"], true);
-	GLDG_Print(" - "..self:GetColors().help.."[show] <name>:|r "..L["List main and alts for <name>"], true);
-	GLDG_Print(" - "..self:GetColors().help.."full <name>:|r "..L["List main and alts for <name> with full class and level info"], true);
-	GLDG_Print(" - "..self:GetColors().help.."detail <name>:|r "..L["Print a dump of internal data for character <name> to chat"], true);
-	GLDG_Print(" - "..self:GetColors().help.."clear:|r "..L["Clear the greet list without greeting anyone"], true);
-	GLDG_Print(" - "..self:GetColors().help.."check:|r "..L["Check if main-alt assignments are correct"], true);
-	GLDG_Print(" - "..self:GetColors().help.."alert:|r "..L["Check if |cFFFFFF7FGuild member notification|r is enabled"], true);
+	GLDG:Print(helpCol..L["A tool to manage mains and alts in the guild and greet them"].."|r")
+	GLDG:Print(helpCol..L["Usage"]..":|r /gg guild "..helpCol.."[|rshow"..helpCol.."] | |rguild all "..helpCol.."| |rguild list")
+	GLDG:Print(helpCol..L["Usage"]..":|r /gg char "..helpCol.."[|rshow"..helpCol.."] | |rchar all "..helpCol.."| |rchar list")
+	GLDG:Print(helpCol..L["Usage"]..":|r /gg "..helpCol.."[|rshow"..helpCol.."] <|r"..L["name"]..helpCol.."> | |rfull "..helpCol.."<|r"..L["name"]..helpCol.."> | |rdetail "..helpCol.."<|r"..L["name"]..helpCol..">|r")
+	GLDG_Print(helpCol..L["Usage"]..":|r /gg help "..helpCol.."| |rabout "..helpCol.."| |rconfig "..helpCol.."| |rtest", true)
+	GLDG_Print(helpCol..L["Usage"]..":|r /gg clear", true)
+	GLDG_Print(helpCol..L["Usage"]..":|r /gg check", true)
+	GLDG_Print(helpCol..L["Usage"]..":|r /gg alert", true)
+	GLDG_Print(helpCol..L["Usage"]..":|r /gg aliasreset", true)
+	GLDG_Print(helpCol..L["Usage"]..":|r /gg greet "..helpCol.."| |rbye "..helpCol.."| |rlater "..helpCol.."[|r guild "..helpCol.."| |rchannel "..helpCol.."| |rall "..helpCol.."| <|rname"..helpCol.."> ]|r", true)
+	GLDG_Print(" - "..helpCol.."guild/all [show]:|r "..L["List alts of all members to chat"], true);
+	GLDG_Print(" - "..helpCol.."guild/all all:|r "..L["List alts of members that are online to chat"], true);
+	GLDG_Print(" - "..helpCol.."guild/all list:|r "..L["List alts of all members for copying"], true);
+	GLDG_Print(" - "..helpCol.."[show] <name>:|r "..L["List main and alts for <name>"], true);
+	GLDG_Print(" - "..helpCol.."full <name>:|r "..L["List main and alts for <name> with full class and level info"], true);
+	GLDG_Print(" - "..helpCol.."detail <name>:|r "..L["Print a dump of internal data for character <name> to chat"], true);
+	GLDG_Print(" - "..helpCol.."clear:|r "..L["Clear the greet list without greeting anyone"], true);
+	GLDG_Print(" - "..helpCol.."check:|r "..L["Check if main-alt assignments are correct"], true);
+	GLDG_Print(" - "..helpCol.."alert:|r "..L["Check if |cFFFFFF7FGuild member notification|r is enabled"], true);
 	GLDG_Print(" - "..L["without argument, show config frame"], true);
 	GLDG_Print(" ", true)
 end
@@ -64,7 +65,7 @@ function GLDG.HelpUtils:TreatWhoInfo(charname, guildname, level, class)
 	if not charname then return end
 
 	if GLDG_DataChar[charname] then
-		result = L["Who results for"].." ["..tostring(charname).."] "
+		local result = L["Who results for"].." ["..tostring(charname).."] "
 		if guildname and guildname ~= "" then
 			GLDG_DataChar[charname].guild = guildname
 			result = result.."<"..tostring(guildname)..">"

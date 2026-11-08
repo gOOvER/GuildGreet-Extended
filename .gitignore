@@ -1,6 +1,7 @@
 # OS artifacts
 .DS_Store
 Thumbs.db
+Desktop.ini
 
 # Editor swap/backup files
 *.swp
@@ -8,22 +9,26 @@ Thumbs.db
 *.tmp
 *.bak
 *.orig
+*~
+.vscode/
+.idea/
+.github/appmod/
 
 # Logs
 *.log
 
-# Packaging/output folders
+# Packaging/output folders & externals
 pkg/
 release/
+.release/
 dist/
+libs/
+Libs/
+
+# Changelog (do not include in AddOns folder / repo)
+CHANGELOG.md
 
 # Temporary archives
 *.zip
 *.tar
 *.tar.gz
-
-# PowerShell helper scripts (excluded)
-*.ps1
-
-# Shell scripts (excluded)
-*.sh

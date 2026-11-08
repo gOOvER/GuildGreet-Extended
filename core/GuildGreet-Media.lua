@@ -4,7 +4,7 @@ Provides comprehensive media resource management (fonts, textures, sounds, color
 ]]--
 
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- Initialize Media module
 function GLDG:InitializeMedia()

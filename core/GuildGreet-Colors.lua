@@ -5,7 +5,7 @@
 
 -- Get or create the GuildGreet addon instance
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- Color Management Library Namespace
 GLDG.Colors = {}
@@ -24,11 +24,11 @@ local GLDG_DEFAULT_RANK_COLOUR = "|cFFCC00CC"
 local GLDG_DEFAULT_RELOG_COLOUR = "|cFF3FFF3F"
 local GLDG_DEFAULT_ACHIEVMENT_COLOUR = "|cFF001FFF"
 
--- Active Color Variables  
-local GLDG_ONLINE_COLOUR = GLDG_DEFAULT_ONLINE_COLOUR
-local GLDG_IS_OFFLINE_COLOUR = GLDG_DEFAULT_IS_OFFLINE_COLOUR
-local GLDG_GOES_OFFLINE_COLOUR = GLDG_DEFAULT_GOES_OFFLINE_COLOUR
-local GLDG_ALIAS_COLOUR = GLDG_DEFAULT_ALIAS_COLOUR
+-- Active Color Variables (kept global as well for other modules)
+GLDG_ONLINE_COLOUR = GLDG_DEFAULT_ONLINE_COLOUR
+GLDG_IS_OFFLINE_COLOUR = GLDG_DEFAULT_IS_OFFLINE_COLOUR
+GLDG_GOES_OFFLINE_COLOUR = GLDG_DEFAULT_GOES_OFFLINE_COLOUR
+GLDG_ALIAS_COLOUR = GLDG_DEFAULT_ALIAS_COLOUR
 
 -- Color Picker Variables
 local GLDG_colorPickerShown = false
@@ -53,313 +53,17 @@ local GLDG_COLOUR = "GuildGreetColour"
 -- Color System Initialization --
 -------------------------------
 
--- Complex Color UI Functions
-
-function GLDG.Colors:ColourPicked(flag)
-	if GLDG_colorPickerShown and not GLDG_updating then
-		-- get values
-		local r, g, b = GLDG_ColorPickerFrame:GetColorRGB();
-
-		-- use values
-		local a = 1
-		if (GLDG_colourName=="header") then
-			a = GLDG_OpacitySliderFrame:GetValue()
-		end
-		GLDG_colour = GLDG.Colors:RGBToColour_perc(a, r, g, b)
-		GLDG.Colors:UpdateCurrentColour()
-
-		if (flag) then
-			GLDG.Colors:HideColourPicker()
-		else
-			GLDG_updating = true
-			GLDG.Colors:UpdateColoursNumbers()
-			GLDG_updating = nil
-		end
-	end
-end
-
-function GLDG.Colors:ColourCancelEdit(self, element)
-	if not GLDG_updating then
-		if self then
-			self:HighlightText(self:GetNumLetters())
-		end
-		GLDG_updating = true
-		GLDG.Colors:UpdateColoursSwatch()
-		GLDG_updating = nil
-	end
-end
-
-function GLDG.Colors:ColourEnter(self, element, number)
-	if not GLDG_updating then
-		if self then
-			self:HighlightText(self:GetNumLetters())
-		end
-		if (number >= 0 and number<=255) then
-			local a,r,g,b = GLDG.Colors:ColourToRGB(GLDG_colour)
-
-			if (element == "GuildGreetColourFrameRed") then
-				GLDG_current_red = number
-				GLDG_colour = GLDG.Colors:RGBToColour(a, number, g, b)
-				GLDG.Colors:UpdateCurrentColour()
-			elseif (element == "GuildGreetColourFrameGreen") then
-				GLDG_current_green = number
-				GLDG_colour = GLDG.Colors:RGBToColour(a, r, number, b)
-				GLDG.Colors:UpdateCurrentColour()
-			elseif (element == "GuildGreetColourFrameBlue") then
-				GLDG_current_blue = number
-				GLDG_colour = GLDG.Colors:RGBToColour(a, r, g, number)
-				GLDG.Colors:UpdateCurrentColour()
-			elseif (element == "GuildGreetColourFrameOpacity") then
-				GLDG_current_opacity = number
-				GLDG_colour = GLDG.Colors:RGBToColour(number, r, g, b)
-				GLDG.Colors:UpdateCurrentColour()
-			end
-		else
-			if (element == "GuildGreetColourFrameRed") then
-				GuildGreetColourFrameRed:SetNumber(GLDG_current_red)
-			elseif (element == "GuildGreetColourFrameGreen") then
-				GuildGreetColourFrameGreen:SetNumber(GLDG_current_green)
-			elseif (element == "GuildGreetColourFrameBlue") then
-				GuildGreetColourFrameBlue:SetNumber(GLDG_current_blue)
-			elseif (element == "GuildGreetColourFrameOpacity") then
-				GuildGreetColourFrameOpacity:SetNumber(GLDG_current_opacity)
-			end
-		end
-
-		GLDG_updating = true
-		GLDG.Colors:UpdateColoursSwatch()
-		GLDG_updating = nil
-	end
-end
-
-function GLDG.Colors:ColourTab(self, element)
-	if self then
-		self:HighlightText(self:GetNumLetters())
-	end
-	if (element == "GuildGreetColourFrameRed") then
-		GuildGreetColourFrameGreen:SetFocus()
-		GuildGreetColourFrameGreen:HighlightText()
-	elseif (element == "GuildGreetColourFrameGreen") then
-		GuildGreetColourFrameBlue:SetFocus()
-		GuildGreetColourFrameBlue:HighlightText()
-	elseif (element == "GuildGreetColourFrameBlue") then
-		if (GLDG_ColorPickerFrame.hasOpacity) then
-			GuildGreetColourFrameOpacity:SetFocus()
-			GuildGreetColourFrameOpacity:HighlightText()
-		else
-			GuildGreetColourFrameRed:SetFocus()
-			GuildGreetColourFrameRed:HighlightText()
-		end
-	elseif (element == "GuildGreetColourFrameOpacity") then
-		GuildGreetColourFrameRed:SetFocus()
-		GuildGreetColourFrameRed:HighlightText()
-	end
-end
-
-function GLDG.Colors:ColourUpdate(element, number)
-	--GLDG_Print("Update: element ["..element.."].. - number ["..number.."]")
-end
-
-function GLDG.Colors:SetActiveColourSet(set)
-	GLDG_ONLINE_COLOUR			= GLDG_DEFAULT_ONLINE_COLOUR
-	GLDG_IS_OFFLINE_COLOUR		= GLDG_DEFAULT_IS_OFFLINE_COLOUR
-	GLDG_GOES_OFFLINE_COLOUR	= GLDG_DEFAULT_GOES_OFFLINE_COLOUR
-	GLDG_ALIAS_COLOUR			= GLDG_DEFAULT_ALIAS_COLOUR
-
-	if (set and GLDG:GetColors()[set]) then
-		GLDG_ONLINE_COLOUR			= GLDG:GetColors()[set].online
-		GLDG_IS_OFFLINE_COLOUR		= GLDG:GetColors()[set].isOff
-		GLDG_GOES_OFFLINE_COLOUR	= GLDG:GetColors()[set].goOff
-		GLDG_ALIAS_COLOUR			= GLDG:GetColors()[set].alias
-	end
-end
-
-function GLDG.Colors:ColoursShow()
-	local name = GLDG_GUI.."Colour"
-
-	-- only build these lists the first time they are used to avoid excessive garbage creation
-	if not GLDG_set_list then
-		GLDG_set_list = {}
-		GLDG_set_list["Guild"] = "guild"
-		GLDG_set_list["Friends"] = "friends"
-		GLDG_set_list["Channel"] = "channel"
-	end
-	if not GLDG_element_list then
-		GLDG_element_list = {}
-		GLDG_element_list["Online"] = "online"
-		GLDG_element_list["IsOffline"] = "isOff"
-		GLDG_element_list["GoOffline"] = "goOff"
-		GLDG_element_list["Alias"] = "alias"
-		GLDG_element_list["List"] = "list"
-		GLDG_element_list["Relog"] = "relog"
-		GLDG_element_list["New"] = "new"
-		GLDG_element_list["Level"] = "lvl"
-		GLDG_element_list["Rank"] = "rank"
-		GLDG_element_list["Achievment"] = "achievment"
-	end
-
-	for s in pairs(GLDG_set_list) do
-		for e in pairs(GLDG_element_list) do
-			local colour = GLDG:GetColors()[GLDG_set_list[s]][GLDG_element_list[e]]
-			local a,r,g,b = GLDG.Colors:ColourToRGB_perc(colour)
-			local texture = _G[name..s..e.."ColourTexture"]
-			texture:SetColorTexture(r, g, b, a)
-			local text = _G[name..s..e.."Button"]
-			text:SetText(string.sub(colour, 5))
-		end
-	end
-
-	local a,r,g,b = GLDG.Colors:ColourToRGB_perc(GLDG:GetColors().help)
-	local texture = _G[name.."HelpColourTexture"]
-	texture:SetColorTexture(r, g, b, a)
-	local text = _G[name.."HelpButton"]
-	text:SetText(string.sub(GLDG:GetColors().help, 5))
-
-	a,r,g,b = GLDG.Colors:ColourToRGB_perc(GLDG:GetColors().header)
-	texture = _G[name.."HeaderColourTexture"]
-	texture:SetColorTexture(r, g, b, a)
-	local text = _G[name.."HeaderButton"]
-	text:SetText(string.sub(GLDG:GetColors().header, 3))
-end
-
-function GLDG.Colors:ColourClick(name)
-	if not GLDG_colorPickerShown then
-		-- which element was clicked
-		GLDG_setName = ""
-		if (string.find(name, GLDG_GUI.."Colour".."Guild")) then
-			GLDG_setName = "guild"
-		elseif (string.find(name, GLDG_GUI.."Colour".."Friends")) then
-			GLDG_setName = "friends"
-		elseif (string.find(name, GLDG_GUI.."Colour".."Channel")) then
-			GLDG_setName = "channel"
-		end
-
-		GLDG_colourName = ""
-		if (string.find(name, "Online")) then
-			GLDG_colourName = "online"
-		elseif (string.find(name, "IsOffline")) then
-			GLDG_colourName = "isOff"
-		elseif (string.find(name, "GoOffline")) then
-			GLDG_colourName = "goOff"
-		elseif (string.find(name, "Alias")) then
-			GLDG_colourName = "alias"
-
-		elseif (string.find(name, "List")) then
-			GLDG_colourName = "list"
-		elseif (string.find(name, "New")) then
-			GLDG_colourName = "new"
-		elseif (string.find(name, "Level")) then
-			GLDG_colourName = "lvl"
-		elseif (string.find(name, "Rank")) then
-			GLDG_colourName = "rank"
-		elseif (string.find(name, "Relog")) then
-			GLDG_colourName = "relog"
-		elseif (string.find(name, "Achievment")) then
-			GLDG_colourName = "achievment"
-
-		elseif (string.find(name, "Help")) then
-			GLDG_colourName = "help"
-		elseif (string.find(name, "Header")) then
-			GLDG_colourName = "header"
-		end
-
-		if (string.find(name, "Default")) then
-			GLDG.Colors:ColourRestoreDefaults()
-		else
-			if ((GLDG_setName~="" or GLDG_colourName=="help" or GLDG_colourName=="header") and (GLDG_colourName ~="")) then
-				-- get current colour
-				if (GLDG_colourName=="help") then
-					GLDG_colour = GLDG:GetColors().help
-				elseif (GLDG_colourName=="header") then
-					GLDG_colour = GLDG:GetColors().header
-				else
-					GLDG_colour = GLDG:GetColors()[GLDG_setName][GLDG_colourName]
-				end
-
-				-- open color picker
-				GLDG.Colors:ShowColourPicker()
-			else
-				GLDG:Print("--- unknown button ["..Ambiguate(name, "guild").."] pressed ---")
-			end
-		end
-	else
-		GLDG:PrintHelp(L["Cannot set default colours while colour picker is open"])
-	end
-end
-
-function GLDG.Colors:UpdateCurrentColour()
-	--GLDG_Print("Colour is "..GLDG_colour..string.sub(GLDG_colour, 3).."|r")
-
-	if (not GLDG_setName) or (not GLDG_colourName) then return end
-
-	if ((GLDG_setName~="" or GLDG_colourName=="help" or GLDG_colourName=="header") and (GLDG_colourName ~="")) then
-		-- set value
-		if (GLDG_colourName=="help") then
-			GLDG:GetColors().help = GLDG_colour
-		elseif (GLDG_colourName=="header") then
-			GLDG:GetColors().header = GLDG_colour
-		else
-			GLDG:GetColors()[GLDG_setName][GLDG_colourName] = GLDG_colour
-		end
-
-		-- update colour cache
-		GLDG.Colors:SetActiveColourSet("guild")
-	end
-
-	GLDG.Colors:ColoursShow()
-end
-
-function GLDG.Colors:ColourRestoreDefaults()
-	if not GLDG_colorPickerShown then
-		GLDG:GetColors().help = GLDG_DEFAULT_HELP_COLOUR
-		GLDG:GetColors().header = GLDG_DEFAULT_HEADER_COLOUR
-
-		GLDG:GetColors().guild.online = GLDG_DEFAULT_ONLINE_COLOUR
-		GLDG:GetColors().guild.isOff = GLDG_DEFAULT_IS_OFFLINE_COLOUR
-		GLDG:GetColors().guild.goOff = GLDG_DEFAULT_GOES_OFFLINE_COLOUR
-		GLDG:GetColors().guild.alias = GLDG_DEFAULT_ALIAS_COLOUR
-		GLDG:GetColors().guild.list = GLDG_DEFAULT_LIST_COLOUR
-		GLDG:GetColors().guild.new = GLDG_DEFAULT_NEW_COLOUR
-		GLDG:GetColors().guild.lvl = GLDG_DEFAULT_LVL_COLOUR
-		GLDG:GetColors().guild.rank = GLDG_DEFAULT_RANK_COLOUR
-		GLDG:GetColors().guild.relog = GLDG_DEFAULT_RELOG_COLOUR
-		GLDG:GetColors().guild.achievment = GLDG_DEFAULT_ACHIEVMENT_COLOUR
-
-		GLDG:GetColors().friends.online = GLDG_DEFAULT_ONLINE_COLOUR
-		GLDG:GetColors().friends.isOff = GLDG_DEFAULT_IS_OFFLINE_COLOUR
-		GLDG:GetColors().friends.goOff = GLDG_DEFAULT_GOES_OFFLINE_COLOUR
-		GLDG:GetColors().friends.alias = GLDG_DEFAULT_ALIAS_COLOUR
-		GLDG:GetColors().friends.list = GLDG_DEFAULT_LIST_COLOUR
-		GLDG:GetColors().friends.new = GLDG_DEFAULT_NEW_COLOUR
-		GLDG:GetColors().friends.lvl = GLDG_DEFAULT_LVL_COLOUR
-		GLDG:GetColors().friends.rank = GLDG_DEFAULT_RANK_COLOUR
-		GLDG:GetColors().friends.relog = GLDG_DEFAULT_RELOG_COLOUR
-		GLDG:GetColors().friends.achievment = GLDG_DEFAULT_ACHIEVMENT_COLOUR
-
-		GLDG:GetColors().channel.online = GLDG_DEFAULT_ONLINE_COLOUR
-		GLDG:GetColors().channel.isOff = GLDG_DEFAULT_IS_OFFLINE_COLOUR
-		GLDG:GetColors().channel.goOff = GLDG_DEFAULT_GOES_OFFLINE_COLOUR
-		GLDG:GetColors().channel.alias = GLDG_DEFAULT_ALIAS_COLOUR
-		GLDG:GetColors().channel.list = GLDG_DEFAULT_LIST_COLOUR
-		GLDG:GetColors().channel.new = GLDG_DEFAULT_NEW_COLOUR
-		GLDG:GetColors().channel.lvl = GLDG_DEFAULT_LVL_COLOUR
-		GLDG:GetColors().channel.rank = GLDG_DEFAULT_RANK_COLOUR
-		GLDG:GetColors().channel.relog = GLDG_DEFAULT_RELOG_COLOUR
-		GLDG:GetColors().channel.achievment = GLDG_DEFAULT_ACHIEVMENT_COLOUR
-
-		-- update colour cache
-		GLDG.Colors:SetActiveColourSet("guild")
-
-		GLDG.Colors:ColoursShow()
-	else
-		GLDG:PrintHelp(L["Cannot set default colours while colour picker is open"])
-	end
-end
-
 function GLDG.Colors:Initialize()
 	-- Initialize color data structure if not exists
-	if not GLDG_Data.colours then
-		GLDG_Data.colours = {}
+	if GLDG_Data then
+		if GLDG_Data.Colors and not GLDG_Data.colours then
+			GLDG_Data.colours = GLDG_Data.Colors
+		elseif GLDG_Data.colours and not GLDG_Data.Colors then
+			GLDG_Data.Colors = GLDG_Data.colours
+		elseif not GLDG_Data.colours then
+			GLDG_Data.colours = {}
+			GLDG_Data.Colors = GLDG_Data.colours
+		end
 	end
 	
 	-- Initialize default color schemes
@@ -367,8 +71,6 @@ function GLDG.Colors:Initialize()
 	
 	-- Set active color set to guild by default
 	self:SetActiveColourSet("guild")
-	
-	print("GuildGreet: Color system initialized")
 end
 
 -------------------------------
@@ -378,18 +80,21 @@ end
 function GLDG.Colors:InitializeColorSchemes()
 	-- Ensure GLDG_Data exists before accessing colours
 	if not GLDG_Data then
-		GLDG:Print("Warning: GLDG_Data not yet initialized, skipping color scheme setup")
 		return
 	end
+	if not GLDG_Data.colours then
+		GLDG_Data.colours = GLDG_Data.Colors or {}
+	end
+	GLDG_Data.Colors = GLDG_Data.colours
 	
 	local colors = GLDG_Data.colours
 	
 	-- Initialize help and header colors
-	if not colors.help then colors.help = GLDG_DEFAULT_HELP_COLOUR end
-	if not colors.header then colors.header = GLDG_DEFAULT_HEADER_COLOUR end
+	if type(colors.help) ~= "string" then colors.help = GLDG_DEFAULT_HELP_COLOUR end
+	if type(colors.header) ~= "string" then colors.header = GLDG_DEFAULT_HEADER_COLOUR end
 	
 	-- Initialize guild color scheme
-	if not colors.guild then colors.guild = {} end
+	if type(colors.guild) ~= "table" then colors.guild = {} end
 	local guild = colors.guild
 	if not guild.online then guild.online = GLDG_DEFAULT_ONLINE_COLOUR end
 	if not guild.isOff then guild.isOff = GLDG_DEFAULT_IS_OFFLINE_COLOUR end
@@ -403,7 +108,7 @@ function GLDG.Colors:InitializeColorSchemes()
 	if not guild.achievment then guild.achievment = GLDG_DEFAULT_ACHIEVMENT_COLOUR end
 	
 	-- Initialize friends color scheme
-	if not colors.friends then colors.friends = {} end
+	if type(colors.friends) ~= "table" then colors.friends = {} end
 	local friends = colors.friends
 	if not friends.online then friends.online = GLDG_DEFAULT_ONLINE_COLOUR end
 	if not friends.isOff then friends.isOff = GLDG_DEFAULT_IS_OFFLINE_COLOUR end
@@ -417,7 +122,7 @@ function GLDG.Colors:InitializeColorSchemes()
 	if not friends.achievment then friends.achievment = GLDG_DEFAULT_ACHIEVMENT_COLOUR end
 	
 	-- Initialize channel color scheme
-	if not colors.channel then colors.channel = {} end
+	if type(colors.channel) ~= "table" then colors.channel = {} end
 	local channel = colors.channel
 	if not channel.online then channel.online = GLDG_DEFAULT_ONLINE_COLOUR end
 	if not channel.isOff then channel.isOff = GLDG_DEFAULT_IS_OFFLINE_COLOUR end
@@ -438,14 +143,32 @@ end
 function GLDG.Colors:GetColors()
 	-- Return default colors if GLDG_Data is not ready yet
 	if not GLDG_Data then
+		local defaultSet = {
+			online = GLDG_DEFAULT_ONLINE_COLOUR,
+			isOff = GLDG_DEFAULT_IS_OFFLINE_COLOUR,
+			goOff = GLDG_DEFAULT_GOES_OFFLINE_COLOUR,
+			alias = GLDG_DEFAULT_ALIAS_COLOUR,
+			list = GLDG_DEFAULT_LIST_COLOUR,
+			new = GLDG_DEFAULT_NEW_COLOUR,
+			lvl = GLDG_DEFAULT_LVL_COLOUR,
+			rank = GLDG_DEFAULT_RANK_COLOUR,
+			relog = GLDG_DEFAULT_RELOG_COLOUR,
+			achievment = GLDG_DEFAULT_ACHIEVMENT_COLOUR,
+		}
 		return {
-		help = GLDG_DEFAULT_HELP_COLOUR or "|cFFFFFFFF",
-			header = GLDG_DEFAULT_HEADER_COLOUR or "|cFFFFFFFF"
+			help = GLDG_DEFAULT_HELP_COLOUR or "|cFFFFFF7F",
+			header = GLDG_DEFAULT_HEADER_COLOUR or "|c7FFF0000",
+			guild = defaultSet,
+			friends = defaultSet,
+			channel = defaultSet,
 		}
 	end
 	
 	-- Initialize colour structure if needed
-	if not GLDG_Data.colours then
+	if not GLDG_Data.colours
+		or type(GLDG_Data.colours.guild) ~= "table"
+		or type(GLDG_Data.colours.friends) ~= "table"
+		or type(GLDG_Data.colours.channel) ~= "table" then
 		self:InitializeColorSchemes()
 	end
 	

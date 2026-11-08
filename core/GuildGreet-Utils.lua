@@ -3,9 +3,10 @@
 -- Provides common utility functions and helpers
 ------------------------------------------------------------]]
 
--- Get or create the GuildGreet addon instance
-local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+-- Get or create the global GuildGreet addon instance with all required Ace3 mixins
+GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true)
+	or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0", "AceComm-3.0", "AceSerializer-3.0")
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- Utility Library Namespace
 GLDG.Utils = {}
@@ -786,44 +787,21 @@ function GLDG.Utils:InitFull()
 	-- Legacy color migration will be done automatically
 
 
-	-- Initialize default data structures
-	GLDG_DataChar = {}
-	GLDG_DataGreet = {}
+	-- Synchronize database references (do NOT overwrite GLDG_DataChar or GLDG_DataGreet with empty tables!)
+	if GLDG.SyncDatabaseReferences then
+		GLDG:SyncDatabaseReferences()
+	end
 
 	GLDG_ChannelName = ""
-
-	-- Keep version in configuration file
---	GLDG_Data.Version = GDLG_VNMBR
 
 	-- Prepare popup dialogs
 	GLDG_PrepareReloadQuestion()
 	GLDG_PrepareAlertQuestion()
 
-	-- Initialize the list GUI (disabled - using new AceGUI system)
-	-- _G[GLDG_LIST.."TitleText"]:SetText(GLDG_NAME.." "..version)
-
-	-- Initialize new AceGUI system
-	if GuildGreet.gui then
+	-- Initialize GUI modules if available
+	if GuildGreet and GuildGreet.gui and GuildGreet.gui.InitializeAll then
 		GuildGreet.gui:InitializeAll()
 	end
-	--	local frameName = GLDG_Tab2Frame["Tab"..tabNum]
-	--	if frameName then
-	--		local label = L["Tab"..frameName]
-	--		if label then
-	--			-- tab has label: initialize frame
-	--			tab:SetText(label)
-	--			tab:Show()
-	--			GLDG_InitFrame(frameName)
-	--		end
-	--	end
-	-- end
-
-	-- Initialize subtabs and set the first one active (disabled - using new AceGUI system)
-	-- local frame = _G[GLDG_GUI.."Settings"]
-	-- PanelTemplates_SetNumTabs(frame, GLDG_TableSize(GLDG_SubTab2Frame))
-	-- PanelTemplates_SetTab(frame, 1)
-
-	-- Set subtab names and initialize tabframes (disabled - using new AceGUI system)
 
 	GLDG_InitComplete = true
 
@@ -844,8 +822,12 @@ end
 
 -- Command processing and slash commands
 function GLDG.Utils:SlashHandler(msg)
-	if not msg then
-		_G[GLDG_GUI]:Show()
+	if not msg or msg == "" then
+		if GLDG.ToggleConfigWindow then
+			GLDG:ToggleConfigWindow()
+		elseif _G[GLDG_GUI] then
+			_G[GLDG_GUI]:Show()
+		end
 	else
 		local msgLower = string.lower(msg)
 		local words = GLDG_GetWords(msg)
@@ -866,6 +848,7 @@ function GLDG.Utils:SlashHandler(msg)
 					elseif (wordsLower[1]=="list") then
 						GLDG:PrintHelp(L["Pasting to list"]);
 						GLDG_list = GLDG_ListAllPlayers(true, false);	-- include_offline=true, print=false, guildOnly=false
+						if not GLDG_PasteList.List then GLDG_CreatePasteListFrame() end
 						GLDG_PasteList.List:Show();
 					else
 						GLDG:HandleError(L["Could not parse command"], msgLower)
@@ -882,6 +865,7 @@ function GLDG.Utils:SlashHandler(msg)
 					elseif (wordsLower[1]=="list") then
 						GLDG:PrintHelp(L["Pasting to list"]);
 						GLDG_list = GLDG_ListAllPlayers(true, false, true);	-- include_offline=true, print=true, guildOnly=true
+						if not GLDG_PasteList.List then GLDG_CreatePasteListFrame() end
 						GLDG_PasteList.List:Show();
 					else
 						GLDG:PrintHelp(L["Could not parse command"].." ["..(GLDG:GetColors().help or "")..msgLower.."|r]")
@@ -925,7 +909,6 @@ function GLDG.Utils:SlashHandler(msg)
 						GLDG_GreetChannel()
 					else
 						GLDG_SendGreet(words[1])
-						--GLDG_SendGreet(words[1], true) -- true at the end means "testing only"
 					end
 				else
 					GLDG_GreetGuild()
@@ -942,7 +925,6 @@ function GLDG.Utils:SlashHandler(msg)
 						GLDG_ByeChannel()
 					else
 						GLDG_SendBye(words[1])
-						--GLDG_SendBye(words[1], true)	-- true at the end means "testing only"
 					end
 				else
 					GLDG_ByeGuild()
@@ -992,13 +974,39 @@ function GLDG.Utils:SlashHandler(msg)
 				GLDG_ShowBigBrother()
 			elseif (wordsLower[0]=="bb") then
 				GLDG_BB(not GLDG.db.profile.BigBrother)
-			elseif (wordsLower[0]=="config") then
-				_G[GLDG_GUI]:Show()
+			elseif (wordsLower[0]=="config" or wordsLower[0]=="options") then
+				if GLDG.ToggleConfigWindow then
+					GLDG:ToggleConfigWindow("settings")
+				end
+			elseif (wordsLower[0]=="players") then
+				if GLDG.ToggleConfigWindow then
+					GLDG:ToggleConfigWindow("players")
+				end
+			elseif (wordsLower[0]=="greetings") then
+				if GLDG.ToggleConfigWindow then
+					GLDG:ToggleConfigWindow("greetings")
+				end
+			elseif (wordsLower[0]=="cleanup") then
+				if GLDG.ToggleConfigWindow then
+					GLDG:ToggleConfigWindow("cleanup")
+				end
+			elseif (wordsLower[0]=="colours" or wordsLower[0]=="colors" or wordsLower[0]=="colour") then
+				if GLDG.ToggleConfigWindow then
+					GLDG:ToggleConfigWindow("colour")
+				end
+			elseif (wordsLower[0]=="profiles" or wordsLower[0]=="profile") then
+				if GLDG.ToggleConfigWindow then
+					GLDG:ToggleConfigWindow("profiles")
+				end
 			else
 				GLDG_ListForPlayer(words[0], false)
 			end
 		else
-			_G[GLDG_GUI]:Show()
+			if GLDG.ToggleConfigWindow then
+				GLDG:ToggleConfigWindow()
+			elseif _G[GLDG_GUI] then
+				_G[GLDG_GUI]:Show()
+			end
 		end
 	end
 end
@@ -1014,23 +1022,25 @@ function GLDG.Utils:InitRoster()
 	if not GLDG.GuildName or GLDG.GuildName == "" then GLDG.GuildName = GetGuildInfo("player") end
 	if not GLDG.GuildName then GLDG.GuildName = "" end
 	if not GLDG.unique_GuildName or GLDG.unique_GuildName == "" then
-		local maxMembers = GetNumGuildMembers()
-		if maxMembers == nil then maxMembers = nil end
+		local maxMembers = GetNumGuildMembers() or 0
 		for i = 1, maxMembers do
-			local pl, rn, ri, lv, cl, zn, pn, on, ol, st, enClass, ap, ar, isMobile = GetGuildRosterInfo(i)
+			local pl, rn, ri = GetGuildRosterInfo(i)
 			if ri == 0 then GLDG_GuildLeader = pl end
 		end
 		if GLDG_GuildLeader then
 			GLDG.unique_GuildName = (GLDG.GuildName.."@"..GLDG_GuildLeader)
+			GLDG_unique_GuildName = GLDG.unique_GuildName
 			GLDG_Init()
 		end
 	end
 	if not GLDG.unique_GuildName then
 		GLDG.unique_GuildName = ""
 	end
+	GLDG_unique_GuildName = GLDG.unique_GuildName
 	if (GLDG.unique_GuildName == "") then
 		GLDG_GuildAlias = ""
 	else
+		if not GLDG_Data.GuildAlias then GLDG_Data.GuildAlias = {} end
 		if not GLDG_Data.GuildAlias[GLDG.unique_GuildName] then
 			GLDG_Data.GuildAlias[GLDG.unique_GuildName] = GLDG.unique_GuildName
 		end
@@ -1039,8 +1049,9 @@ function GLDG.Utils:InitRoster()
 
 	if not (GLDG.Realm and GLDG.Player) then return end
 
-	if not GLDG_Data["DataChar"] then GLDG_Data["DataChar"] = {} end
-	GLDG_DataChar = GLDG_Data["DataChar"]
+	if GLDG.SyncDatabaseReferences then
+		GLDG:SyncDatabaseReferences()
+	end
 
 	if (GLDG.Realm and GLDG.Player) then
 		-- create channel name store if needed
@@ -1052,6 +1063,7 @@ function GLDG.Utils:InitRoster()
 		end
 		-- set channel name pointer
 		GLDG_ChannelName = GLDG_Data.ChannelNames[GLDG.Realm.." - "..GLDG.Player]
+		if not GLDG_Data.Frameopts then GLDG_Data.Frameopts = {} end
 		if not GLDG_Data.Frameopts[GLDG.Realm.." - "..GLDG.Player] then
 			GLDG_Data.Frameopts[GLDG.Realm.." - "..GLDG.Player] = {}
 			GLDG_Data.Frameopts[GLDG.Realm.." - "..GLDG.Player].anchorFrom = "CENTER"
@@ -1071,44 +1083,19 @@ function GLDG.Utils:InitRoster()
 		   GLDG_InitGreet(GLDG.unique_GuildName) and
 		   GLDG_InitGreet(GLDG.Realm) then
 			-- No custom collections are used
-			GLDG_DataGreet = GLDG_Data
+			GLDG_DataGreet = GLDG.db and GLDG.db.realm and GLDG.db.realm.greetings or GLDG_Data
 		end
-
-		-- Set initial custom collection settings
-		GLDG_ShowCustom(GLDG_GUI.."Greetings")
 	else
-		GLDG_DataGreet = GLDG_Data
-	end
-
-	-- Update config dialog (can't be done in InitFrame())
-	local name = GLDG_GUI.."SettingsGreeting"
-	if (GLDG.unique_GuildName~="") then
-
-		_G[name.."GuildAliasHeader"]:SetText(L["Guild alias for:"].." |cFFFFFF7F"..GLDG.unique_GuildName.."|r")
-		if (GLDG_GuildAlias ~= GLDG.unique_GuildName) then
-			_G[name.."GuildAliasEditbox"]:SetText(GLDG_GuildAlias)
-		else
-			_G[name.."GuildAliasEditbox"]:SetText("")
-		end
-
-		_G[name.."GuildAliasEditbox"]:Show()
-		_G[name.."GuildAliasWarning"]:Hide()
-		_G[name.."GuildAliasSet"]:Enable("")
-		_G[name.."GuildAliasClear"]:Enable("")
-	else
-		_G[name.."GuildAliasHeader"]:SetText(L["Guild alias for:"].." |cFFFFFF7F"..GLDG.unique_GuildName.."|r")
-		_G[name.."GuildAliasWarning"]:SetText(L["Can't set guild alias while unguilded"])
-		_G[name.."GuildAliasEditbox"]:SetText("")
-
-		_G[name.."GuildAliasEditbox"]:Hide()
-		_G[name.."GuildAliasWarning"]:Show()
-		_G[name.."GuildAliasSet"]:Disable("")
-		_G[name.."GuildAliasClear"]:Disable("")
+		GLDG_DataGreet = GLDG.db and GLDG.db.realm and GLDG.db.realm.greetings or GLDG_Data
 	end
 
 	-- clear stale achievment information
-	for p in pairs(GLDG_DataChar) do
-		GLDG_DataChar[p].achievment = nil
+	if GLDG_DataChar then
+		for p in pairs(GLDG_DataChar) do
+			if type(GLDG_DataChar[p]) == "table" then
+				GLDG_DataChar[p].achievment = nil
+			end
+		end
 	end
 
 	-- Launch request for full guild roster
@@ -1199,28 +1186,57 @@ end
 
 ------------------------------------------------------------
 function GLDG.Utils:Test(showAll)
-	GLDG_Print(GLDG:GetColors().help..GLDG_NAME..":|r Test")
+	GLDG:PrintHelp("Test")
 
-	local num, numon = BNGetNumFriends()
-	if (numon > 0) or showAll then
-		GLDG_Print("BN friends ["..tostring(num).."] - online ["..tostring(numon).."]")
-		local presenceID, givenName, surname, toonName, toonID, client, isOnline, lastOnline, isAFK, isDND, broadcastText, noteText, isFriend, broadcastTime
-		local numToons
-		local hasFocus, toonName, client, realmName, faction, race, class, guild, zoneName, level, gameText
-		for i = 1, num do
-			presenceID, givenName, surname, isBattleTagPresence, toonName, toonID, client, isOnline, lastOnline, isAFK, isDND, broadcastText, noteText, isFriend, broadcastTime = BNGetFriendInfo(i)
-			--GLDG_Print("  BN friend "..tostring(i)..": presenceId ["..tostring(presenceId).."] givenName ["..tostring(givenName).."] surname ["..tostring(surname).."] toonName ["..tostring(toonName).."] toonID ["..tostring(toonId).."] client ["..tostring(client).."] isOnline ["..tostring(isOnline).."] lastOnline ["..tostring(GLDG_SecToTimeString(lastOnline)).."] isAFK ["..tostring(isAFK).."] isDND ["..tostring(isDND).."] broadcastText ["..tostring(broadcastText).."] noteText ["..tostring(noteText).."] isFriend ["..tostring(isFriend).."] broadcastTime ["..tostring(GLDG_SecToTimeString(broadCastTime)).."]");
-			if (isOnline or showAll) then
-				if isOnline then isOnline = "online" else isOnline = "offline" end
-				GLDG_Print("  BN friend ["..tostring(givenName).." "..tostring(surname).."] - ["..tostring(toonName).."] - ["..tostring(client).."] is ["..tostring(isOnline).."] since ["..tostring(self:SecToTimeString(lastOnline)).."]");
+	if C_BattleNet and C_BattleNet.GetFriendAccountInfo and BNGetNumFriends then
+		local num, numon = BNGetNumFriends()
+		num = num or 0
+		numon = numon or 0
+		if (numon > 0) or showAll then
+			GLDG_Print("BN friends ["..tostring(num).."] - online ["..tostring(numon).."]")
+			for i = 1, num do
+				local accountInfo = C_BattleNet.GetFriendAccountInfo(i)
+				if accountInfo then
+					local gameInfo = accountInfo.gameAccountInfo
+					local isOnline = gameInfo and gameInfo.isOnline
+					if isOnline or showAll then
+						local statusStr = isOnline and "online" or "offline"
+						local friendName = accountInfo.accountName or accountInfo.battleTag or "?"
+						local charName = (gameInfo and gameInfo.characterName) or "-"
+						local client = (gameInfo and gameInfo.clientProgram) or "-"
+						GLDG_Print("  BN friend ["..tostring(friendName).."] - ["..tostring(charName).."] - ["..tostring(client).."] is ["..statusStr.."] since ["..tostring(self:SecToTimeString(accountInfo.lastOnlineTime)).."]")
 
-				numToons = BNGetNumFriendGameAccounts(i);
-				if ( numToons > 0 ) then
-					GLDG_Print("  Has "..tostring(numToons).." toons")
-					for j = 1, numToons do
-						hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText = BNGetFriendGameAccountInfo(i, j)
-						--GLDG_Print("     Toon "..tostring(j)..": hasFocus ["..tostring(hasFocus).."] toonName ["..tostring(toonName).."] client ["..tostring(client).."] realmName ["..tostring(realmName).."] faction ["..tostring(faction).."] race ["..tostring(race).."] class ["..tostring(class).."] guild ["..tostring(guild).."] zoneName ["..tostring(zoneName).."] level ["..tostring(level).."] gameText ["..tostring(gameText).."]")
-						GLDG_Print("     Toon "..tostring(j)..": ["..tostring(toonName).."] on ["..tostring(realmName).."] ["..tostring(faction).."] is ["..tostring(race).."] ["..tostring(class).."] in guild ["..tostring(guild).."] currently in ["..tostring(zoneName).."] - level ["..tostring(level).."]")
+						local numToons = (C_BattleNet.GetFriendNumGameAccounts and C_BattleNet.GetFriendNumGameAccounts(i)) or 0
+						if numToons > 0 and C_BattleNet.GetFriendGameAccountInfo then
+							GLDG_Print("  Has "..tostring(numToons).." toons")
+							for j = 1, numToons do
+								local toon = C_BattleNet.GetFriendGameAccountInfo(i, j)
+								if toon then
+									GLDG_Print("     Toon "..tostring(j)..": ["..tostring(toon.characterName).."] on ["..tostring(toon.realmName).."] ["..tostring(toon.factionName).."] is ["..tostring(toon.raceName).."] ["..tostring(toon.className).."] in guild ["..tostring(toon.guildName).."] currently in ["..tostring(toon.areaName).."] - level ["..tostring(toon.characterLevel).."]")
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	elseif BNGetNumFriends and BNGetFriendInfo then
+		local num, numon = BNGetNumFriends()
+		if (numon > 0) or showAll then
+			GLDG_Print("BN friends ["..tostring(num).."] - online ["..tostring(numon).."]")
+			for i = 1, num do
+				local _, givenName, surname, _, toonName, _, client, isOnline, lastOnline = BNGetFriendInfo(i)
+				if (isOnline or showAll) then
+					local statusStr = isOnline and "online" or "offline"
+					GLDG_Print("  BN friend ["..tostring(givenName).." "..tostring(surname).."] - ["..tostring(toonName).."] - ["..tostring(client).."] is ["..statusStr.."] since ["..tostring(self:SecToTimeString(lastOnline)).."]")
+
+					local numToons = BNGetNumFriendGameAccounts and BNGetNumFriendGameAccounts(i) or 0
+					if (numToons > 0) and BNGetFriendGameAccountInfo then
+						GLDG_Print("  Has "..tostring(numToons).." toons")
+						for j = 1, numToons do
+							local _, tName, _, realmName, _, faction, race, class, guild, zoneName, level = BNGetFriendGameAccountInfo(i, j)
+							GLDG_Print("     Toon "..tostring(j)..": ["..tostring(tName).."] on ["..tostring(realmName).."] ["..tostring(faction).."] is ["..tostring(race).."] ["..tostring(class).."] in guild ["..tostring(guild).."] currently in ["..tostring(zoneName).."] - level ["..tostring(level).."]")
+						end
 					end
 				end
 			end
@@ -1250,7 +1266,7 @@ function GLDG.Utils:ShowDetails(name)
 	if not name then return end
 
 	if (GLDG_DataChar[name]) then
-		GLDG_Print(GLDG:GetColors().help..GLDG_NAME..":|r ["..Ambiguate(name, "guild").."]")
+		GLDG_Print(GLDG:GetColors().help.."["..Ambiguate(name, "guild").."]|r")
 		for p in pairs(GLDG_DataChar[name]) do
 			if type(GLDG_DataChar[name][p]) == "table" then
 				local l = ""
@@ -1274,5 +1290,4 @@ end
 function GLDG.Utils:Initialize()
 	-- Utils module doesn't need special initialization
 	-- All functions are available immediately
-	print("GuildGreet: Utilities module initialized")
 end

@@ -5,7 +5,7 @@
 
 -- Get or create the GuildGreet addon instance
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- Message System Library Namespace
 GLDG.Messages = {}
@@ -22,10 +22,19 @@ function GLDG.Messages:Initialize()
 	-- Initialize message queues (use addon instance for storage)
 	if not GLDG.Queue then GLDG.Queue = {} end
 	
+	-- Register addon message prefix
+	if C_ChatInfo and C_ChatInfo.RegisterAddonMessagePrefix then
+		C_ChatInfo.RegisterAddonMessagePrefix("GLDG")
+	end
+
 	-- Set up message filters
 	self:SetupMessageFilters()
-	
-	print("GuildGreet: Message system initialized")
+end
+
+function GLDG.Messages:ShowQueue()
+	if GLDG and GLDG.ShowQueue then
+		GLDG:ShowQueue()
+	end
 end
 
 -------------------------------
@@ -33,12 +42,15 @@ end
 -------------------------------
 
 function GLDG.Messages:SetupMessageFilters()
+	if self.filtersRegistered then return end
+	self.filtersRegistered = true
+
 	-- Register chat message filters for enhanced chat display
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(...) return self:ChatFilter(...) end)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_OFFICER", function(...) return self:ChatFilter(...) end)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", function(...) return self:ChatFilter(...) end)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...) return self:ChatFilter(...) end)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", function(...) return self:ChatFilter(...) end)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", GLDG_ChatFilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_OFFICER", GLDG_ChatFilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", GLDG_ChatFilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", GLDG_ChatFilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", GLDG_ChatFilter)
 end
 
 -------------------------------
@@ -298,8 +310,7 @@ function GLDG.Messages:SendGreet(name, testing)
 
 	-- Send greeting
 	if testing then
-		local colors = GLDG.Colors:GetColors()
-		GLDG:Print(colors.help..GLDG_NAME..":|r ["..message.."]")
+		GLDG:PrintHelp("["..message.."]")
 	else
 		self:SendMessage(message, whisper, player, cname)
 	end
@@ -376,8 +387,7 @@ function GLDG.Messages:SendBye(name, testing)
 
 	-- Send goodbye
 	if testing then
-		local colors = GLDG.Colors:GetColors()
-		GLDG:Print(colors.help..GLDG_NAME..":|r ["..message.."]")
+		GLDG:PrintHelp("["..message.."]")
 	else
 		self:SendMessage(message, GLDG_Data.GuildSettings.Whisper, player, cname)
 	end
@@ -568,30 +578,31 @@ end
 
 function GLDG.Messages:TreatAchievement(message, playerName)
 	if not message or not playerName then return end
+	local shortName, realm = string.split("-", playerName)
+	if not realm and GLDG.Realm then
+		playerName = shortName.."-"..string.gsub(GLDG.Realm, " ", "")
+	end
 	
 	-- Parse achievement from system message
-	local achievementText = string.match(message, GLDG_ACHIEVE)
-	if not achievementText then return end
+	local _, _, _, achievementText = string.find(message, GLDG_ACHIEVE)
+	if not achievementText then
+		achievementText = message
+	end
 	
 	-- Store achievement for greeting
-	if GLDG_DataChar[playerName] then
-		GLDG_DataChar[playerName].achievment = achievementText
-		
-		-- Queue for achievement greeting if enabled
-		if GLDG_Data.GuildSettings.ListAchievments and not GLDG_Data.GuildSettings.SupressAchievment then
-			-- Add to greeting queue
-			table.insert(GLDG.Queue, {
-				name = playerName,
-				type = "achievement",
-				timestamp = GetTime()
-			})
-		end
-		
+	if GLDG_DataChar[playerName] and not GLDG_DataChar[playerName].ignore then
 		-- Print achievement notification if enabled
 		if GLDG_Data.GuildSettings.ListAchievments then
 			local colors = GLDG.Colors:GetColors()
-			local achievementColor = colors.guild.achievment or GLDG_DEFAULT_ACHIEVMENT_COLOUR
-			GLDG:PrintHelp(achievementColor..Ambiguate(playerName, "guild").." "..L["earned the achievement"].." "..achievementText.."|r")
+			local achievementColor = (colors.guild and colors.guild.achievment) or GLDG_DEFAULT_ACHIEVMENT_COLOUR
+			GLDG:PrintHelp(achievementColor..Ambiguate(playerName, "guild").." "..(L["has earned"] or "earned").." "..tostring(achievementText).."|r")
+		end
+
+		-- Queue for achievement greeting if enabled
+		if not GLDG_Data.GuildSettings.SupressAchievment and GLDG.Utils:TableSize(GLDG_DataGreet.Achievment) > 0 and not GLDG_DataChar[playerName].own then
+			GLDG_DataChar[playerName].achievment = achievementText
+			GLDG_Queue[playerName] = GLDG_GetLogtime(playerName)
+			GLDG_ShowQueue()
 		end
 	end
 end
@@ -601,29 +612,7 @@ end
 -------------------------------
 
 function GLDG.Messages:ProcessQueue()
-	if not GLDG.Queue or #GLDG.Queue == 0 then return end
-	
-	local now = GetTime()
-	local processed = {}
-	
-	-- Process greeting queue
-	for i, entry in ipairs(GLDG.Queue) do
-		if entry and entry.timestamp and (now - entry.timestamp > 2.0) then -- Wait 2 seconds before greeting
-			if entry.type == "greet" then
-				self:SendGreet(entry.name)
-			elseif entry.type == "achievement" then
-				self:SendGreet(entry.name) -- Use regular greeting for achievements
-			elseif entry.type == "levelup" then
-				self:SendGreet(entry.name) -- Use regular greeting for level ups
-			end
-			table.insert(processed, i)
-		end
-	end
-	
-	-- Remove processed entries (in reverse order to maintain indices)
-	for i = #processed, 1, -1 do
-		table.remove(GLDG.Queue, processed[i])
-	end
+	GLDG_ShowQueue()
 end
 
 -------------------------------
@@ -633,14 +622,6 @@ end
 function GLDG.Messages:ProcessSystemMessage(msg)
 	if not msg then return end
 	
-	-- Set up patterns for different types of system messages
-	local GLDG_ONLINE = ".*%[(.+)%]%S*"..string.sub(ERR_FRIEND_ONLINE_SS, 20)
-	local GLDG_OFFLINE = string.format(ERR_FRIEND_OFFLINE_S, "(.+)")
-	local GLDG_JOINED = string.format(ERR_GUILD_JOIN_S, "(.+)")
-	local GLDG_PROMO = string.format(ERR_GUILD_PROMOTE_SSS, "(.+)", "(.+)", "(.+)")
-	local GLDG_DEMOTE = string.format(ERR_GUILD_DEMOTE_SSS, ".+", "(.+)", "(.+)")
-	local GLDG_ACHIEVE = string.format(ACHIEVEMENT_BROADCAST, "(.+)", "(.+)")
-	
 	-- Check for player coming online
 	local _, _, player = string.find(msg, GLDG_ONLINE)
 	if player then
@@ -649,36 +630,36 @@ function GLDG.Messages:ProcessSystemMessage(msg)
 	end
 	
 	-- Check for player going offline
-	local _, _, player = string.find(msg, GLDG_OFFLINE)
-	if player then
-		self:HandlePlayerOffline(player)
+	local _, _, offPlayer = string.find(msg, GLDG_OFFLINE)
+	if offPlayer then
+		self:HandlePlayerOffline(offPlayer)
 		return
 	end
 	
 	-- Check for guild join
-	local _, _, player = string.find(msg, GLDG_JOINED)
-	if player then
-		self:HandleGuildJoin(player)
+	local _, _, joinPlayer = string.find(msg, GLDG_JOINED)
+	if joinPlayer then
+		self:HandleGuildJoin(joinPlayer)
 		return
 	end
 	
 	-- Check for promotion
-	local _, _, promotePlayer, oldRank, newRank = string.find(msg, GLDG_PROMO)
+	local _, _, _, promotePlayer, newRank = string.find(msg, GLDG_PROMO)
 	if promotePlayer then
-		self:HandlePromotion(promotePlayer, oldRank, newRank)
+		self:HandlePromotion(promotePlayer, nil, newRank)
 		return
 	end
 	
 	-- Check for demotion
-	local _, _, demotePlayer, newRank = string.find(msg, GLDG_DEMOTE)
+	local _, _, demotePlayer, demoteRank = string.find(msg, GLDG_DEMOTE)
 	if demotePlayer then
-		self:HandleDemotion(demotePlayer, newRank)
+		self:HandleDemotion(demotePlayer, demoteRank)
 		return
 	end
 	
 	-- Check for achievement
-	local _, _, achievePlayer, achievement = string.find(msg, GLDG_ACHIEVE)
-	if achievePlayer and achievement then
+	local _, _, achievePlayer = string.find(msg, GLDG_ACHIEVE)
+	if achievePlayer then
 		self:TreatAchievement(msg, achievePlayer)
 		return
 	end
@@ -693,7 +674,7 @@ function GLDG.Messages:HandlePlayerOnline(playerName)
 	
 	-- Normalize player name
 	local shortName, realm = string.split("-", playerName)
-	if not realm then 
+	if not realm and GLDG.Realm then 
 		playerName = shortName.."-"..string.gsub(GLDG.Realm, " ", "") 
 	end
 	
@@ -701,19 +682,32 @@ function GLDG.Messages:HandlePlayerOnline(playerName)
 	GLDG_Online[playerName] = GetTime()
 	
 	-- Check if this is a known player
-	if GLDG_DataChar[playerName] and not GLDG_DataChar[playerName].ignore then
-		-- Add to greeting queue if not suppressed
-		if not GLDG_Data.GuildSettings.SupressGreet then
-			table.insert(GLDG.Queue, {
-				name = playerName,
-				type = "greet",
-				timestamp = GetTime()
-			})
-		end
-		
+	local p = GLDG_DataChar[playerName]
+	if p and not p.ignore and (not p.own or GLDG_Data.GuildSettings.IncludeOwn) then
 		-- Show player list if enabled
 		if GLDG_Data.GuildSettings.ListNames then
 			GLDG.PlayerManager:ListForPlayer(playerName, false, nil, true)
+		end
+
+		if p.alt and GLDG_Offline[p.alt] then
+			GLDG_Offline[playerName] = GLDG_Offline[p.alt]
+		end
+		if GLDG_Offline[playerName] and type(GLDG_Offline[playerName]) == "number" then
+			if (GLDG_Online[playerName] - GLDG_Offline[playerName]) < ((GLDG_Data.GuildSettings.RelogTime or 2) * 60) then
+				return
+			end
+		end
+
+		-- Add to greeting queue if not suppressed
+		if not GLDG_Data.GuildSettings.SupressGreet then
+			if GLDG_Offline[playerName] and GLDG.Utils:TableSize(GLDG_DataGreet.GreetBack) == 0 then
+				return
+			end
+			if not GLDG_Offline[playerName] and GLDG.Utils:TableSize(GLDG_DataGreet.Greet) == 0 then
+				return
+			end
+			GLDG_Queue[playerName] = GLDG_GetLogtime(playerName)
+			GLDG_ShowQueue()
 		end
 	end
 end
@@ -723,28 +717,48 @@ function GLDG.Messages:HandlePlayerOffline(playerName)
 	
 	-- Normalize player name
 	local shortName, realm = string.split("-", playerName)
-	if not realm then 
+	if not realm and GLDG.Realm then 
 		playerName = shortName.."-"..string.gsub(GLDG.Realm, " ", "") 
 	end
 	
-	-- Store offline time
-	GLDG_Offline[playerName] = GetTime()
-	
 	-- Remove from online list
-	if GLDG_Online[playerName] then
-		GLDG_Online[playerName] = nil
+	GLDG_Online[playerName] = nil
+	GLDG_RankUpdate[playerName] = nil
+
+	local p = GLDG_DataChar[playerName]
+	if p then
+		if p.alt and GLDG_DataChar[p.alt] then
+			GLDG_DataChar[p.alt].last = playerName
+			GLDG_Offline[p.alt] = GetTime()
+		elseif p.main then
+			p.last = playerName
+			GLDG_Offline[playerName] = GetTime()
+		else
+			GLDG_Offline[playerName] = GetTime()
+		end
+	else
+		GLDG_Offline[playerName] = GetTime()
+	end
+
+	if GLDG_Queue[playerName] then
+		GLDG_Queue[playerName] = nil
+		GLDG_ShowQueue()
 	end
 	
 	-- Show offline notification if enabled
-	if GLDG_Data.GuildSettings.ListNamesOff and GLDG_DataChar[playerName] and not GLDG_DataChar[playerName].ignore then
+	if GLDG_Data.GuildSettings.ListNamesOff and p and not p.ignore then
 		local colors = GLDG.Colors:GetColors()
-		local offlineColor = colors.guild.goOff or GLDG_DEFAULT_GOES_OFFLINE_COLOUR
-		GLDG:PrintHelp(offlineColor..Ambiguate(playerName, "guild").." "..L["went offline"].."|r")
+		local offlineColor = (colors.guild and colors.guild.goOff) or GLDG_DEFAULT_GOES_OFFLINE_COLOUR
+		GLDG:PrintHelp(offlineColor..Ambiguate(playerName, "guild").." "..(L["went offline"] or "went offline").."|r")
 	end
 end
 
 function GLDG.Messages:HandleGuildJoin(playerName)
 	if not playerName then return end
+	local shortName, realm = string.split("-", playerName)
+	if not realm and GLDG.Realm then 
+		playerName = shortName.."-"..string.gsub(GLDG.Realm, " ", "") 
+	end
 	
 	-- Mark as new player
 	if not GLDG_DataChar[playerName] then
@@ -754,42 +768,45 @@ function GLDG.Messages:HandleGuildJoin(playerName)
 	GLDG_DataChar[playerName].guild = GLDG.unique_GuildName
 	
 	-- Add to greeting queue if not suppressed
-	if not GLDG_Data.GuildSettings.SupressJoin then
-		table.insert(GLDG.Queue, {
-			name = playerName,
-			type = "greet",
-			timestamp = GetTime()
-		})
+	if not GLDG_Data.GuildSettings.SupressJoin and GLDG.Utils:TableSize(GLDG_DataGreet.Welcome) > 0 then
+		GLDG_Queue[playerName] = GLDG_GetLogtime(playerName)
+		GLDG_ShowQueue()
 	end
 end
 
 function GLDG.Messages:HandlePromotion(playerName, oldRank, newRank)
 	if not playerName then return end
+	local shortName, realm = string.split("-", playerName)
+	if not realm and GLDG.Realm then 
+		playerName = shortName.."-"..string.gsub(GLDG.Realm, " ", "") 
+	end
 	
 	-- Update player rank information
 	if GLDG_DataChar[playerName] then
 		GLDG_DataChar[playerName].newrank = true
 		GLDG_DataChar[playerName].rankname = newRank
 		GLDG_DataChar[playerName].oldrank = oldRank
+		GLDG_RankUpdate[playerName] = GetTime()
 		
 		-- Add to greeting queue if not suppressed
-		if not GLDG_Data.GuildSettings.SupressRank then
-			table.insert(GLDG.Queue, {
-				name = playerName,
-				type = "greet",
-				timestamp = GetTime()
-			})
+		if not GLDG_Data.GuildSettings.SupressRank and GLDG.Utils:TableSize(GLDG_DataGreet.NewRank) > 0 then
+			GLDG_Queue[playerName] = GLDG_GetLogtime(playerName)
+			GLDG_ShowQueue()
 		end
 		
 		-- Show promotion notification
 		local colors = GLDG.Colors:GetColors()
-		local rankColor = colors.guild.rank or GLDG_DEFAULT_RANK_COLOUR
-		GLDG:PrintHelp(rankColor..Ambiguate(playerName, "guild").." "..L["was promoted to"].." "..newRank.."|r")
+		local rankColor = (colors.guild and colors.guild.rank) or GLDG_DEFAULT_RANK_COLOUR
+		GLDG:PrintHelp(rankColor..Ambiguate(playerName, "guild").." "..(L["was promoted to"] or "promoted to").." "..tostring(newRank).."|r")
 	end
 end
 
 function GLDG.Messages:HandleDemotion(playerName, newRank)
 	if not playerName then return end
+	local shortName, realm = string.split("-", playerName)
+	if not realm and GLDG.Realm then 
+		playerName = shortName.."-"..string.gsub(GLDG.Realm, " ", "") 
+	end
 	
 	-- Update player rank information
 	if GLDG_DataChar[playerName] then
@@ -797,8 +814,8 @@ function GLDG.Messages:HandleDemotion(playerName, newRank)
 		
 		-- Show demotion notification
 		local colors = GLDG.Colors:GetColors()
-		local rankColor = colors.guild.rank or GLDG_DEFAULT_RANK_COLOUR
-		GLDG:PrintHelp(rankColor..Ambiguate(playerName, "guild").." "..L["was demoted to"].." "..newRank.."|r")
+		local rankColor = (colors.guild and colors.guild.rank) or GLDG_DEFAULT_RANK_COLOUR
+		GLDG:PrintHelp(rankColor..Ambiguate(playerName, "guild").." "..(L["was demoted to"] or "demoted to").." "..tostring(newRank).."|r")
 	end
 end
 
@@ -847,29 +864,25 @@ function GLDG.Messages:OnEvent(mainObj, event, ...)
 		GLDG_CheckForGuildAlert()
 		GLDG_InitRoster()
 		mainObj:UnregisterEvent("PLAYER_ENTERING_WORLD")
-		mainObj:RegisterEvent("GUILD_ROSTER_UPDATE")
-		mainObj:RegisterEvent("FRIENDLIST_UPDATE")
-		mainObj:RegisterEvent("CHAT_MSG_CHANNEL_JOIN")
-		mainObj:RegisterEvent("CHAT_MSG_CHANNEL_LEAVE")
-		mainObj:RegisterEvent("CHAT_MSG_CHANNEL_NOTICE")
-		mainObj:RegisterEvent("CHAT_MSG_ADDON")
-		mainObj:RegisterEvent("GROUP_ROSTER_UPDATE")
-		mainObj:RegisterEvent("CHAT_MSG_GUILD_ACHIEVEMENT")
-		mainObj:RegisterEvent("WHO_LIST_UPDATE")
+		mainObj:RegisterEvent("GUILD_ROSTER_UPDATE", "OnEvent")
+		mainObj:RegisterEvent("FRIENDLIST_UPDATE", "OnEvent")
+		mainObj:RegisterEvent("CHAT_MSG_CHANNEL_JOIN", "OnEvent")
+		mainObj:RegisterEvent("CHAT_MSG_CHANNEL_LEAVE", "OnEvent")
+		mainObj:RegisterEvent("CHAT_MSG_CHANNEL_NOTICE", "OnEvent")
+		mainObj:RegisterEvent("CHAT_MSG_ADDON", "OnEvent")
+		mainObj:RegisterEvent("GROUP_ROSTER_UPDATE", "OnEvent")
+		mainObj:RegisterEvent("CHAT_MSG_GUILD_ACHIEVEMENT", "OnEvent")
+		mainObj:RegisterEvent("WHO_LIST_UPDATE", "OnEvent")
 
-		-- hooking msg events (replacing old ChatFrame_OnEvent handling)
-		ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", GLDG_ChatFilter)
-		ChatFrame_AddMessageEventFilter("CHAT_MSG_OFFICER", GLDG_ChatFilter)
-		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", GLDG_ChatFilter)
-		ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", GLDG_ChatFilter)
-		ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", GLDG_ChatFilter)
+		-- Ensure message filters are registered
+		self:SetupMessageFilters()
 
 		-- Battle.net events (testing)
-		mainObj:RegisterEvent("BN_CONNECTED")
-		mainObj:RegisterEvent("BN_DISCONNECTED")
-		mainObj:RegisterEvent("BN_FRIEND_ACCOUNT_OFFLINE")
-		mainObj:RegisterEvent("BN_FRIEND_ACCOUNT_ONLINE")
-		mainObj:RegisterEvent("BN_FRIEND_INFO_CHANGED")
+		mainObj:RegisterEvent("BN_CONNECTED", "OnEvent")
+		mainObj:RegisterEvent("BN_DISCONNECTED", "OnEvent")
+		mainObj:RegisterEvent("BN_FRIEND_ACCOUNT_OFFLINE", "OnEvent")
+		mainObj:RegisterEvent("BN_FRIEND_ACCOUNT_ONLINE", "OnEvent")
+		mainObj:RegisterEvent("BN_FRIEND_INFO_CHANGED", "OnEvent")
 
 	elseif (event == "GUILD_ROSTER_UPDATE") then
 		if IsInGuild() then
@@ -996,16 +1009,17 @@ function GLDG.Messages:OnEvent(mainObj, event, ...)
 					end
 				end
 			elseif (string.sub(arg2, 1, 6)=="QUERY:") then
-				C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
+				local ver = GLDG_GetAddOnMetadata("GuildGreet", "Version") or "Unknown"
+				C_ChatInfo.SendAddonMessage("GLDG", "VER:"..ver, "GUILD")
 				local inInstance, instanceType = IsInInstance()
 				if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumSubgroupMembers() > 0) then
-					C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "PARTY")
+					C_ChatInfo.SendAddonMessage("GLDG", "VER:"..ver, "PARTY")
 				end
 				if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumGroupMembers() > 0) then
-					C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "RAID")
+					C_ChatInfo.SendAddonMessage("GLDG", "VER:"..ver, "RAID")
 				end
 				if (instanceType == "pvp") then
-					C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "BATTLEGROUND")
+					C_ChatInfo.SendAddonMessage("GLDG", "VER:"..ver, "BATTLEGROUND")
 				end
 			end
 		end
@@ -1013,15 +1027,16 @@ function GLDG.Messages:OnEvent(mainObj, event, ...)
 	-- catching people leaving or entering party/raid
 	-- it seems that GetNumParty/RaidMembers() returns >0 when in BGs but PARTY and RAID are unavailable in these settings
 	elseif (event == "GROUP_ROSTER_UPDATE") then
+		local ver = GLDG_GetAddOnMetadata("GuildGreet", "Version") or "Unknown"
 		local inInstance, instanceType = IsInInstance()
 		if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumSubgroupMembers() > 0 ) then
-			C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "PARTY")
+			C_ChatInfo.SendAddonMessage("GLDG", "VER:"..ver, "PARTY")
 		end
 		if (instanceType ~= "pvp") and (instanceType ~= "arena") and (GetNumGroupMembers() > 0) then
-			C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "RAID")
+			C_ChatInfo.SendAddonMessage("GLDG", "VER:"..ver, "RAID")
 		end
 		if (instanceType == "pvp") then
-			C_ChatInfo.SendAddonMessage("GLDG", "VER:"..GetAddOnMetadata("GuildGreet", "Version"), "BATTLEGROUND")
+			C_ChatInfo.SendAddonMessage("GLDG", "VER:"..ver, "BATTLEGROUND")
 		end
 
 	elseif (event == "BN_CONNECTED") or
@@ -1082,360 +1097,6 @@ end
 
 function GLDG_ChatFilter(...)
 	return GLDG.Messages:ChatFilter(...)
-end
-
--- Message filtering and processing
-function GLDG.Messages:FilterMessages(player, list)
-	local newlist = {}
-	local count = 0
-
-	local hour,minute = GLDG_GetTime();
-	hour = tonumber(hour)
-	minute = tonumber(minute)
-
-	if player == nil then
-		-- dummy player, so the checks for subvars below are safe, even if the fail
-		player = {}
-	end
-
-	local level = nil
-	if player.storedLvl then
-		level = player.storedLvl
-	elseif player.lvl then
-		level = player.lvl
-	end
-
-	for p in pairs(list) do
-		local message = list[p]
-
-		-- first level check takes care of "<levels:##:##>msg" and "<levels:##:##><time:##.##:##.##>msg"
-		message = GLDG_FilterLevels(message, level)
-		-- time check takes care of "<time:##.##:##.##>msg", "<time:##.##:##.##><levels:##:##>msg" and second part of "<levels:##:##><time:##.##:##.##>msg"
-		if message then
-			message = GLDG_FilterTime(message, hour, minute)
-		end
-		-- second level check takes care of second part of "<time:##.##:##.##><levels:##:##>msg"
-		if message then
-			message = GLDG_FilterLevels(message, level)
-		end
-
-		-- if the message wants information we don't have, filter it out
-		if (message and (not player.achievment) and string.find(message, "%%v")) then
-			message = nil
-		end
-		if (message and (not player.class) and string.find(message, "%%C")) then
-			message = nil
-		end
-		if (message and (not level) and string.find(message, "%%l")) then
-			message = nil
-		end
-		if (message and (not level) and string.find(message, "%%L")) then
-			message = nil
-		end
-		if (message and (not player.rankname) and string.find(message, "%%r")) then
-			message = nil
-		end
-		if message then
-			count = count + 1
-			newlist[count] = message
-			--GLDG_Print("      ------> adding message ["..message.."]")
-		end
-	end
-
-	return newlist
-end
-
--- Parse custom message with variable substitution
-function GLDG.Messages:ParseCustomMessage(cname, name, msg)
-	local result = msg
-
-	local player = GLDG_DataChar[cname]
-	if not player then
-		player = {}
-	end
-
-	-- prepare our own %-codes
-	local p_c = Ambiguate(cname, "guild")	-- %c = char
-	local p_n = nil
-	local _, uRealm = string.split("-", name)
-	if not uRealm then
-		p_n = name	-- %n = name as used today (depending on settings)
-	else
-		p_n = Ambiguate(name, "guild")	-- %n = name as used today (depending on settings)
-	end
-	local p_a = Ambiguate(cname, "guild")	-- %a = alias
-	if (player.alias) then
-		p_a = player.alias
-	end
-	local p_m = Ambiguate(cname, "guild")	-- %m = main if available, %c else
-	if (player.alt) then
-		p_m = Ambiguate(player.alt, "guild")
-	end
-	local p_A = p_m	-- %A = main alias if available, %a else if available, %m else
-	if (player.alt and GLDG_DataChar[player.alt].alias) then
-		p_A = GLDG_DataChar[player.alt].alias
-	elseif player.alias then
-		p_A = player.alias
-	end
-	local p_l = ""	-- %l = level if available, empty else
-	if (player.storedLvl) then
-		p_l = tostring(player.storedLvl)
-	elseif (player.lvl) then
-		p_l = tostring(player.lvl)
-	end
-	local p_L = ""	-- %L = levels left to level cap (inspired by lebanoncyberspace)
-	if (player.storedLvl) then
-		p_L = tostring(GLDG_LEVEL_CAP - player.storedLvl)
-	elseif (player.lvl) then
-		p_L = tostring(GLDG_LEVEL_CAP - player.lvl)
-	end
-	local p_C = ""	-- %C = class name if available, emtpy else (inspired by lebanoncyberspace)
-	if (player.class) then
-		p_C = player.class
-	end
-	local p_r = ""	-- %r = rankname if available, rank number else if available, empty else
-	if (player.rankname) then
-		p_r = player.rankname
-	elseif (player.rank) then
-		p_r = tostring(player.rank)
-	end
-	local p_v = ""	-- %v = achievment if available, empty else
-	if (player.achievment) then
-		p_v = player.achievment
-	end
-	local p_g = ""	-- %g = guild alias if available, else guild if available, else empty
-	local p_G = ""	-- %G = guild name if available, else empty
-	if (GLDG.unique_GuildName ~= "") then
-		p_g = GLDG.unique_GuildName
-		p_G = GLDG.unique_GuildName
-	end
-	if (GLDG_GuildAlias ~= "") then
-		p_g = GLDG_GuildAlias
-	end
-
-	-- replace fields
-	msg = string.gsub(msg, "%%c", p_c)
-	msg = string.gsub(msg, "%%n", p_n)
-	msg = string.gsub(msg, "%%a", p_a)
-	msg = string.gsub(msg, "%%m", p_m)
-	msg = string.gsub(msg, "%%A", p_A)
-	msg = string.gsub(msg, "%%l", p_l)
-	msg = string.gsub(msg, "%%L", p_L)
-	msg = string.gsub(msg, "%%C", p_C)
-	msg = string.gsub(msg, "%%r", p_r)
-	msg = string.gsub(msg, "%%v", p_v)
-	msg = string.gsub(msg, "%%g", p_g)
-	msg = string.gsub(msg, "%%G", p_G)
-
-	return msg
-end
-
--------------------------------
--- Send Greeting Functions --
--------------------------------
-
-function GLDG.Messages:SendGreet(name, testing)
-	-- find player entry
-	local option = ""
-	local list = GLDG_DataGreet.Greet
-	local player = GLDG_DataChar[name]
-	local names = {}
-	local whisper = GLDG_Data.GuildSettings.Whisper
-
-	if (not player) then
-		return
-	end
-	local cname = name
-	table.insert(names, name)
-
-	-- Choose appropriate greeting list
-	if player.new then
-		list = GLDG_DataGreet.Welcome
-	elseif player.newrank then
-		list = GLDG_DataGreet.NewRank
-		option = player.rankname
-	elseif player.achievment then
-		list = GLDG_DataGreet.Achievment
-		option = player.achievment
-	elseif player.newlvl then
-		list = GLDG_DataGreet.NewLevel
-		option = player.lvl
-		if (GLDG_Data.GuildSettings.WhisperLevelup==true) then
-			whisper = true
-		end
-	elseif GLDG_Offline[name] then
-		list = GLDG_DataGreet.GreetBack
-	end
-	list = self:FilterMessages(player, list)
-
-	-- Switch to alias if defined
-	local usedAlias = false
-	if player.alias then
-		name = player.alias
-		table.insert(names, name)
-		usedAlias = true
-	else
-		name = Ambiguate(name, "guild")
-	end
-
-	-- Use name of main if alt and option is set
-	if player.alt then
-		local lname = ""
-		local lalias = ""
-		if GLDG_DataChar[player.alt].alias then
-			lalias = GLDG_DataChar[player.alt].alias
-		end
-		lname = Ambiguate(player.alt, "guild")
-		if (lname~="") then
-			table.insert(names, lname)
-		end
-		if (lalias~="") then
-			table.insert(names, lalias)
-			lname = lalias
-		end
-		if (usedAlias==false and GLDG_Data[GLDG_unique_GuildName].GreetAsMain == true and lname and lname~="") then
-			name = lname;
-		end
-	end
-
-	-- Select a random greeting
-	local greetSize = GLDG_TableSize(list)
-	if (greetSize == 0) then return end
-	local msg = list[math.random(greetSize)]
-
-	-- Select a random name
-	greetSize = GLDG_TableSize(names)
-	if GLDG_Data.GuildSettings.Randomize==true and (greetSize ~= 0) then
-		name = names[math.random(greetSize)]
-		local uName, uRealm = string.split("-", name)
-		if uRealm then
-		name = Ambiguate(name, "guild")
-		end
-	end
-
-	-- parse for our own %-codes
-	local message = self:ParseCustomMessage(cname, name, msg)
-	message = string.format(message, name, option)
-
-	-- Send greeting
-	if (testing) then
-		GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r ["..message.."]")
-	else
-		if whisper==true then
-			-- manual whisper setting overrides all
-			SendChatMessage(message, "WHISPER", nil, cname)
-
-		elseif (player.guild and player.guild == GLDG_unique_GuildName) then
-			-- in same guild as this char
-			SendChatMessage(message, "GUILD")
-
-		elseif (GLDG_ChannelName and player.channels and player.channels[GLDG_ChannelName]) then
-			-- in same channel as this char
-			local channel = GetChannelName(GLDG_ChannelName)
-			if (channel) then
-				SendChatMessage(message, "CHANNEL", nil, tostring(channel))
-			else
-				SendChatMessage(message, "WHISPER", nil, cname)
-			end
-		else
-			-- friends or indeterminate
-			SendChatMessage(message, "WHISPER", nil, cname)
-		end
-	end
-end
-
-function GLDG.Messages:SendBye(name, testing)
-	if (name == nil) then return end
-
-	-- find player entry
-	local player = GLDG_DataChar[name]
-	local names = {}
-
-	if (not player) then
-		return
-	end
-
-	local cname = name
-	table.insert(names, name)
-
-	-- Choose appropriate greeting list
-	local option = ""
-	local list = GLDG_DataGreet.Bye
-
-	-- if time is between 20:00 and 05:00 use night mode
-	local hour,min = GLDG_GetTime();
-	if ((hour >= 20) or (hour <=5)) then
-		list = GLDG_DataGreet.Night;
-	end
-	list = self:FilterMessages(player, list)
-
-	-- Switch to alias if defined
-	local usedAlias = false
-	if player.alias then
-		name = player.alias
-		table.insert(names, name)
-		usedAlias = true
-	end
-
-	-- Use name of main if alt and option is set
-	if player.alt then
-		local lname = ""
-		local lalias = ""
-		if GLDG_DataChar[player.alt].alias then
-			lalias = GLDG_DataChar[player.alt].alias
-		end
-		lname = player.alt
-		if (lname~="") then
-			table.insert(names, lname)
-		end
-		if (lalias~="") then
-			table.insert(names, lalias)
-			lname = lalias
-		end
-		if (usedAlias==false and GLDG_Data[GLDG_unique_GuildName].GreetAsMain == true and lname~="") then
-			name = lname;
-		end
-	end
-
-	-- Select a random good bye
-	local greetSize = GLDG_TableSize(list)
-	if (greetSize == 0) then return end
-	local msg = list[math.random(greetSize)]
-
-	-- Select a random name
-	greetSize = GLDG_TableSize(names)
-	if GLDG_Data.GuildSettings.Randomize==true and (greetSize ~= 0) then
-		name = names[math.random(greetSize)]
-	end
-
-	-- parse for our own %-codes
-	local message = self:ParseCustomMessage(cname, name, msg)
-
-	-- still replace first and second %s to support old messages
-	--print("Name: "..name.." Message: "..message.." Option: "..option)
-	message = string.format(message, name, option)
-
-	-- Send good bye
-	if (testing) then
-		GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r ["..message.."]")
-	else
-		if GLDG_Data.GuildSettings.Whisper==true then
-			SendChatMessage(message, "WHISPER", nil, cname)
-
-		elseif (player.guild and player.guild == GLDG_unique_GuildName) then
-			SendChatMessage(message, "GUILD")
-
-		elseif (GLDG_ChannelName and player.channels and player.channels[GLDG_ChannelName]) then
-			local channel = GetChannelName(GLDG_ChannelName)
-			if (channel) then
-				SendChatMessage(message, "CHANNEL", nil, tostring(channel))
-			else
-				SendChatMessage(message, "WHISPER", nil, cname)
-			end
-		else
-			SendChatMessage(message, "WHISPER", nil, cname)
-		end
-	end
 end
 
 ------------------------------------------------------------

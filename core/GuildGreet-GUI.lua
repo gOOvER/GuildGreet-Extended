@@ -5,7 +5,7 @@
 
 -- Get or create the GuildGreet addon instance
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- GUI System Library Namespace
 GLDG.GUI = {}
@@ -20,8 +20,6 @@ GLDG.GUI = {}
 function GLDG.GUI:Initialize()
 	-- Initialize GUI dropdowns
 	self:InitializeDropdowns()
-	
-	print("GuildGreet: GUI system initialized")
 end
 
 -------------------------------
@@ -242,11 +240,14 @@ function GLDG.GUI:ListPlayers()
 			end
 		end
 	end
-	-- Update the scrollbar
-	GLDG_ClickPlayerBar()
+	-- Update the scrollbar if legacy XML frame exists
+	if _G[GLDG_GUI.."PlayersPlayerbar"] then
+		GLDG_ClickPlayerBar()
+	end
 end
 
 function GLDG.GUI:ShowPlayers()
+	if not _G[GLDG_GUI.."PlayersLine1"] then return end
 	-- Display the players visible in the frame
 	local cnt = 1
 	local line = GLDG_GUI.."PlayersLine"
@@ -379,6 +380,7 @@ end
 function GLDG.GUI:ShowPlayerButtons()
 	-- Set frame
 	local frame = GLDG_GUI.."Players"
+	if not _G[frame.."SubAlias"] then return end
 	-- Hide subframes
 	_G[frame.."SubAlias"]:Hide()
 	_G[frame.."SubGuild"]:Hide()
@@ -496,11 +498,27 @@ end
 -------------------------------
 
 function GLDG.GUI:CreatePasteListFrame()
+local key = (GLDG.Realm or GetRealmName()).." - "..(GLDG.Player or UnitName("player"))
+if not GLDG_Data.Frameopts then GLDG_Data.Frameopts = {} end
+if not GLDG_Data.Frameopts[key] then
+	GLDG_Data.Frameopts[key] = {
+		anchorFrom = "CENTER",
+		anchorTo = "CENTER",
+		offsetx = 0,
+		offsety = 0,
+		Width = 400,
+		Height = 250,
+	}
+end
 GLDG_PasteList.List = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
 GLDG_PasteList.List:SetMovable(true)
 GLDG_PasteList.List:SetResizable(true)
 GLDG_PasteList.List:EnableMouse(true)
-GLDG_PasteList.List:SetMinResize(320,120)
+if GLDG_PasteList.List.SetResizeBounds then
+	GLDG_PasteList.List:SetResizeBounds(320, 120)
+elseif GLDG_PasteList.List.SetMinResize then
+	GLDG_PasteList.List:SetMinResize(320, 120)
+end
 GLDG_PasteList.List:RegisterForDrag("LeftButton","RightButton")
 GLDG_PasteList.List:SetScript("OnMouseDown",
 	function(self, button)
@@ -669,9 +687,9 @@ function GLDG.GUI:FriendsUpdate()
 							end
 
 							if (mainName) then
-								GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r ["..Ambiguate(name, "guild").."] "..GLDG.Colors:GetColors().help.."{"..mainName.."}|r "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[name].lvl, level));
+								GLDG:PrintHelp("["..Ambiguate(name, "guild").."] "..GLDG.Colors:GetColors().help.."{"..mainName.."}|r "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[name].lvl, level))
 							else
-								GLDG:Print(GLDG.Colors:GetColors().help..GLDG_NAME..":|r ["..Ambiguate(name, "guild").."] "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[name].lvl, level));
+								GLDG:PrintHelp("["..Ambiguate(name, "guild").."] "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[name].lvl, level))
 							end
 						end
 						if (GLDG_TableSize(GLDG_DataGreet.NewLevel) > 0) and (GLDG_Data.GuildSettings.SupressLevel==false) and (not GLDG_DataChar[name].ignore) and (level > GLDG_Data.GuildSettings.MinLevelUp) then
@@ -718,7 +736,7 @@ function GLDG.GUI:FriendsUpdate()
 	if (cnt > 0) then
 		if not GLDG_InitialFriendsUpdate then
 			GLDG_InitialFriendsUpdate = true
-			GLDG:RegisterEvent("CHAT_MSG_SYSTEM")
+			GLDG:RegisterEvent("CHAT_MSG_SYSTEM", "OnEvent")
 		end
 
 		if bit.band(GLDG_InitCheck, 2)==2 then
@@ -748,6 +766,9 @@ function GLDG.GUI:SetCheckboxes()
 	local name2 = GLDG_GUI.."SettingsChat"
 	local name3 = GLDG_GUI.."SettingsGreeting"
 	local name4 = GLDG_GUI.."SettingsOther"
+	if not _G[name1.."GreetAsMainBox"] then
+		return
+	end
 	
 	if GLDG_Data.GuildSettings.UseGuildDefault==true then
 		_G[name1.."GreetAsMainBox"]:Disable()
@@ -892,7 +913,7 @@ function GLDG.GUI:UpdateChatFrame(self)
 		
 		if (GLDG_Data.PlayerChatFrame[GLDG.Player.."-"..GLDG.Realm] == 0) then
 			text:SetText(L["Using default chat frame"])
-			GLDG_Print(GLDG:GetColors().help..GLDG_NAME..":|r Now using default chat frame")
+			GLDG:PrintHelp("Now using default chat frame")
 		else
 			local name, fontSize, r, g, b, alpha, shown, locked, docked = GetChatWindowInfo(GLDG_Data.PlayerChatFrame[GLDG.Player.."-"..GLDG.Realm])
 			text:SetText(string.format(L["Using chat frame %d (%s)"], GLDG_Data.PlayerChatFrame[GLDG.Player.."-"..GLDG.Realm], name))

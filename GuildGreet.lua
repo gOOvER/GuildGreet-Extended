@@ -36,10 +36,10 @@
 ]]----------------------------------------------------------
 
 -- Global addon object for library access
--- Using LibStub for AceDB-3.0 to avoid version conflicts with other addons
 -- Get existing addon if created by libraries, otherwise create new one
-GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0", "AceComm-3.0", "AceSerializer-3.0")
+GuildGreet = GLDG
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- Global helper function for cross-version API compatibility
 function GLDG_GetAddOnMetadata(addonName, field)
@@ -101,13 +101,44 @@ local defaults = {
 		
 		-- Farben
 		colours = {
-			help = "|cff00ff00",
-			player = "|cffffffff",
-			text = "|cffffffff",
-			channel = "|cffff8040",
-			guild = "|cff40ff40",
-			whisper = "|cffff40ff",
-			emote = "|cffff8040",
+			help = "|cFFFFFF7F",
+			header = "|c7FFF0000",
+			guild = {
+				online = "|cFFA0FFA0",
+				isOff = "|cFFFFFFFF",
+				goOff = "|cFF7F7F7F",
+				alias = "|cFFFFA0A0",
+				list = "|cFFFF7F00",
+				new = "|cFFFF3F3F",
+				lvl = "|cFF7F7F7F",
+				rank = "|cFFCC00CC",
+				relog = "|cFF3FFF3F",
+				achievment = "|cFF001FFF",
+			},
+			friends = {
+				online = "|cFFA0FFA0",
+				isOff = "|cFFFFFFFF",
+				goOff = "|cFF7F7F7F",
+				alias = "|cFFFFA0A0",
+				list = "|cFFFF7F00",
+				new = "|cFFFF3F3F",
+				lvl = "|cFF7F7F7F",
+				rank = "|cFFCC00CC",
+				relog = "|cFF3FFF3F",
+				achievment = "|cFF001FFF",
+			},
+			channel = {
+				online = "|cFFA0FFA0",
+				isOff = "|cFFFFFFFF",
+				goOff = "|cFF7F7F7F",
+				alias = "|cFFFFA0A0",
+				list = "|cFFFF7F00",
+				new = "|cFFFF3F3F",
+				lvl = "|cFF7F7F7F",
+				rank = "|cFFCC00CC",
+				relog = "|cFF3FFF3F",
+				achievment = "|cFF001FFF",
+			},
 		},
 		
 		-- Filter-Einstellungen
@@ -176,6 +207,7 @@ local defaults = {
 BINDING_HEADER_GUILDGREET = L["GuildGreet"]
 BINDING_NAME_GUILDGREETCONFIG = L["Open config window"]
 BINDING_NAME_GUILDGREETCLEAR = L["Clear greet list"]
+BINDING_NAME_GUILDGREETTEST = L["Test trigger"]
 BINDING_NAME_GUILDGREETTESTL = L["Test trigger"]
 BINDING_NAME_GUILDGREETGREETGUILD = L["Greet Guild and Channel"]
 BINDING_NAME_GUILDGREETBYEGUILD = L["Say goodbye to guild and channel"]
@@ -332,10 +364,9 @@ GLDG_autoConsistencyChecked = nil
 ------------------------------------------------------------
 function GLDG:OnLoad()
 	-- Events monitored by Event Handler
-	self:RegisterEvent("ADDON_LOADED")
-	self:RegisterEvent("VARIABLES_LOADED")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("SAVED_VARIABLES_TOO_LARGE")
+	self:RegisterEvent("ADDON_LOADED", "OnEvent")
+	self:RegisterEvent("VARIABLES_LOADED", "OnEvent")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnEvent")
 
 	-- Modern AceConsole slash command registration
 	self:RegisterChatCommand("gg", "SlashHandler")
@@ -347,49 +378,124 @@ function GLDG:OnInitialize()
 	-- AceDB-3.0 Database Initialisierung
 	self.db = LibStub("AceDB-3.0"):New("GuildGreetDB", defaults, true)
 	GLDG.db = self.db  -- Make db accessible globally for all modules
-	
+
 	-- Set addon constants as instance properties
 	self.NAME = "GuildGreet"
 	self.GUI = "GuildGreetFrame"
 	self.LIST = "GuildGreetList"
 	self.COLOUR = "GuildGreetColourFrame"
 	self.VERSION = 100000
-	
+
+	-- Addon-Instanz Variablen & globale Legacy-Laufzeitvariablen
+	GLDG.Realm = GetRealmName()
+	GLDG.Player = UnitName("player")
+	self.shortName = GLDG.Player
+	GLDG_shortName = GLDG.Player
+	self.GuildName = nil
+	self.GuildAlias = nil
+	GLDG_GuildAlias = nil
+	self.GuildLeader = nil
+	GLDG_GuildLeader = nil
+	self.unique_GuildName = ""
+	GLDG_unique_GuildName = ""
+	self.ginfotxt = nil
+	GLDG_ginfotxt = nil
+	self.config_from_guild = nil
+	GLDG_config_from_guild = nil
+	self.corrupted_config_from_guild = nil
+	GLDG_corrupted_config_from_guild = nil
+	self.NewGuild = nil
+	GLDG_NewGuild = nil
+	self.InitialGuildUpdate = nil
+	GLDG_InitialGuildUpdate = nil
+	self.InitialFriendsUpdate = nil
+	GLDG_InitialFriendsUpdate = nil
+	self.UpdateRequest = 0
+	GLDG_UpdateRequest = 0
+	self.UpdateRequestFriends = 0
+	GLDG_UpdateRequestFriends = 0
+	self.InitComplete = nil
+	GLDG_InitComplete = nil
+	self.ReadNotes = 1
+	GLDG_ReadNotes = 1
+	self.RosterImportRunning = 0
+	GLDG_RosterImportRunning = 0
+	self.InitCheck = 0
+	GLDG_InitCheck = 0
+	self.ChangesText = {}
+	GLDG_ChangesText = self.ChangesText
+	self.Online = {}
+	GLDG_Online = self.Online
+
+	-- Synchronize direct table references for Lua 5.1 pairs() compatibility
+	self:SyncDatabaseReferences()
+
+	-- Register AceDB profile callbacks
+	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
+	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
+	self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
+
 	-- Initialize Libraries (must be done after database initialization)
 	if self.Utils then self.Utils:Initialize() end
-	if self.Database then self.Database:Initialize() end
 	if self.Colors then self.Colors:Initialize() end
+	if self.Database then self.Database:Initialize() end
 	if GLDG.PlayerManager then GLDG.PlayerManager:Initialize() end
 	if self.Messages then self.Messages:Initialize() end
 	if self.Migration then self.Migration:Initialize() end
-	
-	-- Addon-Instanz Variablen (anstatt globaler Variablen)
-	GLDG.Realm = nil
-	GLDG.Player = nil
-	self.shortName = nil
-	self.GuildName = nil
-	self.GuildAlias = nil
-	self.GuildLeader = nil
-	self.unique_GuildName = nil
-	self.ginfotxt = nil
-	self.config_from_guild = nil
-	self.corrupted_config_from_guild = nil
-	self.NewGuild = nil
-	self.InitialGuildUpdate = nil
-	self.InitialFriendsUpdate = nil
-	self.UpdateRequest = 0
-	self.UpdateRequestFriends = 0
-	self.InitComplete = nil
-	self.ReadNotes = 1
-	self.RosterImportRunning = 0
-	self.InitCheck = 0
-	self.ChangesText = {}
-	
-	-- Core variablen
-	self.Online = {}
-	
-	-- Initialize compatibility layer for gradual migration
-	self:InitializeCompatibilityLayer()
+
+	-- Re-sync after library initialization
+	self:SyncDatabaseReferences()
+end
+
+function GLDG:OnEnable()
+	-- Register slash commands
+	self:RegisterChatCommand("gg", "SlashHandler")
+	self:RegisterChatCommand("guildgreet", "SlashHandler")
+
+	-- Register core events via AceEvent-3.0 (handler: OnEvent)
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnEvent")
+	self:RegisterEvent("VARIABLES_LOADED", "OnEvent")
+	self:RegisterEvent("GUILD_ROSTER_UPDATE", "OnEvent")
+	self:RegisterEvent("FRIENDLIST_UPDATE", "OnEvent")
+	self:RegisterEvent("CHAT_MSG_SYSTEM", "OnEvent")
+	self:RegisterEvent("CHAT_MSG_CHANNEL_JOIN", "OnEvent")
+	self:RegisterEvent("CHAT_MSG_CHANNEL_LEAVE", "OnEvent")
+	self:RegisterEvent("CHAT_MSG_CHANNEL_NOTICE", "OnEvent")
+	self:RegisterEvent("CHAT_MSG_ADDON", "OnEvent")
+	self:RegisterEvent("GROUP_ROSTER_UPDATE", "OnEvent")
+	self:RegisterEvent("CHAT_MSG_GUILD_ACHIEVEMENT", "OnEvent")
+	self:RegisterEvent("CHAT_MSG_ACHIEVEMENT", "OnEvent")
+	self:RegisterEvent("WHO_LIST_UPDATE", "OnEvent")
+
+	-- Ensure greeting queue frame exists
+	self:CreateQueueFrame()
+
+	-- Run full initialization if not yet done
+	if not GLDG_InitComplete then
+		GLDG_Init()
+	end
+
+	-- Periodic update timer (replaces legacy XML <OnUpdate>)
+	if not self.updateTimer then
+		self.updateTimer = self:ScheduleRepeatingTimer("OnUpdateTimer", 1.0)
+	end
+end
+
+function GLDG:OnUpdateTimer()
+	if self.Utils and self.Utils.OnUpdate then
+		self.Utils:OnUpdate(self, 1.0)
+	end
+end
+
+function GLDG:OnProfileChanged()
+	self:SyncDatabaseReferences()
+	if self.Colors and self.Colors.Initialize then
+		self.Colors:Initialize()
+	end
+	self:ShowQueue()
+	if self.RefreshConfigUI then
+		self:RefreshConfigUI()
+	end
 end
 
 ------------------------------------------------------------
@@ -459,112 +565,75 @@ function GLDG:SetCharData(key, value)
 end
 
 ------------------------------------------------------------
--- Compatibility Layer (temporary during migration)
--- Maps legacy global variables to AceDB structure
+-- Database Reference Synchronization
+-- Uses direct AceDB table references so Lua 5.1 pairs() works properly
 ------------------------------------------------------------
+function GLDG:SyncDatabaseReferences()
+	if not self.db then return end
+
+	self.db.profile.GuildSettings = self.db.profile.GuildSettings or {}
+	self.db.profile.colours = self.db.profile.colours or {}
+	self.db.profile.Frameopts = self.db.profile.Frameopts or {}
+	self.db.profile.AutoGreet = self.db.profile.AutoGreet or {}
+	self.db.profile.GreetGuild = self.db.profile.GreetGuild or {}
+	self.db.profile.GreetChannel = self.db.profile.GreetChannel or {}
+
+	self.db.realm.players = self.db.realm.players or {}
+	self.db.realm.greetings = self.db.realm.greetings or {}
+	self.db.realm.PlayerChatFrame = self.db.realm.PlayerChatFrame or {}
+	self.db.realm.ChannelNames = self.db.realm.ChannelNames or {}
+	self.db.realm.Collections = self.db.realm.Collections or {}
+	self.db.realm.Custom = self.db.realm.Custom or {}
+	self.db.realm.Ranks = self.db.realm.Ranks or {}
+
+	self.db.global.BigBrother = self.db.global.BigBrother or {}
+	self.db.global.GreetCollections = self.db.global.GreetCollections or {}
+	self.db.global.GuildAlias = self.db.global.GuildAlias or {}
+
+	-- Link shared realm/global subtables into profile so GLDG_Data.<key> accesses live tables
+	self.db.profile.PlayerChatFrame = self.db.realm.PlayerChatFrame
+	self.db.profile.ChannelNames = self.db.realm.ChannelNames
+	self.db.profile.Collections = self.db.realm.Collections
+	self.db.profile.Custom = self.db.realm.Custom
+	self.db.profile.Ranks = self.db.realm.Ranks
+	self.db.profile.GreetCollections = self.db.global.GreetCollections
+	self.db.profile.GuildAlias = self.db.global.GuildAlias
+
+	-- Direct table pointers (Lua 5.1 pairs() compatible!)
+	GLDG_Data = self.db.profile
+	GLDG_DataChar = self.db.realm.players
+	GLDG_DataGreet = self.db.realm.greetings
+	GLDG_BigBrother = self.db.global.BigBrother
+
+	-- Ensure default greetings are populated
+	if self.Database and self.Database.InitializeGreetings then
+		self.Database:InitializeGreetings()
+	end
+
+	-- Mirror greeting arrays on GLDG_Data for legacy GUI/Collection code
+	for k, v in pairs(self.db.realm.greetings) do
+		self.db.profile[k] = v
+	end
+end
+
 function GLDG:InitializeCompatibilityLayer()
-	-- GLDG_Data compatibility (profile + realm mixed)
-	GLDG_Data = setmetatable({}, {
-		__index = function(t, k)
-			-- Profile data
-			if k == "GuildSettings" then
-				return GLDG.db.profile.GuildSettings
-			elseif k == "colours" then
-				return GLDG.db.profile.colours
-			elseif k == "filters" then
-				return GLDG.db.profile.filters
-			elseif k == "ShowNewerVersions" or k == "BigBrother" or k == "ExtendPlayerMenu" 
-				or k == "EnableContextMenu" or k == "UseFriends" or k == "ListUp" 
-				or k == "ListVisible" or k == "ListSize" or k == "UpdateTime" 
-				or k == "CheckedGuildAlert" or k == "AutoWho" or k == "Frameopts" then
-				return GLDG.db.profile[k]
-			-- Realm data
-			elseif k == "PlayerChatFrame" or k == "ChannelNames" or k == "Collections" 
-				or k == "Custom" or k == "Ranks" then
-				return GLDG.db.realm[k]
-			-- Global data
-			elseif k == "GreetCollections" or k == "GuildAlias" then
-				return GLDG.db.global[k]
-			else
-				-- Default: try profile first, then realm
-				return GLDG.db.profile[k] or GLDG.db.realm[k]
-			end
-		end,
-		__newindex = function(t, k, v)
-			-- Profile data
-			if k == "GuildSettings" then
-				GLDG.db.profile.GuildSettings = v
-			elseif k == "colours" or k == "filters" then
-				GLDG.db.profile[k] = v
-			elseif k == "ShowNewerVersions" or k == "BigBrother" or k == "ExtendPlayerMenu" 
-				or k == "EnableContextMenu" or k == "UseFriends" or k == "ListUp" 
-				or k == "ListVisible" or k == "ListSize" or k == "UpdateTime" 
-				or k == "CheckedGuildAlert" or k == "AutoWho" or k == "Frameopts" then
-				GLDG.db.profile[k] = v
-			-- Realm data
-			elseif k == "PlayerChatFrame" or k == "ChannelNames" or k == "Collections" 
-				or k == "Custom" or k == "Ranks" then
-				GLDG.db.realm[k] = v
-			-- Global data
-			elseif k == "GreetCollections" or k == "GuildAlias" then
-				GLDG.db.global[k] = v
-			else
-				-- Default: store in profile
-				GLDG.db.profile[k] = v
-			end
-		end
-	})
-	
-	-- GLDG_DataChar compatibility (realm.players)
-	GLDG_DataChar = setmetatable({}, {
-		__index = function(t, k)
-			return GLDG.db.realm.players[k]
-		end,
-		__newindex = function(t, k, v)
-			GLDG.db.realm.players[k] = v
-		end
-	})
-	
-	-- GLDG_DataGreet compatibility (realm.greetings)
-	GLDG_DataGreet = setmetatable({}, {
-		__index = function(t, k)
-			return GLDG.db.realm.greetings[k]
-		end,
-		__newindex = function(t, k, v)
-			GLDG.db.realm.greetings[k] = v
-		end
-	})
-	
-	-- GLDG_BigBrother compatibility (global.BigBrother)
-	GLDG_BigBrother = setmetatable({}, {
-		__index = function(t, k)
-			if not GLDG.db.global.BigBrother then
-				GLDG.db.global.BigBrother = {}
-			end
-			return GLDG.db.global.BigBrother[k]
-		end,
-		__newindex = function(t, k, v)
-			if not GLDG.db.global.BigBrother then
-				GLDG.db.global.BigBrother = {}
-			end
-			GLDG.db.global.BigBrother[k] = v
-		end
-	})
+	self:SyncDatabaseReferences()
 end
 
 ------------------------------------------------------------
 -- Moderne Print-Helper Funktionen
 ------------------------------------------------------------
 function GLDG:PrintInfo(message)
-	self:Print("|cff00ff00" .. GLDG_NAME .. ":|r " .. message)
+	self:Print(tostring(message or ""))
 end
 
 function GLDG:PrintError(message)
-	self:Print("|cffff0000" .. GLDG_NAME .. " Error:|r " .. message)
+	self:Print("|cffff4040" .. tostring(message or "") .. "|r")
 end
 
 function GLDG:PrintHelp(message)
-	self:Print("|cff00ff00" .. GLDG_NAME .. ":|r " .. message)
+	local helpCol = (self.GetColors and self:GetColors() and self:GetColors().help) or "|cFFFFFF7F"
+	self:Print(helpCol .. tostring(message or "") .. "|r")
 end
 
 -- Legacy Kompatibilität für Farben - wird jetzt von Colors Library verwaltet
@@ -697,8 +766,304 @@ end
 -- _07_ Display Greetlist --
 ----------------------------
 
+function GLDG:CreateQueueFrame()
+	if _G[GLDG_LIST] then
+		return _G[GLDG_LIST]
+	end
+
+	local listFrame = CreateFrame("Frame", GLDG_LIST, UIParent, "BackdropTemplate")
+	listFrame:SetSize(230, 22)
+	listFrame:SetPoint("LEFT", UIParent, "LEFT", 24, 120)
+	listFrame:SetFrameStrata("MEDIUM")
+	listFrame:SetToplevel(true)
+	listFrame:SetClampedToScreen(true)
+	listFrame:EnableMouse(true)
+	listFrame:SetMovable(true)
+	listFrame:RegisterForDrag("LeftButton")
+	listFrame:SetScript("OnDragStart", function(f) f:StartMoving() end)
+	listFrame:SetScript("OnDragStop", function(f) f:StopMovingOrSizing() end)
+	listFrame:Hide()
+
+	-- Title bar
+	local titleFrame = CreateFrame("Frame", GLDG_LIST.."Title", listFrame, "BackdropTemplate")
+	titleFrame:SetSize(230, 22)
+	titleFrame:SetPoint("TOP", listFrame, "TOP", 0, 0)
+	titleFrame:EnableMouse(true)
+	titleFrame:RegisterForDrag("LeftButton")
+	titleFrame:SetScript("OnDragStart", function() listFrame:StartMoving() end)
+	titleFrame:SetScript("OnDragStop", function() listFrame:StopMovingOrSizing() end)
+	titleFrame:SetBackdrop({
+		bgFile = "Interface\\Buttons\\WHITE8x8",
+		edgeFile = "Interface\\Buttons\\WHITE8x8",
+		edgeSize = 1,
+	})
+	titleFrame:SetBackdropColor(0.09, 0.10, 0.13, 0.96)
+	titleFrame:SetBackdropBorderColor(0.85, 0.71, 0.29, 0.65)
+
+	local titleTex = titleFrame:CreateTexture(GLDG_LIST.."TitleTexture", "BACKGROUND")
+	titleTex:SetAllPoints(titleFrame)
+	titleTex:SetColorTexture(0.09, 0.10, 0.13, 0.96)
+
+	local accentLine = titleFrame:CreateTexture(nil, "OVERLAY")
+	accentLine:SetHeight(1)
+	accentLine:SetPoint("BOTTOMLEFT", titleFrame, "BOTTOMLEFT", 1, 0)
+	accentLine:SetPoint("BOTTOMRIGHT", titleFrame, "BOTTOMRIGHT", -1, 0)
+	accentLine:SetColorTexture(0.85, 0.71, 0.29, 0.85)
+
+	local titleText = titleFrame:CreateFontString(GLDG_LIST.."TitleText", "OVERLAY", "GameFontNormalSmall")
+	titleText:SetPoint("LEFT", titleFrame, "LEFT", 8, 0)
+	titleText:SetText("|cffd9b54aGuildGreet|r")
+
+	-- Close / Clear Queue button
+	local closeBtn = CreateFrame("Button", GLDG_LIST.."Close", titleFrame, "BackdropTemplate")
+	closeBtn:SetSize(18, 18)
+	closeBtn:SetPoint("RIGHT", titleFrame, "RIGHT", -2, 0)
+	closeBtn:SetBackdrop({
+		bgFile = "Interface\\Buttons\\WHITE8x8",
+		edgeFile = "Interface\\Buttons\\WHITE8x8",
+		edgeSize = 1,
+	})
+	closeBtn:SetBackdropColor(0.16, 0.17, 0.22, 0.9)
+	closeBtn:SetBackdropBorderColor(0.28, 0.30, 0.38, 1)
+	local closeTxt = closeBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	closeTxt:SetPoint("CENTER", 0, 0)
+	closeTxt:SetText("x")
+	closeBtn:SetScript("OnEnter", function(btn)
+		btn:SetBackdropColor(0.65, 0.18, 0.18, 1)
+		btn:SetBackdropBorderColor(0.90, 0.30, 0.30, 1)
+		GameTooltip:SetOwner(btn, "ANCHOR_RIGHT")
+		GameTooltip:SetText(L["Clear greet list"] or "Clear greet list", 1, 0.82, 0)
+		GameTooltip:Show()
+	end)
+	closeBtn:SetScript("OnLeave", function(btn)
+		btn:SetBackdropColor(0.16, 0.17, 0.22, 0.9)
+		btn:SetBackdropBorderColor(0.28, 0.30, 0.38, 1)
+		GameTooltip:Hide()
+	end)
+	closeBtn:SetScript("OnClick", function()
+		GLDG_ClearList()
+	end)
+
+	local function createQueueLine(name, anchorTo, anchorPoint, relativePoint)
+		local btn = CreateFrame("Button", name, listFrame, "BackdropTemplate")
+		btn:SetSize(230, 18)
+		btn:SetPoint(anchorPoint, anchorTo, relativePoint, 0, 0)
+		btn:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+		btn:SetBackdrop({
+			bgFile = "Interface\\Buttons\\WHITE8x8",
+			edgeFile = "Interface\\Buttons\\WHITE8x8",
+			edgeSize = 1,
+		})
+		btn:SetBackdropColor(0.06, 0.07, 0.09, 0.92)
+		btn:SetBackdropBorderColor(0.20, 0.22, 0.28, 0.85)
+
+		local text1 = btn:CreateFontString(name.."Text", "OVERLAY", "GameFontHighlightSmall")
+		text1:SetPoint("LEFT", btn, "LEFT", 6, 0)
+		text1:SetJustifyH("LEFT")
+
+		local text2 = btn:CreateFontString(name.."Text2", "OVERLAY", "GameFontHighlightSmall")
+		text2:SetPoint("RIGHT", btn, "RIGHT", -6, 0)
+		text2:SetJustifyH("RIGHT")
+
+		btn:SetScript("OnEnter", function(selfBtn)
+			selfBtn:SetBackdropColor(0.16, 0.18, 0.24, 0.98)
+			selfBtn:SetBackdropBorderColor(0.85, 0.71, 0.29, 0.9)
+			GLDG_ShowToolTip(selfBtn, selfBtn:GetName())
+		end)
+		btn:SetScript("OnLeave", function(selfBtn)
+			selfBtn:SetBackdropColor(0.06, 0.07, 0.09, 0.92)
+			selfBtn:SetBackdropBorderColor(0.20, 0.22, 0.28, 0.85)
+			GameTooltip:Hide()
+		end)
+		btn:SetScript("OnClick", function(selfBtn, mouseBtn)
+			local t = _G[selfBtn:GetName().."Text"]
+			if t then
+				GLDG_ClickName(mouseBtn, t:GetText())
+			end
+		end)
+		btn:Hide()
+		return btn
+	end
+
+	-- Create downward lines (Line1..15) and upward lines (ULine1..15)
+	for i = 1, 15 do
+		local prevDown = (i == 1) and titleFrame or _G[GLDG_LIST.."Line"..(i - 1)]
+		createQueueLine(GLDG_LIST.."Line"..i, prevDown, "TOP", "BOTTOM")
+
+		local prevUp = (i == 1) and titleFrame or _G[GLDG_LIST.."ULine"..(i - 1)]
+		createQueueLine(GLDG_LIST.."ULine"..i, prevUp, "BOTTOM", "TOP")
+	end
+
+	return listFrame
+end
+
+function GLDG_ShowToolTip(self, element)
+	if not element then return end
+	local txtObj = _G[element.."Text"]
+	if not txtObj then return end
+	local raw = txtObj:GetText()
+	if not raw or raw == "" then return end
+
+	local name = string.sub(raw, 9)
+	local _, uRealm = string.split("-", name)
+	if not uRealm then
+		local prefix = name.."-"
+		local len = string.len(prefix)
+		for k in pairs(GLDG_DataChar) do
+			if string.sub(k, 1, len) == prefix then
+				name = k
+				break
+			end
+		end
+	end
+
+	local p = GLDG_DataChar and GLDG_DataChar[name]
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip:SetText(Ambiguate(name, "guild"), 0.85, 0.71, 0.29)
+	if p then
+		if p.alias then
+			GameTooltip:AddDoubleLine(L["Alias"] or "Alias", tostring(p.alias), 0.7, 0.7, 0.7, 1, 1, 1)
+		end
+		if p.alt then
+			GameTooltip:AddDoubleLine(L["Main"] or "Main", Ambiguate(p.alt, "guild"), 0.7, 0.7, 0.7, 0.25, 1, 0.5)
+		end
+		if p.lvl then
+			GameTooltip:AddDoubleLine(L["Level"] or "Level", tostring(p.lvl).." "..tostring(p.class or ""), 0.7, 0.7, 0.7, 1, 1, 1)
+		end
+		if p.rankname then
+			GameTooltip:AddDoubleLine(L["Rank"] or "Rank", tostring(p.rankname), 0.7, 0.7, 0.7, 1, 1, 1)
+		end
+		if p.new then
+			GameTooltip:AddLine(L["New in guild"] or "New in guild", 1, 0.35, 0.35)
+		elseif p.achievment then
+			GameTooltip:AddLine((L["Last achievment"] or "Achievement")..": "..tostring(p.achievment), 0.4, 0.6, 1)
+		elseif p.newrank then
+			GameTooltip:AddLine(L["(new rank)"] or "Promoted", 0.8, 0.3, 1)
+		elseif p.newlvl then
+			GameTooltip:AddLine("Level Up!", 0.3, 1, 0.3)
+		end
+	end
+	GameTooltip:AddLine(" ")
+	GameTooltip:AddLine("|cff4cd964Left-Click:|r Greet  |cffe64d4dRight-Click:|r Dismiss", 0.8, 0.8, 0.8)
+	GameTooltip:Show()
+end
+
+function GLDG:ShowQueue()
+	local listFrame = self:CreateQueueFrame()
+	if not listFrame or not GLDG_Data then return end
+
+	-- Hide all lines first
+	for i = 1, 15 do
+		local dLine = _G[GLDG_LIST.."Line"..i]
+		local uLine = _G[GLDG_LIST.."ULine"..i]
+		if dLine then dLine:Hide() end
+		if uLine then uLine:Hide() end
+	end
+
+	-- Collect and sort queued players
+	local sorted = {}
+	for name in pairs(GLDG_Queue or {}) do
+		table.insert(sorted, name)
+	end
+	table.sort(sorted)
+
+	local count = #sorted
+	if count == 0 and not GLDG_Data.ListVisible then
+		listFrame:Hide()
+		return
+	end
+
+	listFrame:Show()
+	local titleText = _G[GLDG_LIST.."TitleText"]
+	if titleText then
+		if self.UIStyle then self.UIStyle:ApplyFont(titleText, 0) end
+		if count > 0 then
+			titleText:SetText(string.format("|cffd9b54aGuildGreet|r |cff9499a6(%d)|r", count))
+		else
+			titleText:SetText("|cffd9b54aGuildGreet|r")
+		end
+	end
+
+	local maxLines = math.min(math.max(tonumber(GLDG_Data.ListSize) or 5, 1), 15)
+	local prefix = GLDG_Data.ListUp and (GLDG_LIST.."ULine") or (GLDG_LIST.."Line")
+	local fontSize = self.UIStyle and self.UIStyle:GetFontSize() or 13
+	local lineHeight = math.max(20, fontSize + 7)
+	local lineWidth = math.max(190, math.floor(190 * (fontSize / 12)))
+	listFrame:SetWidth(lineWidth)
+
+	for i = 1, math.min(count, maxLines) do
+		local name = sorted[i]
+		local lineBtn = _G[prefix..i]
+		local text1 = _G[prefix..i.."Text"]
+		local text2 = _G[prefix..i.."Text2"]
+		if lineBtn and text1 and text2 then
+			if self.UIStyle then
+				self.UIStyle:ApplyFont(text1, -1)
+				self.UIStyle:ApplyFont(text2, -1)
+			end
+			lineBtn:SetSize(lineWidth, lineHeight)
+			lineBtn:ClearAllPoints()
+			if GLDG_Data.ListUp then
+				lineBtn:SetPoint("BOTTOMLEFT", listFrame, "TOPLEFT", 0, (i - 1) * (lineHeight - 1))
+			else
+				lineBtn:SetPoint("TOPLEFT", listFrame, "BOTTOMLEFT", 0, -(i - 1) * (lineHeight - 1))
+			end
+			local logTime = GLDG_Queue[name] or "[00:00] "
+			local shortName = Ambiguate(name, "guild")
+			text1:SetText(logTime..shortName)
+
+			local p = GLDG_DataChar and GLDG_DataChar[name]
+			local setType = "guild"
+			if p then
+				if not p.guild or p.guild ~= GLDG_unique_GuildName then
+					if p.friends and p.friends[GLDG.Player] then
+						setType = "friends"
+					elseif p.channels and GLDG_ChannelName and p.channels[GLDG_ChannelName] then
+						setType = "channel"
+					end
+				end
+			end
+
+			local rightInfo = ""
+			local colourKey = "list"
+			if p then
+				if p.alias then
+					rightInfo = "("..p.alias..")"
+				elseif p.alt then
+					if GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].alias then
+						rightInfo = "["..GLDG_DataChar[p.alt].alias.."]"
+					else
+						rightInfo = "["..Ambiguate(p.alt, "guild").."]"
+					end
+				end
+
+				if p.new then
+					colourKey = "new"
+					rightInfo = (rightInfo ~= "" and (rightInfo.." ") or "").."NEW"
+				elseif p.achievment then
+					colourKey = "achievment"
+					rightInfo = (rightInfo ~= "" and (rightInfo.." ") or "").."ACHV"
+				elseif p.newrank then
+					colourKey = "rank"
+					rightInfo = (rightInfo ~= "" and (rightInfo.." ") or "").."RANK"
+				elseif p.newlvl then
+					colourKey = "lvl"
+					rightInfo = (rightInfo ~= "" and (rightInfo.." ") or "").."LVL "..tostring(p.lvl or "")
+				elseif GLDG_Offline and GLDG_Offline[name] then
+					colourKey = "relog"
+				end
+			end
+
+			text2:SetText(rightInfo)
+			GLDG_SetTextColor(prefix..i.."Text", setType, colourKey)
+			GLDG_SetTextColor(prefix..i.."Text2", setType, "alias")
+			lineBtn:Show()
+		end
+	end
+end
+
 function GLDG_ShowQueue()
-	return GLDG.Messages:ShowQueue()
+	return GLDG:ShowQueue()
 end
 
 
@@ -1456,11 +1821,11 @@ end
 ------------------------------------------------------------
 -- Add modern AceConsole error handling method
 function GLDG:HandleError(msg, input)
-	local errorMsg = self:GetColors().help..GLDG_NAME..":|r "..msg
+	local errorMsg = tostring(msg or "")
 	if input then
 		errorMsg = errorMsg .. " ["..self:GetColors().help..input.."|r]"
 	end
-	self:Print(errorMsg)
+	self:PrintError(errorMsg)
 	GLDG_Help()
 end
 
@@ -1605,13 +1970,13 @@ function GLDG_TreatAchievment(achievmentLink, name)
 
 		if (main) then
 			if (GLDG_Data.GuildSettings.ListAchievments==true) then
-				GLDG_Print(name..self:GetColors().help.." {"..Ambiguate(main, "guild").."}|r "..L["has earned"].." "..tostring(achievment))
+				GLDG_Print(name..GLDG:GetColors().help.." {"..Ambiguate(main, "guild").."}|r "..L["has earned"].." "..tostring(achievment))
 			end
 		end
 		if (GLDG_DataChar[name] and (GLDG_Data.GuildSettings.SupressAchievment==false) and (GLDG_TableSize(GLDG_DataGreet.Achievment) > 0)) then
 			if (not GLDG_DataChar[name].own) then
 				GLDG_DataChar[name].achievment = achievment
-				GLDG_Queue[name] = GLDG_GetLogtime(player)
+				GLDG_Queue[name] = GLDG_GetLogtime(name)
 				GLDG_ShowQueue()
 			end
 		end
@@ -1635,7 +2000,7 @@ function GLDG_InitChannel(data)
 	if (GLDG_unregister > 0) then
 		GLDG_unregister = GLDG_unregister - 1
 		if (GLDG_unregister == 0) then
-			self:UnregisterEvent("CHAT_MSG_CHANNEL_LIST")
+			GLDG:UnregisterEvent("CHAT_MSG_CHANNEL_LIST")
 			DEFAULT_CHAT_FRAME:RegisterEvent("CHAT_MSG_CHANNEL_LIST")
 		end
 	end
@@ -2015,7 +2380,7 @@ classColors["DEMONHUNTER"] = C_ClassColor.GetClassColor("DEMONHUNTER");
 classColors["WARRIOR"] = C_ClassColor.GetClassColor("WARRIOR");
 classColors["ROGUE"] = C_ClassColor.GetClassColor("ROGUE");
 classColors["HUNTER"] = C_ClassColor.GetClassColor("HUNTER");
-classColors["DEADKNIGHT"] = C_ClassColor.GetClassColor("DEADKNIGHT");
+classColors["DEATHKNIGHT"] = C_ClassColor.GetClassColor("DEATHKNIGHT");
 classColors["MONK"] = C_ClassColor.GetClassColor("MONK");
 classColors["EVOKER"] = C_ClassColor.GetClassColor("EVOKER");
 
@@ -2152,7 +2517,7 @@ function GLDG_PrepareReloadQuestion()
 			ReloadUI();
 			end,
 		OnCancel = function()
-			GLDG_Print(self:GetColors().help..GLDG_NAME..":|cFFFF0000 "..L["You must manually reload your interface by typing /console reloadui"])
+			GLDG:PrintError(L["You must manually reload your interface by typing /console reloadui"])
 			end,
 		timeout = 0,
 		whileDead = 1,
@@ -2165,16 +2530,17 @@ end
 -- _30_ big brother
 --------------------------
 function GLDG_BB(flag)
-	self.db.profile.BigBrother = flag
+	GLDG.db.profile.BigBrother = flag
 	if (not flag) then
-		GLDG_BigBrother = nil
+		GLDG.db.global.BigBrother = {}
+		GLDG_BigBrother = GLDG.db.global.BigBrother
 	end
-	GLDG_Print("BigBrother is ["..tostring(self.db.profile.BigBrother).."]")
+	GLDG_Print("BigBrother is ["..tostring(GLDG.db.profile.BigBrother).."]")
 end
 
 ------------------------------------------------------------
 function GLDG_ShowBigBrother()
-	if (self.db.profile.BigBrother and GLDG_BigBrother) then
+	if (GLDG.db.profile.BigBrother and GLDG_BigBrother) then
 		GLDG:PrintHelp(L["Listing known GuildGreet users"])
 		for p in pairs(GLDG_BigBrother) do
 			GLDG:PrintHelp(Ambiguate(p, "guild")..": "..GLDG_BigBrother[p])
@@ -2186,7 +2552,7 @@ end
 
 ------------------------------------------------------------
 function GLDG_PollBigBrother()
-	C_ChatInfo.SendAddonMessage("GLDG", "QUERY:"..GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
+	C_ChatInfo.SendAddonMessage("GLDG", "QUERY:"..GLDG_GetAddOnMetadata("GuildGreet", "Version"), "GUILD")
 	local _, instanceType = IsInInstance()
 	if (instanceType ~= "pvp") and (instanceType ~= "arena") then
 		local groupMembers = GetNumGroupMembers()
@@ -2351,7 +2717,7 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 				for q in pairs(GLDG_DataChar) do
 					if GLDG_DataChar[q].alt and GLDG_DataChar[q].alt==p then
 						GLDG_DataChar[q].alt = alt
-						GLDG_Print(self:GetColors().help..GLDG_NAME..":|r    "..L["Moving alt"].." ["..q.."] "..L["from main"].." ["..Ambiguate(p, "guild").."] "..L["to main"].." ["..alt.."]");
+						GLDG:PrintHelp("   "..L["Moving alt"].." ["..q.."] "..L["from main"].." ["..Ambiguate(p, "guild").."] "..L["to main"].." ["..alt.."]")
 					end
 				end
 			else
@@ -2364,7 +2730,7 @@ function GLDG_Convert_Plausibility_Fix(suppressTitle)
 					for q in pairs(GLDG_DataChar) do
 						if GLDG_DataChar[q].alt and GLDG_DataChar[q].alt==p then
 							GLDG_DataChar[q].alt = GLDG_DataChar[alt].alt
-							GLDG_Print(self:GetColors().help..GLDG_NAME..":|r    "..L["Moving alt"].." ["..q.."] "..L["from main"].." ["..Ambiguate(p, "guild").."] "..L["to main"].." ["..GLDG_DataChar[alt].alt.."]");
+							GLDG:PrintHelp("   "..L["Moving alt"].." ["..q.."] "..L["from main"].." ["..Ambiguate(p, "guild").."] "..L["to main"].." ["..GLDG_DataChar[alt].alt.."]")
 						end
 					end
 				else
@@ -2427,11 +2793,11 @@ end
 
 ------------------------------------------------------------
 function GLDG_Reset_Aliases()
-	GLDG_Print(self:GetColors().help..GLDG_NAME..":|r Remove all saved aliases")
+	GLDG:PrintHelp("Remove all saved aliases")
 	for p in pairs(GLDG_DataChar) do
 		if (GLDG_DataChar[p].alias) then
 			GLDG_DataChar[p].alias = nil
-			GLDG_Print(self:GetColors().help..GLDG_NAME..":|r Alias from ["..Ambiguate(p, "guild").."] deleted")
+			GLDG:PrintHelp("Alias from ["..Ambiguate(p, "guild").."] deleted")
 		end
 	end
 end
@@ -2753,10 +3119,13 @@ end
 
 function GLDG_readConfigString()
 	GLDG_ginfotxt = GetGuildInfoText()
-	if (GLDG_CONFIG_STRING ~= nil) and (GLDG_CONFIG_STRING ~= GLDG_config_from_guild) and IsGuildLeader() then
-		_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Enable()
-	else
-		_G[GLDG_GUI.."SettingsGeneralWriteGuildString"]:Disable()
+	local writeBtn = _G[GLDG_GUI.."SettingsGeneralWriteGuildString"]
+	if writeBtn then
+		if (GLDG_CONFIG_STRING ~= nil) and (GLDG_CONFIG_STRING ~= GLDG_config_from_guild) and IsGuildLeader() then
+			writeBtn:Enable()
+		else
+			writeBtn:Disable()
+		end
 	end
 	local gstringstart = string.find(GLDG_ginfotxt, "{GG", 1)
 	local gstring1, gstring2, gstring3, gstring4

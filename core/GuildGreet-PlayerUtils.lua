@@ -54,7 +54,7 @@ function GLDG.PlayerUtils:FilterTime(message, hour, minute)
 		fromM = tonumber(fromM)
 		toH = tonumber(toH)
 		toM = tonumber(toM)
-		if (hour < fromH) or (hour > toH) or ((hour == fromH) and (minute < fromM)) or ((hour == toH) and (minute > toH)) then
+		if (hour < fromH) or (hour > toH) or ((hour == fromH) and (minute < fromM)) or ((hour == toH) and (minute > toM)) then
 			--GLDG_Print(" --> time criteria failed, removing message")
 			message = nil
 		else

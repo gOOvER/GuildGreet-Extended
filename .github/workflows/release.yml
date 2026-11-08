@@ -4,475 +4,91 @@ permissions:
   contents: write
 
 on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g., 12.0.0 or 12.0.0-beta1). Use "auto" to read from CHANGELOG.md'
+        description: 'Version to release (e.g., 1.0.0 or 1.0.0-beta1). Use "auto" to read from CHANGELOG.md or .toc'
         required: true
         type: string
+        default: 'auto'
       create_tag:
-        description: 'Create git tag for the release'
+        description: 'Create and push git tag for the release'
         required: true
         type: boolean
         default: true
-      prerelease:
-        description: 'Mark as prerelease (for beta/alpha versions)'
-        required: false
-        type: boolean
-        default: false
 
 jobs:
-  validate-release:
-    name: Validate Release
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-      tag_name: ${{ steps.version.outputs.tag_name }}
-      is_prerelease: ${{ steps.version.outputs.is_prerelease }}
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Determine version
-      id: version
-      run: |
-        VERSION="${{ github.event.inputs.version }}"
-        if [[ -z "$VERSION" || "$VERSION" == "auto" ]]; then
-          if [ -f CHANGELOG.md ]; then
-            VERSION=$(awk '/^## \[/{gsub(/\[|\]/, "", $2); print $2; exit}' CHANGELOG.md)
-            echo "ℹ️ Auto-detected version from CHANGELOG.md: $VERSION"
-          else
-            echo "❌ No CHANGELOG.md found and no version specified"
-            exit 1
-          fi
-        fi
-
-        TAG_NAME="v$VERSION"
-
-        if [[ "$VERSION" =~ (alpha|beta|rc|dev|pre) ]]; then
-          IS_PRERELEASE="true"
-        else
-          IS_PRERELEASE="false"
-        fi
-
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-        echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
-        echo "Release version: $VERSION"
-        echo "Tag name: $TAG_NAME"
-        echo "Is prerelease: $IS_PRERELEASE"
-
-    - name: Validate version format
-      run: |
-        VERSION="${{ steps.version.outputs.version }}"
-        IS_PRERELEASE="${{ steps.version.outputs.is_prerelease }}"
-
-        if [[ "$IS_PRERELEASE" == "true" ]]; then
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-(alpha|beta|rc|dev|pre)[0-9]*$ ]]; then
-            echo "✗ Invalid prerelease version format: $VERSION"
-            exit 1
-          fi
-          echo "✓ Prerelease version format is valid: $VERSION"
-        else
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "✗ Invalid stable version format: $VERSION (expected: X.Y.Z)"
-            exit 1
-          fi
-          echo "✓ Stable version format is valid: $VERSION"
-        fi
-
-    - name: Check TOC version consistency
-      run: |
-        VERSION="${{ steps.version.outputs.version }}"
-        IS_PRERELEASE="${{ steps.version.outputs.is_prerelease }}"
-        TOC_VERSION=$(grep "## Version:" GuildGreet.toc | head -1 | awk '{print $3}')
-
-        if [[ "$IS_PRERELEASE" == "true" ]]; then
-          echo "ℹ️ Prerelease detected - skipping strict TOC version check"
-        else
-          if [[ "$TOC_VERSION" != "$VERSION" && "$TOC_VERSION" != "@project-version@" ]]; then
-            echo "✗ Version mismatch: TOC ($TOC_VERSION) != Release ($VERSION)"
-            exit 1
-          fi
-          echo "✓ TOC version is compatible with release version: $VERSION"
-        fi
-
-  create-tag:
-    name: Create Git Tag
-    runs-on: ubuntu-latest
-    needs: validate-release
-    if: ${{ github.event.inputs.create_tag == 'true' }}
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Create and push tag
-      run: |
-        TAG_NAME="${{ needs.validate-release.outputs.tag_name }}"
-        VERSION="${{ needs.validate-release.outputs.version }}"
-        IS_PRERELEASE="${{ needs.validate-release.outputs.is_prerelease }}"
-
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-
-        if [[ "$IS_PRERELEASE" == "true" ]]; then
-          git tag -a "$TAG_NAME" -m "Prerelease version $VERSION"
-        else
-          git tag -a "$TAG_NAME" -m "Release version $VERSION"
-        fi
-
-        git push origin "$TAG_NAME"
-
   package-addon:
-    name: Package Addon
+    name: Package & Publish Addon (BigWigs Packager)
     runs-on: ubuntu-latest
-    needs: validate-release
-    outputs:
-      manual_package_created: ${{ steps.manual_package.outputs.manual_package_created }}
-      package_available: ${{ steps.verify_package.outputs.package_available }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Configure git user
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Configure git user & tag (when triggered via workflow_dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-    - name: Update version in TOC file
-      run: |
-        VERSION="${{ needs.validate-release.outputs.version }}"
-        echo "Updating version placeholder in TOC file to: $VERSION"
-        sed -i "s/@project-version@/$VERSION/g" GuildGreet.toc
-        echo "Updated TOC version line:" 
-        grep "## Version:" GuildGreet.toc
-
-    - name: Create local tag for packager
-      run: |
-        VERSION="${{ needs.validate-release.outputs.version }}"
-        TAG_NAME="v$VERSION"
-        if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-          echo "Tag $TAG_NAME already exists locally"
-        else
-          git tag -a "$TAG_NAME" -m "Release version $VERSION"
-          echo "Created local tag $TAG_NAME for packaging"
-        fi
-
-    - name: Package with BigWigs Packager
-      id: bigwigs_package
-      uses: BigWigsMods/packager@v2
-      with:
-        args: -S
-      env:
-        CF_API_KEY: ${{ needs.validate-release.outputs.is_prerelease == 'true' && '' || secrets.CF_API_KEY }}
-        WAGO_API_TOKEN: ${{ needs.validate-release.outputs.is_prerelease == 'true' && '' || secrets.WAGO_API_TOKEN }}
-        WOWI_API_TOKEN: ${{ needs.validate-release.outputs.is_prerelease == 'true' && '' || secrets.WOWI_API_TOKEN }}
-        GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
-      continue-on-error: true
-
-    - name: Manual package fallback
-      if: always()
-      id: manual_package
-      run: |
-        BW_SUCCESS="${{ steps.bigwigs_package.outcome }}"
-        BW_ARTIFACTS_EXIST="false"
-        
-        echo "BigWigs packager outcome: $BW_SUCCESS"
-        
-        if [[ "$BW_SUCCESS" == "success" ]]; then
-          if [ -d ".release" ] && [ "$(find .release -name "*.zip" | wc -l)" -gt 0 ]; then
-            echo "BigWigs created packages:"
-            ls -la .release/
-            BW_ARTIFACTS_EXIST="true"
+          VERSION="${{ github.event.inputs.version }}"
+          if [[ -z "$VERSION" || "$VERSION" == "auto" ]]; then
+            if [[ -f CHANGELOG.md ]]; then
+              VERSION=$(awk '/^## \[/{gsub(/\[|\]/, "", $2); print $2; exit}' CHANGELOG.md)
+            fi
+            if [[ -z "$VERSION" ]]; then
+              VERSION=$(grep -h -m1 '^## Version:' *.toc */*.toc 2>/dev/null | head -n 1 | sed 's/^## Version:[[:space:]]*//' | tr -d '\r')
+            fi
           fi
-        fi
+          TAG_NAME="v${VERSION#v}"
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
 
-        if [[ "$BW_ARTIFACTS_EXIST" == "true" ]]; then
-          echo "✓ BigWigs packager succeeded, skipping manual package"
-          echo "manual_package_created=false" >> $GITHUB_OUTPUT
-          exit 0
-        fi
+          if ! git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+          else
+            git tag -f -a "$TAG_NAME" -m "Release $TAG_NAME"
+          fi
 
-        echo "Creating manual package (fallback)..."
-        VERSION="${{ needs.validate-release.outputs.version }}"
-        PACKAGE_NAME="GuildGreet-Extended-$VERSION"
+          if [[ "${{ github.event.inputs.create_tag }}" == "true" ]]; then
+            git push -f origin "$TAG_NAME"
+          fi
 
-        mkdir -p temp_package/GuildGreet-Extended
-        cp GuildGreet.toc temp_package/GuildGreet-Extended/
-        cp GuildGreet.lua temp_package/GuildGreet-Extended/
-        cp GuildGreet.xml temp_package/GuildGreet-Extended/ 2>/dev/null || true
-        cp Bindings.xml temp_package/GuildGreet-Extended/ 2>/dev/null || true
-        cp embeds.xml temp_package/GuildGreet-Extended/ 2>/dev/null || true
-        cp -r libs temp_package/GuildGreet-Extended/ 2>/dev/null || true
-        cp -r GUI temp_package/GuildGreet-Extended/ 2>/dev/null || true
-        cp -r lang temp_package/GuildGreet-Extended/ 2>/dev/null || true
-        cp README.md temp_package/GuildGreet-Extended/ 2>/dev/null || true
-        cp LICENCE.md temp_package/GuildGreet-Extended/ 2>/dev/null || true
+      - name: Ensure CHANGELOG.md exists for BigWigs Packager release notes
+        run: |
+          if [[ ! -f CHANGELOG.md ]]; then
+            echo "# Changelog" > CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            git log -n 20 --pretty=format:"- %s" >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+          fi
 
-        cd temp_package
-        zip -r "../$PACKAGE_NAME.zip" GuildGreet-Extended/
-        cd ..
+      - name: Package with BigWigs Packager (Retail, Classic, BCC, Wrath, Cata, Mists, Forever)
+        uses: BigWigsMods/packager@v2
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+          WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
 
-        if [ -f "$PACKAGE_NAME.zip" ]; then
-          echo "✓ Manual package created: $PACKAGE_NAME.zip"
-          ls -la
-          echo "manual_package_created=true" >> $GITHUB_OUTPUT
-        else
-          echo "manual_package_created=false" >> $GITHUB_OUTPUT
-          exit 1
-        fi
-
-    - name: Upload manual package artifact
-      if: steps.manual_package.outputs.manual_package_created == 'true'
-      uses: actions/upload-artifact@v4
-      with:
-        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-manual
-        path: "*.zip"
-        retention-days: 90
-
-    - name: Upload BigWigs package artifact
-      if: steps.bigwigs_package.outcome == 'success' && steps.manual_package.outputs.manual_package_created != 'true'
-      uses: actions/upload-artifact@v4
-      with:
-        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-bigwigs
-        path: ".release/*.zip"
-        retention-days: 90
-
-    - name: Verify at least one package exists
-      id: verify_package
-      run: |
-        MANUAL_CREATED="${{ steps.manual_package.outputs.manual_package_created }}"
-        BW_SUCCESS="${{ steps.bigwigs_package.outcome }}"
-
-        HAS_PACKAGE="false"
-
-        if [[ "$MANUAL_CREATED" == "true" ]]; then
-          HAS_PACKAGE="true"
-        fi
-
-        if [[ "$BW_SUCCESS" == "success" ]] && [ -d ".release" ] && [ "$(find .release -name "*.zip" | wc -l)" -gt 0 ]; then
-          HAS_PACKAGE="true"
-        fi
-
-        echo "package_available=$HAS_PACKAGE" >> $GITHUB_OUTPUT
-
-        if [[ "$HAS_PACKAGE" != "true" ]]; then
-          echo "❌ No packages were created successfully!" && exit 1
-        fi
-
-  create-github-release:
-    name: Create GitHub Release
-    runs-on: ubuntu-latest
-    needs: [validate-release, package-addon]
-    if: ${{ always() && needs.validate-release.result == 'success' && needs.package-addon.result == 'success' }}
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Download BigWigs package artifact
-      id: download_bigwigs
-      uses: actions/download-artifact@v4
-      with:
-        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-bigwigs
-        path: ./artifacts
-      continue-on-error: true
-
-    - name: Download manual package artifact
-      id: download_manual
-      uses: actions/download-artifact@v4
-      with:
-        name: GuildGreet-Extended-${{ needs.validate-release.outputs.version }}-manual
-        path: ./artifacts
-      continue-on-error: true
-
-    - name: Emergency package creation
-      if: always()
-      id: emergency_package
-      run: |
-        BIGWIGS_OUTCOME="${{ steps.download_bigwigs.outcome }}"
-        MANUAL_OUTCOME="${{ steps.download_manual.outcome }}"
-        
-        echo "Download outcomes:"
-        echo "- BigWigs: $BIGWIGS_OUTCOME"
-        echo "- Manual: $MANUAL_OUTCOME"
-        
-        ARTIFACTS_EXIST="false"
-        if [ -d "./artifacts" ] && [ "$(find ./artifacts -name "*.zip" | wc -l)" -gt 0 ]; then
-          echo "✅ Artifacts directory found with ZIP files"
-          ARTIFACTS_EXIST="true"
-        else
-          echo "❌ No artifacts directory or no ZIP files found"
-        fi
-        
-        if [[ "$ARTIFACTS_EXIST" == "true" ]]; then
-          echo "✅ Artifacts available, skipping emergency package creation"
-          echo "emergency_package=false" >> $GITHUB_OUTPUT
-          exit 0
-        fi
-        
-        echo "🚨 No artifacts available - creating emergency package"
-        VERSION="${{ needs.validate-release.outputs.version }}"
-        PACKAGE_NAME="GuildGreet-Extended-$VERSION"
-        
-        sed -i "s/@project-version@/$VERSION/g" GuildGreet.toc
-        
-        mkdir -p "$PACKAGE_NAME"
-        cp GuildGreet.toc "$PACKAGE_NAME/"
-        cp GuildGreet.lua "$PACKAGE_NAME/"
-        cp GuildGreet.xml "$PACKAGE_NAME/" 2>/dev/null || true
-        cp Bindings.xml "$PACKAGE_NAME/" 2>/dev/null || true
-        cp embeds.xml "$PACKAGE_NAME/" 2>/dev/null || true
-        cp -r libs "$PACKAGE_NAME/" 2>/dev/null || true
-        cp -r GUI "$PACKAGE_NAME/" 2>/dev/null || true
-        cp -r lang "$PACKAGE_NAME/" 2>/dev/null || true
-        cp README.md "$PACKAGE_NAME/" 2>/dev/null || true
-        cp LICENCE.md "$PACKAGE_NAME/" 2>/dev/null || true
-        
-        zip -r "$PACKAGE_NAME.zip" "$PACKAGE_NAME/"
-        
-        if [ -f "$PACKAGE_NAME.zip" ]; then
-          echo "✅ Emergency package created: $PACKAGE_NAME.zip"
-          echo "package_file=$PACKAGE_NAME.zip" >> $GITHUB_OUTPUT
-          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
-          echo "emergency_package=true" >> $GITHUB_OUTPUT
-        else
-          echo "❌ Failed to create emergency package!"
-          exit 1
-        fi
-
-    - name: Find package files
-      id: find_package
-      run: |
-        if [[ "${{ steps.emergency_package.outputs.emergency_package }}" == "true" ]]; then
-          echo "📦 Using emergency package"
-          echo "package_file=${{ steps.emergency_package.outputs.package_file }}" >> $GITHUB_OUTPUT
-          echo "package_name=${{ steps.emergency_package.outputs.package_name }}" >> $GITHUB_OUTPUT
-          exit 0
-        fi
-        
-        echo "Searching for package files..."
-        if [ ! -d "./artifacts" ]; then
-          echo "❌ No artifacts directory found!"
-          exit 1
-        fi
-        
-        ls -la ./artifacts/
-        PACKAGE_FILE=$(find ./artifacts -name "*.zip" | head -1)
-        
-        if [ -z "$PACKAGE_FILE" ]; then
-          echo "❌ No package file found!"
-          exit 1
-        fi
-        
-        echo "Found package: $PACKAGE_FILE"
-        PACKAGE_NAME=$(basename "$PACKAGE_FILE" .zip)
-        echo "package_file=$PACKAGE_FILE" >> $GITHUB_OUTPUT
-        echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
-
-    - name: Generate release notes
-      id: release_notes
-      run: |
-        VERSION="${{ needs.validate-release.outputs.version }}"
-        PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -v "^${{ needs.validate-release.outputs.tag_name }}$" | head -1)
-
-        CHANGELOG_CONTENT=""
-        if [ -f "CHANGELOG.md" ]; then
-          CHANGELOG_CONTENT=$(awk -v version="$VERSION" 'BEGIN{c=0} /^## \[/ { if(c){exit}; if(index($0, version)>0){c=1; next}} c' CHANGELOG.md)
-        fi
-
-        if [ -z "$CHANGELOG_CONTENT" ]; then
-          COMMITS=$(git log --pretty=format:"- %s (%h)" ${PREVIOUS_TAG}..HEAD --no-merges | head -20)
-          if [ -z "$COMMITS" ]; then COMMITS="- Initial release of GuildGreet-Extended"; fi
-          CHANGELOG_CONTENT="**Changes:**\n$COMMITS"
-        fi
-
-        echo "## GuildGreet-Extended v$VERSION" > release_notes.md
-        echo "" >> release_notes.md
-        echo "$CHANGELOG_CONTENT" >> release_notes.md
-
-        echo "release_notes_file=release_notes.md" >> $GITHUB_OUTPUT
-
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ needs.validate-release.outputs.tag_name }}
-        name: GuildGreet-Extended v${{ needs.validate-release.outputs.version }}
-        body_path: release_notes.md
-        files: ${{ steps.find_package.outputs.package_file }}
-        draft: false
-        prerelease: ${{ fromJSON(needs.validate-release.outputs.is_prerelease) }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  platform-upload-summary:
-    name: Platform Upload Summary
-    runs-on: ubuntu-latest
-    needs: [validate-release, package-addon, create-github-release]
-    if: ${{ always() && needs.validate-release.result == 'success' }}
-
-    steps:
-    - name: Platform upload summary
-      env:
-        IS_PRERELEASE: ${{ needs.validate-release.outputs.is_prerelease }}
-        PACKAGE_RESULT: ${{ needs.package-addon.result }}
-        RELEASE_RESULT: ${{ needs.create-github-release.result }}
-        VERSION: ${{ needs.validate-release.outputs.version }}
-        TAG_NAME: ${{ needs.validate-release.outputs.tag_name }}
-      run: |
-        echo "## 📦 Release Summary" >> $GITHUB_STEP_SUMMARY
-        echo "**Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
-        echo "**Tag:** $TAG_NAME" >> $GITHUB_STEP_SUMMARY
-        
-        if [ "$IS_PRERELEASE" = "true" ]; then
-          echo "**Type:** 🧪 Prerelease" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "**Type:** ✅ Stable Release" >> $GITHUB_STEP_SUMMARY
-        fi
-
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### Job Results" >> $GITHUB_STEP_SUMMARY
-        echo "| Job | Status | Notes |" >> $GITHUB_STEP_SUMMARY
-        echo "|-----|--------|-------|" >> $GITHUB_STEP_SUMMARY
-        
-        if [ "$PACKAGE_RESULT" = "success" ]; then
-          echo "| Package Creation | ✅ Success | Created successfully |" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "| Package Creation | ❌ Failed | Check logs |" >> $GITHUB_STEP_SUMMARY
-        fi
-        
-        if [ "$RELEASE_RESULT" = "success" ]; then
-          echo "| GitHub Release | ✅ Success | Created successfully |" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "| GitHub Release | ❌ Failed | Check logs |" >> $GITHUB_STEP_SUMMARY
-        fi
-
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### Platform Upload Status" >> $GITHUB_STEP_SUMMARY
-        echo "| Platform | Status | Notes |" >> $GITHUB_STEP_SUMMARY
-        echo "|----------|--------|-------|" >> $GITHUB_STEP_SUMMARY
-        
-        if [ "$RELEASE_RESULT" = "success" ]; then
-          echo "| GitHub Releases | ✅ Uploaded | Available for download |" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "| GitHub Releases | ❌ Failed | Check job logs |" >> $GITHUB_STEP_SUMMARY
-        fi
-
-        if [ "$IS_PRERELEASE" = "true" ]; then
-          echo "| CurseForge | ⏸️ Manual-only | Prereleases not auto-uploaded |" >> $GITHUB_STEP_SUMMARY
-          echo "| WoWInterface | ⏸️ Manual-only | Prereleases not auto-uploaded |" >> $GITHUB_STEP_SUMMARY
-          echo "| Wago | ⏸️ Manual-only | Prereleases not auto-uploaded |" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "| CurseForge | 🔑 Auto-upload | Via BigWigs Packager (if CF_API_KEY set) |" >> $GITHUB_STEP_SUMMARY
-          echo "| WoWInterface | 🔑 Auto-upload | Via BigWigs Packager (if WOWI_API_TOKEN set) |" >> $GITHUB_STEP_SUMMARY
-          echo "| Wago | 🔑 Auto-upload | Via BigWigs Packager (if WAGO_API_TOKEN set) |" >> $GITHUB_STEP_SUMMARY
-        fi
+      - name: Attach per-flavor ZIP copies to GitHub Release (Wago.io GitHub Webhook fallback)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${TAG_NAME:-${GITHUB_REF_NAME}}"
+          PKG_NAME=$(awk '/^package-as:/{print $2; exit}' .pkgmeta | tr -d '\r')
+          BASE_ZIP=$(ls .release/${PKG_NAME}-*.zip 2>/dev/null | grep -v "\-nolib" | head -n 1)
+          if [ -n "$BASE_ZIP" ] && [ -f "$BASE_ZIP" ] && [ -n "$TAG_NAME" ]; then
+            for SUFFIX in "-mists" "-cata" "-wrath" "-bcc" "-forever" "-classic"; do
+              TARGET_ZIP=".release/${PKG_NAME}-${TAG_NAME}${SUFFIX}.zip"
+              if [ ! -f "$TARGET_ZIP" ]; then
+                cp "$BASE_ZIP" "$TARGET_ZIP"
+                gh release upload "$TAG_NAME" "$TARGET_ZIP" --clobber || true
+              fi
+            done
+          fi

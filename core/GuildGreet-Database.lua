@@ -5,7 +5,7 @@
 
 -- Get or create the GuildGreet addon instance
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- Database Library Namespace
 GLDG.Database = {}
@@ -36,8 +36,8 @@ function GLDG.Database:Initialize()
 	-- store realm and player names (falls noch nicht gesetzt)
 	if not GLDG.Realm then GLDG.Realm = GetRealmName() end
 	if not GLDG.Player then GLDG.Player = UnitName("player") end
-	if not GLDG.GuildName then GLDG.GuildName = GetGuildInfo("player") or "NoGuild" end
-	GLDG.unique_GuildName = GLDG.GuildName.."-"..GLDG.Realm
+	if not GLDG.GuildName then GLDG.GuildName = GetGuildInfo("player") or "" end
+	if not GLDG.unique_GuildName then GLDG.unique_GuildName = "" end
 
 	-- Clear obsolete options from profile
 	if GLDG.db.profile.EnableContextMenu then 
@@ -54,8 +54,6 @@ function GLDG.Database:Initialize()
 	GLDG_UpdatePlayerCheckboxes()
 
 	GLDG.InitComplete = true
-	
-	GLDG:Print(GLDG.Database:GetColors().help..GLDG_NAME..":|r "..L["Database initialized successfully"])
 end
 
 -- Legacy compatibility function (mapped to new Initialize)
@@ -193,10 +191,49 @@ end
 -------------------------------
 
 function GLDG.Database:InitializeGreetings()
-	-- NOTE: Greetings are now stored in AceDB at GLDG.db.realm.greetings
-	-- This function is now largely unnecessary since AceDB handles defaults
-	-- Kept for legacy compatibility in case direct GLDG_Data accesses still exist
-	-- Actual initialization is done via the defaults structure in GuildGreet.lua
+	if not GLDG.db or not GLDG.db.realm then return end
+	if not GLDG.db.realm.greetings then GLDG.db.realm.greetings = {} end
+	local g = GLDG.db.realm.greetings
+
+	local defaultsMap = {
+		Greet        = GLDG_GREET         or { "Hi %n", "Hello %n" },
+		GreetBack    = GLDG_GREETBACK     or { "wb %n", "Welcome back %n" },
+		Welcome      = GLDG_WELCOME       or { "Welcome to the guild, %n", "Welcome %n, nice to have you in the guild" },
+		NewRank      = GLDG_RANK          or { "Congratulations %n on your promotion to %r", "Grats for %r, %n" },
+		NewLevel     = GLDG_LEVEL         or { "Congratulations %n on reaching level %l", "Grats on level %l, %n", "gz %n" },
+		Bye          = GLDG_BYE           or { "Good bye %n", "Bye bye %n" },
+		Night        = GLDG_NIGHT         or { "Good bye %n", "Bye bye %n", "Good night %n" },
+		Guild        = GLDG_GUILD         or { "Hi guild", "Hello guildies" },
+		Channel      = GLDG_CHANNEL       or { "Hi channel", "Hello folks" },
+		ByeGuild     = GLDG_BYE_GUILD     or { "Good bye guild", "Bye guildies" },
+		NightGuild   = GLDG_NIGHT_GUILD   or { "Good bye guild", "Bye guildies", "Good night guild" },
+		ByeChannel   = GLDG_BYE_CHANNEL   or { "Good bye channel", "Bye folks" },
+		NightChannel = GLDG_NIGHT_CHANNEL or { "Good bye channel", "Bye folks", "Good night channel" },
+		LaterGuild   = GLDG_LATER_GUILD   or { "See you later guild", "cya guildies" },
+		LaterChannel = GLDG_LATER_CHANNEL or { "See you later channel", "See you later folks" },
+		Achievment   = GLDG_ACHIEVMENT    or { "Congratulations %n for %a", "Congrats, %n", "gratz %n", "gz %n" },
+	}
+
+	for key, defaultList in pairs(defaultsMap) do
+		if type(g[key]) ~= "table" or #g[key] == 0 then
+			g[key] = {}
+			for i, msg in ipairs(defaultList) do
+				g[key][i] = msg
+			end
+		end
+	end
+
+	-- Keep aliases GreetGuild <-> Guild and GreetChannel <-> Channel synchronized
+	if not g.GreetGuild or #g.GreetGuild == 0 then
+		g.GreetGuild = g.Guild
+	else
+		g.Guild = g.GreetGuild
+	end
+	if not g.GreetChannel or #g.GreetChannel == 0 then
+		g.GreetChannel = g.Channel
+	else
+		g.Channel = g.GreetChannel
+	end
 end
 
 ------------------------------------

@@ -1,579 +1,349 @@
---[[
-	GuildGreet Greetings GUI Module
-	Handles the Greetings tab interface
-]]--
+------------------------------------------------------------
+-- GuildGreet Modern GUI - Greetings & Collections Tab
+-- Manages all 16 greeting categories and custom collections
+------------------------------------------------------------
 
-local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet")
 local AceGUI = LibStub("AceGUI-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
+local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet")
+GuildGreet = GLDG
 
-local GreetingsGUI = GLDG:NewModule("GreetingsGUI")
+local UIStyle = GLDG.UIStyle
 
--- Current state
-GreetingsGUI.selectedCollection = nil
-GreetingsGUI.selectedCategory = "Greet"
-GreetingsGUI.selectedMessage = nil
+local selectedCategory = "Greet"
+local selectedCollection = "" -- "" = Default Realm Greetings
+local selectedMsgIndex = nil
 
--- Greeting categories (must match defaults in GuildGreet.lua)
-GreetingsGUI.categories = {
-	"Greet", "GreetBack", "Welcome", "NewRank", "NewLevel", "Bye", "Night",
-	"Guild", "Channel", "ByeGuild", "NightGuild", "ByeChannel", "NightChannel", 
-	"LaterGuild", "LaterChannel", "Achievment"
+local CATEGORY_ORDER = {
+    "Greet",
+    "GreetBack",
+    "Welcome",
+    "NewLevel",
+    "NewRank",
+    "Achievment",
+    "Bye",
+    "Night",
+    "Guild",
+    "Channel",
+    "ByeGuild",
+    "NightGuild",
+    "ByeChannel",
+    "NightChannel",
+    "LaterGuild",
+    "LaterChannel",
 }
 
---[[
-	Create the Greetings tab content
-]]
-function GreetingsGUI:CreateTabContent(container)
-	-- Main container with horizontal layout
-	local mainGroup = AceGUI:Create("SimpleGroup")
-	mainGroup:SetFullWidth(true)
-	mainGroup:SetFullHeight(true)
-	mainGroup:SetLayout("Flow")
-	
-	-- Left panel - Collections and Categories
-	local leftPanel = AceGUI:Create("InlineGroup")
-	leftPanel:SetTitle(L["Collections"] or "Collections")
-	leftPanel:SetWidth(200)
-	leftPanel:SetFullHeight(true)
-	leftPanel:SetLayout("Flow")
-	
-	self:CreateCollectionsList(leftPanel)
-	mainGroup:AddChild(leftPanel)
-	
-	-- Right panel - Messages
-	local rightPanel = AceGUI:Create("InlineGroup")
-	rightPanel:SetTitle(L["Messages"] or "Messages")
-	rightPanel:SetRelativeWidth(0.75)
-	rightPanel:SetFullHeight(true)
-	rightPanel:SetLayout("Flow")
-	
-	self:CreateMessagesList(rightPanel)
-	mainGroup:AddChild(rightPanel)
-	
-	container:AddChild(mainGroup)
-	
-	-- Store references
-	self.leftPanel = leftPanel
-	self.rightPanel = rightPanel
-	
-	-- Load initial data
-	self:RefreshCollectionsList()
+local CATEGORY_LABELS = {
+    Greet        = "1. Online Greeting (Default)",
+    GreetBack    = "2. Relog Greeting (Welcome Back)",
+    Welcome      = "3. New Guild Member (Welcome)",
+    NewLevel     = "4. Level-Up Congratulations",
+    NewRank      = "5. Promotion / New Rank",
+    Achievment   = "6. Achievement Congratulations",
+    Bye          = "7. Player Goodbye (Day)",
+    Night        = "8. Player Good Night (20:00 - 05:00)",
+    Guild        = "9. Greet Entire Guild",
+    Channel      = "10. Greet Entire Channel",
+    ByeGuild     = "11. Say Goodbye to Guild (Day)",
+    NightGuild   = "12. Say Good Night to Guild",
+    ByeChannel   = "13. Say Goodbye to Channel (Day)",
+    NightChannel = "14. Say Good Night to Channel",
+    LaterGuild   = "15. See You Later to Guild",
+    LaterChannel = "16. See You Later to Channel",
+}
+
+local function GetActiveCategoryList(cat)
+    cat = cat or selectedCategory
+    if selectedCollection and selectedCollection ~= "" and GLDG_Data.Collections and GLDG_Data.Collections[selectedCollection] then
+        local col = GLDG_Data.Collections[selectedCollection]
+        col[cat] = col[cat] or {}
+        return col[cat]
+    end
+    GLDG_DataGreet[cat] = GLDG_DataGreet[cat] or {}
+    GLDG_Data[cat] = GLDG_DataGreet[cat]
+    return GLDG_DataGreet[cat]
 end
 
---[[
-	Create collections list
-]]
-function GreetingsGUI:CreateCollectionsList(container)
-	-- Collection dropdown and controls
-	local collectionGroup = AceGUI:Create("SimpleGroup")
-	collectionGroup:SetFullWidth(true)
-	collectionGroup:SetLayout("Flow")
-	
-	local collectionDropdown = AceGUI:Create("Dropdown")
-	collectionDropdown:SetLabel(L["Select Collection"] or "Select Collection")
-	collectionDropdown:SetRelativeWidth(0.8)
-	collectionDropdown:SetCallback("OnValueChanged", function(widget, event, key, value)
-		self:SelectCollection(key)
-	end)
-	collectionGroup:AddChild(collectionDropdown)
-	
-	-- Add collection button
-	local addCollectionBtn = AceGUI:Create("Button")
-	addCollectionBtn:SetText(L["New"] or "New")
-	addCollectionBtn:SetWidth(60)
-	addCollectionBtn:SetCallback("OnClick", function()
-		self:ShowAddCollectionDialog()
-	end)
-	collectionGroup:AddChild(addCollectionBtn)
-	
-	container:AddChild(collectionGroup)
-	
-	-- Category list
-	local categoryGroup = AceGUI:Create("InlineGroup")
-	categoryGroup:SetTitle(L["Categories"] or "Categories")
-	categoryGroup:SetFullWidth(true)
-	categoryGroup:SetHeight(300)
-	categoryGroup:SetLayout("List")
-	
-	-- Store buttons for visual feedback updates
-	self.categoryButtons = {}
-	
-	for _, category in ipairs(self.categories) do
-		local categoryButton = AceGUI:Create("InteractiveLabel")
-		local labelText = L[category] or category
-		-- Color code selected category (yellow/gold)
-		if category == self.selectedCategory then
-			labelText = "|cffffff00" .. labelText .. "|r"  -- Yellow for selected
-		else
-			labelText = "|cffffffff" .. labelText .. "|r"  -- White for unselected
-		end
-		categoryButton:SetText(labelText)
-		categoryButton:SetFullWidth(true)
-		categoryButton:SetCallback("OnClick", function()
-			self:SelectCategory(category)
-		end)
-		categoryGroup:AddChild(categoryButton)
-		self.categoryButtons[category] = categoryButton
-	end
-	
-	container:AddChild(categoryGroup)
-	
-	-- Store references
-	self.collectionDropdown = collectionDropdown
-	self.categoryGroup = categoryGroup
-	
-	-- Auto-select first category if none selected
-	if not self.selectedCategory then
-		self.selectedCategory = self.categories[1] or "Greet"
-	end
+local function SyncGreetingAliases()
+    if GLDG_DataGreet then
+        GLDG_DataGreet.GreetGuild = GLDG_DataGreet.Guild
+        GLDG_DataGreet.GreetChannel = GLDG_DataGreet.Channel
+    end
 end
 
---[[
-	Create messages list
-]]
-function GreetingsGUI:CreateMessagesList(container)
-	-- Messages frame with scroll
-	local messagesFrame = AceGUI:Create("SimpleGroup")
-	messagesFrame:SetFullWidth(true)
-	messagesFrame:SetFullHeight(true)
-	messagesFrame:SetLayout("Flow")
-	
-	-- Add/Edit controls group - horizontal layout
-	local controlsGroup = AceGUI:Create("SimpleGroup")
-	controlsGroup:SetFullWidth(true)
-	controlsGroup:SetHeight(30)
-	controlsGroup:SetLayout("Flow")
-	
-	-- Add message button
-	local addButton = AceGUI:Create("Button")
-	addButton:SetText(L["Add"] or "Add")
-	addButton:SetWidth(80)
-	addButton:SetCallback("OnClick", function()
-		self:ShowAddMessageDialog()
-	end)
-	controlsGroup:AddChild(addButton)
-	
-	-- Edit message button
-	local editButton = AceGUI:Create("Button")
-	editButton:SetText(L["Edit"] or "Edit")
-	editButton:SetWidth(80)
-	editButton:SetCallback("OnClick", function()
-		self:ShowEditMessageDialog()
-	end)
-	controlsGroup:AddChild(editButton)
-	
-	-- Delete message button
-	local deleteButton = AceGUI:Create("Button")
-	deleteButton:SetText(L["Delete"] or "Delete")
-	deleteButton:SetWidth(80)
-	deleteButton:SetCallback("OnClick", function()
-		self:DeleteSelectedMessage()
-	end)
-	controlsGroup:AddChild(deleteButton)
-	
-	messagesFrame:AddChild(controlsGroup)
-	
-	-- Messages list container with scroll
-	local messagesScroll = AceGUI:Create("ScrollFrame")
-	messagesScroll:SetFullWidth(true)
-	messagesScroll:SetHeight(400)
-	messagesScroll:SetLayout("List")
-	
-	messagesFrame:AddChild(messagesScroll)
-	
-	container:AddChild(messagesFrame)
-	
-	-- Store references
-	self.messagesFrame = messagesFrame
-	self.messagesScroll = messagesScroll
-	self.messagesList = messagesScroll  -- Keep both names for compatibility
-	self.addButton = addButton
-	self.editButton = editButton
-	self.deleteButton = deleteButton
-end
+function GLDG:CreateGreetingsTab(container)
+    if self.Database and self.Database.InitializeGreetings then
+        self.Database:InitializeGreetings()
+    end
 
---[[
-	Refresh collections list
-]]
-function GreetingsGUI:RefreshCollectionsList()
-	if not self.collectionDropdown then return end
-	
-	local collections = {}
-	collections["default"] = L["Default"] or "Default"
-	
-	-- Add custom collections
-	if GLDG.db.global.GreetCollections then
-		for name, collection in pairs(GLDG.db.global.GreetCollections) do
-			collections[name] = name
-		end
-	end
-	
-	self.collectionDropdown:SetList(collections)
-	
-	-- Select default if none selected
-	if not self.selectedCollection then
-		self.selectedCollection = "default"
-		self.collectionDropdown:SetValue("default")
-		
-		-- Ensure category is selected
-		if not self.selectedCategory then
-			self.selectedCategory = self.categories[1] or "Greet"
-		end
-		
-		-- Refresh message list
-		self:RefreshMessagesList()
-	end
-end
+    local scroll = AceGUI:Create("ScrollFrame")
+    scroll:SetLayout("Flow")
+    scroll:SetFullWidth(true)
+    scroll:SetFullHeight(true)
+    container:AddChild(scroll)
 
---[[
-	Select a collection
-]]
-function GreetingsGUI:SelectCollection(collectionName)
-	self.selectedCollection = collectionName
-	
-	-- If no category selected, select the first one
-	if not self.selectedCategory then
-		self.selectedCategory = self.categories[1]
-	end
-	
-	self:RefreshMessagesList()
-end
+    local CATEGORY_LABELS = {
+        Greet        = "1. " .. (L["Going online"] or "Online Greeting (Default)"),
+        GreetBack    = "2. " .. (L["Coming back online"] or "Relog Greeting (Welcome Back)"),
+        Welcome      = "3. " .. (L["Welcome to guild"] or "New Guild Member (Welcome)"),
+        NewLevel     = "4. " .. (L["Level up"] or "Level-Up Congratulations"),
+        NewRank      = "5. " .. (L["Promotion"] or "Promotion / New Rank"),
+        Achievment   = "6. " .. (L["Achievment"] or "Achievement Congratulations"),
+        Bye          = "7. " .. (L["Leaving char (day)"] or "Player Goodbye (Day)"),
+        Night        = "8. " .. (L["Leaving char (night)"] or "Player Good Night (20:00 - 05:00)"),
+        Guild        = "9. " .. (L["Greeting the guild"] or "Greet Entire Guild"),
+        Channel      = "10. " .. (L["Greeting the channel"] or "Greet Entire Channel"),
+        ByeGuild     = "11. " .. (L["Say goodbye to guild"] or "Say Goodbye to Guild (Day)"),
+        NightGuild   = "12. " .. (L["Say good night to guild"] or "Say Good Night to Guild"),
+        ByeChannel   = "13. " .. (L["Say goodbye to channel"] or "Say Goodbye to Channel (Day)"),
+        NightChannel = "14. " .. (L["Say good night to channel"] or "Say Good Night to Channel"),
+        LaterGuild   = "15. " .. (L["See you later to guild"] or "See You Later to Guild"),
+        LaterChannel = "16. " .. (L["See you later to channel"] or "See You Later to Channel"),
+    }
 
---[[
-	Select a category
-]]
-function GreetingsGUI:SelectCategory(category)
-	self.selectedCategory = category
-	self:RefreshMessagesList()
-	
-	-- Update category selection visual feedback with colors
-	if self.categoryButtons then
-		for key, button in pairs(self.categoryButtons) do
-			local labelText = L[key] or key
-			if key == self.selectedCategory then
-				labelText = "|cffffff00" .. labelText .. "|r"  -- Yellow for selected
-			else
-				labelText = "|cffffffff" .. labelText .. "|r"  -- White for unselected
-			end
-			button:SetText(labelText)
-		end
-	end
-end
+    --------------------------------------------------------
+    -- 1. Collection & Category Selector Bar
+    --------------------------------------------------------
+    local topGroup = AceGUI:Create("InlineGroup")
+    topGroup:SetTitle(L["Manage the messages you want to use for greeting"] or "Category & Collection Selection")
+    topGroup:SetFullWidth(true)
+    topGroup:SetLayout("Flow")
+    scroll:AddChild(topGroup)
 
---[[
-	Refresh messages list
-]]
-function GreetingsGUI:RefreshMessagesList()
-	if not self.messagesList then
-		return
-	end
-	
-	if not self.selectedCollection or not self.selectedCategory then
-		self.messagesList:ReleaseChildren()
-		local noSelection = AceGUI:Create("Label")
-		noSelection:SetText("No category selected")
-		noSelection:SetFullWidth(true)
-		self.messagesList:AddChild(noSelection)
-		return
-	end
-	
-	-- Clear current list
-	self.messagesList:ReleaseChildren()
-	
-	-- Get messages for current collection and category
-	local messages = self:GetMessages(self.selectedCollection, self.selectedCategory)
-	
-	if not messages or #messages == 0 then
-		local noMessages = AceGUI:Create("Label")
-		noMessages:SetText(L["No messages defined for this category"] or "No messages defined for this category")
-		noMessages:SetFullWidth(true)
-		self.messagesList:AddChild(noMessages)
-		return
-	end
-	
-	-- Add message entries
-	for i, message in ipairs(messages) do
-		local messageLabel = AceGUI:Create("InteractiveLabel")
-		local labelText = string.format("%d. %s", i, message:sub(1, 80) .. (message:len() > 80 and "..." or ""))
-		if i == self.selectedMessage then
-			labelText = "> " .. labelText
-		end
-		messageLabel:SetText(labelText)
-		messageLabel:SetFullWidth(true)
-		messageLabel:SetCallback("OnClick", function()
-			self:SelectMessage(i)
-		end)
-		self.messagesList:AddChild(messageLabel)
-	end
-end
+    local catDropdown = AceGUI:Create("Dropdown")
+    catDropdown:SetLabel(L["Greeting Category"] or "Greeting Category")
+    catDropdown:SetList(CATEGORY_LABELS, CATEGORY_ORDER)
+    catDropdown:SetValue(selectedCategory)
+    catDropdown:SetRelativeWidth(0.50)
+    catDropdown:SetCallback("OnValueChanged", function(_, _, val)
+        selectedCategory = val
+        selectedMsgIndex = nil
+        GLDG:RefreshConfigUI()
+    end)
+    topGroup:AddChild(catDropdown)
 
---[[
-	Get messages for collection and category
-]]
-function GreetingsGUI:GetMessages(collection, category)
-	if collection == "default" then
-		-- Use default messages from realm greetings
-		if GLDG.db.realm.greetings and GLDG.db.realm.greetings[category] then
-			return GLDG.db.realm.greetings[category]
-		else
-			-- Initialize if needed
-			if not GLDG.db.realm.greetings then GLDG.db.realm.greetings = {} end
-			if not GLDG.db.realm.greetings[category] then GLDG.db.realm.greetings[category] = {} end
-			return GLDG.db.realm.greetings[category]
-		end
-	else
-		-- Use custom collection from global
-		if GLDG.db.global.GreetCollections and GLDG.db.global.GreetCollections[collection] and 
-		   GLDG.db.global.GreetCollections[collection][category] then
-			return GLDG.db.global.GreetCollections[collection][category]
-		end
-	end
-	return {}
-end
+    local colList = { [""] = L["Global defaults"] or "Default Greetings (Active)" }
+    if GLDG_Data and GLDG_Data.Collections then
+        for colName in pairs(GLDG_Data.Collections) do
+            colList[colName] = (L["Collection"] or "Collection") .. ": " .. colName
+        end
+    end
 
---[[
-	Select a message
-]]
-function GreetingsGUI:SelectMessage(index)
-	self.selectedMessage = index
-	self:RefreshMessagesList()
-end
+    local colDropdown = AceGUI:Create("Dropdown")
+    colDropdown:SetLabel(L["Available custom collections"] or "Target Collection")
+    colDropdown:SetList(colList)
+    colDropdown:SetValue(selectedCollection or "")
+    colDropdown:SetRelativeWidth(0.50)
+    colDropdown:SetCallback("OnValueChanged", function(_, _, val)
+        selectedCollection = val or ""
+        selectedMsgIndex = nil
+        GLDG:RefreshConfigUI()
+    end)
+    topGroup:AddChild(colDropdown)
 
---[[
-	Show add collection dialog
-]]
-function GreetingsGUI:ShowAddCollectionDialog()
-	local dialog = AceGUI:Create("Window")
-	dialog:SetTitle(L["Create New Collection"] or "Create New Collection")
-	dialog:SetWidth(400)
-	dialog:SetHeight(150)
-	dialog:SetLayout("Flow")
-	
-	-- Collection name input
-	local nameEdit = AceGUI:Create("EditBox")
-	nameEdit:SetLabel(L["Collection Name"] or "Collection Name")
-	nameEdit:SetFullWidth(true)
-	dialog:AddChild(nameEdit)
-	
-	-- Buttons
-	local buttonGroup = AceGUI:Create("SimpleGroup")
-	buttonGroup:SetFullWidth(true)
-	buttonGroup:SetLayout("Flow")
-	
-	local createBtn = AceGUI:Create("Button")
-	createBtn:SetText(L["Create"] or "Create")
-	createBtn:SetWidth(100)
-	createBtn:SetCallback("OnClick", function()
-		local name = nameEdit:GetText()
-		if name and name:trim() ~= "" then
-			self:CreateCollection(name)
-			dialog:Release()
-		else
-			GLDG:Print(L["Please enter a collection name"] or "Please enter a collection name")
-		end
-	end)
-	buttonGroup:AddChild(createBtn)
-	
-	local cancelBtn = AceGUI:Create("Button")
-	cancelBtn:SetText(L["Cancel"] or "Cancel")
-	cancelBtn:SetWidth(100)
-	cancelBtn:SetCallback("OnClick", function()
-		dialog:Release()
-	end)
-	buttonGroup:AddChild(cancelBtn)
-	
-	dialog:AddChild(buttonGroup)
-	dialog:BringToFront()
-end
+    local newColEdit = AceGUI:Create("EditBox")
+    newColEdit:SetLabel(L["Create new collection"] or "Create New Collection Name")
+    newColEdit:SetRelativeWidth(0.45)
+    newColEdit:SetCallback("OnEnterPressed", function(widget, _, text)
+        text = strtrim(text or "")
+        if text == "" then return end
+        GLDG_Data.Collections = GLDG_Data.Collections or {}
+        if not GLDG_Data.Collections[text] then
+            local newCol = {}
+            for _, cat in ipairs(CATEGORY_ORDER) do
+                newCol[cat] = {}
+            end
+            GLDG_Data.Collections[text] = newCol
+        end
+        selectedCollection = text
+        widget:SetText("")
+        GLDG:RefreshConfigUI()
+    end)
+    topGroup:AddChild(newColEdit)
 
---[[
-	Create a new collection
-]]
-function GreetingsGUI:CreateCollection(collectionName)
-	if not GLDG.db.global then GLDG.db.global = {} end
-	if not GLDG.db.global.GreetCollections then GLDG.db.global.GreetCollections = {} end
-	
-	-- Check if collection already exists
-	if GLDG.db.global.GreetCollections[collectionName] then
-		GLDG:Print(L["Collection already exists"] or "Collection already exists")
-		return
-	end
-	
-	-- Create new empty collection with all categories
-	GLDG.db.global.GreetCollections[collectionName] = {}
-	for _, category in ipairs(self.categories) do
-		GLDG.db.global.GreetCollections[collectionName][category] = {}
-	end
-	
-	-- Refresh the dropdown and select the new collection
-	self:RefreshCollectionsList()
-	self:SelectCollection(collectionName)
-	self.collectionDropdown:SetValue(collectionName)
-	
-	GLDG:Print(string.format(L["Collection created: %s"] or "Collection created: %s", collectionName))
-end
+    if selectedCollection ~= "" then
+        local assignGuildBtn = AceGUI:Create("Button")
+        assignGuildBtn:SetText(L["Set guild"] or "Use for Current Guild")
+        assignGuildBtn:SetRelativeWidth(0.28)
+        assignGuildBtn:SetCallback("OnClick", function()
+            if GLDG_unique_GuildName and GLDG_unique_GuildName ~= "" then
+                GLDG_Data.Custom = GLDG_Data.Custom or {}
+                GLDG_Data.Custom[GLDG_unique_GuildName] = selectedCollection
+                GLDG_DataGreet = GLDG_Data.Collections[selectedCollection]
+                GLDG:PrintInfo("Assigned collection '" .. selectedCollection .. "' to current guild.")
+            end
+        end)
+        topGroup:AddChild(assignGuildBtn)
 
---[[
-	Show add message dialog
-]]
-function GreetingsGUI:ShowAddMessageDialog()
-	local dialog = AceGUI:Create("Window")
-	dialog:SetTitle(L["Add New Message"] or "Add New Message")
-	dialog:SetWidth(500)
-	dialog:SetHeight(300)
-	dialog:SetLayout("Flow")
-	
-	-- Message text
-	local messageEdit = AceGUI:Create("MultiLineEditBox")
-	messageEdit:SetLabel(L["Message Text"] or "Message Text")
-	messageEdit:SetFullWidth(true)
-	messageEdit:SetHeight(150)
-	dialog:AddChild(messageEdit)
-	
-	-- Buttons
-	local buttonGroup = AceGUI:Create("SimpleGroup")
-	buttonGroup:SetFullWidth(true)
-	buttonGroup:SetLayout("Flow")
-	
-	local addBtn = AceGUI:Create("Button")
-	addBtn:SetText(L["Add"] or "Add")
-	addBtn:SetWidth(100)
-	addBtn:SetCallback("OnClick", function()
-		local text = messageEdit:GetText()
-		if text and text:trim() ~= "" then
-			self:AddMessage(text)
-			dialog:Release()
-		end
-	end)
-	buttonGroup:AddChild(addBtn)
-	
-	local cancelBtn = AceGUI:Create("Button")
-	cancelBtn:SetText(L["Cancel"] or "Cancel")
-	cancelBtn:SetWidth(100)
-	cancelBtn:SetCallback("OnClick", function()
-		dialog:Release()
-	end)
-	buttonGroup:AddChild(cancelBtn)
-	
-	dialog:AddChild(buttonGroup)
-	dialog:BringToFront()
-end
+        local delColBtn = AceGUI:Create("Button")
+        delColBtn:SetText(L["Remove collection"] or "Delete Collection")
+        delColBtn:SetRelativeWidth(0.27)
+        delColBtn:SetCallback("OnClick", function()
+            if GLDG_Data.Collections and GLDG_Data.Collections[selectedCollection] then
+                GLDG_Data.Collections[selectedCollection] = nil
+                selectedCollection = ""
+                selectedMsgIndex = nil
+                GLDG:RefreshConfigUI()
+            end
+        end)
+        topGroup:AddChild(delColBtn)
+    end
 
---[[
-	Add a new message
-]]
-function GreetingsGUI:AddMessage(messageText)
-	-- Get or create message list
-	local messages = self:GetMessagesRef(self.selectedCollection, self.selectedCategory)
-	
-	if messages then
-		table.insert(messages, messageText)
-		self:RefreshMessagesList()
-	end
-end
+    --------------------------------------------------------
+    -- 2. Add / Edit Template Group
+    --------------------------------------------------------
+    local editGroup = AceGUI:Create("InlineGroup")
+    local currentDesc = L["Editbox/" .. selectedCategory] or CATEGORY_LABELS[selectedCategory] or selectedCategory
+    editGroup:SetTitle((L["Add New Message"] or "Add or Edit Template") .. " — " .. currentDesc)
+    editGroup:SetFullWidth(true)
+    editGroup:SetLayout("Flow")
+    scroll:AddChild(editGroup)
 
---[[
-	Get reference to messages table for editing
-]]
-function GreetingsGUI:GetMessagesRef(collection, category)
-	if collection == "default" then
-		-- Initialize default messages if needed (realm greetings)
-		if not GLDG.db.realm.greetings then GLDG.db.realm.greetings = {} end
-		if not GLDG.db.realm.greetings[category] then GLDG.db.realm.greetings[category] = {} end
-		return GLDG.db.realm.greetings[category]
-	else
-		-- Initialize custom collection if needed (global GreetCollections)
-		if not GLDG.db.global.GreetCollections then GLDG.db.global.GreetCollections = {} end
-		if not GLDG.db.global.GreetCollections[collection] then GLDG.db.global.GreetCollections[collection] = {} end
-		if not GLDG.db.global.GreetCollections[collection][category] then 
-			GLDG.db.global.GreetCollections[collection][category] = {} 
-		end
-		return GLDG.db.global.GreetCollections[collection][category]
-	end
-end
+    local list = GetActiveCategoryList(selectedCategory)
+    local currentEditValue = (selectedMsgIndex and list[selectedMsgIndex]) or ""
 
---[[
-	Show edit message dialog
-]]
-function GreetingsGUI:ShowEditMessageDialog()
-	if not self.selectedMessage then
-		GLDG:Print(L["Please select a message to edit"] or "Please select a message to edit")
-		return
-	end
-	
-	local messages = self:GetMessages(self.selectedCollection, self.selectedCategory)
-	if not messages or not messages[self.selectedMessage] then return end
-	
-	local dialog = AceGUI:Create("Window")
-	dialog:SetTitle(L["Edit Message"] or "Edit Message")
-	dialog:SetWidth(500)
-	dialog:SetHeight(300)
-	dialog:SetLayout("Flow")
-	
-	-- Message text
-	local messageEdit = AceGUI:Create("MultiLineEditBox")
-	messageEdit:SetLabel(L["Message Text"] or "Message Text")
-	messageEdit:SetText(messages[self.selectedMessage])
-	messageEdit:SetFullWidth(true)
-	messageEdit:SetHeight(150)
-	dialog:AddChild(messageEdit)
-	
-	-- Buttons
-	local buttonGroup = AceGUI:Create("SimpleGroup")
-	buttonGroup:SetFullWidth(true)
-	buttonGroup:SetLayout("Flow")
-	
-	local saveBtn = AceGUI:Create("Button")
-	saveBtn:SetText(L["Save"] or "Save")
-	saveBtn:SetWidth(100)
-	saveBtn:SetCallback("OnClick", function()
-		local text = messageEdit:GetText()
-		if text and text:trim() ~= "" then
-			self:UpdateMessage(self.selectedMessage, text)
-			dialog:Release()
-		end
-	end)
-	buttonGroup:AddChild(saveBtn)
-	
-	local cancelBtn = AceGUI:Create("Button")
-	cancelBtn:SetText(L["Cancel"] or "Cancel")
-	cancelBtn:SetWidth(100)
-	cancelBtn:SetCallback("OnClick", function()
-		dialog:Release()
-	end)
-	buttonGroup:AddChild(cancelBtn)
-	
-	dialog:AddChild(buttonGroup)
-	dialog:BringToFront()
-end
+    local msgEdit = AceGUI:Create("EditBox")
+    msgEdit:SetLabel(selectedMsgIndex and ((L["EditSelected"] or "Editing Message") .. " #" .. selectedMsgIndex) or (L["Add New Message"] or "New Greeting Message (Press Enter to Save)"))
+    msgEdit:SetText(currentEditValue)
+    msgEdit:SetRelativeWidth(0.65)
+    msgEdit:SetCallback("OnEnterPressed", function(widget, _, text)
+        text = strtrim(text or "")
+        if text == "" then return end
+        if selectedMsgIndex and list[selectedMsgIndex] then
+            list[selectedMsgIndex] = text
+        else
+            table.insert(list, text)
+        end
+        selectedMsgIndex = nil
+        SyncGreetingAliases()
+        widget:SetText("")
+        GLDG:RefreshConfigUI()
+    end)
+    editGroup:AddChild(msgEdit)
 
---[[
-	Update a message
-]]
-function GreetingsGUI:UpdateMessage(index, newText)
-	local messages = self:GetMessagesRef(self.selectedCollection, self.selectedCategory)
-	
-	if messages and messages[index] then
-		messages[index] = newText
-		self:RefreshMessagesList()
-	end
-end
+    local saveBtn = AceGUI:Create("Button")
+    saveBtn:SetText(selectedMsgIndex and (L["update"] or "Update") or (L["add"] or "Add Message"))
+    saveBtn:SetRelativeWidth(0.18)
+    saveBtn:SetCallback("OnClick", function()
+        local text = strtrim(msgEdit:GetText() or "")
+        if text == "" then return end
+        if selectedMsgIndex and list[selectedMsgIndex] then
+            list[selectedMsgIndex] = text
+        else
+            table.insert(list, text)
+        end
+        selectedMsgIndex = nil
+        SyncGreetingAliases()
+        GLDG:RefreshConfigUI()
+    end)
+    editGroup:AddChild(saveBtn)
 
---[[
-	Delete selected message
-]]
-function GreetingsGUI:DeleteSelectedMessage()
-	if not self.selectedMessage then
-		GLDG:Print(L["Please select a message to delete"] or "Please select a message to delete")
-		return
-	end
-	
-	local messages = self:GetMessagesRef(self.selectedCollection, self.selectedCategory)
-	
-	if messages and messages[self.selectedMessage] then
-		table.remove(messages, self.selectedMessage)
-		self.selectedMessage = nil
-		self:RefreshMessagesList()
-	end
+    local clearSelBtn = AceGUI:Create("Button")
+    clearSelBtn:SetText(selectedMsgIndex and (L["Remove selection"] or "Cancel Edit") or (L["Restore default"] or "Restore Defaults"))
+    clearSelBtn:SetRelativeWidth(0.17)
+    clearSelBtn:SetCallback("OnClick", function()
+        if selectedMsgIndex then
+            selectedMsgIndex = nil
+            GLDG:RefreshConfigUI()
+        else
+            wipe(list)
+            if GLDG.Database and GLDG.Database.InitializeGreetings then
+                GLDG.Database:InitializeGreetings()
+            end
+            GLDG:RefreshConfigUI()
+        end
+    end)
+    editGroup:AddChild(clearSelBtn)
+
+    --------------------------------------------------------
+    -- 3. Configured Messages List
+    --------------------------------------------------------
+    local listGroup = AceGUI:Create("InlineGroup")
+    listGroup:SetTitle(string.format("%s (%d)", L["Greetings"] or "Configured Messages", #list))
+    listGroup:SetFullWidth(true)
+    listGroup:SetLayout("Flow")
+    scroll:AddChild(listGroup)
+
+    if #list == 0 then
+        local emptyLabel = AceGUI:Create("Label")
+        emptyLabel:SetText(UIStyle.Hex.textMuted .. (L["No greeting templates configured in this category."] or "No greeting templates configured in this category.") .. UIStyle.Hex.reset)
+        emptyLabel:SetFullWidth(true)
+        listGroup:AddChild(emptyLabel)
+    else
+        for idx, msgText in ipairs(list) do
+            local row = AceGUI:Create("SimpleGroup")
+            row:SetFullWidth(true)
+            row:SetLayout("Flow")
+
+            local isSelected = (selectedMsgIndex == idx)
+            local prefixColor = isSelected and UIStyle.Hex.gold or UIStyle.Hex.textLight
+
+            local lbl = AceGUI:Create("InteractiveLabel")
+            lbl:SetText(string.format("%s#%d:|r %s%s|r", UIStyle.Hex.goldDim, idx, prefixColor, msgText))
+            lbl:SetRelativeWidth(0.66)
+            lbl:SetCallback("OnClick", function()
+                if selectedMsgIndex == idx then
+                    selectedMsgIndex = nil
+                else
+                    selectedMsgIndex = idx
+                end
+                GLDG:RefreshConfigUI()
+            end)
+            row:AddChild(lbl)
+
+            local testBtn = AceGUI:Create("Button")
+            testBtn:SetText(L["Test"] or "Preview")
+            testBtn:SetRelativeWidth(0.17)
+            testBtn:SetCallback("OnClick", function()
+                local player = (GLDG.Player or UnitName("player") or "Player")
+                local fullPlayer = player .. "-" .. string.gsub(GLDG.Realm or GetRealmName() or "Realm", " ", "")
+                local parsed = GLDG_ParseCustomMessage(fullPlayer, player, msgText)
+                local ok, formatted = pcall(string.format, parsed, player, "80")
+                GLDG:PrintInfo("Preview: " .. (ok and formatted or parsed))
+            end)
+            row:AddChild(testBtn)
+
+            local delBtn = AceGUI:Create("Button")
+            delBtn:SetText(L["remove"] or "Delete")
+            delBtn:SetRelativeWidth(0.17)
+            delBtn:SetCallback("OnClick", function()
+                table.remove(list, idx)
+                if selectedMsgIndex == idx then
+                    selectedMsgIndex = nil
+                end
+                SyncGreetingAliases()
+                GLDG:RefreshConfigUI()
+            end)
+            row:AddChild(delBtn)
+
+            listGroup:AddChild(row)
+        end
+    end
+
+    --------------------------------------------------------
+    -- 4. Placeholder Reference Card
+    --------------------------------------------------------
+    local helpGroup = AceGUI:Create("InlineGroup")
+    helpGroup:SetTitle(L["Available Message Placeholders & Filters"] or "Available Message Placeholders & Filters")
+    helpGroup:SetFullWidth(true)
+    helpGroup:SetLayout("Flow")
+    scroll:AddChild(helpGroup)
+
+    local helpLabel = AceGUI:Create("Label")
+    helpLabel:SetFullWidth(true)
+    helpLabel:SetText(
+        UIStyle.Hex.gold .. "%s / %n|r = Selected greet name (Char, Main, or Alias)    " ..
+        UIStyle.Hex.gold .. "%c|r = Character name    " ..
+        UIStyle.Hex.gold .. "%m|r = Main name\n" ..
+        UIStyle.Hex.gold .. "%a|r = Character alias    " ..
+        UIStyle.Hex.gold .. "%A|r = Main's alias    " ..
+        UIStyle.Hex.gold .. "%l|r = Level    " ..
+        UIStyle.Hex.gold .. "%L|r = Levels left to cap\n" ..
+        UIStyle.Hex.gold .. "%C|r = Character class    " ..
+        UIStyle.Hex.gold .. "%r|r = Guild rank    " ..
+        UIStyle.Hex.gold .. "%v|r = Achievement link    " ..
+        UIStyle.Hex.gold .. "%g / %G|r = Guild alias / Guild name\n" ..
+        UIStyle.Hex.cyan .. "Filters:|r Prefix message with " .. UIStyle.Hex.gold .. "{min:max}|r for level range (NewLevel) or " .. UIStyle.Hex.gold .. "{HH:MM:HH:MM}|r for time of day."
+    )
+    helpGroup:AddChild(helpLabel)
 end

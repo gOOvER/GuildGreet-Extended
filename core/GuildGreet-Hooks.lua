@@ -4,7 +4,7 @@ Provides secure hooks for Blizzard functions and addon interoperability
 ]]--
 
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or LibStub("AceAddon-3.0"):NewAddon("GuildGreet", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- Initialize Hooks module
 function GLDG:InitializeHooks()
@@ -32,12 +32,14 @@ end
 
 -- Setup roster-related hooks
 function GLDG:SetupRosterHooks()
-	-- Hook GuildRoster_Update to track roster changes
-	self:SecureHook("GuildRoster_Update", function()
-		if GLDG:IsRosterUpdateEnabled() then
-			GLDG:OnGuildRosterUpdated()
-		end
-	end)
+	-- Hook GuildRoster_Update to track roster changes (if present in client flavor)
+	if GuildRoster_Update then
+		self:SecureHook("GuildRoster_Update", function()
+			if GLDG:IsRosterUpdateEnabled() then
+				GLDG:OnGuildRosterUpdated()
+			end
+		end)
+	end
 	
 	-- Hook GuildRoster_SetSelection for player selection
 	if GuildRoster_SetSelection then

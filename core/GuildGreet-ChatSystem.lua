@@ -22,12 +22,12 @@ function GLDG.ChatSystem:CheckChannel()
 			GLDG_inChannel = true;
 
 			-- get members of channel
-			self:RegisterEvent("CHAT_MSG_CHANNEL_LIST")
+			GLDG:RegisterEvent("CHAT_MSG_CHANNEL_LIST", "OnEvent")
 			DEFAULT_CHAT_FRAME:UnregisterEvent("CHAT_MSG_CHANNEL_LIST")
 			GLDG_unregister = GLDG_unregister + 1
 			ListChannelByName(GLDG_ChannelName)
 
-			if not bit.band(GLDG_InitCheck, 32)==32 then
+			if bit.band(GLDG_InitCheck, 32) ~= 32 then
 				GLDG_InitCheck = bit.bor(GLDG_InitCheck, 4) -- start channel update
 				--GLDG_Print("InitCheck is ["..tostring(GLDG_InitCheck).."] - channel started")
 			end
@@ -44,7 +44,7 @@ function GLDG.ChatSystem:InitChannel(data)
 	if (GLDG_unregister > 0) then
 		GLDG_unregister = GLDG_unregister - 1
 		if (GLDG_unregister == 0) then
-			self:UnregisterEvent("CHAT_MSG_CHANNEL_LIST")
+			GLDG:UnregisterEvent("CHAT_MSG_CHANNEL_LIST")
 			DEFAULT_CHAT_FRAME:RegisterEvent("CHAT_MSG_CHANNEL_LIST")
 		end
 	end
@@ -56,7 +56,7 @@ function GLDG.ChatSystem:InitChannel(data)
 		local splits = {strsplit(", ", data)}
 
 		for i=1, table.getn(splits), 1 do
-			local name = string.strip(splits[i])
+			local name = strtrim and strtrim(splits[i]) or string.gsub(splits[i], "^%s*(.-)%s*$", "%1")
 
 			-- ignore ourselves
 			if (name ~= GLDG.Player) then
@@ -201,7 +201,7 @@ function GLDG.ChatSystem:ChatFilter(chatFrame, event, ...)
 		end
 
 		if ((main ~= "") and msg and arg2 and (arg2 ~= GLDG.Player)) then
-			msg = chatFrame:GetColors().help.."{"..Ambiguate(main, "guild").."}|r "..msg
+			msg = (GLDG:GetColors().help or "|cFFFFFF7F").."{"..Ambiguate(main, "guild").."}|r "..msg
 		end
 	end
 
