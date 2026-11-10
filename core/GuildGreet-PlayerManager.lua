@@ -38,11 +38,11 @@ function GLDG:FormatGuildDisplay(guildStr)
 	return clean
 end
 
-function GLDG.PlayerManager:NormalizeStoredPlayers()
-	if not GLDG_DataChar then return end
+function GLDG.PlayerManager:CleanPollutedAliasesInTable(charTable)
+	if type(charTable) ~= "table" then return end
 	local localizedMale = LOCALIZED_CLASS_NAMES_MALE or {}
 	local localizedFemale = LOCALIZED_CLASS_NAMES_FEMALE or {}
-	for _, p in pairs(GLDG_DataChar) do
+	for _, p in pairs(charTable) do
 		if type(p) == "table" then
 			if type(p.guild) == "string" and p.guild ~= "" then
 				p.guild = GLDG:FormatGuildDisplay(p.guild)
@@ -54,7 +54,23 @@ function GLDG.PlayerManager:NormalizeStoredPlayers()
 					p.class = p.classDisplayName or localizedMale[upper] or localizedFemale[upper] or p.class
 				end
 			end
+			-- Remove raw guild notes that were previously auto-copied into p.alias
+			if p.alias and not p.manualAlias then
+				p.alias = nil
+			end
 		end
+	end
+end
+
+function GLDG.PlayerManager:NormalizeStoredPlayers()
+	if GLDG.db and GLDG.db.realm and type(GLDG.db.realm.guildPlayers) == "table" then
+		for _, gTable in pairs(GLDG.db.realm.guildPlayers) do
+			self:CleanPollutedAliasesInTable(gTable)
+		end
+	end
+	if GLDG_DataChar then
+		self:CleanPollutedAliasesInTable(GLDG_DataChar)
+		self:DetectMainFromNotes()
 	end
 end
 
@@ -152,6 +168,9 @@ function GLDG.PlayerManager:RosterImport(silent)
 
 	-- Update main character data with new roster
 	self:UpdateCharacterData(newRoster)
+
+	-- Automatically detect Twink / Alt / Main references in public & officer notes
+	self:DetectMainFromNotes()
 	
 	-- Process main/alt relationships
 	self:ProcessMainAltRelationships()
@@ -173,31 +192,118 @@ end
 
 function GLDG.PlayerManager:ProcessPlayerNotes(playerName, playerData)
 	if not playerData then return end
-	
-	local publicNote = playerData.pNote or ""
-	local officerNote = playerData.oNote or ""
-	
-	-- Check for alias in public note
-	if publicNote and publicNote ~= "" then
-		-- Simple alias detection - could be enhanced
-		if not string.find(publicNote, "alt") and not string.find(publicNote, "main") then
-			playerData.alias = publicNote
+	-- Never copy raw public/officer notes into playerData.alias.
+	-- Twink/Alt/Main detection is handled by DetectMainFromNotes() after the full roster is loaded.
+end
+
+-------------------------------
+-- Detect Twinks & Mains from Guild Notes --
+-------------------------------
+
+function GLDG.PlayerManager:DetectMainFromNotes()
+	if not GLDG_DataChar then return end
+
+	-- Build candidate list of all guild characters sorted by name length descending
+	-- so multi-word character names (e.g. "Aerandir Elfaron") match before single words.
+	local candidates = {}
+	for charKey, charData in pairs(GLDG_DataChar) do
+		if type(charData) == "table" then
+			local short = strtrim(Ambiguate(charKey, "guild") or "")
+			local shortLower = string.lower(short)
+			local normShort = string.gsub(shortLower, "%s+", " ")
+			local firstWord = string.match(normShort, "^(%S+)")
+			if #normShort >= 3 then
+				table.insert(candidates, {
+					key = charKey,
+					short = short,
+					normShort = normShort,
+					firstWord = firstWord,
+				})
+			end
 		end
 	end
-	
-	-- Check for main/alt relationships in officer note
-	if officerNote and officerNote ~= "" then
-		local mainPattern = "main:%s*([%w%-]+)"
-		local altPattern = "alt:%s*([%w%-]+)"
-		
-		local mainName = string.match(string.lower(officerNote), mainPattern)
-		if mainName then
-			playerData.alt = mainName -- This player is an alt of mainName
-		end
-		
-		-- Check if this player is marked as main
-		if string.find(string.lower(officerNote), "main") and not mainName then
-			playerData.main = true
+	table.sort(candidates, function(a, b)
+		return #a.normShort > #b.normShort
+	end)
+
+	for playerName, pData in pairs(GLDG_DataChar) do
+		if type(pData) == "table" then
+			local pNote = strtrim(pData.pNote or "")
+			local oNote = strtrim(pData.oNote or "")
+			local combinedRaw = strtrim(pNote .. " " .. oNote)
+			if combinedRaw ~= "" then
+				local lowerNote = string.lower(combinedRaw)
+				local padded = " " .. string.gsub(lowerNote, "[%p%c]+", " ") .. " "
+				padded = string.gsub(padded, "%s+", " ")
+
+				local isTwinkNote = (string.find(padded, " twink ", 1, true) ~= nil)
+					or (string.find(padded, " alt ", 1, true) ~= nil)
+					or (string.find(padded, " main ", 1, true) ~= nil)
+
+				if isTwinkNote then
+					local matchedMainKey = nil
+
+					-- 1. Try exact full guild character name match (supports multi-word names like "Aerandir Elfaron")
+					for _, cand in ipairs(candidates) do
+						if cand.key ~= playerName then
+							if string.find(padded, " " .. cand.normShort .. " ", 1, true) then
+								matchedMainKey = cand.key
+								break
+							end
+						end
+					end
+
+					-- 2. Fallback: match first word of a guild character name after twink/alt/main keyword
+					if not matchedMainKey then
+						local afterKeyword = string.match(padded, " twink von (.+)")
+							or string.match(padded, " twink of (.+)")
+							or string.match(padded, " twink (.+)")
+							or string.match(padded, " alt von (.+)")
+							or string.match(padded, " alt of (.+)")
+							or string.match(padded, " alt (.+)")
+							or string.match(padded, " main (.+)")
+						if afterKeyword then
+							local paddedAfter = " " .. afterKeyword .. " "
+							for _, cand in ipairs(candidates) do
+								if cand.key ~= playerName and cand.firstWord and #cand.firstWord >= 3 then
+									if string.find(paddedAfter, " " .. cand.firstWord .. " ", 1, true) then
+										matchedMainKey = cand.key
+										break
+									end
+								end
+							end
+						end
+					end
+
+					if matchedMainKey then
+						pData.alt = matchedMainKey
+						pData.main = nil
+						pData.twinkMainName = Ambiguate(matchedMainKey, "guild")
+						if GLDG_DataChar[matchedMainKey] and not GLDG_DataChar[matchedMainKey].alt then
+							GLDG_DataChar[matchedMainKey].main = true
+						end
+					else
+						-- Check if note marks this character itself as Main (e.g. "Main" without twink/alt)
+						local hasOnlyMain = (string.find(padded, " main ", 1, true) ~= nil)
+							and not string.find(padded, " twink ", 1, true)
+							and not string.find(padded, " alt ", 1, true)
+						if hasOnlyMain and not pData.alt then
+							pData.main = true
+						else
+							-- Extract fallback main name string from note if main is not in guild roster
+							local extracted = string.match(combinedRaw, "[Tt][Ww][Ii][Nn][Kk]%s+[vv][oo][nn]%s+([%aÄÖÜäöüß]+)")
+								or string.match(combinedRaw, "[Tt][Ww][Ii][Nn][Kk]%s+[oo][ff]%s+([%aÄÖÜäöüß]+)")
+								or string.match(combinedRaw, "[Tt][Ww][Ii][Nn][Kk]%s*:?%s*([%aÄÖÜäöüß]+)")
+								or string.match(combinedRaw, "[Aa][Ll][Tt]%s+[vv][oo][nn]%s+([%aÄÖÜäöüß]+)")
+								or string.match(combinedRaw, "[Aa][Ll][Tt]%s+[oo][ff]%s+([%aÄÖÜäöüß]+)")
+								or string.match(combinedRaw, "[Aa][Ll][Tt]%s*:?%s*([%aÄÖÜäöüß]+)")
+							if extracted and #extracted >= 3 then
+								pData.twinkMainName = extracted
+							end
+						end
+					end
+				end
+			end
 		end
 	end
 end
@@ -217,36 +323,75 @@ function GLDG.PlayerManager:UpdateCharacterData(newRoster)
 		if not GLDG_DataChar[playerName] then
 			GLDG_DataChar[playerName] = {}
 		end
+
+		local existing = GLDG_DataChar[playerName]
+		local oldLvl = existing.lvl
+		local oldRank = existing.rank
+
+		-- Detect guild member level-up before overwriting level
+		if oldLvl and playerData.lvl and playerData.lvl > oldLvl then
+			existing.storedLvl = oldLvl
+			local gs = GLDG_Data and GLDG_Data.GuildSettings
+			if not existing.own and not existing.ignore and gs and not gs.SupressLevel then
+				local minLvl = tonumber(gs.MinLevelUp) or 0
+				if playerData.lvl >= minLvl and (not gs.OnlyLevelUpOnline or playerData.online) then
+					if GLDG_DataGreet and GLDG_DataGreet.NewLevel and GLDG.Utils:TableSize(GLDG_DataGreet.NewLevel) > 0 then
+						existing.newlvl = true
+						GLDG_Queue = GLDG_Queue or {}
+						if not GLDG_Queue[playerName] then
+							GLDG_Queue[playerName] = (GLDG_GetLogtime and GLDG_GetLogtime(playerName)) or date("[%H:%M] ")
+						end
+						if GLDG_ShowQueue then
+							GLDG_ShowQueue()
+						end
+					end
+				end
+			end
+		else
+			existing.storedLvl = playerData.lvl
+		end
+
+		-- Detect guild member promotion (lower rank index = higher guild rank)
+		if oldRank and playerData.rank and playerData.rank < oldRank then
+			local gs = GLDG_Data and GLDG_Data.GuildSettings
+			if not existing.own and not existing.ignore and gs and not gs.SupressRank then
+				if GLDG_DataGreet and GLDG_DataGreet.NewRank and GLDG.Utils:TableSize(GLDG_DataGreet.NewRank) > 0 then
+					existing.newrank = true
+					GLDG_Queue = GLDG_Queue or {}
+					if not GLDG_Queue[playerName] then
+						GLDG_Queue[playerName] = (GLDG_GetLogtime and GLDG_GetLogtime(playerName)) or date("[%H:%M] ")
+					end
+					if GLDG_ShowQueue then
+						GLDG_ShowQueue()
+					end
+				end
+			end
+		end
 		
 		-- Update basic information
-		GLDG_DataChar[playerName].lvl = playerData.lvl
-		GLDG_DataChar[playerName].rank = playerData.rank
-		GLDG_DataChar[playerName].rankname = playerData.rankname
-		GLDG_DataChar[playerName].zone = playerData.zone
-		GLDG_DataChar[playerName].pNote = playerData.pNote
-		GLDG_DataChar[playerName].oNote = playerData.oNote
-		GLDG_DataChar[playerName].enClass = playerData.enClass
-		GLDG_DataChar[playerName].class = playerData.class
-		GLDG_DataChar[playerName].classDisplayName = playerData.classDisplayName
-		GLDG_DataChar[playerName].achievementPoints = playerData.achievementPoints
-		GLDG_DataChar[playerName].guild = playerData.guild
-		GLDG_DataChar[playerName].own = playerData.own
+		existing.lvl = playerData.lvl
+		existing.rank = playerData.rank
+		existing.rankname = playerData.rankname
+		existing.zone = playerData.zone
+		existing.pNote = playerData.pNote
+		existing.oNote = playerData.oNote
+		existing.enClass = playerData.enClass
+		existing.class = playerData.class
+		existing.classDisplayName = playerData.classDisplayName
+		existing.achievementPoints = playerData.achievementPoints
+		existing.guild = playerData.guild
+		existing.own = playerData.own
 		
-		-- Store previous level for level-up detection
-		if GLDG_DataChar[playerName].lvl and playerData.lvl > GLDG_DataChar[playerName].lvl then
-			GLDG_DataChar[playerName].storedLvl = GLDG_DataChar[playerName].lvl
-		end
-		GLDG_DataChar[playerName].storedLvl = playerData.lvl
-		
-		-- Update alias and main/alt relationships from notes
-		if playerData.alias then
-			GLDG_DataChar[playerName].alias = playerData.alias
+		-- Update main/alt relationships if explicitly set
+		if playerData.alias and playerData.manualAlias then
+			existing.alias = playerData.alias
+			existing.manualAlias = true
 		end
 		if playerData.main then
-			GLDG_DataChar[playerName].main = playerData.main
+			existing.main = playerData.main
 		end
 		if playerData.alt then
-			GLDG_DataChar[playerName].alt = playerData.alt
+			existing.alt = playerData.alt
 		end
 	end
 	
@@ -974,11 +1119,13 @@ end
 function GLDG.PlayerManager:ClickAliasSet(alias)
 	if (alias == "") then return end
 	GLDG_DataChar[GLDG_SelPlrName].alias = alias
+	GLDG_DataChar[GLDG_SelPlrName].manualAlias = true
 	GLDG_ListPlayers()
 end
 
 function GLDG.PlayerManager:ClickAliasRemove()
 	GLDG_DataChar[GLDG_SelPlrName].alias = nil
+	GLDG_DataChar[GLDG_SelPlrName].manualAlias = nil
 	GLDG_ListPlayers()
 end
 

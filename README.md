@@ -46,13 +46,14 @@ Supports **all World of Warcraft flavors** from a single unified codebase:
 
 ### 📋 Interactive Floating Greeting Queue (`GuildGreetList`)
 - Displays guild members, friends, and channel members who just logged in, relogged, joined the guild, leveled up, earned an achievement, or got promoted.
+- **Event Icons & Color-Coded Status Badges**: Each queue entry features a colored left accent bar, class-colored character name, clean `(Twink: <Main>)` or manual alias badge, and a right-aligned icon + status label (`Eingeloggt` / `Logged in`, `Relog`, `Stufe X!` / `Level X!`, `Rang: <Rang>` / `Rank: <Rank>`, `Neu in Gilde` / `New in guild`, `Erfolg` / `Achievement`) without cluttering the queue with raw guild notes.
 - **Left-Click** an entry to send a context-aware greeting, welcome, or congratulation message; **Right-Click** to dismiss the entry from the queue.
-- **Rich Hover Tooltips**: Shows Main/Alt associations, aliases, level, class, guild rank, public/officer notes, online/offline timestamps, and event badges (`NEW`, `LVL`, `RANK`, `ACHV`).
+- **Rich Hover Tooltips**: Shows Main/Alt associations, manual aliases, level, class, guild rank, and localized event status.
 - Configurable growth direction (upward or downward), maximum visible entries (`1–15`), custom row dimensions, and persistent drag position.
 
 ### 👥 Main / Alt (Twink) & Alias Management
 - Link any number of alt characters to a player's **Main** character and assign custom **Aliases** (nicknames) and personal notes.
-- **Automatic Guild Note Parsing**: Optionally auto-assigns Main/Alt links and aliases from public and officer guild notes (supports standard notations as well as EGP / GuildAds tags).
+- **Smart Twink / Main Note Detection**: Automatically scans public and officer guild notes for `Twink`, `Alt`, and `Main` references (including multi-word character names such as `"twink aerandir elfaron"`) and links the character to the matching Main in the guild roster without copying raw guild notes into player aliases.
 - **Chat Enhancement**: Optionally prepends `{Main}` or `{Alias}` tags to guild, officer, whisper, and channel messages so you always know who you are talking to.
 - **Roster Inspector & Filters**: Search and filter your character database by name, alias, main, note, guild, online status, unassigned characters, or ignored players.
 

@@ -128,7 +128,7 @@ function GLDG.Messages:ParseCustomMessage(cname, name, msg)
 	local p_c = shortCName  -- %c = character name
 	local p_n = shortName   -- %n = display name (alias or character name)
 	local p_a = ""          -- %a = alias if available, character name else
-	if player.alias then
+	if player.manualAlias and player.alias and player.alias ~= "" then
 		p_a = player.alias
 	else
 		p_a = shortCName
@@ -138,11 +138,17 @@ function GLDG.Messages:ParseCustomMessage(cname, name, msg)
 	local p_A = ""     -- %A = main alias if available, main name else, character name else
 	if player.alt and GLDG_DataChar[player.alt] then
 		p_m = Ambiguate(player.alt, "guild")
-		if GLDG_DataChar[player.alt].alias then
+		if GLDG_DataChar[player.alt].manualAlias and GLDG_DataChar[player.alt].alias and GLDG_DataChar[player.alt].alias ~= "" then
 			p_A = GLDG_DataChar[player.alt].alias
 		else
 			p_A = Ambiguate(player.alt, "guild")
 		end
+	elseif player.alt and player.alt ~= "" then
+		p_m = Ambiguate(player.alt, "guild")
+		p_A = p_m
+	elseif player.twinkMainName and player.twinkMainName ~= "" then
+		p_m = player.twinkMainName
+		p_A = p_m
 	elseif player.main then
 		p_m = shortCName
 		p_A = p_a
@@ -271,7 +277,7 @@ function GLDG.Messages:SendGreet(name, testing)
 
 	-- Switch to alias if defined
 	local usedAlias = false
-	if player.alias then
+	if player.manualAlias and player.alias and player.alias ~= "" then
 		name = player.alias
 		table.insert(names, name)
 		usedAlias = true
@@ -280,13 +286,13 @@ function GLDG.Messages:SendGreet(name, testing)
 	end
 
 	-- Use name of main if alt and option is set
-	if player.alt then
+	if player.alt or player.twinkMainName then
 		local lname = ""
 		local lalias = ""
-		if GLDG_DataChar[player.alt] and GLDG_DataChar[player.alt].alias then
+		if player.alt and GLDG_DataChar[player.alt] and GLDG_DataChar[player.alt].manualAlias and GLDG_DataChar[player.alt].alias then
 			lalias = GLDG_DataChar[player.alt].alias
 		end
-		lname = Ambiguate(player.alt, "guild")
+		lname = (player.alt and player.alt ~= "" and Ambiguate(player.alt, "guild")) or player.twinkMainName or ""
 		if lname ~= "" then
 			table.insert(names, lname)
 		end
@@ -354,20 +360,20 @@ function GLDG.Messages:SendBye(name, testing)
 
 	-- Switch to alias if defined
 	local usedAlias = false
-	if player.alias then
+	if player.manualAlias and player.alias and player.alias ~= "" then
 		name = player.alias
 		table.insert(names, name)
 		usedAlias = true
 	end
 
 	-- Use name of main if alt and option is set
-	if player.alt then
+	if player.alt or player.twinkMainName then
 		local lname = ""
 		local lalias = ""
-		if GLDG_DataChar[player.alt] and GLDG_DataChar[player.alt].alias then
+		if player.alt and GLDG_DataChar[player.alt] and GLDG_DataChar[player.alt].manualAlias and GLDG_DataChar[player.alt].alias then
 			lalias = GLDG_DataChar[player.alt].alias
 		end
-		lname = player.alt
+		lname = (player.alt and player.alt ~= "" and Ambiguate(player.alt, "guild")) or player.twinkMainName or ""
 		if lname ~= "" then
 			table.insert(names, lname)
 		end

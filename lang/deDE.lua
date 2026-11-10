@@ -850,6 +850,11 @@ L["Ignore"] = "Ignorieren"
 L["Select"] = "Auswählen"
 L["No Guild"] = "Keine Gilde"
 L["You are currently not in a guild."] = "Du bist aktuell in keiner Gilde."
+L["Logged in"] = "Eingeloggt"
+L["New in guild"] = "Neu in Gilde"
+L["Left-Click"] = "Linksklick"
+L["Right-Click"] = "Rechtsklick"
+L["Dismiss"] = "Ausblenden"
 L["|cFFFFFF7FGuild member notification|r is currently turned off (See Interface settings, Game, Social).\r\nThis means that GuildGreet is unable to reliably track when your guild mates come online or go offline.\r\n\r\nThis question will only be asked once. To manually check later on type |cFFFFFF7F/gg alert|r.\r\n\r\nDo you want to activate these notifications? (Recommended)"] = "|cFFFFFF7FGildenmitglieder-Benachrichtigung|r ist derzeit deaktiviert.\r\nDadurch kann GuildGreet nicht zuverlässig erkennen, wann Gildenmitglieder online oder offline gehen.\r\n\r\nMöchtest du diese Benachrichtigung jetzt aktivieren? (Empfohlen)"
 
 --@localization(locale="deDE", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@

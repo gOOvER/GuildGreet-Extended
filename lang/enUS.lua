@@ -863,3 +863,7 @@ L["You are currently not in a guild."] = true
 L["Unignore"] = true
 L["Ignore"] = true
 L["Select"] = true
+L["Logged in"] = true
+L["Left-Click"] = true
+L["Right-Click"] = true
+L["Dismiss"] = true

@@ -49,7 +49,7 @@ local function GetAllMainsMap()
     for name, p in pairs(GLDG_DataChar) do
         if p and p.main then
             local label = Ambiguate(name, "guild")
-            if p.alias and p.alias ~= "" then
+            if p.manualAlias and p.alias and p.alias ~= "" then
                 label = label .. " (" .. p.alias .. ")"
             end
             mains[name] = label
@@ -242,9 +242,10 @@ function GLDG:CreatePlayersTab(container)
         editGroup:SetLayout("Flow")
         scroll:AddChild(editGroup)
 
+        local mainDisplay = (p.alt and p.alt ~= "" and Ambiguate(p.alt, "guild")) or p.twinkMainName
         local roleTag = p.ignore and (UIStyle.Hex.red .. (L["Ignored"] or "IGNORED") .. "|r")
             or p.main and (UIStyle.Hex.green .. string.format(L["MAIN (%d Alts)"] or "MAIN (%d Alts)", CountAltsOf(selectedPlayer)) .. "|r")
-            or p.alt and (UIStyle.Hex.cyan .. string.format(L["ALT of %s"] or "ALT of %s", Ambiguate(p.alt, "guild")) .. "|r")
+            or (mainDisplay and mainDisplay ~= "") and (UIStyle.Hex.cyan .. string.format(L["ALT of %s"] or "ALT of %s", mainDisplay) .. "|r")
             or (UIStyle.Hex.textMuted .. (L["Not assigned"] or "Unassigned") .. "|r")
 
         local cleanGuild = CleanGuildName(p.guild)
@@ -286,11 +287,17 @@ function GLDG:CreatePlayersTab(container)
 
         local aliasEdit = AceGUI:Create("EditBox")
         aliasEdit:SetLabel(L["Alias"] or "Alias (Press Enter)")
-        aliasEdit:SetText(p.alias or "")
+        aliasEdit:SetText((p.manualAlias and p.alias) or "")
         aliasEdit:SetRelativeWidth(0.32)
         aliasEdit:SetCallback("OnEnterPressed", function(_, _, text)
             text = strtrim(text or "")
-            p.alias = (text ~= "") and text or nil
+            if text ~= "" then
+                p.alias = text
+                p.manualAlias = true
+            else
+                p.alias = nil
+                p.manualAlias = nil
+            end
             GLDG:RefreshConfigUI()
         end)
         editGroup:AddChild(aliasEdit)
@@ -460,15 +467,16 @@ function GLDG:CreatePlayersTab(container)
                 local selMarker = (selectedPlayer == name) and (UIStyle.Hex.gold .. "» |r") or ""
 
                 local roleText = ""
+                local rowMainDisp = (p.alt and p.alt ~= "" and Ambiguate(p.alt, "guild")) or p.twinkMainName
                 if p.ignore then
                     roleText = UIStyle.Hex.red .. "[" .. (L["Ignored"] or "IGN") .. "]|r "
                 elseif p.main then
                     roleText = UIStyle.Hex.green .. "[" .. (L["Main"] or "MAIN") .. "]|r "
-                elseif p.alt then
-                    roleText = UIStyle.Hex.cyan .. "[" .. (L["Alt"] or "ALT") .. " -> " .. Ambiguate(p.alt, "guild") .. "]|r "
+                elseif rowMainDisp and rowMainDisp ~= "" then
+                    roleText = UIStyle.Hex.cyan .. "[" .. (L["Alt"] or "ALT") .. " -> " .. rowMainDisp .. "]|r "
                 end
 
-                local aliasText = (p.alias and p.alias ~= "") and (UIStyle.Hex.gold .. " (" .. p.alias .. ")|r") or ""
+                local aliasText = (p.manualAlias and p.alias and p.alias ~= "") and (UIStyle.Hex.gold .. " (" .. p.alias .. ")|r") or ""
                 local dispClass = p.classDisplayName or p.class or ""
                 local cleanGuild = CleanGuildName(p.guild)
                 local rankOrGuild = (p.rankname and p.rankname ~= "") and (cleanGuild ~= "" and (p.rankname .. " (" .. cleanGuild .. ")") or p.rankname) or (cleanGuild ~= "" and cleanGuild or "---")

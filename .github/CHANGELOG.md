@@ -27,10 +27,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Native compatibility across **Retail (12.0.1 Midnight / 11.2.7 The War Within)**, **Mists of Pandaria Classic (5.5.x)**, **Cataclysm Classic (4.4.2)**, **Wrath of the Lich King Classic (3.4.5)**, **Burning Crusade Classic Anniversary (2.5.5)**, **Classic Era (1.15.8)**, and **Classic Forever (1.60.x)**.
 
 ### Changed
+- **Floating Greeting Queue Event Icons & Status Badges (`GuildGreet.lua`)**:
+  - Redesigned each queue row with a color-coded left accent bar, class-colored character name, optional clean `(Twink: <Main>)` or manual alias tag, and a dedicated right-aligned **Icon + Event Status Badge** (`Eingeloggt` / `Logged in`, `Relog`, `Stufe X!` / `Level X!`, `Rang: <Rang>` / `Rank: <Rank>`, `Neu in Gilde` / `New in guild`, `Erfolg` / `Achievement`).
+- **Automatic Twink / Main Detection from Guild Notes (`core/GuildGreet-PlayerManager.lua`)**:
+  - Added `DetectMainFromNotes()` to automatically scan public and officer guild notes for `twink`, `alt`, and `main` indicators (e.g. `"twink aerandir elfaron  Sascha"`, `"twink von ..."`, `"alt of ..."`) and match single- or multi-word character names against the guild roster, linking `p.alt = mainKey` and marking the main character (`main = true`).
 - Modernized all `C_GuildInfo`, `C_FriendList`, `C_ChatInfo`, and `BackdropTemplate` API calls for full compatibility across Retail 12.x and Classic clients.
 - Replaced text-based close button labels (`X`) with native crisp cross textures (`Interface\Buttons\UI-StopButton`) across the main window and floating greeting queue.
 
 ### Fixed
+- **Removed Raw Guild Notes from Greeting Queue & Alias Fields (`core/GuildGreet-PlayerManager.lua`, `GuildGreet.lua`, `GUI/Players.lua`)**:
+  - Stopped `ProcessPlayerNotes()` from copying raw public guild notes into `p.alias` and added automatic cleanup (`CleanPollutedAliasesInTable`) to strip previously note-polluted aliases while preserving manually configured aliases (`p.manualAlias = true`).
+- **Guild Member Level-Up & Promotion Detection (`core/GuildGreet-PlayerManager.lua`)**:
+  - Fixed `UpdateCharacterData()` so guild member level-ups and rank promotions are compared before overwriting `existing.lvl` / `existing.rank`, properly flagging `newlvl` / `newrank` and adding the player to the greeting queue.
 - **Per-Guild Player Storage & Active Guild Isolation (`GuildGreet.lua`, `GUI/Players.lua`, `GUI/Core.lua`, `GUI/Cleanup.lua`, `core/GuildGreet-Messages.lua`, `core/GuildGreet-PlayerManager.lua`)**:
   - Stored player roster data per guild (`self.db.realm.guildPlayers[guildName][playerName]`) with automatic migration from legacy flat `self.db.realm.players` tables.
   - Scoped `GLDG_DataChar`, the `Players` (`Spieler`) tab, and sidebar statistics strictly to the current character's active guild (`GetCurrentGuildName()`), showing `0` players and a localized notice (`"Du bist aktuell in keiner Gilde."` / `"Keine Gilde"`) when logged in on a guildless character.

@@ -1246,6 +1246,13 @@ end
 
 ------------------------------------------------------------
 function GLDG.Utils:CreateTestChars()
+	GLDG_DataChar = GLDG_DataChar or {}
+	GLDG_DataChar["Tester1"] = { enClass = "DRUID", class = "Druide", lvl = 14, rankname = "Veteran", twinkMainName = "Aerandir Elfaron" }
+	GLDG_DataChar["Tester2"] = { enClass = "HUNTER", class = "Jäger", lvl = 21, rankname = "Mitglied", newlvl = true }
+	GLDG_DataChar["Tester3"] = { enClass = "ROGUE", class = "Schurke", lvl = 20, rankname = "Offizier", newrank = true }
+	GLDG_DataChar["Tester4"] = { enClass = "MAGE", class = "Magierin", lvl = 18, rankname = "Initiand", new = true }
+	GLDG_DataChar["Tester5"] = { enClass = "PRIEST", class = "Priesterin", lvl = 36, rankname = "Veteran", achievment = "Erkundet Westfall" }
+
 	GLDG_Queue["Tester1"] = GLDG_GetLogtime("Tester1")
 	GLDG_Queue["Tester2"] = GLDG_GetLogtime("Tester2")
 	GLDG_Queue["Tester3"] = GLDG_GetLogtime("Tester3")

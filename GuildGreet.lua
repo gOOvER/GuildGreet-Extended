@@ -993,8 +993,15 @@ function GLDG:CreateQueueFrame()
 			edgeFile = "Interface\\Buttons\\WHITE8x8",
 			edgeSize = 1,
 		})
-		btn:SetBackdropColor(0.06, 0.07, 0.09, 0.92)
+		btn:SetBackdropColor(0.06, 0.07, 0.09, 0.94)
 		btn:SetBackdropBorderColor(0.20, 0.22, 0.28, 0.85)
+
+		local accentBar = btn:CreateTexture(nil, "OVERLAY")
+		accentBar:SetWidth(3)
+		accentBar:SetPoint("TOPLEFT", btn, "TOPLEFT", 1, -1)
+		accentBar:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 1, 1)
+		accentBar:SetColorTexture(0.30, 0.85, 0.39, 0.95)
+		btn.accentBar = accentBar
 
 		local text2 = btn:CreateFontString(name.."Text2", "OVERLAY", "GameFontHighlightSmall")
 		text2:SetPoint("RIGHT", btn, "RIGHT", -8, 0)
@@ -1002,7 +1009,7 @@ function GLDG:CreateQueueFrame()
 		text2:SetWordWrap(false)
 
 		local text1 = btn:CreateFontString(name.."Text", "OVERLAY", "GameFontHighlightSmall")
-		text1:SetPoint("LEFT", btn, "LEFT", 8, 0)
+		text1:SetPoint("LEFT", btn, "LEFT", 9, 0)
 		text1:SetJustifyH("LEFT")
 		text1:SetWordWrap(false)
 
@@ -1068,30 +1075,35 @@ function GLDG_ShowToolTip(self, element)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	GameTooltip:SetText(Ambiguate(name, "guild"), 0.85, 0.71, 0.29)
 	if p then
-		if p.alias then
-			GameTooltip:AddDoubleLine(L["Alias"] or "Alias", tostring(p.alias), 0.7, 0.7, 0.7, 1, 1, 1)
+		if p.manualAlias and p.alias and p.alias ~= "" then
+			GameTooltip:AddDoubleLine(L["Alias"] or "Alias", tostring(p.alias), 0.7, 0.7, 0.7, 1, 0.82, 0.4)
 		end
-		if p.alt then
-			GameTooltip:AddDoubleLine(L["Main"] or "Main", Ambiguate(p.alt, "guild"), 0.7, 0.7, 0.7, 0.25, 1, 0.5)
+		local mainName = (p.alt and p.alt ~= "" and Ambiguate(p.alt, "guild")) or p.twinkMainName
+		if mainName and mainName ~= "" then
+			GameTooltip:AddDoubleLine(L["Alt of"] or "Twink von", tostring(mainName), 0.7, 0.7, 0.7, 0.50, 0.85, 1)
 		end
 		if p.lvl then
-			GameTooltip:AddDoubleLine(L["Level"] or "Level", tostring(p.lvl).." "..tostring(p.class or ""), 0.7, 0.7, 0.7, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Level"] or "Stufe", tostring(p.lvl).." "..tostring(p.classDisplayName or p.class or ""), 0.7, 0.7, 0.7, 1, 1, 1)
 		end
 		if p.rankname then
-			GameTooltip:AddDoubleLine(L["Rank"] or "Rank", tostring(p.rankname), 0.7, 0.7, 0.7, 1, 1, 1)
+			GameTooltip:AddDoubleLine(L["Rank"] or "Rang", tostring(p.rankname), 0.7, 0.7, 0.7, 1, 1, 1)
 		end
 		if p.new then
-			GameTooltip:AddLine(L["New in guild"] or "New in guild", 1, 0.35, 0.35)
+			GameTooltip:AddDoubleLine(L["Status"] or "Status", L["New in guild"] or "Neu in Gilde", 0.7, 0.7, 0.7, 1, 0.35, 0.35)
 		elseif p.achievment then
-			GameTooltip:AddLine((L["Last achievment"] or "Achievement")..": "..tostring(p.achievment), 0.4, 0.6, 1)
+			GameTooltip:AddDoubleLine(L["Last achievment"] or "Erfolg", tostring(p.achievment), 0.7, 0.7, 0.7, 0.4, 0.7, 1)
 		elseif p.newrank then
-			GameTooltip:AddLine(L["(new rank)"] or "Promoted", 0.8, 0.3, 1)
+			GameTooltip:AddDoubleLine(L["Status"] or "Status", (L["promotion"] or "Beförderung") .. (p.rankname and (" (" .. p.rankname .. ")") or ""), 0.7, 0.7, 0.7, 0.85, 0.4, 1)
 		elseif p.newlvl then
-			GameTooltip:AddLine("Level Up!", 0.3, 1, 0.3)
+			GameTooltip:AddDoubleLine(L["Status"] or "Status", string.format("%s %s!", L["Level"] or "Stufe", tostring(p.lvl or "?")), 0.7, 0.7, 0.7, 1, 0.85, 0.3)
+		elseif GLDG_Offline and GLDG_Offline[name] then
+			GameTooltip:AddDoubleLine(L["Status"] or "Status", L["Relog"] or "Relog", 0.7, 0.7, 0.7, 0.25, 1, 0.72)
+		else
+			GameTooltip:AddDoubleLine(L["Status"] or "Status", L["Logged in"] or "Eingeloggt", 0.7, 0.7, 0.7, 0.3, 0.85, 0.39)
 		end
 	end
 	GameTooltip:AddLine(" ")
-	GameTooltip:AddLine("|cff4cd964Left-Click:|r Greet  |cffe64d4dRight-Click:|r Dismiss", 0.8, 0.8, 0.8)
+	GameTooltip:AddLine("|cff4cd964" .. (L["Left-Click"] or "Linksklick") .. ":|r " .. (L["Greeting"] or "Begrüßen") .. "  |cffe64d4d" .. (L["Right-Click"] or "Rechtsklick") .. ":|r " .. (L["Dismiss"] or "Ausblenden"), 0.8, 0.8, 0.8)
 	GameTooltip:Show()
 end
 
@@ -1139,9 +1151,9 @@ function GLDG:ShowQueue()
 	local visibleCount = math.min(count, maxLines)
 	local prefix = GLDG_Data.ListUp and (GLDG_LIST.."ULine") or (GLDG_LIST.."Line")
 	local fontSize = self.UIStyle and self.UIStyle:GetFontSize() or 13
-	local lineHeight = math.max(20, fontSize + 7)
+	local lineHeight = math.max(22, fontSize + 8)
 	local titleHeight = math.max(22, lineHeight + 2)
-	local baseWidth = math.max(210, math.floor(200 * (fontSize / 12)))
+	local baseWidth = math.max(250, math.floor(235 * (fontSize / 12)))
 	local headerNeeded = titleText and math.ceil((titleText:GetStringWidth() or 100) + 40) or baseWidth
 	local maxRowWidth = math.max(baseWidth, headerNeeded)
 
@@ -1157,70 +1169,92 @@ function GLDG:ShowQueue()
 				self.UIStyle:ApplyFont(text1, -1)
 				self.UIStyle:ApplyFont(text2, -1)
 			end
-			local logTime = GLDG_Queue[name] or "[00:00] "
+			local logTime = strtrim(GLDG_Queue[name] or "[00:00]")
 			local shortName = Ambiguate(name, "guild")
-			text1:ClearAllPoints()
-			text1:SetPoint("LEFT", lineBtn, "LEFT", 8, 0)
-			text1:SetText(logTime..shortName)
-
 			local p = GLDG_DataChar and GLDG_DataChar[name]
-			local setType = "guild"
-			if p then
-				if not p.guild or p.guild ~= GLDG_unique_GuildName then
-					if p.friends and p.friends[GLDG.Player] then
-						setType = "friends"
-					elseif p.channels and GLDG_ChannelName and p.channels[GLDG_ChannelName] then
-						setType = "channel"
-					end
+
+			-- Class color for character name
+			local nameHex = "|cffffd166"
+			if p and p.enClass and RAID_CLASS_COLORS and RAID_CLASS_COLORS[p.enClass] then
+				local c = RAID_CLASS_COLORS[p.enClass]
+				if c.colorStr then
+					nameHex = "|c" .. c.colorStr
+				else
+					nameHex = string.format("|cff%02x%02x%02x", (c.r or 1) * 255, (c.g or 1) * 255, (c.b or 1) * 255)
 				end
 			end
 
-			local rightInfo = ""
-			local colourKey = "list"
+			-- Optional clean Twink->Main or manual Alias tag (never raw guild notes!)
+			local extraTag = ""
 			if p then
-				if p.alias then
-					rightInfo = "("..p.alias..")"
-				elseif p.alt then
-					if GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].alias then
-						rightInfo = "["..GLDG_DataChar[p.alt].alias.."]"
+				local mainDisp = nil
+				if p.alt and p.alt ~= "" then
+					if GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].manualAlias and GLDG_DataChar[p.alt].alias and GLDG_DataChar[p.alt].alias ~= "" then
+						mainDisp = GLDG_DataChar[p.alt].alias
 					else
-						rightInfo = "["..Ambiguate(p.alt, "guild").."]"
+						mainDisp = Ambiguate(p.alt, "guild")
 					end
+				elseif p.twinkMainName and p.twinkMainName ~= "" then
+					mainDisp = p.twinkMainName
 				end
 
-				if p.new then
-					colourKey = "new"
-					rightInfo = (rightInfo ~= "" and (rightInfo.." ") or "").."NEW"
-				elseif p.achievment then
-					colourKey = "achievment"
-					rightInfo = (rightInfo ~= "" and (rightInfo.." ") or "").."ACHV"
-				elseif p.newrank then
-					colourKey = "rank"
-					rightInfo = (rightInfo ~= "" and (rightInfo.." ") or "").."RANK"
-				elseif p.newlvl then
-					colourKey = "lvl"
-					rightInfo = (rightInfo ~= "" and (rightInfo.." ") or "").."LVL "..tostring(p.lvl or "")
-				elseif GLDG_Offline and GLDG_Offline[name] then
-					colourKey = "relog"
+				if mainDisp and mainDisp ~= "" then
+					extraTag = string.format(" |cff80d8ff(%s: %s)|r", L["Alt"] or "Twink", mainDisp)
+				elseif p.manualAlias and p.alias and p.alias ~= "" then
+					extraTag = " |cffffd166(" .. p.alias .. ")|r"
 				end
+			end
+
+			text1:ClearAllPoints()
+			text1:SetPoint("LEFT", lineBtn, "LEFT", 9, 0)
+			text1:SetTextColor(1, 1, 1, 1)
+			text1:SetText(string.format("|cff9499a8%s|r %s%s|r%s", logTime, nameHex, shortName, extraTag))
+
+			-- Event Icon + Status Badge on the right
+			local rightInfo = ""
+			local accentR, accentG, accentB = 0.30, 0.85, 0.39
+			if p and p.new then
+				accentR, accentG, accentB = 1.00, 0.35, 0.35
+				rightInfo = "|TInterface\\FriendsFrame\\UI-Toast-FriendInviteIcon:14:14:0:0|t |cffff6666" .. (L["New in guild"] or "Neu in Gilde") .. "|r"
+			elseif p and p.newrank then
+				accentR, accentG, accentB = 0.85, 0.40, 1.00
+				local rankLabel = (p.rankname and p.rankname ~= "")
+					and ((L["Rank"] or "Rang") .. ": " .. p.rankname)
+					or (L["promotion"] or "Beförderung")
+				rightInfo = "|TInterface\\GroupFrame\\UI-Group-LeaderIcon:14:14:0:0|t |cffd966ff" .. rankLabel .. "|r"
+			elseif p and p.newlvl then
+				accentR, accentG, accentB = 1.00, 0.85, 0.30
+				rightInfo = "|TInterface\\Icons\\Spell_Holy_Crusade:14:14:0:0:64:64:5:59:5:59|t |cffffd94d" .. string.format("%s %s!", L["Level"] or "Stufe", tostring(p.lvl or "?")) .. "|r"
+			elseif p and p.achievment then
+				accentR, accentG, accentB = 0.40, 0.70, 1.00
+				rightInfo = "|TInterface\\Icons\\Achievement_General:14:14:0:0:64:64:5:59:5:59|t |cff66b3ff" .. (L["Achievment"] or "Erfolg") .. "|r"
+			elseif GLDG_Offline and GLDG_Offline[name] then
+				accentR, accentG, accentB = 0.25, 1.00, 0.72
+				rightInfo = "|TInterface\\FriendsFrame\\StatusIcon-Online:14:14:0:0|t |cff3fffb8" .. (L["Relog"] or "Relog") .. "|r"
+			else
+				accentR, accentG, accentB = 0.30, 0.85, 0.39
+				rightInfo = "|TInterface\\FriendsFrame\\StatusIcon-Online:14:14:0:0|t |cff4cd964" .. (L["Logged in"] or "Eingeloggt") .. "|r"
+			end
+
+			if lineBtn.accentBar then
+				lineBtn.accentBar:SetColorTexture(accentR, accentG, accentB, 0.95)
 			end
 
 			text2:ClearAllPoints()
 			text2:SetPoint("RIGHT", lineBtn, "RIGHT", -8, 0)
+			text2:SetTextColor(1, 1, 1, 1)
 			text2:SetText(rightInfo)
-			GLDG_SetTextColor(prefix..i.."Text", setType, colourKey)
-			GLDG_SetTextColor(prefix..i.."Text2", setType, "alias")
 
 			local w1 = text1:GetStringWidth() or 120
-			local w2 = (rightInfo ~= "") and ((text2:GetStringWidth() or 30) + 14) or 0
-			local needed = math.ceil(w1 + w2 + 20)
+			local w2 = (rightInfo ~= "") and ((text2:GetStringWidth() or 40) + 18) or 0
+			local needed = math.ceil(w1 + w2 + 24)
 			if needed > maxRowWidth then
 				maxRowWidth = needed
 			end
 		end
 	end
 
-	local lineWidth = math.min(maxRowWidth, 460)
+	local lineWidth = math.min(maxRowWidth, 520)
 	listFrame:SetSize(lineWidth, titleHeight)
 	if titleFrame then
 		titleFrame:SetHeight(titleHeight)
@@ -1240,8 +1274,8 @@ function GLDG:ShowQueue()
 				lineBtn:SetPoint("TOPLEFT", listFrame, "BOTTOMLEFT", 0, -(i - 1) * (lineHeight - 1))
 			end
 			text1:ClearAllPoints()
-			text1:SetPoint("LEFT", lineBtn, "LEFT", 8, 0)
-			text1:SetPoint("RIGHT", text2, "LEFT", -8, 0)
+			text1:SetPoint("LEFT", lineBtn, "LEFT", 9, 0)
+			text1:SetPoint("RIGHT", text2, "LEFT", -10, 0)
 			lineBtn:Show()
 		end
 	end
