@@ -52,10 +52,10 @@ Supports **all World of Warcraft flavors** from a single unified codebase:
 - Configurable growth direction (upward or downward), maximum visible entries (`1–15`), custom row dimensions, and persistent drag position.
 
 ### 👥 Main / Alt (Twink) & Alias Management
-- Link any number of alt characters to a player's **Main** character and assign custom **Aliases** (nicknames) and personal notes.
+- **Structured Multi-Column Roster Table & Floating Edit Popup**: Browse your guild roster in a clean, non-wrapping multi-column table (`Character`, `First Name`, `Role / Main`, `Level & Rank`, `Public Note`) with compact **Edit** and **Quick-Greet** icon buttons. Clicking a character or its Edit icon opens a dedicated floating **Player Edit Popup** to set a shared **First Name / Alias** (automatically synced across the Main and all linked Alts), assign Alts to Mains, manage custom notes, or toggle Main/Ignore status.
 - **Smart Twink / Main Note Detection**: Automatically scans public and officer guild notes for `Twink`, `Alt`, and `Main` references (including multi-word character names such as `"twink aerandir elfaron"`) and links the character to the matching Main in the guild roster without copying raw guild notes into player aliases.
 - **Chat Enhancement**: Optionally prepends `{Main}` or `{Alias}` tags to guild, officer, whisper, and channel messages so you always know who you are talking to.
-- **Roster Inspector & Filters**: Search and filter your character database by name, alias, main, note, guild, online status, unassigned characters, or ignored players.
+- **Live Roster Search & Role Filters**: Instant search-as-you-type and role filtering by name, first name/alias, main, note, online status, unassigned characters, or ignored players.
 
 ### 💬 16 Greeting Categories & Custom Collections
 - **16 Specialized Message Categories**:

@@ -108,6 +108,10 @@ local function UpdateSidebarStats()
     ))
 end
 
+function GLDG:RefreshSidebarStats()
+    UpdateSidebarStats()
+end
+
 local function GetRecommendedWindowSize(fontSize)
     fontSize = fontSize or UIStyle:GetFontSize()
     local delta = math.max(0, fontSize - 12)
@@ -601,6 +605,11 @@ local function CreateMainFrame()
         UpdateChromeFontsAndLayout()
         GLDG:SelectTab(currentTab or "settings")
     end)
+    frame:SetScript("OnHide", function()
+        if GLDG.HidePlayerEditPopup then
+            GLDG:HidePlayerEditPopup()
+        end
+    end)
 
     mainWindow = frame
     UpdateChromeFontsAndLayout()
@@ -655,6 +664,15 @@ function GLDG:SelectTab(tab)
         contentGroup:ReleaseChildren()
         contentGroup:Release()
         contentGroup = nil
+    end
+
+    if tab ~= "players" and self.HidePlayersTabPanel then
+        self:HidePlayersTabPanel()
+    end
+
+    if tab == "players" and self.ShowPlayersTabPanel then
+        self:ShowPlayersTabPanel(contentHost)
+        return
     end
 
     contentGroup = AceGUI:Create("SimpleGroup")
