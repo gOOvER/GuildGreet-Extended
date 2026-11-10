@@ -101,10 +101,10 @@ local function UpdateSidebarStats()
     end
     local guildLabel = (curGuild ~= "") and curGuild or (L["No Guild"] or L["Guildless"] or "No Guild")
     sidebarStatsText:SetText(string.format(
-        "%s%s:|r %s\n%s%s:|r %d (%d %s)\n%sQueue:|r %d",
+        "%s%s:|r %s\n%s%s:|r %d (%d %s)\n%s%s:|r %d",
         UIStyle.Hex.gold, L["Guild"] or "Guild", guildLabel,
         UIStyle.Hex.gold, L["Players"] or "Players", playerCount, mainCount, L["Main"] or "Mains",
-        UIStyle.Hex.gold, queueCount
+        UIStyle.Hex.gold, L["Queue"] or "Warteschlange", queueCount
     ))
 end
 
@@ -735,8 +735,8 @@ end
 function GuildGreet_OnAddonCompartmentEnter(_, menuButtonFrame)
     GameTooltip:SetOwner(menuButtonFrame, "ANCHOR_LEFT")
     GameTooltip:SetText("|cffd9b54aGuildGreet Extended|r")
-    GameTooltip:AddLine("Left-Click: Open Configuration", 0.9, 0.9, 0.9)
-    GameTooltip:AddLine("Right-Click: Open Players Manager", 0.9, 0.9, 0.9)
+    GameTooltip:AddLine((L["Left-Click"] or "Linksklick") .. ": " .. (L["Toggle main window"] or "Hauptfenster umschalten"), 0.9, 0.9, 0.9)
+    GameTooltip:AddLine((L["Right-Click"] or "Rechtsklick") .. ": " .. (L["Open players tab"] or "Spieler-Tab öffnen"), 0.9, 0.9, 0.9)
     GameTooltip:Show()
 end
 
@@ -765,9 +765,9 @@ local function SetupMinimapAndBlizzardOptions()
             end,
             OnTooltipShow = function(tt)
                 tt:AddLine("|cffd9b54aGuildGreet Extended|r")
-                tt:AddLine("|cff4cd973Left-Click:|r Toggle Config Window", 0.9, 0.9, 0.9)
-                tt:AddLine("|cff4cd973Right-Click:|r Manage Players", 0.9, 0.9, 0.9)
-                tt:AddLine("|cff4cd973Shift + Right-Click:|r Clear Greeting Queue", 0.9, 0.9, 0.9)
+                tt:AddLine("|cff4cd973" .. (L["Left-Click"] or "Linksklick") .. ":|r " .. (L["Toggle main window"] or "Hauptfenster umschalten"), 0.9, 0.9, 0.9)
+                tt:AddLine("|cff4cd973" .. (L["Right-Click"] or "Rechtsklick") .. ":|r " .. (L["Open players tab"] or "Spieler-Tab öffnen"), 0.9, 0.9, 0.9)
+                tt:AddLine("|cff4cd973Shift + " .. (L["Right-Click"] or "Rechtsklick") .. ":|r " .. (L["Clear greet list"] or "Begrüßungsliste leeren"), 0.9, 0.9, 0.9)
             end,
         })
         if LDBIcon and GLDG.db and GLDG.db.profile then

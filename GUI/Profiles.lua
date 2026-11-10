@@ -15,14 +15,13 @@ local selectedCopySource = nil
 local selectedDeleteTarget = nil
 
 StaticPopupDialogs["GUILDGREET_CONFIRM_DELETE_PROFILE"] = {
-    text = "Are you sure you want to delete the profile '%s'?",
-    button1 = YES or "Yes",
-    button2 = NO or "No",
+    text = L["Are you sure you want to delete the profile '%s'?"] or "Are you sure you want to delete the profile '%s'?",
+    button1 = YES or L["Yes"] or "Yes",
+    button2 = NO or L["No"] or "No",
     OnAccept = function(_, data)
         if data and GLDG.db and data ~= GLDG.db:GetCurrentProfile() then
             GLDG.db:DeleteProfile(data, true)
             selectedDeleteTarget = nil
-            GLDG:PrintInfo("Deleted profile: " .. tostring(data))
             GLDG:RefreshConfigUI()
         end
     end,
@@ -32,14 +31,13 @@ StaticPopupDialogs["GUILDGREET_CONFIRM_DELETE_PROFILE"] = {
 }
 
 StaticPopupDialogs["GUILDGREET_CONFIRM_RESET_PROFILE"] = {
-    text = "Are you sure you want to reset the current profile '%s' to default values?",
-    button1 = YES or "Yes",
-    button2 = NO or "No",
+    text = L["Are you sure you want to reset the current profile '%s' to default values?"] or "Are you sure you want to reset the current profile '%s' to default values?",
+    button1 = YES or L["Yes"] or "Yes",
+    button2 = NO or L["No"] or "No",
     OnAccept = function()
         if GLDG.db then
             GLDG.db:ResetProfile()
             GLDG:OnProfileChanged()
-            GLDG:PrintInfo("Current profile reset to defaults.")
             GLDG:RefreshConfigUI()
         end
     end,
