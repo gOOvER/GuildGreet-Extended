@@ -58,15 +58,16 @@ Supports **all World of Warcraft flavors** from a single unified codebase:
 - **Live Roster Search & Role Filters**: Instant search-as-you-type and role filtering by name, first name/alias, main, note, online status, unassigned characters, or ignored players.
 
 ### 💬 16 Greeting Categories & Custom Collections
+- **Master-Detail Template Studio**: Browse all **16 greeting categories** (`Player Events` & `Own Announcements`) in a dedicated left sidebar with live template counters, insert placeholders with 1-click **Placeholder Chips**, preview rendered messages inline, and edit or remove templates via compact icon buttons.
 - **16 Specialized Message Categories**:
   - `Greet` (Login), `GreetBack` (Relog), `Welcome` (Joined Guild), `NewRank` (Promotion), `NewLevel` (Level-Up), `Achievment` (Achievement), `Bye` (Logout Day), `Night` (Logout Night), `Guild` / `Channel` (Self Login), `ByeGuild` / `ByeChannel`, `NightGuild` / `NightChannel`, `LaterGuild` / `LaterChannel`.
-- **Custom Collections**: Create reusable message collections and assign them globally, per **Realm**, per **Guild**, or per **Character**.
+- **Custom Collections**: Create reusable message collections and assign them globally or per **Guild**.
 - **Dynamic Placeholders & Conditional Filters**: Use `%s`, `%c`, `%m`, `%a`, `%A`, `%l`, `%L`, `%C`, `%r`, `%v`, `%g`, `%G` and restrict messages by level range (`<min:max>`) or time of day (`<HH:MM:HH:MM>`).
 
-### 🧹 Database Maintenance, Plausibility Checks & Safe Backups
-- **Consistency & Plausibility Checker**: Detects and automatically repairs orphaned alt links, circular references, and missing main flags.
-- **Database Cleanup Tools**: Prune orphaned characters, guildless characters, or stale guild/channel/friend references.
-- **Safe Snapshots & Export/Import**: Create/restore local database backups (`GLDG_DataBackup`) or share settings via `AceSerializer-3.0`.
+### 🧹 Database Maintenance, Colour Studio & Profile Manager
+- **Structured Maintenance Dashboard (`Cleanup`)**: Real-time KPI tiles (`Players`, `Mains`, `Alts`, `Ignored`, `Guildless`, `Orphans`), 2-column action cards with inline diagnostic feedback, smart Guild/Channel/Friend reference cleanup, and safe `AceSerializer-3.0` Export/Import backups.
+- **Segmented Colour Studio (`Colours`)**: Customize chat and greeting queue colors across `Guild`, `Friends`, and `Channel` scopes with `#RRGGBB` swatch cards and a localized live preview.
+- **AceDB-3.0 Profile Manager (`Profiles`)**: Switch, reset, copy, or delete profiles, or create new profiles in one click using **Character**, **Guild**, or **Class** quick presets.
 
 ---
 

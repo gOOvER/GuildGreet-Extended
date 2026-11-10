@@ -131,6 +131,16 @@ function UIStyle:CreateButton(parent, text, minWidth, height, onClick, isAccent)
         self:UpdateSize()
     end
 
+    function btn:SetDisabledState(disabled)
+        if disabled then
+            self:Disable()
+            self:SetAlpha(0.45)
+        else
+            self:Enable()
+            self:SetAlpha(1.0)
+        end
+    end
+
     btn:UpdateSize()
 
     btn:SetScript("OnEnter", function(selfBtn)
@@ -155,6 +165,375 @@ function UIStyle:CreateButton(parent, text, minWidth, height, onClick, isAccent)
         btn:SetScript("OnClick", onClick)
     end
     return btn
+end
+
+------------------------------------------------------------
+-- Shared Native Dark-Slate Components (Zero Taint)
+------------------------------------------------------------
+local sharedDropdownMenu = nil
+local sharedDropdownCatcher = nil
+
+function UIStyle:CloseDropdown()
+    if sharedDropdownMenu then sharedDropdownMenu:Hide() end
+    if sharedDropdownCatcher then sharedDropdownCatcher:Hide() end
+end
+
+function UIStyle:OpenDropdown(anchorBtn, items, selectedValue, onSelect)
+    if sharedDropdownMenu and sharedDropdownMenu:IsShown() and sharedDropdownMenu._anchor == anchorBtn then
+        self:CloseDropdown()
+        return
+    end
+
+    if not sharedDropdownCatcher then
+        sharedDropdownCatcher = CreateFrame("Button", nil, UIParent)
+        sharedDropdownCatcher:SetFrameStrata("FULLSCREEN_DIALOG")
+        sharedDropdownCatcher:SetFrameLevel(90)
+        sharedDropdownCatcher:SetAllPoints(UIParent)
+        sharedDropdownCatcher:EnableMouse(true)
+        sharedDropdownCatcher:SetScript("OnClick", function() UIStyle:CloseDropdown() end)
+    end
+
+    if not sharedDropdownMenu then
+        sharedDropdownMenu = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate" or nil)
+        sharedDropdownMenu:SetFrameStrata("TOOLTIP")
+        sharedDropdownMenu:SetFrameLevel(125)
+        sharedDropdownMenu:SetClampedToScreen(true)
+        sharedDropdownMenu:EnableMouse(true)
+        self:ApplyBox(sharedDropdownMenu, self.Colors.bgSidebar, self.Colors.borderHighlight)
+
+        local sf = CreateFrame("ScrollFrame", nil, sharedDropdownMenu, "UIPanelScrollFrameTemplate")
+        sf:SetPoint("TOPLEFT", sharedDropdownMenu, "TOPLEFT", 4, -4)
+        sf:SetPoint("BOTTOMRIGHT", sharedDropdownMenu, "BOTTOMRIGHT", -24, 4)
+        sharedDropdownMenu.scrollFrame = sf
+
+        local child = CreateFrame("Frame", nil, sf)
+        child:SetSize(200, 20)
+        sf:SetScrollChild(child)
+        sharedDropdownMenu.scrollChild = child
+        sharedDropdownMenu.optionButtons = {}
+    end
+
+    sharedDropdownMenu._anchor = anchorBtn
+    local menuW = math.max(anchorBtn:GetWidth() or 200, 220)
+    local rowH = math.max(24, self:GetFontSize() + 10)
+    local totalH = #items * rowH
+    local visibleH = math.min(math.max(totalH + 8, 32), 280)
+    local needsScroll = (totalH + 8) > 280
+
+    sharedDropdownMenu:SetSize(menuW, visibleH)
+    sharedDropdownMenu:ClearAllPoints()
+    sharedDropdownMenu:SetPoint("TOPLEFT", anchorBtn, "BOTTOMLEFT", 0, -2)
+
+    local sf = sharedDropdownMenu.scrollFrame
+    sf:ClearAllPoints()
+    sf:SetPoint("TOPLEFT", sharedDropdownMenu, "TOPLEFT", 4, -4)
+    sf:SetPoint("BOTTOMRIGHT", sharedDropdownMenu, "BOTTOMRIGHT", needsScroll and -24 or -4, 4)
+    if sf.ScrollBar then
+        if needsScroll then sf.ScrollBar:Show() else sf.ScrollBar:Hide() end
+    end
+
+    local childW = menuW - (needsScroll and 28 or 8)
+    sharedDropdownMenu.scrollChild:SetSize(childW, math.max(totalH, 10))
+
+    for idx, item in ipairs(items) do
+        local opt = sharedDropdownMenu.optionButtons[idx]
+        if not opt then
+            opt = CreateFrame("Button", nil, sharedDropdownMenu.scrollChild, BackdropTemplateMixin and "BackdropTemplate" or nil)
+            local txt = opt:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            txt:SetPoint("LEFT", opt, "LEFT", 8, 0)
+            txt:SetPoint("RIGHT", opt, "RIGHT", -8, 0)
+            txt:SetJustifyH("LEFT")
+            txt:SetWordWrap(false)
+            opt.label = txt
+            sharedDropdownMenu.optionButtons[idx] = opt
+        end
+
+        opt:SetSize(childW, rowH)
+        opt:ClearAllPoints()
+        opt:SetPoint("TOPLEFT", sharedDropdownMenu.scrollChild, "TOPLEFT", 0, -(idx - 1) * rowH)
+        self:ApplyFont(opt.label, 0)
+        opt.label:SetText(item.label or "")
+
+        local isSelected = (item.value == selectedValue)
+        if isSelected then
+            self:ApplyBox(opt, self.Colors.bgRowActive, self.Colors.borderSubtle)
+            opt.label:SetTextColor(unpack(self.Colors.gold))
+        else
+            self:ApplyBox(opt, (idx % 2 == 0) and self.Colors.bgRowAlt or self.Colors.bgRow, self.Colors.borderSubtle)
+            opt.label:SetTextColor(unpack(self.Colors.textLight))
+        end
+
+        opt:SetScript("OnEnter", function(selfBtn)
+            UIStyle:ApplyBox(selfBtn, UIStyle.Colors.bgRowHover, UIStyle.Colors.borderHighlight)
+        end)
+        opt:SetScript("OnLeave", function(selfBtn)
+            if item.value == selectedValue then
+                UIStyle:ApplyBox(selfBtn, UIStyle.Colors.bgRowActive, UIStyle.Colors.borderSubtle)
+            else
+                UIStyle:ApplyBox(selfBtn, (idx % 2 == 0) and UIStyle.Colors.bgRowAlt or UIStyle.Colors.bgRow, UIStyle.Colors.borderSubtle)
+            end
+        end)
+        opt:SetScript("OnClick", function()
+            UIStyle:CloseDropdown()
+            if onSelect then
+                onSelect(item.value, item.label)
+            end
+        end)
+        opt:Show()
+    end
+
+    for idx = #items + 1, #sharedDropdownMenu.optionButtons do
+        sharedDropdownMenu.optionButtons[idx]:Hide()
+    end
+
+    sharedDropdownCatcher:Show()
+    sharedDropdownMenu:Show()
+end
+
+function UIStyle:CreateDropdown(parent, width, height)
+    local btn = CreateFrame("Button", nil, parent, BackdropTemplateMixin and "BackdropTemplate" or nil)
+    btn:SetSize(width or 180, height or 28)
+    self:ApplyBox(btn, self.Colors.bgInput, self.Colors.border)
+
+    local txt = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    txt:SetPoint("LEFT", btn, "LEFT", 10, 0)
+    txt:SetPoint("RIGHT", btn, "RIGHT", -24, 0)
+    txt:SetJustifyH("LEFT")
+    txt:SetWordWrap(false)
+    self:ApplyFont(txt, 0)
+    txt:SetTextColor(unpack(self.Colors.textLight))
+    btn.label = txt
+
+    local arrow = btn:CreateTexture(nil, "ARTWORK")
+    arrow:SetSize(12, 12)
+    arrow:SetPoint("RIGHT", btn, "RIGHT", -8, -1)
+    arrow:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up")
+    arrow:SetTexCoord(0.2, 0.8, 0.2, 0.8)
+    btn.arrow = arrow
+
+    btn:SetScript("OnEnter", function(selfBtn)
+        if not selfBtn:IsEnabled() then return end
+        UIStyle:ApplyBox(selfBtn, UIStyle.Colors.bgRowHover, UIStyle.Colors.borderHighlight)
+    end)
+    btn:SetScript("OnLeave", function(selfBtn)
+        if not selfBtn:IsEnabled() then return end
+        UIStyle:ApplyBox(selfBtn, UIStyle.Colors.bgInput, UIStyle.Colors.border)
+    end)
+
+    function btn:SetDisabledState(disabled)
+        if disabled then
+            self:Disable()
+            self:SetAlpha(0.50)
+        else
+            self:Enable()
+            self:SetAlpha(1.0)
+        end
+    end
+
+    return btn
+end
+
+function UIStyle:CreateEditBox(parent, height, placeholderText)
+    local box = CreateFrame("EditBox", nil, parent, BackdropTemplateMixin and "BackdropTemplate" or nil)
+    box:SetHeight(height or 28)
+    box:SetAutoFocus(false)
+    box:SetTextInsets(10, 26, 0, 0)
+    box:SetFontObject(ChatFontNormal)
+    self:ApplyFont(box, 0)
+    box:SetTextColor(unpack(self.Colors.textLight))
+    self:ApplyBox(box, self.Colors.bgInput, self.Colors.border)
+
+    if placeholderText and placeholderText ~= "" then
+        local ph = box:CreateFontString(nil, "ARTWORK", "GameFontDisable")
+        ph:SetPoint("LEFT", box, "LEFT", 10, 0)
+        ph:SetPoint("RIGHT", box, "RIGHT", -26, 0)
+        ph:SetJustifyH("LEFT")
+        ph:SetWordWrap(false)
+        self:ApplyFont(ph, 0)
+        ph:SetTextColor(unpack(self.Colors.textMuted))
+        ph:SetText(placeholderText)
+        box.placeholder = ph
+    end
+
+    local clearBtn = CreateFrame("Button", nil, box)
+    clearBtn:SetSize(13, 13)
+    clearBtn:SetPoint("RIGHT", box, "RIGHT", -7, 0)
+    local clearTex = clearBtn:CreateTexture(nil, "ARTWORK")
+    clearTex:SetAllPoints()
+    clearTex:SetTexture("Interface\\Buttons\\UI-StopButton")
+    clearTex:SetVertexColor(0.65, 0.68, 0.75, 0.85)
+    clearBtn.tex = clearTex
+    clearBtn:Hide()
+    clearBtn:SetScript("OnEnter", function() clearTex:SetVertexColor(1, 0.82, 0.35, 1) end)
+    clearBtn:SetScript("OnLeave", function() clearTex:SetVertexColor(0.65, 0.68, 0.75, 0.85) end)
+    clearBtn:SetScript("OnClick", function()
+        box:SetText("")
+        box:ClearFocus()
+        if box._onClear then box._onClear() end
+    end)
+    box.clearBtn = clearBtn
+
+    local function syncPlaceholder()
+        local hasText = (box:GetText() or "") ~= ""
+        if box.placeholder then
+            if hasText or box:HasFocus() then
+                box.placeholder:Hide()
+            else
+                box.placeholder:Show()
+            end
+        end
+        if hasText then
+            clearBtn:Show()
+        else
+            clearBtn:Hide()
+        end
+    end
+
+    box:SetScript("OnEditFocusGained", function(selfBox)
+        UIStyle:ApplyBox(selfBox, UIStyle.Colors.bgInput, UIStyle.Colors.borderHighlight)
+        syncPlaceholder()
+    end)
+    box:SetScript("OnEditFocusLost", function(selfBox)
+        UIStyle:ApplyBox(selfBox, UIStyle.Colors.bgInput, UIStyle.Colors.border)
+        syncPlaceholder()
+    end)
+    box:SetScript("OnEscapePressed", function(selfBox)
+        selfBox:ClearFocus()
+    end)
+    box:HookScript("OnTextChanged", syncPlaceholder)
+    box._syncPlaceholder = syncPlaceholder
+
+    return box
+end
+
+function UIStyle:CreateIconButton(parent, iconPath, size, tooltipTitle, onClick, isAccent)
+    local btn = CreateFrame("Button", nil, parent, BackdropTemplateMixin and "BackdropTemplate" or nil)
+    btn:SetSize(size or 24, size or 24)
+    self:ApplyBox(
+        btn,
+        isAccent and self.Colors.bgRowActive or self.Colors.bgInput,
+        isAccent and self.Colors.borderHighlight or self.Colors.border
+    )
+
+    local ic = btn:CreateTexture(nil, "ARTWORK")
+    local icSize = math.max(13, (size or 24) - 10)
+    ic:SetSize(icSize, icSize)
+    ic:SetPoint("CENTER", 0, 0)
+    ic:SetTexture(iconPath)
+    if isAccent then
+        ic:SetVertexColor(1, 0.86, 0.42, 1)
+    else
+        ic:SetVertexColor(0.86, 0.88, 0.92, 1)
+    end
+    btn.icon = ic
+
+    btn:SetScript("OnEnter", function(selfBtn)
+        UIStyle:ApplyBox(selfBtn, UIStyle.Colors.bgRowHover, UIStyle.Colors.borderHighlight)
+        selfBtn.icon:SetVertexColor(1, 0.92, 0.55, 1)
+        if tooltipTitle and tooltipTitle ~= "" then
+            GameTooltip:SetOwner(selfBtn, "ANCHOR_TOP")
+            GameTooltip:SetText(tooltipTitle, 0.95, 0.82, 0.35)
+            GameTooltip:Show()
+        end
+    end)
+    btn:SetScript("OnLeave", function(selfBtn)
+        UIStyle:ApplyBox(
+            selfBtn,
+            isAccent and UIStyle.Colors.bgRowActive or UIStyle.Colors.bgInput,
+            isAccent and UIStyle.Colors.borderHighlight or UIStyle.Colors.border
+        )
+        if isAccent then
+            selfBtn.icon:SetVertexColor(1, 0.86, 0.42, 1)
+        else
+            selfBtn.icon:SetVertexColor(0.86, 0.88, 0.92, 1)
+        end
+        GameTooltip:Hide()
+    end)
+    if onClick then
+        btn:SetScript("OnClick", onClick)
+    end
+    return btn
+end
+
+function UIStyle:CreateCard(parent, titleText)
+    local card = CreateFrame("Frame", nil, parent, BackdropTemplateMixin and "BackdropTemplate" or nil)
+    self:ApplyBox(card, self.Colors.bgPanel, self.Colors.borderSubtle)
+
+    if titleText then
+        local hdr = CreateFrame("Frame", nil, card, BackdropTemplateMixin and "BackdropTemplate" or nil)
+        hdr:SetHeight(28)
+        hdr:SetPoint("TOPLEFT", card, "TOPLEFT", 1, -1)
+        hdr:SetPoint("TOPRIGHT", card, "TOPRIGHT", -1, -1)
+        self:ApplyBox(hdr, self.Colors.bgHeader, self.Colors.borderSubtle)
+        card.header = hdr
+
+        local lbl = hdr:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        lbl:SetPoint("LEFT", hdr, "LEFT", 12, 0)
+        lbl:SetPoint("RIGHT", hdr, "RIGHT", -12, 0)
+        lbl:SetJustifyH("LEFT")
+        lbl:SetWordWrap(false)
+        self:ApplyFont(lbl, 0)
+        lbl:SetTextColor(unpack(self.Colors.gold))
+        lbl:SetText(titleText)
+        card.title = lbl
+    end
+
+    return card
+end
+
+function UIStyle:OpenColorPicker(r, g, b, a, hasAlpha, onChange)
+    if not ColorPickerFrame then return end
+    ColorPickerFrame:Hide()
+    ColorPickerFrame:SetFrameStrata("FULLSCREEN_DIALOG")
+    ColorPickerFrame:SetClampedToScreen(true)
+
+    local invertedAlpha = (WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE)
+    local initR, initG, initB, initA = r or 1, g or 1, b or 1, (hasAlpha and (a or 1) or 1)
+
+    if ColorPickerFrame.SetupColorPickerAndShow then
+        local pickerOpacity = invertedAlpha and (1 - initA) or initA
+        local function applyCurrent()
+            local nr, ng, nb = ColorPickerFrame:GetColorRGB()
+            local na = 1
+            if hasAlpha and ColorPickerFrame.GetColorAlpha then
+                local rawA = ColorPickerFrame:GetColorAlpha() or 1
+                na = invertedAlpha and (1 - rawA) or rawA
+            end
+            if onChange then onChange(nr, ng, nb, na) end
+        end
+        ColorPickerFrame:SetupColorPickerAndShow({
+            r = initR,
+            g = initG,
+            b = initB,
+            hasOpacity = hasAlpha and true or false,
+            opacity = pickerOpacity,
+            swatchFunc = applyCurrent,
+            opacityFunc = applyCurrent,
+            cancelFunc = function()
+                if onChange then onChange(initR, initG, initB, initA) end
+            end,
+        })
+    else
+        local function applyLegacy()
+            local nr, ng, nb = ColorPickerFrame:GetColorRGB()
+            local na = 1
+            if hasAlpha and OpacitySliderFrame then
+                na = 1 - (OpacitySliderFrame:GetValue() or 0)
+            end
+            if onChange then onChange(nr, ng, nb, na) end
+        end
+        ColorPickerFrame.func = applyLegacy
+        ColorPickerFrame.hasOpacity = hasAlpha and true or false
+        ColorPickerFrame.opacityFunc = applyLegacy
+        if hasAlpha then
+            ColorPickerFrame.opacity = 1 - initA
+        end
+        ColorPickerFrame:SetColorRGB(initR, initG, initB)
+        ColorPickerFrame.cancelFunc = function()
+            if onChange then onChange(initR, initG, initB, initA) end
+        end
+        ColorPickerFrame:Show()
+    end
 end
 
 function UIStyle:StyleAceWidget(widget)
@@ -355,7 +734,32 @@ function UIStyle:StyleAceWidget(widget)
             widget.label:SetTextColor(unpack(self.Colors.goldDim))
         end
         if widget.editbox then
-            self:ApplyFont(widget.editbox, 0)
+            local eb = widget.editbox
+            self:ApplyFont(eb, 0)
+            eb:SetTextColor(unpack(self.Colors.textLight))
+            if not eb._ggFlatBox then
+                local name = eb:GetName()
+                if name then
+                    if _G[name .. "Left"] then _G[name .. "Left"]:SetAlpha(0) end
+                    if _G[name .. "Middle"] then _G[name .. "Middle"]:SetAlpha(0) end
+                    if _G[name .. "Right"] then _G[name .. "Right"]:SetAlpha(0) end
+                end
+                if eb.Left then eb.Left:SetAlpha(0) end
+                if eb.Middle then eb.Middle:SetAlpha(0) end
+                if eb.Right then eb.Right:SetAlpha(0) end
+                local bg = CreateFrame("Frame", nil, eb, BackdropTemplateMixin and "BackdropTemplate" or nil)
+                bg:SetFrameLevel(math.max(1, eb:GetFrameLevel() - 1))
+                bg:SetPoint("TOPLEFT", eb, "TOPLEFT", -4, 2)
+                bg:SetPoint("BOTTOMRIGHT", eb, "BOTTOMRIGHT", 0, -2)
+                self:ApplyBox(bg, self.Colors.bgInput, self.Colors.border)
+                eb._ggFlatBox = bg
+                eb:HookScript("OnEditFocusGained", function()
+                    UIStyle:ApplyBox(bg, UIStyle.Colors.bgInput, UIStyle.Colors.borderHighlight)
+                end)
+                eb:HookScript("OnEditFocusLost", function()
+                    UIStyle:ApplyBox(bg, UIStyle.Colors.bgInput, UIStyle.Colors.border)
+                end)
+            end
         end
     elseif wtype == "MultiLineEditBox" then
         if widget.label then
@@ -373,8 +777,37 @@ function UIStyle:StyleAceWidget(widget)
             self:ApplyFont(widget.label, -1)
             widget.label:SetTextColor(unpack(self.Colors.goldDim))
         end
+        if widget.dropdown and not widget.dropdown._ggFlatBox then
+            local dd = widget.dropdown
+            local dName = dd:GetName()
+            if dName then
+                if _G[dName .. "Left"] then _G[dName .. "Left"]:SetAlpha(0) end
+                if _G[dName .. "Middle"] then _G[dName .. "Middle"]:SetAlpha(0) end
+                if _G[dName .. "Right"] then _G[dName .. "Right"]:SetAlpha(0) end
+            end
+            if dd.Left then dd.Left:SetAlpha(0) end
+            if dd.Middle then dd.Middle:SetAlpha(0) end
+            if dd.Right then dd.Right:SetAlpha(0) end
+            local bg = CreateFrame("Frame", nil, widget.frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
+            bg:SetFrameLevel(math.max(1, widget.frame:GetFrameLevel()))
+            bg:SetPoint("BOTTOMLEFT", widget.frame, "BOTTOMLEFT", 0, 2)
+            bg:SetPoint("TOPRIGHT", widget.frame, "BOTTOMRIGHT", 0, 26)
+            self:ApplyBox(bg, self.Colors.bgInput, self.Colors.border)
+            dd._ggFlatBox = bg
+            if widget.button_cover then
+                widget.button_cover:HookScript("OnEnter", function()
+                    if not widget.disabled then
+                        UIStyle:ApplyBox(bg, UIStyle.Colors.bgRowHover, UIStyle.Colors.borderHighlight)
+                    end
+                end)
+                widget.button_cover:HookScript("OnLeave", function()
+                    UIStyle:ApplyBox(bg, UIStyle.Colors.bgInput, UIStyle.Colors.border)
+                end)
+            end
+        end
         if widget.text then
             self:ApplyFont(widget.text, 0)
+            widget.text:SetTextColor(unpack(self.Colors.textLight))
             if widget.text.SetJustifyH then widget.text:SetJustifyH("LEFT") end
         end
     elseif wtype == "Slider" then

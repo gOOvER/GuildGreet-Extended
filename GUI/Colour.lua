@@ -1,33 +1,54 @@
 ------------------------------------------------------------
 -- GuildGreet Modern GUI - Colours Configuration Tab
--- Directly edits GLDG.Colors (guild, friends, channel, help, header)
+-- Segmented Scope Selector, Structured Swatch Cards & Localized Preview
 ------------------------------------------------------------
 
-local AceGUI = LibStub("AceGUI-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet")
 GuildGreet = GLDG
 
 local UIStyle = GLDG.UIStyle
-local activeColourSet = "guild"
 
-local COLOUR_KEYS = {
-    { key = "online",     label = "Coming Online (Chat)" },
-    { key = "goOff",      label = "Going Offline (Chat)" },
-    { key = "isOff",      label = "Is Offline (Chat List)" },
-    { key = "alias",      label = "Alias & Main Tag" },
-    { key = "list",       label = "Queue: Default Online" },
-    { key = "relog",      label = "Queue: Relog" },
-    { key = "new",        label = "Queue: New Guild Member" },
-    { key = "lvl",        label = "Queue: Level-Up" },
-    { key = "rank",       label = "Queue: Promotion" },
-    { key = "achievment", label = "Queue: Achievement" },
+local activeColourSet = "guild"
+local colourPanel = nil
+
+local SCOPES = {
+    { id = "guild",   key = "Guild",   fallback = "Gilde" },
+    { id = "friends", key = "Friends", fallback = "Freunde" },
+    { id = "channel", key = "Channel", fallback = "Kanal" },
+}
+
+local CHAT_SWATCHES = {
+    { key = "online", labelKey = "Comes online",  fallback = "Kommt online" },
+    { key = "goOff",  labelKey = "Going offline", fallback = "Geht offline" },
+    { key = "isOff",  labelKey = "Is offline",    fallback = "Ist offline" },
+    { key = "alias",  labelKey = "First Name / Alias", fallback = "Vorname / Alias" },
+}
+
+local QUEUE_SWATCHES = {
+    { key = "list",       labelKey = "Online Greeting", fallback = "Online-Begrüßung" },
+    { key = "relog",      labelKey = "Relog",           fallback = "Wiedereinloggen (Relog)" },
+    { key = "new",        labelKey = "New member",      fallback = "Neues Mitglied" },
+    { key = "lvl",        labelKey = "Level up",        fallback = "Stufenaufstieg" },
+    { key = "rank",       labelKey = "Promotion",       fallback = "Beförderung" },
+    { key = "achievment", labelKey = "Achievment",      fallback = "Erfolg" },
+}
+
+local SYSTEM_SWATCHES = {
+    { key = "help",   labelKey = "Help",   fallback = "Hilfe-Textfarbe",   hasAlpha = false },
+    { key = "header", labelKey = "Header", fallback = "Kopfzeilen-Farbe",  hasAlpha = true },
 }
 
 local function HexToRGBA(hexStr)
     if GLDG.Colors and GLDG.Colors.ColourToRGB_perc then
         local a, r, g, b = GLDG.Colors:ColourToRGB_perc(hexStr)
         return r or 1, g or 1, b or 1, a or 1
+    end
+    if type(hexStr) == "string" then
+        local a, r, g, b = string.match(hexStr, "|c(%x%x)(%x%x)(%x%x)(%x%x)")
+        if r and g and b then
+            return tonumber(r, 16) / 255, tonumber(g, 16) / 255, tonumber(b, 16) / 255, (tonumber(a, 16) or 255) / 255
+        end
     end
     return 1, 1, 1, 1
 end
@@ -37,6 +58,19 @@ local function RGBAToHex(r, g, b, a)
         return GLDG.Colors:RGBToColour_perc(a or 1, r or 1, g or 1, b or 1)
     end
     return string.format("|c%02X%02X%02X%02X", (a or 1) * 255, (r or 1) * 255, (g or 1) * 255, (b or 1) * 255)
+end
+
+local function FormatShortHexBadge(r, g, b)
+    return string.format("#%02X%02X%02X", math.floor((r or 1) * 255 + 0.5), math.floor((g or 1) * 255 + 0.5), math.floor((b or 1) * 255 + 0.5))
+end
+
+local function GetScopeLabel(scopeId)
+    for _, sc in ipairs(SCOPES) do
+        if sc.id == scopeId then
+            return L[sc.key] or sc.fallback
+        end
+    end
+    return scopeId
 end
 
 local function SyncColorGlobals()
@@ -49,68 +83,265 @@ local function SyncColorGlobals()
     end
     if GLDG.db and GLDG.db.profile then
         GLDG.db.profile.colours = colors
-        GLDG_Data.colours = colors
+        if GLDG_Data then
+            GLDG_Data.colours = colors
+        end
     end
-    GLDG:ShowQueue()
+    if GLDG.ShowQueue then
+        GLDG:ShowQueue()
+    end
 end
 
-function GLDG:CreateColourTab(container)
-    if self.Colors and self.Colors.Initialize then
-        self.Colors:Initialize()
-    end
-    local colors = self:GetColors()
+local RefreshColourPanel
 
-    local scroll = AceGUI:Create("ScrollFrame")
-    scroll:SetLayout("Flow")
-    scroll:SetFullWidth(true)
-    scroll:SetFullHeight(true)
-    container:AddChild(scroll)
+local function CreateSwatchButton(parent)
+    local btn = CreateFrame("Button", nil, parent, BackdropTemplateMixin and "BackdropTemplate" or nil)
+    btn:SetHeight(34)
+    UIStyle:ApplyBox(btn, UIStyle.Colors.bgRow, UIStyle.Colors.borderSubtle)
 
-    local COLOUR_KEYS = {
-        { key = "online",     label = L["Comes online"] or "Coming Online (Chat)" },
-        { key = "goOff",      label = L["Going offline"] or "Going Offline (Chat)" },
-        { key = "isOff",      label = L["Is offline"] or "Is Offline (Chat List)" },
-        { key = "alias",      label = L["Alias"] or "Alias & Main Tag" },
-        { key = "list",       label = L["Greeting"] or "Queue: Default Online" },
-        { key = "relog",      label = L["Relog"] or "Queue: Relog" },
-        { key = "new",        label = L["New member"] or "Queue: New Guild Member" },
-        { key = "lvl",        label = L["Level up"] or "Queue: Level-Up" },
-        { key = "rank",       label = L["Promotion"] or "Queue: Promotion" },
-        { key = "achievment", label = L["Achievment"] or "Queue: Achievement" },
-    }
+    local swatchBorder = CreateFrame("Frame", nil, btn, BackdropTemplateMixin and "BackdropTemplate" or nil)
+    swatchBorder:SetSize(22, 22)
+    swatchBorder:SetPoint("LEFT", btn, "LEFT", 10, 0)
+    UIStyle:ApplyBox(swatchBorder, { 0, 0, 0, 1 }, UIStyle.Colors.border)
+    btn.swatchBorder = swatchBorder
 
-    --------------------------------------------------------
-    -- 1. Colour Set Selector (Guild / Friends / Channel)
-    --------------------------------------------------------
-    local setGroup = AceGUI:Create("InlineGroup")
-    setGroup:SetTitle(L["Colour Settings"] or "Select Target Colour Set")
-    setGroup:SetFullWidth(true)
-    setGroup:SetLayout("Flow")
-    scroll:AddChild(setGroup)
+    local swatchTex = swatchBorder:CreateTexture(nil, "ARTWORK")
+    swatchTex:SetPoint("TOPLEFT", swatchBorder, "TOPLEFT", 2, -2)
+    swatchTex:SetPoint("BOTTOMRIGHT", swatchBorder, "BOTTOMRIGHT", -2, 2)
+    btn.swatchTex = swatchTex
 
-    local setDropdown = AceGUI:Create("Dropdown")
-    setDropdown:SetLabel(L["Colour"] or "Colour Set")
-    setDropdown:SetList({
-        guild   = L["Guild"] or "Guild Members",
-        friends = L["Friends"] or "Friends List",
-        channel = L["Channel"] or "Custom Channel",
-    })
-    setDropdown:SetValue(activeColourSet)
-    setDropdown:SetRelativeWidth(0.40)
-    setDropdown:SetCallback("OnValueChanged", function(_, _, val)
-        activeColourSet = val or "guild"
-        if GLDG.Colors and GLDG.Colors.SetActiveColourSet then
-            GLDG.Colors:SetActiveColourSet(activeColourSet)
-        end
-        GLDG:RefreshConfigUI()
+    local hexBadge = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    hexBadge:SetPoint("RIGHT", btn, "RIGHT", -10, 0)
+    hexBadge:SetJustifyH("RIGHT")
+    hexBadge:SetTextColor(unpack(UIStyle.Colors.textMuted))
+    btn.hexBadge = hexBadge
+
+    local lbl = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    lbl:SetPoint("LEFT", swatchBorder, "RIGHT", 10, 0)
+    lbl:SetPoint("RIGHT", hexBadge, "LEFT", -8, 0)
+    lbl:SetJustifyH("LEFT")
+    lbl:SetWordWrap(false)
+    lbl:SetTextColor(unpack(UIStyle.Colors.textLight))
+    btn.label = lbl
+
+    btn:SetScript("OnEnter", function(selfBtn)
+        UIStyle:ApplyBox(selfBtn, UIStyle.Colors.bgRowHover, UIStyle.Colors.borderHighlight)
+        GameTooltip:SetOwner(selfBtn, "ANCHOR_TOP")
+        GameTooltip:SetText(selfBtn._title or "", 0.95, 0.82, 0.35)
+        GameTooltip:AddLine(L["Click to pick colour"] or "Klicken, um Farbe zu ändern", 0.85, 0.85, 0.85)
+        GameTooltip:Show()
     end)
-    setGroup:AddChild(setDropdown)
+    btn:SetScript("OnLeave", function(selfBtn)
+        UIStyle:ApplyBox(selfBtn, UIStyle.Colors.bgRow, UIStyle.Colors.borderSubtle)
+        GameTooltip:Hide()
+    end)
 
-    local copyToAllBtn = AceGUI:Create("Button")
-    copyToAllBtn:SetText(L["Copy Set to Friends & Channel"] or "Copy Set to Friends & Channel")
-    copyToAllBtn:SetRelativeWidth(0.32)
-    copyToAllBtn:SetCallback("OnClick", function()
-        local src = colors[activeColourSet]
+    return btn
+end
+
+RefreshColourPanel = function()
+    if not colourPanel or not colourPanel:IsShown() then return end
+
+    local colors = GLDG:GetColors() or {}
+    colors[activeColourSet] = colors[activeColourSet] or {}
+    local activeTable = colors[activeColourSet]
+
+    local fontSize = UIStyle:GetFontSize()
+    local scrollW = math.max(520, (colourPanel:GetWidth() or 820) - 28)
+    local scopeName = GetScopeLabel(activeColourSet)
+    local yCursor = 0
+
+    -- 1. Top Scope Bar
+    local scopeBar = colourPanel.scopeBar
+    local barH = math.max(46, fontSize + 30)
+    scopeBar:ClearAllPoints()
+    scopeBar:SetPoint("TOPLEFT", colourPanel.scrollChild, "TOPLEFT", 0, yCursor)
+    scopeBar:SetSize(scrollW, barH)
+
+    UIStyle:ApplyFont(colourPanel.scopeLbl, 0)
+    local prevScopeBtn = nil
+    for idx, sc in ipairs(SCOPES) do
+        local sBtn = colourPanel.scopeBtns[idx]
+        sBtn:SetText(L[sc.key] or sc.fallback)
+        sBtn:UpdateSize()
+        local isSel = (activeColourSet == sc.id)
+        sBtn._isAccent = isSel
+        UIStyle:ApplyBox(
+            sBtn,
+            isSel and UIStyle.Colors.bgRowActive or UIStyle.Colors.bgRow,
+            isSel and UIStyle.Colors.borderHighlight or UIStyle.Colors.border
+        )
+        sBtn.label:SetTextColor(unpack(isSel and UIStyle.Colors.gold or UIStyle.Colors.textLight))
+        sBtn:ClearAllPoints()
+        if not prevScopeBtn then
+            sBtn:SetPoint("LEFT", colourPanel.scopeLbl, "RIGHT", 10, 0)
+        else
+            sBtn:SetPoint("LEFT", prevScopeBtn, "RIGHT", 6, 0)
+        end
+        prevScopeBtn = sBtn
+    end
+
+    colourPanel.resetBtn:UpdateSize()
+    colourPanel.copyAllBtn:UpdateSize()
+    colourPanel.resetBtn:ClearAllPoints()
+    colourPanel.resetBtn:SetPoint("RIGHT", scopeBar, "RIGHT", -10, 0)
+    colourPanel.copyAllBtn:ClearAllPoints()
+    colourPanel.copyAllBtn:SetPoint("RIGHT", colourPanel.resetBtn, "LEFT", -8, 0)
+
+    yCursor = yCursor - (barH + 8)
+
+    local colW = math.floor((scrollW - 28) / 2)
+    local swH = math.max(34, fontSize + 20)
+
+    -- Helper to layout a Swatch Card
+    local function layoutSwatchCard(card, btnList, metaList, targetTable)
+        UIStyle:ApplyFont(card.title, 0)
+        local rows = math.ceil(#metaList / 2)
+        for idx, meta in ipairs(metaList) do
+            local btn = btnList[idx]
+            local col = (idx - 1) % 2
+            local row = math.floor((idx - 1) / 2)
+            btn:SetSize(colW, swH)
+            btn:ClearAllPoints()
+            btn:SetPoint("TOPLEFT", card, "TOPLEFT", 10 + col * (colW + 8), -36 - row * (swH + 6))
+
+            local titleStr = L[meta.labelKey] or meta.fallback
+            btn._title = titleStr
+            UIStyle:ApplyFont(btn.label, 0)
+            UIStyle:ApplyFont(btn.hexBadge, -2)
+            btn.label:SetText(titleStr)
+
+            local hexVal = targetTable[meta.key] or "|cFFFFFFFF"
+            local r, g, b, a = HexToRGBA(hexVal)
+            btn.swatchTex:SetColorTexture(r, g, b, meta.hasAlpha and a or 1)
+            btn.hexBadge:SetText(FormatShortHexBadge(r, g, b))
+
+            btn:SetScript("OnClick", function()
+                local cr, cg, cb, ca = HexToRGBA(targetTable[meta.key] or "|cFFFFFFFF")
+                UIStyle:OpenColorPicker(cr, cg, cb, ca, meta.hasAlpha, function(nr, ng, nb, na)
+                    targetTable[meta.key] = RGBAToHex(nr, ng, nb, meta.hasAlpha and na or 1)
+                    SyncColorGlobals()
+                    RefreshColourPanel()
+                end)
+            end)
+        end
+
+        local cardH = 36 + rows * (swH + 6) + 6
+        card:ClearAllPoints()
+        card:SetPoint("TOPLEFT", colourPanel.scrollChild, "TOPLEFT", 0, yCursor)
+        card:SetSize(scrollW, cardH)
+        yCursor = yCursor - (cardH + 8)
+    end
+
+    -- 2. Chat Notifications Card
+    colourPanel.chatCard.title:SetText(string.format("%s — %s", L["Chat Notifications"] or "Chat-Benachrichtigungen", scopeName))
+    layoutSwatchCard(colourPanel.chatCard, colourPanel.chatBtns, CHAT_SWATCHES, activeTable)
+
+    -- 3. Greeting Queue Card
+    colourPanel.queueCard.title:SetText(string.format("%s — %s", L["Greeting Queue (Waiting List)"] or "Begrüßungsliste (Warteschlange)", scopeName))
+    layoutSwatchCard(colourPanel.queueCard, colourPanel.queueBtns, QUEUE_SWATCHES, activeTable)
+
+    -- 4. System & Header Card
+    colourPanel.sysCard.title:SetText(L["System & Header"] or "System & Kopfzeile")
+    layoutSwatchCard(colourPanel.sysCard, colourPanel.sysBtns, SYSTEM_SWATCHES, colors)
+
+    -- 5. Localized Live Preview Card
+    local prevCard = colourPanel.prevCard
+    UIStyle:ApplyFont(prevCard.title, 0)
+    prevCard.title:SetText(string.format("%s (%s)", L["Live Preview"] or "Live-Farbvorschau", scopeName))
+
+    local sampleChar = L["PreviewChar"] or "Aerandir"
+    local sampleNew  = L["PreviewNewbie"] or "Neuling"
+    local sampleAlias = "Sascha"
+
+    local cOnline = activeTable.online or "|cFFA0FFA0"
+    local cGoOff  = activeTable.goOff  or "|cFF7F7F7F"
+    local cAlias  = activeTable.alias  or "|cFFFFA0A0"
+    local cList   = activeTable.list   or "|cFFFF7F00"
+    local cRelog  = activeTable.relog  or "|cFF3FFF3F"
+    local cNew    = activeTable.new    or "|cFFFF3F3F"
+    local cLvl    = activeTable.lvl    or "|cFF7F7F7F"
+    local cRank   = activeTable.rank   or "|cFFCC00CC"
+    local cAchv   = activeTable.achievment or "|cFF001FFF"
+
+    UIStyle:ApplyFont(colourPanel.prevText, 0)
+    colourPanel.prevText:SetText(string.format(
+        "%s[%s]|r %s: %s 80 Paladin %s[%s]|r      %s[%s]|r %s %s[%s]|r\n" ..
+        "%s[12:00] %s|r  •  %s    " ..
+        "%s[12:05] %s|r  •  %s    " ..
+        "%s[12:10] %s|r  •  %s\n" ..
+        "%s[12:15] %s|r  •  %s 80!    " ..
+        "%s[12:20] %s|r  •  %s    " ..
+        "%s[12:25] %s|r  •  %s",
+        cOnline, L["Online"] or "Online", sampleChar, L["Level"] or "Stufe", cAlias, sampleAlias,
+        cGoOff, L["Going offline"] or "Geht offline", sampleChar, cAlias, sampleAlias,
+        cList, sampleChar, L["Logged in"] or "Eingeloggt",
+        cRelog, sampleChar, L["Relog"] or "Relog",
+        cNew, sampleNew, L["New member"] or "Neues Mitglied",
+        cLvl, sampleChar, L["Level"] or "Stufe",
+        cRank, sampleChar, L["Promotion"] or "Beförderung",
+        cAchv, sampleChar, L["Achievment"] or "Erfolg"
+    ))
+
+    local prevCardH = math.max(108, fontSize * 4 + 54)
+    prevCard:ClearAllPoints()
+    prevCard:SetPoint("TOPLEFT", colourPanel.scrollChild, "TOPLEFT", 0, yCursor)
+    prevCard:SetSize(scrollW, prevCardH)
+    colourPanel.prevBox:ClearAllPoints()
+    colourPanel.prevBox:SetPoint("TOPLEFT", prevCard, "TOPLEFT", 10, -36)
+    colourPanel.prevBox:SetPoint("BOTTOMRIGHT", prevCard, "BOTTOMRIGHT", -10, 10)
+
+    yCursor = yCursor - (prevCardH + 8)
+    colourPanel.scrollChild:SetSize(scrollW, math.abs(yCursor) + 6)
+end
+
+local function EnsureColourPanel(hostFrame)
+    if colourPanel then
+        colourPanel:SetParent(hostFrame)
+        colourPanel:ClearAllPoints()
+        colourPanel:SetAllPoints(hostFrame)
+        return colourPanel
+    end
+
+    local panel = CreateFrame("Frame", nil, hostFrame)
+    panel:SetAllPoints(hostFrame)
+
+    local scrollFrame = CreateFrame("ScrollFrame", nil, panel, "UIPanelScrollFrameTemplate")
+    scrollFrame:SetPoint("TOPLEFT", panel, "TOPLEFT", 0, 0)
+    scrollFrame:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -24, 0)
+    panel.scrollFrame = scrollFrame
+
+    local scrollChild = CreateFrame("Frame", nil, scrollFrame)
+    scrollChild:SetSize(780, 600)
+    scrollFrame:SetScrollChild(scrollChild)
+    panel.scrollChild = scrollChild
+
+    -- 1. Scope Bar
+    local scopeBar = CreateFrame("Frame", nil, scrollChild, BackdropTemplateMixin and "BackdropTemplate" or nil)
+    UIStyle:ApplyBox(scopeBar, UIStyle.Colors.bgPanel, UIStyle.Colors.borderSubtle)
+    panel.scopeBar = scopeBar
+
+    local scopeLbl = scopeBar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    scopeLbl:SetPoint("LEFT", scopeBar, "LEFT", 12, 0)
+    scopeLbl:SetTextColor(unpack(UIStyle.Colors.gold))
+    scopeLbl:SetText(L["Target Scope:"] or "Farbbereich:")
+    panel.scopeLbl = scopeLbl
+
+    panel.scopeBtns = {}
+    for idx, sc in ipairs(SCOPES) do
+        local btn = UIStyle:CreateButton(scopeBar, L[sc.key] or sc.fallback, 88, 26, function()
+            activeColourSet = sc.id
+            if GLDG.Colors and GLDG.Colors.SetActiveColourSet then
+                GLDG.Colors:SetActiveColourSet(activeColourSet)
+            end
+            RefreshColourPanel()
+        end, sc.id == activeColourSet)
+        panel.scopeBtns[idx] = btn
+    end
+
+    panel.copyAllBtn = UIStyle:CreateButton(scopeBar, L["Copy to All Scopes"] or L["Copy Set to Friends & Channel"] or "Auf alle Bereiche übertragen", 160, 26, function()
+        local colors = GLDG:GetColors()
+        local src = colors and colors[activeColourSet]
         if src then
             for _, targetSet in ipairs({ "guild", "friends", "channel" }) do
                 colors[targetSet] = colors[targetSet] or {}
@@ -119,117 +350,78 @@ function GLDG:CreateColourTab(container)
                 end
             end
             SyncColorGlobals()
-            GLDG:PrintInfo("Copied '" .. activeColourSet .. "' colours to all sets.")
-            GLDG:RefreshConfigUI()
+            RefreshColourPanel()
         end
-    end)
-    setGroup:AddChild(copyToAllBtn)
+    end, false)
 
-    local resetBtn = AceGUI:Create("Button")
-    resetBtn:SetText(L["Restore default"] or "Restore Defaults")
-    resetBtn:SetRelativeWidth(0.28)
-    resetBtn:SetCallback("OnClick", function()
+    panel.resetBtn = UIStyle:CreateButton(scopeBar, L["Restore default"] or "Standard wiederherstellen", 150, 26, function()
         if GLDG.Colors and GLDG.Colors.SetDefaults then
             GLDG.Colors:SetDefaults()
             SyncColorGlobals()
-            GLDG:PrintInfo("Default colours restored.")
-            GLDG:RefreshConfigUI()
+            RefreshColourPanel()
         end
-    end)
-    setGroup:AddChild(resetBtn)
+    end, false)
 
-    --------------------------------------------------------
-    -- 2. Set Specific Colors (Chat & Greeting Queue)
-    --------------------------------------------------------
-    local activeTable = colors[activeColourSet] or {}
-    colors[activeColourSet] = activeTable
-
-    local pickGroup = AceGUI:Create("InlineGroup")
-    pickGroup:SetTitle((L["Character Colours"] or "Chat & Queue Colours") .. " — " .. string.upper(activeColourSet))
-    pickGroup:SetFullWidth(true)
-    pickGroup:SetLayout("Flow")
-    scroll:AddChild(pickGroup)
-
-    for _, item in ipairs(COLOUR_KEYS) do
-        local cp = AceGUI:Create("ColorPicker")
-        cp:SetLabel(item.label)
-        cp:SetHasAlpha(false)
-        local r, g, b, a = HexToRGBA(activeTable[item.key] or "|cFFFFFFFF")
-        cp:SetColor(r, g, b, a)
-        cp:SetRelativeWidth(0.50)
-        cp:SetCallback("OnValueConfirmed", function(_, _, nr, ng, nb, na)
-            activeTable[item.key] = RGBAToHex(nr, ng, nb, na or 1)
-            SyncColorGlobals()
-            GLDG:RefreshConfigUI()
-        end)
-        pickGroup:AddChild(cp)
+    -- 2. Swatch Cards
+    panel.chatCard = UIStyle:CreateCard(scrollChild, L["Chat Notifications"] or "Chat-Benachrichtigungen")
+    panel.chatBtns = {}
+    for i = 1, #CHAT_SWATCHES do
+        panel.chatBtns[i] = CreateSwatchButton(panel.chatCard)
     end
 
-    --------------------------------------------------------
-    -- 3. Global Addon Colors (Help Text & Queue Header)
-    --------------------------------------------------------
-    local globalGroup = AceGUI:Create("InlineGroup")
-    globalGroup:SetTitle(L["System Messages"] or "Global AddOn Colours")
-    globalGroup:SetFullWidth(true)
-    globalGroup:SetLayout("Flow")
-    scroll:AddChild(globalGroup)
+    panel.queueCard = UIStyle:CreateCard(scrollChild, L["Greeting Queue (Waiting List)"] or "Begrüßungsliste (Warteschlange)")
+    panel.queueBtns = {}
+    for i = 1, #QUEUE_SWATCHES do
+        panel.queueBtns[i] = CreateSwatchButton(panel.queueCard)
+    end
 
-    local helpPicker = AceGUI:Create("ColorPicker")
-    helpPicker:SetLabel(L["Help"] or "Chat Help & Notification Accent")
-    helpPicker:SetHasAlpha(false)
-    local hr, hg, hb, ha = HexToRGBA(colors.help or GLDG_DEFAULT_HELP_COLOUR)
-    helpPicker:SetColor(hr, hg, hb, ha)
-    helpPicker:SetRelativeWidth(0.50)
-    helpPicker:SetCallback("OnValueConfirmed", function(_, _, nr, ng, nb, na)
-        colors.help = RGBAToHex(nr, ng, nb, na or 1)
-        SyncColorGlobals()
-        GLDG:RefreshConfigUI()
+    panel.sysCard = UIStyle:CreateCard(scrollChild, L["System & Header"] or "System & Kopfzeile")
+    panel.sysBtns = {}
+    for i = 1, #SYSTEM_SWATCHES do
+        panel.sysBtns[i] = CreateSwatchButton(panel.sysCard)
+    end
+
+    -- 3. Live Preview Card
+    local prevCard = UIStyle:CreateCard(scrollChild, L["Live Preview"] or "Live-Farbvorschau")
+    panel.prevCard = prevCard
+    local prevBox = CreateFrame("Frame", nil, prevCard, BackdropTemplateMixin and "BackdropTemplate" or nil)
+    UIStyle:ApplyBox(prevBox, UIStyle.Colors.bgInput, UIStyle.Colors.borderSubtle)
+    panel.prevBox = prevBox
+    local prevText = prevBox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    prevText:SetPoint("TOPLEFT", prevBox, "TOPLEFT", 12, -8)
+    prevText:SetPoint("BOTTOMRIGHT", prevBox, "BOTTOMRIGHT", -12, 8)
+    prevText:SetJustifyH("LEFT")
+    prevText:SetJustifyV("MIDDLE")
+    prevText:SetSpacing(5)
+    panel.prevText = prevText
+
+    panel:SetScript("OnSizeChanged", function()
+        if panel:IsShown() then
+            RefreshColourPanel()
+        end
     end)
-    globalGroup:AddChild(helpPicker)
 
-    local headerPicker = AceGUI:Create("ColorPicker")
-    headerPicker:SetLabel(L["Header"] or "Queue Header Tint")
-    headerPicker:SetHasAlpha(true)
-    local tr, tg, tb, ta = HexToRGBA(colors.header or GLDG_DEFAULT_HEADER_COLOUR)
-    headerPicker:SetColor(tr, tg, tb, ta)
-    headerPicker:SetRelativeWidth(0.50)
-    headerPicker:SetCallback("OnValueConfirmed", function(_, _, nr, ng, nb, na)
-        colors.header = RGBAToHex(nr, ng, nb, na or 0.5)
-        SyncColorGlobals()
-        GLDG:RefreshConfigUI()
-    end)
-    globalGroup:AddChild(headerPicker)
+    colourPanel = panel
+    return panel
+end
 
-    --------------------------------------------------------
-    -- 4. Live Preview Card
-    --------------------------------------------------------
-    local previewGroup = AceGUI:Create("InlineGroup")
-    previewGroup:SetTitle((L["Current Colour"] or "Live Colour Preview") .. " (" .. string.upper(activeColourSet) .. ")")
-    previewGroup:SetFullWidth(true)
-    previewGroup:SetLayout("Flow")
-    scroll:AddChild(previewGroup)
+function GLDG:ShowColourTabPanel(hostFrame)
+    if self.Colors and self.Colors.Initialize then
+        self.Colors:Initialize()
+    end
+    local panel = EnsureColourPanel(hostFrame)
+    panel:Show()
+    RefreshColourPanel()
+end
 
-    local previewText = AceGUI:Create("Label")
-    previewText:SetFullWidth(true)
-    previewText:SetText(string.format(
-        "%s[Online]|r PlayerName: Lv80 Paladin %s(Alias)|r\n" ..
-        "%s[Going Offline]|r PlayerName %s(Alias)|r\n" ..
-        "%s[Queue Default]|r [12:00] PlayerName    " ..
-        "%s[Queue Relog]|r [12:05] PlayerName    " ..
-        "%s[Queue New]|r [12:10] NewMember\n" ..
-        "%s[Queue Level-Up]|r [12:15] PlayerName    " ..
-        "%s[Queue Promotion]|r [12:20] Officer    " ..
-        "%s[Queue Achievement]|r [12:25] Achiever",
-        activeTable.online or "|cFFA0FFA0",
-        activeTable.alias or "|cFFFFA0A0",
-        activeTable.goOff or "|cFF7F7F7F",
-        activeTable.alias or "|cFFFFA0A0",
-        activeTable.list or "|cFFFF7F00",
-        activeTable.relog or "|cFF3FFF3F",
-        activeTable.new or "|cFFFF3F3F",
-        activeTable.lvl or "|cFF7F7F7F",
-        activeTable.rank or "|cFFCC00CC",
-        activeTable.achievment or "|cFF001FFF"
-    ))
-    previewGroup:AddChild(previewText)
+function GLDG:HideColourTabPanel()
+    if colourPanel then
+        colourPanel:Hide()
+    end
+end
+
+function GLDG:CreateColourTab(container)
+    if container and container.frame then
+        self:ShowColourTabPanel(container.frame)
+    end
 end

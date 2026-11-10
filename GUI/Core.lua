@@ -606,6 +606,9 @@ local function CreateMainFrame()
         GLDG:SelectTab(currentTab or "settings")
     end)
     frame:SetScript("OnHide", function()
+        if UIStyle and UIStyle.CloseDropdown then
+            UIStyle:CloseDropdown()
+        end
         if GLDG.HidePlayerEditPopup then
             GLDG:HidePlayerEditPopup()
         end
@@ -659,6 +662,10 @@ function GLDG:SelectTab(tab)
 
     UpdateSidebarStats()
 
+    if UIStyle and UIStyle.CloseDropdown then
+        UIStyle:CloseDropdown()
+    end
+
     -- Rebuild AceGUI container inside contentHost
     if contentGroup then
         contentGroup:ReleaseChildren()
@@ -666,12 +673,28 @@ function GLDG:SelectTab(tab)
         contentGroup = nil
     end
 
-    if tab ~= "players" and self.HidePlayersTabPanel then
-        self:HidePlayersTabPanel()
-    end
+    -- Hide inactive native tab panels
+    if tab ~= "players" and self.HidePlayersTabPanel then self:HidePlayersTabPanel() end
+    if tab ~= "greetings" and self.HideGreetingsTabPanel then self:HideGreetingsTabPanel() end
+    if tab ~= "cleanup" and self.HideCleanupTabPanel then self:HideCleanupTabPanel() end
+    if tab ~= "colour" and self.HideColourTabPanel then self:HideColourTabPanel() end
+    if tab ~= "profiles" and self.HideProfilesTabPanel then self:HideProfilesTabPanel() end
 
+    -- Mount native Dark-Slate & Gold tab panels directly
     if tab == "players" and self.ShowPlayersTabPanel then
         self:ShowPlayersTabPanel(contentHost)
+        return
+    elseif tab == "greetings" and self.ShowGreetingsTabPanel then
+        self:ShowGreetingsTabPanel(contentHost)
+        return
+    elseif tab == "cleanup" and self.ShowCleanupTabPanel then
+        self:ShowCleanupTabPanel(contentHost)
+        return
+    elseif tab == "colour" and self.ShowColourTabPanel then
+        self:ShowColourTabPanel(contentHost)
+        return
+    elseif tab == "profiles" and self.ShowProfilesTabPanel then
+        self:ShowProfilesTabPanel(contentHost)
         return
     end
 
