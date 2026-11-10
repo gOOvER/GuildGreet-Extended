@@ -334,7 +334,7 @@ local function CreateMainFrame()
     headerSubText = subtitle
 
     -- Version Badge
-    local ver = GLDG_GetAddOnMetadata and GLDG_GetAddOnMetadata("GuildGreet", "Version") or "13.0.0"
+    local ver = GLDG_GetAddOnMetadata and GLDG_GetAddOnMetadata("GuildGreet", "Version") or "13.1.0"
     local verBadge = CreateFrame("Frame", nil, header, "BackdropTemplate")
     verBadge:SetSize(64, 20)
     verBadge:SetPoint("LEFT", title, "RIGHT", 10, 0)

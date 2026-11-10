@@ -832,7 +832,7 @@ function GLDG_About()
 	if GLDG and GLDG.ShowAbout then
 		GLDG:ShowAbout()
 	else
-		local version = GLDG_GetAddOnMetadata and GLDG_GetAddOnMetadata("GuildGreet", "Version") or "13.0.0"
+		local version = GLDG_GetAddOnMetadata and GLDG_GetAddOnMetadata("GuildGreet", "Version") or "13.1.0"
 		GLDG:PrintInfo("GuildGreet-Extended v" .. tostring(version) .. " by gOOvER (https://www.goover.dev)")
 	end
 end

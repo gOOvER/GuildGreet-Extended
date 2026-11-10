@@ -5,6 +5,41 @@ All notable changes to **GuildGreet Extended** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Floating Player Edit Popup (`GUI/Players.lua`, `GUI/Core.lua`)**:
+  - Added a dedicated, draggable floating **Player Edit Popup (`GuildGreetPlayerEditPopup`)** showing read-only guild status, public note, and officer note alongside editable inputs for **First Name / Alias** (automatically synced across Main & all linked Alts), **Assign as Alt of Main** dropdown, **Custom Note**, quick role actions (`Set/Promote/Unset Main`, `Ignore`, `Greeting`, `Remove`), and an explicit **Save (`Speichern`)** button.
+- **Automatic Twink / Main Detection from Guild Notes (`core/GuildGreet-PlayerManager.lua`)**:
+  - Added `DetectMainFromNotes()` to automatically scan public and officer guild notes for `twink`, `alt`, and `main` indicators (e.g. `"twink aerandir elfaron  Sascha"`, `"twink von ..."`, `"alt of ..."`) and match single- or multi-word character names against the guild roster, linking `p.alt = mainKey` and marking the main character (`main = true`).
+- **Separate Greeting Queue Toggles for First Name & Twink Info (`GUI/Settings.lua`, `GuildGreet.lua`)**:
+  - Added two independent toggles in **Settings -> General -> Greeting Queue** (`QueueShowAlias` and `QueueShowTwink`) to separately enable or disable displaying the player's **First Name / Alias** (`[Vorname]`) and/or **Twink Info** (`(Twink: <Main>)`) in the floating greeting queue.
+
+### Changed
+- **Multi-Column Players Roster Table & Compact Action Icons (`GUI/Players.lua`, `lang/deDE.lua`, `lang/enUS.lua`)**:
+  - Replaced the cluttered inline AceGUI character editor and oversized `Select` (`Auswählen`) buttons in the **Players (`Spieler`)** tab with a structured, responsive **6-column roster table** (`Character` with Online/Offline dot + Class Icon, `First Name`, `Role / Main`, `Level & Rank`, single-line non-wrapping `Public Note`, and compact `Actions`) with smooth scrolling, live search-as-you-type filtering, and full hover tooltips.
+  - Replaced wide text row buttons with compact `24x24` **Edit (`Bearbeiten`)** and **Quick-Greet** icon buttons (clicking any row or its Edit icon opens the player editor).
+- **Floating Greeting Queue Event Icons & Status Badges (`GuildGreet.lua`)**:
+  - Redesigned each queue row with a color-coded left accent bar, class-colored character name, and a dedicated right-aligned **Icon + Event Status Badge** (`Eingeloggt` / `Logged in`, `Relog`, `Stufe X!` / `Level X!`, `Rang: <Rang>` / `Rank: <Rank>`, `Neu in Gilde` / `New in guild`, `Erfolg` / `Achievement`).
+- **German (`deDE`) UI Localization (`lang/deDE.lua`, `GUI/Core.lua`, `GUI/Settings.lua`, `GUI/Profiles.lua`, `GuildGreet.lua`)**:
+  - Completed German translations for queue/minimap/compartment tooltips, sidebar statistics, settings labels, profile management dialogs, and player editor controls.
+
+### Fixed
+- **Slash Commands (`/gg`, `/guildgreet`, `/gldg`, `/gghelp`), Window Toggle & Startup Safety (`GuildGreet.lua`, `GUI/Core.lua`, `GUI/Init.lua`, `core/GuildGreet-Utils.lua`, `core/GuildGreet-HelpUtils.lua`, `core/GuildGreet-CleanupUtils.lua`, `core/GuildGreet-PlayerManager.lua`, `core/GuildGreet-ConfigCmd.lua`)**:
+  - Fixed `CreateMainFrame()` in `GUI/Core.lua` starting in a visible state (`IsShown() == true`), which caused the first `/gg` or `ToggleConfigWindow()` call to immediately hide the window instead of opening it.
+  - Fixed `RegisterSlashCommands()` wiping imported `/GG`, `/GUILDGREET`, and `/GLDG` entries from `hash_SlashCmdList` on `PLAYER_LOGIN` in modern 12.x / Forever clients; unified single-pass `AceConsole-3.0` registration with pre-defined `SLASH_ACECONSOLE_*` globals and `AceTab-3.0` tab completion.
+  - Fixed nil-indexing in `GLDG.Utils:UpdatePlayerCheckboxes()` during `OnInitialize()` when legacy XML frames are absent.
+  - Added missing `AceLocale-3.0` (`L`) and `Ambiguate` references in `core/GuildGreet-HelpUtils.lua` and `core/GuildGreet-CleanupUtils.lua` that caused `/gg help` to fail, fixed method casing on `GLDG.PlayerManager`, and added realm-agnostic character name resolution for `/gg show <name>` and `/gg detail <name>`.
+- **Removed Raw Guild Notes from Greeting Queue & Alias Fields (`core/GuildGreet-PlayerManager.lua`, `GuildGreet.lua`, `GUI/Players.lua`)**:
+  - Stopped `ProcessPlayerNotes()` from copying raw public guild notes into `p.alias` and added automatic cleanup (`CleanPollutedAliasesInTable`) to strip previously note-polluted aliases while preserving manually configured aliases (`p.manualAlias = true`).
+- **Guild Member Level-Up & Promotion Detection (`core/GuildGreet-PlayerManager.lua`)**:
+  - Fixed `UpdateCharacterData()` so guild member level-ups and rank promotions are compared before overwriting `existing.lvl` / `existing.rank`, properly flagging `newlvl` / `newrank` and adding the player to the greeting queue.
+- **Per-Guild Player Storage & Active Guild Isolation (`GuildGreet.lua`, `GUI/Players.lua`, `GUI/Core.lua`, `GUI/Cleanup.lua`, `core/GuildGreet-Messages.lua`, `core/GuildGreet-PlayerManager.lua`)**:
+  - Stored player roster data per guild (`self.db.realm.guildPlayers[guildName][playerName]`) with automatic migration from legacy flat `self.db.realm.players` tables.
+  - Scoped `GLDG_DataChar`, the `Players` (`Spieler`) tab, and sidebar statistics strictly to the current character's active guild (`GetCurrentGuildName()`), showing `0` players and a localized notice (`"Du bist aktuell in keiner Gilde."` / `"Keine Gilde"`) when logged in on a guildless character.
+
+---
+
 ## [13.0.0] - 2026-11-08
 
 ### Added
@@ -27,32 +62,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Native compatibility across **Retail (12.0.1 Midnight / 11.2.7 The War Within)**, **Mists of Pandaria Classic (5.5.x)**, **Cataclysm Classic (4.4.2)**, **Wrath of the Lich King Classic (3.4.5)**, **Burning Crusade Classic Anniversary (2.5.5)**, **Classic Era (1.15.8)**, and **Classic Forever (1.60.x)**.
 
 ### Changed
-- **Multi-Column Players Roster Table & Floating Player Edit Popup (`GUI/Players.lua`, `GUI/Core.lua`, `lang/deDE.lua`, `lang/enUS.lua`)**:
-  - Replaced the cluttered inline AceGUI character editor and oversized `Select` (`Auswählen`) buttons in the **Players (`Spieler`)** tab with a structured, responsive **6-column roster table** (`Character` with Online/Offline dot + Class Icon, `First Name`, `Role / Main`, `Level & Rank`, single-line non-wrapping `Public Note`, and compact `Actions`) with smooth scrolling, live search-as-you-type filtering, and full hover tooltips.
-  - Replaced wide text row buttons with compact `24x24` **Edit (`Bearbeiten`)** and **Quick-Greet** icon buttons (clicking any row or its Edit icon opens the player editor).
-  - Added a dedicated, draggable floating **Player Edit Popup (`GuildGreetPlayerEditPopup`)** showing read-only guild status/notes alongside inputs for **First Name / Alias** (auto-synced across Main & all linked Alts), **Assign as Alt of Main** dropdown, **Custom Note**, quick role actions (`Set/Promote/Unset Main`, `Ignore`, `Greeting`, `Remove`), and an explicit **Save (`Speichern`)** button.
-- **Floating Greeting Queue Event Icons, Status Badges & Configurable First Name / Twink Display (`GuildGreet.lua`, `GUI/Settings.lua`, `GUI/Players.lua`, `core/GuildGreet-PlayerManager.lua`)**:
-  - Redesigned each queue row with a color-coded left accent bar, class-colored character name, and a dedicated right-aligned **Icon + Event Status Badge** (`Eingeloggt` / `Logged in`, `Relog`, `Stufe X!` / `Level X!`, `Rang: <Rang>` / `Rank: <Rank>`, `Neu in Gilde` / `New in guild`, `Erfolg` / `Achievement`).
-  - Added two independent toggles in **Settings -> General -> Greeting Queue** (`QueueShowAlias` and `QueueShowTwink`) to separately enable or disable displaying the player's **First Name / Alias** (`[Vorname]`) and/or **Twink Info** (`(Twink: <Main>)`) in the greeting queue.
-  - Entering a **First Name / Alias** (`Vorname / Alias`) for a character in the **Players (`Spieler`)** tab now automatically synchronizes that name across the character's Main and all linked Twinks, and displays each character's public guild note subtly on the roster row as a quick reference.
-- **Automatic Twink / Main Detection from Guild Notes (`core/GuildGreet-PlayerManager.lua`)**:
-  - Added `DetectMainFromNotes()` to automatically scan public and officer guild notes for `twink`, `alt`, and `main` indicators (e.g. `"twink aerandir elfaron  Sascha"`, `"twink von ..."`, `"alt of ..."`) and match single- or multi-word character names against the guild roster, linking `p.alt = mainKey` and marking the main character (`main = true`).
 - Modernized all `C_GuildInfo`, `C_FriendList`, `C_ChatInfo`, and `BackdropTemplate` API calls for full compatibility across Retail 12.x and Classic clients.
 - Replaced text-based close button labels (`X`) with native crisp cross textures (`Interface\Buttons\UI-StopButton`) across the main window and floating greeting queue.
 
 ### Fixed
-- **Slash Commands (`/gg`, `/guildgreet`, `/gldg`, `/gghelp`), Window Toggle & Startup Safety (`GuildGreet.lua`, `GUI/Core.lua`, `GUI/Init.lua`, `core/GuildGreet-Utils.lua`, `core/GuildGreet-HelpUtils.lua`, `core/GuildGreet-CleanupUtils.lua`, `core/GuildGreet-PlayerManager.lua`, `core/GuildGreet-ConfigCmd.lua`)**:
-  - Fixed `CreateMainFrame()` in `GUI/Core.lua` starting in a visible state (`IsShown() == true`), which caused the first `/gg` or `ToggleConfigWindow()` call to immediately hide the window instead of opening it.
-  - Fixed `RegisterSlashCommands()` wiping imported `/GG`, `/GUILDGREET`, and `/GLDG` entries from `hash_SlashCmdList` on `PLAYER_LOGIN` in modern 12.x / Forever clients; unified single-pass `AceConsole-3.0` registration with pre-defined `SLASH_ACECONSOLE_*` globals and `AceTab-3.0` tab completion.
-  - Fixed nil-indexing in `GLDG.Utils:UpdatePlayerCheckboxes()` during `OnInitialize()` when legacy XML frames are absent.
-  - Added missing `AceLocale-3.0` (`L`) and `Ambiguate` references in `core/GuildGreet-HelpUtils.lua` and `core/GuildGreet-CleanupUtils.lua` that caused `/gg help` to fail, fixed method casing on `GLDG.PlayerManager`, and added realm-agnostic character name resolution for `/gg show <name>` and `/gg detail <name>`.
-- **Removed Raw Guild Notes from Greeting Queue & Alias Fields (`core/GuildGreet-PlayerManager.lua`, `GuildGreet.lua`, `GUI/Players.lua`)**:
-  - Stopped `ProcessPlayerNotes()` from copying raw public guild notes into `p.alias` and added automatic cleanup (`CleanPollutedAliasesInTable`) to strip previously note-polluted aliases while preserving manually configured aliases (`p.manualAlias = true`).
-- **Guild Member Level-Up & Promotion Detection (`core/GuildGreet-PlayerManager.lua`)**:
-  - Fixed `UpdateCharacterData()` so guild member level-ups and rank promotions are compared before overwriting `existing.lvl` / `existing.rank`, properly flagging `newlvl` / `newrank` and adding the player to the greeting queue.
-- **Per-Guild Player Storage & Active Guild Isolation (`GuildGreet.lua`, `GUI/Players.lua`, `GUI/Core.lua`, `GUI/Cleanup.lua`, `core/GuildGreet-Messages.lua`, `core/GuildGreet-PlayerManager.lua`)**:
-  - Stored player roster data per guild (`self.db.realm.guildPlayers[guildName][playerName]`) with automatic migration from legacy flat `self.db.realm.players` tables.
-  - Scoped `GLDG_DataChar`, the `Players` (`Spieler`) tab, and sidebar statistics strictly to the current character's active guild (`GetCurrentGuildName()`), showing `0` players and a localized notice (`"Du bist aktuell in keiner Gilde."` / `"Keine Gilde"`) when logged in on a guildless character.
 - Fixed invisible `AceGUI-3.0` checkbox tick marks when **ElvUI** or **AddOnSkins** strips default button textures by rendering an explicit gold checkmark texture (`Interface\Buttons\UI-CheckBox-Check`).
 - Fixed legacy saved-variables migration order so fresh installs and upgrades from older GuildGreet versions initialize cleanly without `nil` errors.
 
