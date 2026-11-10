@@ -37,8 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replaced text-based close button labels (`X`) with native crisp cross textures (`Interface\Buttons\UI-StopButton`) across the main window and floating greeting queue.
 
 ### Fixed
-- **Slash Commands (`/gg`, `/guildgreet`, `/gldg`) & Startup Safety (`GuildGreet.lua`, `core/GuildGreet-Utils.lua`, `core/GuildGreet-HelpUtils.lua`, `core/GuildGreet-CleanupUtils.lua`, `core/GuildGreet-PlayerManager.lua`, `core/GuildGreet-ConfigCmd.lua`, `GUI/Init.lua`)**:
-  - Fixed nil-indexing in `GLDG.Utils:UpdatePlayerCheckboxes()` during `OnInitialize()` when legacy XML frames are absent, and registered `/gg`, `/guildgreet`, and `/gldg` both via `AceConsole-3.0` and native `SlashCmdList["GUILDGREET"]` with `hash_SlashCmdList` cache invalidation.
+- **Slash Commands (`/gg`, `/guildgreet`, `/gldg`, `/gghelp`), Window Toggle & Startup Safety (`GuildGreet.lua`, `GUI/Core.lua`, `GUI/Init.lua`, `core/GuildGreet-Utils.lua`, `core/GuildGreet-HelpUtils.lua`, `core/GuildGreet-CleanupUtils.lua`, `core/GuildGreet-PlayerManager.lua`, `core/GuildGreet-ConfigCmd.lua`)**:
+  - Fixed `CreateMainFrame()` in `GUI/Core.lua` starting in a visible state (`IsShown() == true`), which caused the first `/gg` or `ToggleConfigWindow()` call to immediately hide the window instead of opening it.
+  - Fixed `RegisterSlashCommands()` wiping imported `/GG`, `/GUILDGREET`, and `/GLDG` entries from `hash_SlashCmdList` on `PLAYER_LOGIN` in modern 12.x / Forever clients; unified single-pass `AceConsole-3.0` registration with pre-defined `SLASH_ACECONSOLE_*` globals and `AceTab-3.0` tab completion.
+  - Fixed nil-indexing in `GLDG.Utils:UpdatePlayerCheckboxes()` during `OnInitialize()` when legacy XML frames are absent.
   - Added missing `AceLocale-3.0` (`L`) and `Ambiguate` references in `core/GuildGreet-HelpUtils.lua` and `core/GuildGreet-CleanupUtils.lua` that caused `/gg help` to fail, fixed method casing on `GLDG.PlayerManager`, and added realm-agnostic character name resolution for `/gg show <name>` and `/gg detail <name>`.
 - **Removed Raw Guild Notes from Greeting Queue & Alias Fields (`core/GuildGreet-PlayerManager.lua`, `GuildGreet.lua`, `GUI/Players.lua`)**:
   - Stopped `ProcessPlayerNotes()` from copying raw public guild notes into `p.alias` and added automatic cleanup (`CleanPollutedAliasesInTable`) to strip previously note-polluted aliases while preserving manually configured aliases (`p.manualAlias = true`).

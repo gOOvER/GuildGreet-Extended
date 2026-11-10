@@ -95,18 +95,16 @@ Supports **all World of Warcraft flavors** from a single unified codebase:
 
 ## ⌨️ Slash Commands & Keybindings
 
-### Slash Commands (`/gg` or `/guildgreet`)
+### Slash Commands (`/gg`, `/guildgreet`, or `/gldg`)
 | Command | Action |
 | :--- | :--- |
-| `/gg` or `/guildgreet` | Toggle the main **GuildGreet Extended** configuration window |
-| `/gg test` | Add sample characters to the floating greeting queue to test layout and messages |
-| `/gg clear` | Clear all pending players from the greeting queue |
-| `/gg <charname>` | Print the Main and all known Alt characters for `<charname>` in chat |
-| `/gg` or `/guildgreet` or `/gldg` | Toggle the GuildGreet Extended configuration window |
+| `/gg` or `/guildgreet` or `/gldg` | Toggle the main **GuildGreet Extended** configuration window (supports `Tab` completion for `/gg <subcommand>`) |
+| `/gg config` / `/gg settings` | Open the Settings tab directly |
 | `/gg players` / `/gg spieler` | Open the Players (Main/Alt & First Name/Alias) tab |
-| `/gg help` | Show all available slash command options in chat |
-| `/gg clear` | Clear the active greeting queue without sending greetings |
-| `/gg test` | Add sample characters to the greeting queue for testing |
+| `/gg greetings` / `/gg cleanup` / `/gg colours` / `/gg profiles` | Open the respective configuration tab directly |
+| `/gg help` or `/gghelp` | Show all available slash command options in chat |
+| `/gg clear` | Clear all pending players from the greeting queue without sending greetings |
+| `/gg test` | Add sample characters to the floating greeting queue to test layout and messages |
 | `/gg greet [guild\|channel\|all\|<name>]` | Manually send a greeting to your guild, channel, both, or a specific player |
 | `/gg bye [guild\|channel\|all\|<name>]` | Manually send a goodbye (or good-night) message |
 | `/gg later [guild\|channel\|all]` | Manually send a "see you later" message |

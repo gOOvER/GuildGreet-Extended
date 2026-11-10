@@ -464,20 +464,35 @@ function GLDG:OnInitialize()
 end
 
 function GLDG:RegisterSlashCommands()
+	if self._slashCommandsRegistered then return end
+	self._slashCommandsRegistered = true
+
+	_G["SLASH_ACECONSOLE_GG1"] = "/gg"
+	_G["SLASH_ACECONSOLE_GUILDGREET1"] = "/guildgreet"
+	_G["SLASH_ACECONSOLE_GLDG1"] = "/gldg"
+	_G["SLASH_ACECONSOLE_GGHELP1"] = "/gghelp"
+
 	self:RegisterChatCommand("gg", "SlashHandler")
 	self:RegisterChatCommand("guildgreet", "SlashHandler")
 	self:RegisterChatCommand("gldg", "SlashHandler")
-
-	SLASH_GUILDGREET1 = "/gg"
-	SLASH_GUILDGREET2 = "/guildgreet"
-	SLASH_GUILDGREET3 = "/gldg"
-	SlashCmdList["GUILDGREET"] = function(msg)
-		GLDG:SlashHandler(msg)
+	if self.ShowHelp then
+		self:RegisterChatCommand("gghelp", "ShowHelp")
 	end
-	if hash_SlashCmdList then
-		hash_SlashCmdList["/GG"] = nil
-		hash_SlashCmdList["/GUILDGREET"] = nil
-		hash_SlashCmdList["/GLDG"] = nil
+
+	local AceTab = LibStub("AceTab-3.0", true)
+	if AceTab and not AceTab:IsTabCompletionRegistered("GuildGreet") then
+		AceTab:RegisterTabCompletion(
+			"GuildGreet",
+			"^/[gG][gG]%s+",
+			function(t)
+				for _, cmd in ipairs({
+					"config", "players", "greetings", "cleanup", "colours", "profiles",
+					"help", "about", "status", "clear", "import", "check", "fix", "test",
+				}) do
+					table.insert(t, cmd)
+				end
+			end
+		)
 	end
 end
 

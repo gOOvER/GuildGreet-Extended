@@ -8,10 +8,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- Initialize ConfigCmd module
 function GLDG:InitializeConfigCmd()
-	self:RegisterChatCommand("gg", "SlashHandler")
-	self:RegisterChatCommand("guildgreet", "SlashHandler")
-	self:RegisterChatCommand("gldg", "SlashHandler")
-	self:RegisterChatCommand("gghelp", "ShowHelp")
+	if self.RegisterSlashCommands then
+		self:RegisterSlashCommands()
+	end
 end
 
 -- Main slash command handler (delegates to unified GLDG:SlashHandler)

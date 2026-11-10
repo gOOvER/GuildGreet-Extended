@@ -266,7 +266,8 @@ local function CreateMainFrame()
         return mainWindow
     end
 
-    local frame = CreateFrame("Frame", "GuildGreetConfigFrame", UIParent, "BackdropTemplate")
+    local frame = CreateFrame("Frame", "GuildGreetConfigFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate" or nil)
+    frame:Hide()
     local initW, initH = GetRecommendedWindowSize(UIStyle:GetFontSize())
     frame:SetSize(initW, initH)
     RestoreMainFramePosition(frame)
@@ -698,23 +699,28 @@ function GLDG:ShowConfigWindow(tab)
     if tab then
         currentTab = tab
     end
-    frame:Show()
-    self:SelectTab(currentTab or "settings")
+    if frame:IsShown() then
+        UpdateChromeFontsAndLayout()
+        self:SelectTab(currentTab or "settings")
+    else
+        frame:Show()
+    end
+    frame:Raise()
 end
 
 function GLDG:HideConfigWindow()
-    if mainWindow then
+    if mainWindow and mainWindow:IsShown() then
         mainWindow:Hide()
     end
 end
 
 function GLDG:ToggleConfigWindow(tab)
-    local frame = CreateMainFrame()
-    if frame:IsShown() then
+    if mainWindow and mainWindow:IsShown() then
         if tab and tab ~= currentTab then
             self:SelectTab(tab)
+            mainWindow:Raise()
         else
-            frame:Hide()
+            mainWindow:Hide()
         end
     else
         self:ShowConfigWindow(tab)
