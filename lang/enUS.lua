@@ -897,3 +897,6 @@ L["System Messages"] = true
 L["Current Colour"] = true
 L["Are you sure you want to delete the profile '%s'?"] = true
 L["Are you sure you want to reset the current profile '%s' to default values?"] = true
+L["First Name / Alias"] = true
+L["Show first name / alias in greeting queue"] = true
+L["Show alt info (main character) in greeting queue"] = true

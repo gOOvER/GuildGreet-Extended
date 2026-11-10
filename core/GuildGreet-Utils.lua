@@ -517,41 +517,47 @@ function GLDG_GetWords(str)
 end
 
 function GLDG.Utils:UpdatePlayerCheckboxes()
+	if not GLDG_GUI or not GLDG_Data then return end
 	local name = GLDG_GUI.."Players"
-	
-	-- Check if GUI elements exist before trying to update them
-	-- This can be called during initialization before the GUI is created
 	if not _G[name.."IgnoreBox"] then
 		return
 	end
-	
-	_G[name.."IgnoreBox"]:SetChecked(GLDG_Data.ShowIgnore)
-	_G[name.."AltBox"]:SetChecked(GLDG_Data.ShowAlt)
-	_G[name.."Alt2Box"]:SetChecked(GLDG_Data.GroupAlt)
-	_G[name.."UnassignedBox"]:SetChecked(GLDG_Data.FilterUnassigned)
-	_G[name.."OnlineBox"]:SetChecked(GLDG_Data.FilterOnline)
-	_G[name.."MyFriendsBox"]:SetChecked(GLDG_Data.FilterMyFriends)
-	_G[name.."WithFriendsBox"]:SetChecked(GLDG_Data.FilterWithFriends)
-	_G[name.."CurrentChannelBox"]:SetChecked(GLDG_Data.FilterCurrentChannel)
-	_G[name.."WithChannelBox"]:SetChecked(GLDG_Data.FilterWithChannel)
-	_G[name.."WARRIORFilterBox"]:SetChecked(GLDG_Data.WARRIORFilter)
-	_G[name.."DEATHKNIGHTFilterBox"]:SetChecked(GLDG_Data.DEATHKNIGHTFilter)
-	_G[name.."DRUIDFilterBox"]:SetChecked(GLDG_Data.DRUIDFilter)
-	_G[name.."HUNTERFilterBox"]:SetChecked(GLDG_Data.HUNTERFilter)
-	_G[name.."MAGEFilterBox"]:SetChecked(GLDG_Data.MAGEFilter)
-	_G[name.."PALADINFilterBox"]:SetChecked(GLDG_Data.PALADINFilter)
-	_G[name.."PRIESTFilterBox"]:SetChecked(GLDG_Data.PRIESTFilter)
-	_G[name.."ROGUEFilterBox"]:SetChecked(GLDG_Data.ROGUEFilter)
-	_G[name.."SHAMANFilterBox"]:SetChecked(GLDG_Data.SHAMANFilter)
-	_G[name.."DEMONHUNTERFilterBox"]:SetChecked(GLDG_Data.DEMONHUNTERFilter)
-	_G[name.."WARLOCKFilterBox"]:SetChecked(GLDG_Data.WARLOCKFilter)
-	_G[name.."MONKFilterBox"]:SetChecked(GLDG_Data.MONKFilter)
-	_G[name.."EVOKERFilterBox"]:SetChecked(GLDG_Data.EVOKERFilter)
 
-	if (GLDG_Data.FilterOnline==true or GLDG_Data.GuildSort==true) then
-		_G[name.."Alt2Box"]:Disable()
-	else
-		_G[name.."Alt2Box"]:Enable()
+	local function safeCheck(suffix, val)
+		if _G[name..suffix] and _G[name..suffix].SetChecked then
+			_G[name..suffix]:SetChecked(val)
+		end
+	end
+
+	safeCheck("IgnoreBox", GLDG_Data.ShowIgnore)
+	safeCheck("AltBox", GLDG_Data.ShowAlt)
+	safeCheck("Alt2Box", GLDG_Data.GroupAlt)
+	safeCheck("UnassignedBox", GLDG_Data.FilterUnassigned)
+	safeCheck("OnlineBox", GLDG_Data.FilterOnline)
+	safeCheck("MyFriendsBox", GLDG_Data.FilterMyFriends)
+	safeCheck("WithFriendsBox", GLDG_Data.FilterWithFriends)
+	safeCheck("CurrentChannelBox", GLDG_Data.FilterCurrentChannel)
+	safeCheck("WithChannelBox", GLDG_Data.FilterWithChannel)
+	safeCheck("WARRIORFilterBox", GLDG_Data.WARRIORFilter)
+	safeCheck("DEATHKNIGHTFilterBox", GLDG_Data.DEATHKNIGHTFilter)
+	safeCheck("DRUIDFilterBox", GLDG_Data.DRUIDFilter)
+	safeCheck("HUNTERFilterBox", GLDG_Data.HUNTERFilter)
+	safeCheck("MAGEFilterBox", GLDG_Data.MAGEFilter)
+	safeCheck("PALADINFilterBox", GLDG_Data.PALADINFilter)
+	safeCheck("PRIESTFilterBox", GLDG_Data.PRIESTFilter)
+	safeCheck("ROGUEFilterBox", GLDG_Data.ROGUEFilter)
+	safeCheck("SHAMANFilterBox", GLDG_Data.SHAMANFilter)
+	safeCheck("DEMONHUNTERFilterBox", GLDG_Data.DEMONHUNTERFilter)
+	safeCheck("WARLOCKFilterBox", GLDG_Data.WARLOCKFilter)
+	safeCheck("MONKFilterBox", GLDG_Data.MONKFilter)
+	safeCheck("EVOKERFilterBox", GLDG_Data.EVOKERFilter)
+
+	if _G[name.."Alt2Box"] then
+		if (GLDG_Data.FilterOnline==true or GLDG_Data.GuildSort==true) then
+			if _G[name.."Alt2Box"].Disable then _G[name.."Alt2Box"]:Disable() end
+		else
+			if _G[name.."Alt2Box"].Enable then _G[name.."Alt2Box"]:Enable() end
+		end
 	end
 end
 
@@ -679,6 +685,8 @@ function GLDG.Utils:InitFull()
 	if not GLDG_Data.UseFriends 	then GLDG_Data.UseFriends = false end
 	if not GLDG_Data.ListUp     	then GLDG_Data.ListUp = false end
 	if not GLDG_Data.ListVisible	then GLDG_Data.ListVisible = false end
+	if GLDG_Data.QueueShowAlias == nil then GLDG_Data.QueueShowAlias = true end
+	if GLDG_Data.QueueShowTwink == nil then GLDG_Data.QueueShowTwink = true end
 	if not GLDG_Data.GuildSettings.AddPostfix	then GLDG_Data.GuildSettings.AddPostfix = false end
 	if not GLDG_Data.GuildSettings.ShowWhoSpam	then GLDG_Data.GuildSettings.ShowWhoSpam = false end
 	if not GLDG_Data.GuildSettings.ListAchievments then GLDG_Data.GuildSettings.ListAchievments = false end
@@ -820,9 +828,23 @@ function GLDG_Print(message, color)
 	GLDG.Utils:Print(message, color)
 end
 
+function GLDG_About()
+	if GLDG and GLDG.ShowAbout then
+		GLDG:ShowAbout()
+	else
+		local version = GLDG_GetAddOnMetadata and GLDG_GetAddOnMetadata("GuildGreet", "Version") or "13.0.0"
+		GLDG:PrintInfo("GuildGreet-Extended v" .. tostring(version) .. " by gOOvER (https://www.goover.dev)")
+	end
+end
+
+function GLDG_ListUrbinAddonDetails()
+	GLDG_About()
+end
+
 -- Command processing and slash commands
 function GLDG.Utils:SlashHandler(msg)
-	if not msg or msg == "" then
+	msg = strtrim and strtrim(msg or "") or string.match(msg or "", "^%s*(.-)%s*$") or ""
+	if msg == "" then
 		if GLDG.ToggleConfigWindow then
 			GLDG:ToggleConfigWindow()
 		elseif _G[GLDG_GUI] then
@@ -949,10 +971,16 @@ function GLDG.Utils:SlashHandler(msg)
 					GLDG_LaterChannel()
 				end
 
-			elseif (wordsLower[0]=="help") then
+			elseif (wordsLower[0]=="help" or wordsLower[0]=="hilfe" or wordsLower[0]=="?") then
 				GLDG_Help()
-			elseif (wordsLower[0]=="about") then
+			elseif (wordsLower[0]=="about" or wordsLower[0]=="info") then
 				GLDG_About()
+			elseif (wordsLower[0]=="status") then
+				if GLDG.ShowStatus then GLDG:ShowStatus() end
+			elseif (wordsLower[0]=="import") then
+				GLDG_RosterImport()
+			elseif (wordsLower[0]=="convert") then
+				GLDG_Convert()
 			elseif (wordsLower[0]=="urbin") then
 				GLDG_ListUrbinAddonDetails()
 			elseif (wordsLower[0]=="check") then
@@ -967,6 +995,8 @@ function GLDG.Utils:SlashHandler(msg)
 				GLDG_Data.CheckedGuildAlert = false	-- force check if called from command line
 				GLDG_CheckForGuildAlert()
 			elseif (wordsLower[0]=="test") then
+				self:CreateTestChars()
+			elseif (wordsLower[0]=="bntest") then
 				GLDG_Test(true)
 			elseif (wordsLower[0]=="query") then
 				GLDG_PollBigBrother()
@@ -974,23 +1004,23 @@ function GLDG.Utils:SlashHandler(msg)
 				GLDG_ShowBigBrother()
 			elseif (wordsLower[0]=="bb") then
 				GLDG_BB(not GLDG.db.profile.BigBrother)
-			elseif (wordsLower[0]=="config" or wordsLower[0]=="options") then
+			elseif (wordsLower[0]=="config" or wordsLower[0]=="options" or wordsLower[0]=="einstellungen" or wordsLower[0]=="settings") then
 				if GLDG.ToggleConfigWindow then
 					GLDG:ToggleConfigWindow("settings")
 				end
-			elseif (wordsLower[0]=="players") then
+			elseif (wordsLower[0]=="players" or wordsLower[0]=="spieler") then
 				if GLDG.ToggleConfigWindow then
 					GLDG:ToggleConfigWindow("players")
 				end
-			elseif (wordsLower[0]=="greetings") then
+			elseif (wordsLower[0]=="greetings" or wordsLower[0]=="begrüßungen") then
 				if GLDG.ToggleConfigWindow then
 					GLDG:ToggleConfigWindow("greetings")
 				end
-			elseif (wordsLower[0]=="cleanup") then
+			elseif (wordsLower[0]=="cleanup" or wordsLower[0]=="bereinigung") then
 				if GLDG.ToggleConfigWindow then
 					GLDG:ToggleConfigWindow("cleanup")
 				end
-			elseif (wordsLower[0]=="colours" or wordsLower[0]=="colors" or wordsLower[0]=="colour") then
+			elseif (wordsLower[0]=="colours" or wordsLower[0]=="colors" or wordsLower[0]=="colour" or wordsLower[0]=="farben") then
 				if GLDG.ToggleConfigWindow then
 					GLDG:ToggleConfigWindow("colour")
 				end
@@ -1247,7 +1277,7 @@ end
 ------------------------------------------------------------
 function GLDG.Utils:CreateTestChars()
 	GLDG_DataChar = GLDG_DataChar or {}
-	GLDG_DataChar["Tester1"] = { enClass = "DRUID", class = "Druide", lvl = 14, rankname = "Veteran", twinkMainName = "Aerandir Elfaron" }
+	GLDG_DataChar["Tester1"] = { enClass = "DRUID", class = "Druide", lvl = 14, rankname = "Veteran", alias = "Sascha", manualAlias = true, twinkMainName = "Aerandir Elfaron" }
 	GLDG_DataChar["Tester2"] = { enClass = "HUNTER", class = "Jäger", lvl = 21, rankname = "Mitglied", newlvl = true }
 	GLDG_DataChar["Tester3"] = { enClass = "ROGUE", class = "Schurke", lvl = 20, rankname = "Offizier", newrank = true }
 	GLDG_DataChar["Tester4"] = { enClass = "MAGE", class = "Magierin", lvl = 18, rankname = "Initiand", new = true }
@@ -1271,22 +1301,26 @@ end
 ------------------------------------------------------------
 function GLDG.Utils:ShowDetails(name)
 	if not name then return end
+	if GLDG.PlayerManager and GLDG.PlayerManager.ResolvePlayerKey then
+		name = GLDG.PlayerManager:ResolvePlayerKey(name) or name
+	end
+	local shortFn = (GLDG and GLDG.ShortName) and function(s) return GLDG:ShortName(s) end or function(s) return tostring(s or "") end
 
-	if (GLDG_DataChar[name]) then
-		GLDG_Print(GLDG:GetColors().help.."["..Ambiguate(name, "guild").."]|r")
+	if (GLDG_DataChar and GLDG_DataChar[name]) then
+		GLDG_Print(GLDG:GetColors().help.."["..shortFn(name).."]|r")
 		for p in pairs(GLDG_DataChar[name]) do
 			if type(GLDG_DataChar[name][p]) == "table" then
 				local l = ""
 				for q in pairs(GLDG_DataChar[name][p]) do
 					l = l..q.." "
 				end
-				GLDG_Print("  "..Ambiguate(p, "guild").." = "..l)
+				GLDG_Print("  "..shortFn(p).." = "..l)
 			else
-				GLDG_Print("  "..Ambiguate(p, "guild").." = "..tostring(GLDG_DataChar[name][p]))
+				GLDG_Print("  "..shortFn(p).." = "..tostring(GLDG_DataChar[name][p]))
 			end
 		end
 	else
-		GLDG:PrintHelp(L["No data found for character"].." ["..Ambiguate(name, "guild").."] "..L[""])
+		GLDG:PrintHelp(L["No data found for character"].." ["..shortFn(name).."] "..(L[""] or ""))
 	end
 end
 

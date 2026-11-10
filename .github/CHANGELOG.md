@@ -27,14 +27,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Native compatibility across **Retail (12.0.1 Midnight / 11.2.7 The War Within)**, **Mists of Pandaria Classic (5.5.x)**, **Cataclysm Classic (4.4.2)**, **Wrath of the Lich King Classic (3.4.5)**, **Burning Crusade Classic Anniversary (2.5.5)**, **Classic Era (1.15.8)**, and **Classic Forever (1.60.x)**.
 
 ### Changed
-- **Floating Greeting Queue Event Icons & Status Badges (`GuildGreet.lua`)**:
-  - Redesigned each queue row with a color-coded left accent bar, class-colored character name, optional clean `(Twink: <Main>)` or manual alias tag, and a dedicated right-aligned **Icon + Event Status Badge** (`Eingeloggt` / `Logged in`, `Relog`, `Stufe X!` / `Level X!`, `Rang: <Rang>` / `Rank: <Rank>`, `Neu in Gilde` / `New in guild`, `Erfolg` / `Achievement`).
+- **Floating Greeting Queue Event Icons, Status Badges & Configurable First Name / Twink Display (`GuildGreet.lua`, `GUI/Settings.lua`, `GUI/Players.lua`, `core/GuildGreet-PlayerManager.lua`)**:
+  - Redesigned each queue row with a color-coded left accent bar, class-colored character name, and a dedicated right-aligned **Icon + Event Status Badge** (`Eingeloggt` / `Logged in`, `Relog`, `Stufe X!` / `Level X!`, `Rang: <Rang>` / `Rank: <Rank>`, `Neu in Gilde` / `New in guild`, `Erfolg` / `Achievement`).
+  - Added two independent toggles in **Settings -> General -> Greeting Queue** (`QueueShowAlias` and `QueueShowTwink`) to separately enable or disable displaying the player's **First Name / Alias** (`[Vorname]`) and/or **Twink Info** (`(Twink: <Main>)`) in the greeting queue.
+  - Entering a **First Name / Alias** (`Vorname / Alias`) for a character in the **Players (`Spieler`)** tab now automatically synchronizes that name across the character's Main and all linked Twinks, and displays each character's public guild note subtly on the roster row as a quick reference.
 - **Automatic Twink / Main Detection from Guild Notes (`core/GuildGreet-PlayerManager.lua`)**:
   - Added `DetectMainFromNotes()` to automatically scan public and officer guild notes for `twink`, `alt`, and `main` indicators (e.g. `"twink aerandir elfaron  Sascha"`, `"twink von ..."`, `"alt of ..."`) and match single- or multi-word character names against the guild roster, linking `p.alt = mainKey` and marking the main character (`main = true`).
 - Modernized all `C_GuildInfo`, `C_FriendList`, `C_ChatInfo`, and `BackdropTemplate` API calls for full compatibility across Retail 12.x and Classic clients.
 - Replaced text-based close button labels (`X`) with native crisp cross textures (`Interface\Buttons\UI-StopButton`) across the main window and floating greeting queue.
 
 ### Fixed
+- **Slash Commands (`/gg`, `/guildgreet`, `/gldg`) & Startup Safety (`GuildGreet.lua`, `core/GuildGreet-Utils.lua`, `core/GuildGreet-HelpUtils.lua`, `core/GuildGreet-CleanupUtils.lua`, `core/GuildGreet-PlayerManager.lua`, `core/GuildGreet-ConfigCmd.lua`, `GUI/Init.lua`)**:
+  - Fixed nil-indexing in `GLDG.Utils:UpdatePlayerCheckboxes()` during `OnInitialize()` when legacy XML frames are absent, and registered `/gg`, `/guildgreet`, and `/gldg` both via `AceConsole-3.0` and native `SlashCmdList["GUILDGREET"]` with `hash_SlashCmdList` cache invalidation.
+  - Added missing `AceLocale-3.0` (`L`) and `Ambiguate` references in `core/GuildGreet-HelpUtils.lua` and `core/GuildGreet-CleanupUtils.lua` that caused `/gg help` to fail, fixed method casing on `GLDG.PlayerManager`, and added realm-agnostic character name resolution for `/gg show <name>` and `/gg detail <name>`.
 - **Removed Raw Guild Notes from Greeting Queue & Alias Fields (`core/GuildGreet-PlayerManager.lua`, `GuildGreet.lua`, `GUI/Players.lua`)**:
   - Stopped `ProcessPlayerNotes()` from copying raw public guild notes into `p.alias` and added automatic cleanup (`CleanPollutedAliasesInTable`) to strip previously note-polluted aliases while preserving manually configured aliases (`p.manualAlias = true`).
 - **Guild Member Level-Up & Promotion Detection (`core/GuildGreet-PlayerManager.lua`)**:

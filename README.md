@@ -102,10 +102,18 @@ Supports **all World of Warcraft flavors** from a single unified codebase:
 | `/gg test` | Add sample characters to the floating greeting queue to test layout and messages |
 | `/gg clear` | Clear all pending players from the greeting queue |
 | `/gg <charname>` | Print the Main and all known Alt characters for `<charname>` in chat |
+| `/gg` or `/guildgreet` or `/gldg` | Toggle the GuildGreet Extended configuration window |
+| `/gg players` / `/gg spieler` | Open the Players (Main/Alt & First Name/Alias) tab |
+| `/gg help` | Show all available slash command options in chat |
+| `/gg clear` | Clear the active greeting queue without sending greetings |
+| `/gg test` | Add sample characters to the greeting queue for testing |
+| `/gg greet [guild\|channel\|all\|<name>]` | Manually send a greeting to your guild, channel, both, or a specific player |
+| `/gg bye [guild\|channel\|all\|<name>]` | Manually send a goodbye (or good-night) message |
+| `/gg later [guild\|channel\|all]` | Manually send a "see you later" message |
+| `/gg [show] <charname>` | Print the Main and all Alts for `<charname>` to chat |
 | `/gg full <charname>` | Print the Main and all Alts for `<charname>` including level and class details |
 | `/gg guild [show\|all\|list]` | List Main/Alt groups of online guild members (`show`), all members (`all`), or open a copyable window (`list`) |
-| `/gg friends [show\|all\|list]` | List Main/Alt groups of your friends |
-| `/gg channel [show\|all\|list]` | List Main/Alt groups of members in your tracked custom channel |
+| `/gg char [show\|all\|list]` | List Main/Alt groups across all tracked characters |
 | `/gg check` / `/gg fix` | Check or automatically repair Main/Alt database inconsistencies |
 
 ### Keybindings (`ESC -> Options -> Keybindings -> GuildGreet`)

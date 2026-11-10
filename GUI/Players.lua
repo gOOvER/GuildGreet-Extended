@@ -279,25 +279,39 @@ function GLDG:CreatePlayersTab(container)
                 p.alt = val
                 if GLDG_DataChar[val] then
                     p.ignore = GLDG_DataChar[val].ignore
+                    -- Synchronize manual first name / alias between Main and Alt
+                    local mainObj = GLDG_DataChar[val]
+                    if mainObj.manualAlias and mainObj.alias and mainObj.alias ~= "" then
+                        p.alias = mainObj.alias
+                        p.manualAlias = true
+                    elseif p.manualAlias and p.alias and p.alias ~= "" and GLDG.PlayerManager and GLDG.PlayerManager.SyncFamilyAlias then
+                        GLDG.PlayerManager:SyncFamilyAlias(val, p.alias, true)
+                    end
                 end
             end
+            if GLDG.ShowQueue then GLDG:ShowQueue() end
             GLDG:RefreshConfigUI()
         end)
         editGroup:AddChild(altDrop)
 
+        local currentAlias = (p.manualAlias and p.alias and p.alias ~= "" and p.alias)
+            or (p.alt and GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].manualAlias and GLDG_DataChar[p.alt].alias)
+            or ""
         local aliasEdit = AceGUI:Create("EditBox")
-        aliasEdit:SetLabel(L["Alias"] or "Alias (Press Enter)")
-        aliasEdit:SetText((p.manualAlias and p.alias) or "")
+        aliasEdit:SetLabel(L["First Name / Alias"] or L["Alias"] or "Vorname / Alias")
+        aliasEdit:SetText(currentAlias)
         aliasEdit:SetRelativeWidth(0.32)
         aliasEdit:SetCallback("OnEnterPressed", function(_, _, text)
             text = strtrim(text or "")
-            if text ~= "" then
-                p.alias = text
-                p.manualAlias = true
+            local newAlias = (text ~= "") and text or nil
+            local isManual = (text ~= "") and true or nil
+            if GLDG.PlayerManager and GLDG.PlayerManager.SyncFamilyAlias then
+                GLDG.PlayerManager:SyncFamilyAlias(selectedPlayer, newAlias, isManual)
             else
-                p.alias = nil
-                p.manualAlias = nil
+                p.alias = newAlias
+                p.manualAlias = isManual
             end
+            if GLDG.ShowQueue then GLDG:ShowQueue() end
             GLDG:RefreshConfigUI()
         end)
         editGroup:AddChild(aliasEdit)
@@ -476,16 +490,23 @@ function GLDG:CreatePlayersTab(container)
                     roleText = UIStyle.Hex.cyan .. "[" .. (L["Alt"] or "ALT") .. " -> " .. rowMainDisp .. "]|r "
                 end
 
-                local aliasText = (p.manualAlias and p.alias and p.alias ~= "") and (UIStyle.Hex.gold .. " (" .. p.alias .. ")|r") or ""
+                local rowAlias = (p.manualAlias and p.alias and p.alias ~= "" and p.alias)
+                    or (p.alt and GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].manualAlias and GLDG_DataChar[p.alt].alias and GLDG_DataChar[p.alt].alias ~= "" and GLDG_DataChar[p.alt].alias)
+                    or nil
+                local aliasText = rowAlias and (UIStyle.Hex.gold .. " [" .. rowAlias .. "]|r") or ""
                 local dispClass = p.classDisplayName or p.class or ""
                 local cleanGuild = CleanGuildName(p.guild)
                 local rankOrGuild = (p.rankname and p.rankname ~= "") and (cleanGuild ~= "" and (p.rankname .. " (" .. cleanGuild .. ")") or p.rankname) or (cleanGuild ~= "" and cleanGuild or "---")
+                local noteHint = (p.pNote and strtrim(p.pNote) ~= "")
+                    and ("  |cff7a8090[" .. (L["Public Note"] or "Notiz") .. ": " .. strtrim(p.pNote) .. "]|r")
+                    or ""
                 local lvlRank = string.format(
-                    "%sLv%s%s — %s|r",
+                    "%sLv%s%s — %s|r%s",
                     UIStyle.Hex.textMuted,
                     tostring(p.lvl or "?"),
                     dispClass ~= "" and (" " .. dispClass) or "",
-                    tostring(rankOrGuild)
+                    tostring(rankOrGuild),
+                    noteHint
                 )
 
                 local charLabel = AceGUI:Create("InteractiveLabel")

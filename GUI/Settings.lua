@@ -217,6 +217,26 @@ local function BuildGeneralSubTab(scroll)
     end)
     queueGroup:AddChild(listUp)
 
+    local showQueueAlias = AceGUI:Create("CheckBox")
+    showQueueAlias:SetLabel(L["Show first name / alias in greeting queue"] or "Vorname / Alias in der Begrüßungsliste anzeigen")
+    showQueueAlias:SetValue(GLDG_Data.QueueShowAlias ~= false)
+    showQueueAlias:SetFullWidth(true)
+    showQueueAlias:SetCallback("OnValueChanged", function(_, _, val)
+        GLDG_Data.QueueShowAlias = val and true or false
+        GLDG:ShowQueue()
+    end)
+    queueGroup:AddChild(showQueueAlias)
+
+    local showQueueTwink = AceGUI:Create("CheckBox")
+    showQueueTwink:SetLabel(L["Show alt info (main character) in greeting queue"] or "Twink-Info (Hauptcharakter) in der Begrüßungsliste anzeigen")
+    showQueueTwink:SetValue(GLDG_Data.QueueShowTwink ~= false)
+    showQueueTwink:SetFullWidth(true)
+    showQueueTwink:SetCallback("OnValueChanged", function(_, _, val)
+        GLDG_Data.QueueShowTwink = val and true or false
+        GLDG:ShowQueue()
+    end)
+    queueGroup:AddChild(showQueueTwink)
+
     local listSize = AceGUI:Create("Slider")
     listSize:SetLabel(L["Maximum Visible Queued Players (1 - 15)"] or "Maximum Visible Queued Players (1 - 15)")
     listSize:SetSliderValues(1, 15, 1)

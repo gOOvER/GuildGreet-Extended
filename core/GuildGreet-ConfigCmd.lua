@@ -8,47 +8,16 @@ local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
 
 -- Initialize ConfigCmd module
 function GLDG:InitializeConfigCmd()
-	if not LibStub("AceConfigCmd-3.0", true) then
-		return -- AceConfigCmd not available
-	end
-	
-	local AceConfigCmd = LibStub("AceConfigCmd-3.0")
-	
-	-- Register command handlers
-	self:RegisterChatCommand("gg", "HandleSlashCommand")
-	self:RegisterChatCommand("guildgreet", "HandleSlashCommand")
-	
-	-- Help command
+	self:RegisterChatCommand("gg", "SlashHandler")
+	self:RegisterChatCommand("guildgreet", "SlashHandler")
+	self:RegisterChatCommand("gldg", "SlashHandler")
 	self:RegisterChatCommand("gghelp", "ShowHelp")
 end
 
--- Main slash command handler
+-- Main slash command handler (delegates to unified GLDG:SlashHandler)
 function GLDG:HandleSlashCommand(input)
-	local command, rest = self:GetArgs(input, 2)
-	command = command and command:lower() or ""
-	
-	if command == "config" or command == "options" or command == "" then
-		-- Open settings window
-		if self.GUI and self.GUI.OpenSettings then
-			self.GUI.OpenSettings()
-		end
-	elseif command == "import" then
-		-- Trigger roster import
-		if self.RosterImportFull then
-			self.RosterImportFull()
-			self:Print(L["Roster import started"])
-		end
-	elseif command == "about" then
-		-- Show about information
-		self:ShowAbout()
-	elseif command == "status" then
-		-- Show status information
-		self:ShowStatus()
-	elseif command == "reset" then
-		-- Reset configuration
-		self:ResetConfig()
-	else
-		self:ShowHelp()
+	if self.SlashHandler then
+		return self:SlashHandler(input)
 	end
 end
 

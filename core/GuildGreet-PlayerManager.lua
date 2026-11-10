@@ -279,8 +279,18 @@ function GLDG.PlayerManager:DetectMainFromNotes()
 						pData.alt = matchedMainKey
 						pData.main = nil
 						pData.twinkMainName = Ambiguate(matchedMainKey, "guild")
-						if GLDG_DataChar[matchedMainKey] and not GLDG_DataChar[matchedMainKey].alt then
-							GLDG_DataChar[matchedMainKey].main = true
+						local mainObj = GLDG_DataChar[matchedMainKey]
+						if mainObj then
+							if not mainObj.alt then
+								mainObj.main = true
+							end
+							-- Sync manual first name / alias between Main and Twink if one of them already has it
+							if mainObj.manualAlias and mainObj.alias and mainObj.alias ~= "" then
+								pData.alias = mainObj.alias
+								pData.manualAlias = true
+							elseif pData.manualAlias and pData.alias and pData.alias ~= "" then
+								self:SyncFamilyAlias(matchedMainKey, pData.alias, true)
+							end
 						end
 					else
 						-- Check if note marks this character itself as Main (e.g. "Main" without twink/alt)
@@ -551,6 +561,53 @@ function GLDG.PlayerManager:UpdateGuildInfo()
 	end
 end
 
+function GLDG.PlayerManager:SyncFamilyAlias(charKey, aliasValue, isManual)
+	if not charKey or not GLDG_DataChar or not GLDG_DataChar[charKey] then return end
+	local p = GLDG_DataChar[charKey]
+	local mainKey = (p.alt and p.alt ~= "" and p.alt) or charKey
+
+	-- Update target character
+	p.alias = aliasValue
+	p.manualAlias = isManual and true or nil
+
+	-- Update main character
+	if GLDG_DataChar[mainKey] then
+		GLDG_DataChar[mainKey].alias = aliasValue
+		GLDG_DataChar[mainKey].manualAlias = isManual and true or nil
+	end
+
+	-- Update all alts belonging to this main character
+	for k, data in pairs(GLDG_DataChar) do
+		if type(data) == "table" and data.alt == mainKey then
+			data.alias = aliasValue
+			data.manualAlias = isManual and true or nil
+		end
+	end
+end
+
+function GLDG.PlayerManager:ResolvePlayerKey(query)
+	if not query or not GLDG_DataChar then return query end
+	if GLDG_DataChar[query] then return query end
+	local qLower = string.lower(strtrim(query))
+	local prefixMatch = nil
+	for k in pairs(GLDG_DataChar) do
+		if string.lower(k) == qLower or string.lower(Ambiguate(k, "guild")) == qLower then
+			return k
+		end
+		if not prefixMatch and string.find(string.lower(Ambiguate(k, "guild")), "^" .. qLower, 1, false) then
+			prefixMatch = k
+		end
+	end
+	return prefixMatch or query
+end
+
+local function IsSameGuildAsCurrent(guildVal)
+	local curGuild = (GLDG and GLDG.GetCurrentGuildName and GLDG:GetCurrentGuildName()) or GLDG.GuildName or ""
+	if curGuild == "" then return false end
+	local cleanVal = (GLDG and GLDG.FormatGuildDisplay and GLDG:FormatGuildDisplay(guildVal)) or guildVal or ""
+	return cleanVal == "" or cleanVal == curGuild or guildVal == GLDG_unique_GuildName
+end
+
 -------------------------------
 -- Find Main Name --
 -------------------------------
@@ -559,13 +616,13 @@ function GLDG.PlayerManager:FindMainName(mainName, playerName)
 	local result = ""
 	
 	if mainName and GLDG_DataChar[mainName] then
-		if GLDG_DataChar[mainName].alias then
+		if GLDG_DataChar[mainName].manualAlias and GLDG_DataChar[mainName].alias then
 			result = GLDG_DataChar[mainName].alias
 		else
 			result = Ambiguate(mainName, "guild")
 		end
 	elseif playerName and GLDG_DataChar[playerName] then
-		if GLDG_DataChar[playerName].alias then
+		if GLDG_DataChar[playerName].manualAlias and GLDG_DataChar[playerName].alias then
 			result = GLDG_DataChar[playerName].alias
 		else
 			result = Ambiguate(playerName, "guild")
@@ -592,16 +649,15 @@ function GLDG.PlayerManager:FindAlts(mainName, playerName, colourise)
 	if not mainName then return result end
 	
 	local onList = self:GetOnlineList()
-	local mainDisplayed = false
 	local altsList = {}
 	
 	-- Find all characters related to this main
 	for name, data in pairs(GLDG_DataChar) do
-		if data.guild == GLDG_unique_GuildName then
+		if type(data) == "table" and IsSameGuildAsCurrent(data.guild) then
 			local isRelated = false
 			
 			-- Check if this is the main character
-			if name == mainName and data.main then
+			if name == mainName and (data.main or name == playerName) then
 				isRelated = true
 			-- Check if this is an alt of the main
 			elseif data.alt == mainName then
@@ -609,7 +665,7 @@ function GLDG.PlayerManager:FindAlts(mainName, playerName, colourise)
 			end
 			
 			if isRelated then
-				local displayName = data.alias or Ambiguate(name, "guild")
+				local displayName = Ambiguate(name, "guild")
 				local details = self:FindPlayerDetails(name)
 				local status = ""
 				
@@ -734,7 +790,7 @@ function GLDG.PlayerManager:FindAlias(playerName, colourise)
 	if playerName and GLDG_DataChar[playerName] then
 		local player = GLDG_DataChar[playerName]
 		
-		if player.alias then
+		if player.manualAlias and player.alias then
 			alias = player.alias
 		else
 			alias = playerName
@@ -743,7 +799,7 @@ function GLDG.PlayerManager:FindAlias(playerName, colourise)
 		-- Use main's alias if greeting as main is enabled
 		if GLDG_Data.GuildSettings.GreetAsMain and player.alt then
 			local mainPlayer = GLDG_DataChar[player.alt]
-			if mainPlayer and mainPlayer.alias then
+			if mainPlayer and mainPlayer.manualAlias and mainPlayer.alias then
 				alias = mainPlayer.alias
 			else
 				alias = player.alt
@@ -752,7 +808,7 @@ function GLDG.PlayerManager:FindAlias(playerName, colourise)
 	end
 
 	if alias ~= "" and alias ~= playerName then
-		result = result.." - "..aliasColour..alias.."|r"
+		result = result.." - "..aliasColour..Ambiguate(alias, "guild").."|r"
 	end
 
 	return result
@@ -768,9 +824,11 @@ function GLDG.PlayerManager:ListForPlayer(playerName, allDetails, onList, printR
 	if printResult == nil then printResult = true end
 	if allDetails == nil then allDetails = false end
 	if guildOnly == nil then guildOnly = false end
-	
+
+	playerName = self:ResolvePlayerKey(playerName)
+
 	if not playerName or not GLDG_DataChar[playerName] then
-		result = playerName.." "..L["is not in guild"]
+		result = tostring(playerName or "").." "..L["is not in guild"]
 		if GLDG_Data.UseFriends then
 			result = result.." "..L["or a friend"]
 		end
@@ -790,11 +848,9 @@ function GLDG.PlayerManager:ListForPlayer(playerName, allDetails, onList, printR
 	elseif GLDG_DataChar[playerName].alt then
 		mainName = GLDG_DataChar[playerName].alt
 	else
-		mainName = "-"
+		mainName = playerName
 	end
 
-	local details = self:FindPlayerDetails(playerName)
-	
 	-- Build the result using FindAlts function
 	result = self:FindAlts(mainName, playerName, printResult and 1 or 0)
 	
@@ -840,7 +896,7 @@ function GLDG.PlayerManager:ListAllPlayers(includeOffline, printResult, guildOnl
 			GLDG:PrintHelp(L["Listing online characters only"])
 		end
 		for player in pairs(onList) do
-			if not guildOnly or (GLDG_DataChar[player] and GLDG_DataChar[player].guild == GLDG_unique_GuildName) then
+			if not guildOnly or (GLDG_DataChar[player] and IsSameGuildAsCurrent(GLDG_DataChar[player].guild)) then
 				line = self:ListForPlayer(player, false, onList, printResult)
 				result[i] = line
 				i = i + 1
@@ -860,7 +916,7 @@ function GLDG.PlayerManager:ShouldIncludePlayer(playerName, guildOnly)
 	if not player then return false end
 	
 	if guildOnly then
-		if player.guild ~= GLDG_unique_GuildName then return false end
+		if not IsSameGuildAsCurrent(player.guild) then return false end
 		return (player.main or (not player.alt))
 	else
 		return (player.main or (not player.alt))
@@ -877,13 +933,27 @@ function GLDG.PlayerManager:MainOrAltInCurrentGuild(name)
 	for p in pairs(GLDG_DataChar) do
 		local player = GLDG_DataChar[p]
 		-- Check if this player or their main is in the current guild
-		if ((p == name) and (player.guild == GLDG_unique_GuildName)) or
-		   ((player.alt == name) and (player.guild == GLDG_unique_GuildName)) then
+		if ((p == name) and IsSameGuildAsCurrent(player.guild)) or
+		   ((player.alt == name) and IsSameGuildAsCurrent(player.guild)) then
 			return true
 		end
 	end
 
 	return false
+end
+
+-- Backwards-compatible lowercase method aliases
+function GLDG.PlayerManager:findMainname(mainName, playerName)
+	return self:FindMainName(mainName, playerName)
+end
+function GLDG.PlayerManager:getOnlineList()
+	return self:GetOnlineList()
+end
+function GLDG.PlayerManager:findPlayerDetails(playerName)
+	return self:FindPlayerDetails(playerName)
+end
+function GLDG.PlayerManager:findAlias(playerName, colourise)
+	return self:FindAlias(playerName, colourise)
 end
 
 -------------------------------

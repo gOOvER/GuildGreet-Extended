@@ -886,6 +886,9 @@ L["System Messages"] = "Systemnachrichten"
 L["Current Colour"] = "Farbvorschau"
 L["Are you sure you want to delete the profile '%s'?"] = "Möchtest du das Profil '%s' wirklich löschen?"
 L["Are you sure you want to reset the current profile '%s' to default values?"] = "Möchtest du das aktuelle Profil '%s' wirklich auf die Standardwerte zurücksetzen?"
+L["First Name / Alias"] = "Vorname / Alias (Enter drücken)"
+L["Show first name / alias in greeting queue"] = "Vorname / Alias in der Begrüßungsliste anzeigen"
+L["Show alt info (main character) in greeting queue"] = "Twink-Info (Hauptcharakter) in der Begrüßungsliste anzeigen"
 L["|cFFFFFF7FGuild member notification|r is currently turned off (See Interface settings, Game, Social).\r\nThis means that GuildGreet is unable to reliably track when your guild mates come online or go offline.\r\n\r\nThis question will only be asked once. To manually check later on type |cFFFFFF7F/gg alert|r.\r\n\r\nDo you want to activate these notifications? (Recommended)"] = "|cFFFFFF7FGildenmitglieder-Benachrichtigung|r ist derzeit deaktiviert.\r\nDadurch kann GuildGreet nicht zuverlässig erkennen, wann Gildenmitglieder online oder offline gehen.\r\n\r\nMöchtest du diese Benachrichtigung jetzt aktivieren? (Empfohlen)"
 
 --@localization(locale="deDE", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@

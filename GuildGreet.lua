@@ -74,6 +74,8 @@ local defaults = {
 		ListUp = false,
 		ListVisible = false,
 		ListSize = 5,
+		QueueShowAlias = true,
+		QueueShowTwink = true,
 		UpdateTime = 0,
 		CheckedGuildAlert = false,
 		AutoWho = false,
@@ -456,12 +458,32 @@ function GLDG:OnInitialize()
 
 	-- Re-sync after library initialization
 	self:SyncDatabaseReferences()
+
+	-- Register slash commands early so they are available immediately
+	self:RegisterSlashCommands()
+end
+
+function GLDG:RegisterSlashCommands()
+	self:RegisterChatCommand("gg", "SlashHandler")
+	self:RegisterChatCommand("guildgreet", "SlashHandler")
+	self:RegisterChatCommand("gldg", "SlashHandler")
+
+	SLASH_GUILDGREET1 = "/gg"
+	SLASH_GUILDGREET2 = "/guildgreet"
+	SLASH_GUILDGREET3 = "/gldg"
+	SlashCmdList["GUILDGREET"] = function(msg)
+		GLDG:SlashHandler(msg)
+	end
+	if hash_SlashCmdList then
+		hash_SlashCmdList["/GG"] = nil
+		hash_SlashCmdList["/GUILDGREET"] = nil
+		hash_SlashCmdList["/GLDG"] = nil
+	end
 end
 
 function GLDG:OnEnable()
 	-- Register slash commands
-	self:RegisterChatCommand("gg", "SlashHandler")
-	self:RegisterChatCommand("guildgreet", "SlashHandler")
+	self:RegisterSlashCommands()
 
 	-- Register core events via AceEvent-3.0 (handler: OnEvent)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnEvent")
@@ -809,7 +831,7 @@ end
 
 ------------------------------------------------------------
 function GLDG_findMainname(_main, _pl)
-	return GLDG.PlayerManager:findMainname(_main, _pl)
+	return GLDG.PlayerManager:FindMainName(_main, _pl)
 end
 ------------------------------------------------------------
 function GLDG_RosterPurge()
@@ -828,21 +850,21 @@ end
 -- get a list of players that are on --
 ------------------------------------------
 function GLDG_getOnlineList()
-	return GLDG.PlayerManager:getOnlineList()
+	return GLDG.PlayerManager:GetOnlineList()
 end
 
 ------------------------------------------
 -- find player details for a player --
 ------------------------------------------
 function GLDG_findPlayerDetails(playerName)
-	return GLDG.PlayerManager:findPlayerDetails(playerName)
+	return GLDG.PlayerManager:FindPlayerDetails(playerName)
 end
 
 ------------------------------------------
 -- find alias for current player  --
 ------------------------------------------
 function GLDG_findAlias(playerName, colourise)
-	return GLDG.PlayerManager:findAlias(playerName, colourise)
+	return GLDG.PlayerManager:FindAlias(playerName, colourise)
 end
 
 function GLDG_ListForPlayer(playerName, allDetails, onList, print, guildOnly)
@@ -1075,8 +1097,11 @@ function GLDG_ShowToolTip(self, element)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	GameTooltip:SetText(Ambiguate(name, "guild"), 0.85, 0.71, 0.29)
 	if p then
-		if p.manualAlias and p.alias and p.alias ~= "" then
-			GameTooltip:AddDoubleLine(L["Alias"] or "Alias", tostring(p.alias), 0.7, 0.7, 0.7, 1, 0.82, 0.4)
+		local aliasVal = (p.manualAlias and p.alias and p.alias ~= "" and p.alias)
+			or (p.alt and GLDG_DataChar and GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].manualAlias and GLDG_DataChar[p.alt].alias and GLDG_DataChar[p.alt].alias ~= "" and GLDG_DataChar[p.alt].alias)
+			or nil
+		if aliasVal then
+			GameTooltip:AddDoubleLine(L["First Name / Alias"] or L["Alias"] or "Vorname / Alias", tostring(aliasVal), 0.7, 0.7, 0.7, 1, 0.82, 0.4)
 		end
 		local mainName = (p.alt and p.alt ~= "" and Ambiguate(p.alt, "guild")) or p.twinkMainName
 		if mainName and mainName ~= "" then
@@ -1184,24 +1209,28 @@ function GLDG:ShowQueue()
 				end
 			end
 
-			-- Optional clean Twink->Main or manual Alias tag (never raw guild notes!)
+			-- Separately configurable First Name / Alias and Twink -> Main tags (never raw guild notes!)
 			local extraTag = ""
 			if p then
+				local aliasDisp = nil
+				if p.manualAlias and p.alias and p.alias ~= "" then
+					aliasDisp = p.alias
+				elseif p.alt and p.alt ~= "" and GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].manualAlias and GLDG_DataChar[p.alt].alias and GLDG_DataChar[p.alt].alias ~= "" then
+					aliasDisp = GLDG_DataChar[p.alt].alias
+				end
+
 				local mainDisp = nil
 				if p.alt and p.alt ~= "" then
-					if GLDG_DataChar[p.alt] and GLDG_DataChar[p.alt].manualAlias and GLDG_DataChar[p.alt].alias and GLDG_DataChar[p.alt].alias ~= "" then
-						mainDisp = GLDG_DataChar[p.alt].alias
-					else
-						mainDisp = Ambiguate(p.alt, "guild")
-					end
+					mainDisp = Ambiguate(p.alt, "guild")
 				elseif p.twinkMainName and p.twinkMainName ~= "" then
 					mainDisp = p.twinkMainName
 				end
 
-				if mainDisp and mainDisp ~= "" then
-					extraTag = string.format(" |cff80d8ff(%s: %s)|r", L["Alt"] or "Twink", mainDisp)
-				elseif p.manualAlias and p.alias and p.alias ~= "" then
-					extraTag = " |cffffd166(" .. p.alias .. ")|r"
+				if GLDG_Data.QueueShowAlias ~= false and aliasDisp and aliasDisp ~= "" then
+					extraTag = extraTag .. " |cffffd166[" .. aliasDisp .. "]|r"
+				end
+				if GLDG_Data.QueueShowTwink ~= false and mainDisp and mainDisp ~= "" then
+					extraTag = extraTag .. string.format(" |cff80d8ff(%s: %s)|r", L["Alt"] or "Twink", mainDisp)
 				end
 			end
 
@@ -1291,28 +1320,7 @@ end
 ------------------------
 
 function GLDG_ClickName(button, name)
-	-- Strip timestamp from name
-	name = string.sub(name, 9)
-	local _, uRealm = string.split("-", name)
-	if not uRealm then
-		name = name.."-"
-		local len = string.len(name)
-		for i in pairs(GLDG_DataChar) do
-			if  string.sub(i, 1, len)==name and GLDG_DataChar[i].guild == GLDG_unique_GuildName then
-				name = i
-			end
-		end
-		if string.len(name) == len then name = name..string.gsub(GLDG.Realm, " ", "") end
-	end
-	-- Greet the player if left click
-	if (button == "LeftButton") then
-		GLDG_SendGreet(name)
-	end
-	-- Cleanup where needed
-	GLDG_CleanupPlayer(name)
-	-- Remove name from queue and refresh
-	GLDG_Queue[name] = nil
-	GLDG_ShowQueue()
+	return GLDG.Core:ClickName(button, name)
 end
 
 ------------------------------------------------------------
@@ -2589,19 +2597,21 @@ end
 ------------------------------------------------------------
 -- extracted from r,g,b = RAID_CLASS_COLORS[enClass] * 255
 local classColors = {}
-classColors["MAGE"] = C_ClassColor.GetClassColor("MAGE");
-classColors["PRIEST"] = C_ClassColor.GetClassColor("PRIEST");
-classColors["WARLOCK"] = C_ClassColor.GetClassColor("WARLOCK");
-classColors["PALADIN"] = C_ClassColor.GetClassColor("PALADIN");
-classColors["DRUID"] = C_ClassColor.GetClassColor("DRUID");
-classColors["SHAMAN"] = C_ClassColor.GetClassColor("SHAMAN");
-classColors["DEMONHUNTER"] = C_ClassColor.GetClassColor("DEMONHUNTER");
-classColors["WARRIOR"] = C_ClassColor.GetClassColor("WARRIOR");
-classColors["ROGUE"] = C_ClassColor.GetClassColor("ROGUE");
-classColors["HUNTER"] = C_ClassColor.GetClassColor("HUNTER");
-classColors["DEATHKNIGHT"] = C_ClassColor.GetClassColor("DEATHKNIGHT");
-classColors["MONK"] = C_ClassColor.GetClassColor("MONK");
-classColors["EVOKER"] = C_ClassColor.GetClassColor("EVOKER");
+if C_ClassColor and C_ClassColor.GetClassColor then
+	classColors["MAGE"] = C_ClassColor.GetClassColor("MAGE");
+	classColors["PRIEST"] = C_ClassColor.GetClassColor("PRIEST");
+	classColors["WARLOCK"] = C_ClassColor.GetClassColor("WARLOCK");
+	classColors["PALADIN"] = C_ClassColor.GetClassColor("PALADIN");
+	classColors["DRUID"] = C_ClassColor.GetClassColor("DRUID");
+	classColors["SHAMAN"] = C_ClassColor.GetClassColor("SHAMAN");
+	classColors["DEMONHUNTER"] = C_ClassColor.GetClassColor("DEMONHUNTER");
+	classColors["WARRIOR"] = C_ClassColor.GetClassColor("WARRIOR");
+	classColors["ROGUE"] = C_ClassColor.GetClassColor("ROGUE");
+	classColors["HUNTER"] = C_ClassColor.GetClassColor("HUNTER");
+	classColors["DEATHKNIGHT"] = C_ClassColor.GetClassColor("DEATHKNIGHT");
+	classColors["MONK"] = C_ClassColor.GetClassColor("MONK");
+	classColors["EVOKER"] = C_ClassColor.GetClassColor("EVOKER");
+end
 
 ------------------------------------------------------------
 function GLDG_ChatFilter(chatFrame, event, ...)

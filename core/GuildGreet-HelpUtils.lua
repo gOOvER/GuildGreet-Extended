@@ -3,6 +3,14 @@
 -- Handles help system, startup functions and miscellaneous utilities
 ------------------------------------------------------------
 
+local GLDG = LibStub("AceAddon-3.0"):GetAddon("GuildGreet", true) or GLDG or {}
+local L = LibStub("AceLocale-3.0"):GetLocale("GuildGreet", true)
+
+local function Ambiguate(name)
+	if type(name) ~= "string" then return tostring(name or "") end
+	return string.match(name, "^([^%-]+)") or name
+end
+
 GLDG.HelpUtils = {}
 
 ------------------------------------------------------------
