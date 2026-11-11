@@ -561,19 +561,53 @@ function UIStyle:StyleAceWidget(widget)
         end
     elseif wtype == "InlineGroup" or wtype == "TabGroup" then
         local border = widget.border or widget.content and widget.content:GetParent()
-        if border then
-            if wtype == "InlineGroup" then
-                border:ClearAllPoints()
-                border:SetPoint("TOPLEFT", 0, -17)
-                border:SetPoint("BOTTOMRIGHT", 0, 3)
-            end
-            if border.SetBackdrop then
-                self:ApplyBox(border, self.Colors.bgPanel, self.Colors.borderSubtle)
-            end
-        end
-        if widget.titletext then
+        if wtype == "InlineGroup" and widget.titletext then
             self:ApplyFont(widget.titletext, 1)
             widget.titletext:SetTextColor(unpack(self.Colors.gold))
+            widget.titletext:SetHeight(0)
+            widget.titletext:SetWordWrap(true)
+            local function updateInlineTitleOffset(grp, width)
+                if not grp or not grp.titletext then return end
+                local b = grp.border or (grp.content and grp.content:GetParent())
+                local w = (width or (grp.frame and (grp.frame.width or grp.frame:GetWidth())) or 600) - 28
+                if w > 60 then
+                    grp.titletext:SetWidth(w)
+                end
+                local fs = UIStyle:GetFontSize()
+                local th = math.max(18, math.ceil((grp.titletext:GetStringHeight() or (fs + 2)) + 4))
+                local extra = math.max(0, th - 17)
+                grp._ggTitleExtra = extra
+                if b then
+                    b:ClearAllPoints()
+                    b:SetPoint("TOPLEFT", 0, -(17 + extra))
+                    b:SetPoint("BOTTOMRIGHT", 0, 3)
+                end
+            end
+            updateInlineTitleOffset(widget)
+            if not widget._ggInlineHooked then
+                widget._ggInlineHooked = true
+                if widget.OnWidthSet then
+                    hooksecurefunc(widget, "OnWidthSet", function(selfGroup, width)
+                        updateInlineTitleOffset(selfGroup, width)
+                    end)
+                end
+                if widget.LayoutFinished then
+                    hooksecurefunc(widget, "LayoutFinished", function(selfGroup, _, height)
+                        local extra = selfGroup._ggTitleExtra or 0
+                        if extra > 0 and not selfGroup.noAutoHeight then
+                            selfGroup:SetHeight((height or 0) + 40 + extra)
+                        end
+                    end)
+                end
+            end
+        else
+            if widget.titletext then
+                self:ApplyFont(widget.titletext, 1)
+                widget.titletext:SetTextColor(unpack(self.Colors.gold))
+            end
+        end
+        if border and border.SetBackdrop then
+            self:ApplyBox(border, self.Colors.bgPanel, self.Colors.borderSubtle)
         end
         if wtype == "TabGroup" and widget.tabs then
             for _, tab in ipairs(widget.tabs) do
@@ -664,18 +698,76 @@ function UIStyle:StyleAceWidget(widget)
         if widget.text then
             self:ApplyFont(widget.text, 0)
             widget.text:SetTextColor(unpack(self.Colors.textLight))
-            if widget.AlignImage then
-                pcall(function() widget:AlignImage() end)
+            widget.text:SetHeight(0)
+            widget.text:SetWordWrap(true)
+            if widget.text.SetNonSpaceWrap then
+                widget.text:SetNonSpaceWrap(true)
             end
-        end
-        if widget.frame and widget.text then
-            local h = math.max(26, (widget.text:GetStringHeight() or fontSize) + 10)
-            if widget.SetHeight then
-                widget:SetHeight(h)
-            else
-                widget.frame:SetHeight(h)
-                widget.frame.height = h
+            widget.text:SetJustifyV("TOP")
+            local function anchorCheckText(w, dx, dy)
+                if not w or not w.text or not w.checkbg then return end
+                dx = dx or 0
+                dy = dy or 0
+                w.text:ClearAllPoints()
+                if w.image and w.image:GetTexture() then
+                    w.text:SetPoint("TOPLEFT", w.image, "TOPRIGHT", 4 + dx, -2 + dy)
+                else
+                    w.text:SetPoint("TOPLEFT", w.checkbg, "TOPRIGHT", 4 + dx, -4 + dy)
+                end
+                w.text:SetPoint("RIGHT", w.frame, "RIGHT", -6, 0)
             end
+            anchorCheckText(widget)
+            widget._ggStyledCheck = true
+
+            local function updateCheckHeight(w, width)
+                if not w or not w._ggStyledCheck or not w.text or not w.frame then return end
+                local availW = (width or w.frame.width or w.frame:GetWidth() or 300) - 34
+                if availW > 40 then
+                    w.text:SetWidth(availW)
+                end
+                anchorCheckText(w)
+                local fs = UIStyle:GetFontSize()
+                local h = math.max(26, math.ceil((w.text:GetStringHeight() or fs) + 10))
+                if w.SetHeight then
+                    w:SetHeight(h)
+                else
+                    w.frame:SetHeight(h)
+                    w.frame.height = h
+                end
+            end
+
+            if not widget._ggCheckWidthHooked then
+                widget._ggCheckWidthHooked = true
+                if widget.OnWidthSet then
+                    hooksecurefunc(widget, "OnWidthSet", function(selfCb, width)
+                        updateCheckHeight(selfCb, width)
+                    end)
+                end
+                if widget.frame then
+                    widget.frame:HookScript("OnMouseDown", function()
+                        if widget._ggStyledCheck and not widget.disabled then
+                            anchorCheckText(widget, 1, -1)
+                        end
+                    end)
+                    widget.frame:HookScript("OnMouseUp", function()
+                        if widget._ggStyledCheck then
+                            anchorCheckText(widget, 0, 0)
+                        end
+                    end)
+                end
+                local origRelease = widget.OnRelease
+                widget.OnRelease = function(selfCb, ...)
+                    selfCb._ggStyledCheck = nil
+                    if selfCb.text then
+                        selfCb.text:SetHeight(18)
+                        selfCb.text:SetJustifyV("MIDDLE")
+                    end
+                    if origRelease then
+                        return origRelease(selfCb, ...)
+                    end
+                end
+            end
+            updateCheckHeight(widget)
         end
     elseif wtype == "Button" then
         local frame = widget.frame

@@ -5,7 +5,7 @@ All notable changes to **GuildGreet Extended** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [13.1.0] - 2026-11-11
 
 ### Added
 - **Floating Player Edit Popup (`GUI/Players.lua`, `GUI/Core.lua`)**:
@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Cleanup (`Bereinigung`)**: Redesigned into a structured maintenance dashboard with **6 visual KPI tiles**, spacious 2×3 maintenance action cards (eliminating button text truncation) with an inline diagnostic status bar, clean Dark-Slate reference-removal dropdowns with empty/disabled states, and an unclipped Backup Export/Import editor with `Select All`.
   - **Colours (`Farben`)**: Replaced dropdown scope selection and unstyled swatches with segmented **`Guild` / `Friends` / `Channel`** scope buttons, structured 2-column swatch cards displaying `#RRGGBB` hex badges (`Chat Notifications`, `Greeting Queue`, `System & Header`), and a fully localized live preview card.
   - **Profiles (`Profile`)**: Added an Active Profile hero card with active badge, explicit **`Create & Activate`** button plus 1-click **Quick Presets** (`Character`, `Guild`, `Class`), and side-by-side **Copy / Delete** cards with smart disabled states when no other profiles exist.
-  - **Shared UI Style (`GUI/UIStyle.lua`)**: Added reusable zero-taint Dark-Slate dropdowns, inputs, icon buttons, cards, and cross-flavor `ColorPickerFrame` wrapper, and skinned remaining `AceGUI` `Dropdown` and `EditBox` controls in the `Settings` tab.
+  - **Shared UI Style (`GUI/UIStyle.lua`, `GUI/Settings.lua`)**: Added reusable zero-taint Dark-Slate dropdowns, inputs, icon buttons, cards, and cross-flavor `ColorPickerFrame` wrapper, skinned remaining `AceGUI` `Dropdown` and `EditBox` controls in the `Settings` tab, and enabled full-width multi-line word wrapping with dynamic height adjustment for `CheckBox` and `InlineGroup` labels so long localized texts never truncate (`...`).
 - **Multi-Column Players Roster Table & Compact Action Icons (`GUI/Players.lua`, `lang/deDE.lua`, `lang/enUS.lua`)**:
   - Replaced the cluttered inline AceGUI character editor and oversized `Select` (`Auswählen`) buttons in the **Players (`Spieler`)** tab with a structured, responsive **6-column roster table** (`Character` with Online/Offline dot + Class Icon, `First Name`, `Role / Main`, `Level & Rank`, single-line non-wrapping `Public Note`, and compact `Actions`) with smooth scrolling, live search-as-you-type filtering, and full hover tooltips.
   - Replaced wide text row buttons with compact `24x24` **Edit (`Bearbeiten`)** and **Quick-Greet** icon buttons (clicking any row or its Edit icon opens the player editor).

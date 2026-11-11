@@ -39,10 +39,17 @@ local function BuildGeneralSubTab(scroll)
     guildGroup:SetLayout("Flow")
     scroll:AddChild(guildGroup)
 
+    local rawGuildDefaultLabel = L["Read the guildsettings from the guild info |cFFFF0000You must reload your interface after change this manually!"]
+        or "Use Guild Info Default Settings"
+    rawGuildDefaultLabel = rawGuildDefaultLabel:gsub("%s*|cFFFF0000", "\n|cFFFF5555")
+    if rawGuildDefaultLabel:find("|cFFFF", 1, true) and not rawGuildDefaultLabel:find("|r", 1, true) then
+        rawGuildDefaultLabel = rawGuildDefaultLabel .. "|r"
+    end
+
     local useGuildDefault = AceGUI:Create("CheckBox")
-    useGuildDefault:SetLabel(L["Read the guildsettings from the guild info |cFFFF0000You must reload your interface after change this manually!"] or "Use Guild Info Default Settings")
+    useGuildDefault:SetLabel(rawGuildDefaultLabel)
     useGuildDefault:SetValue(gs.UseGuildDefault == true)
-    useGuildDefault:SetRelativeWidth(0.65)
+    useGuildDefault:SetFullWidth(true)
     useGuildDefault:SetCallback("OnValueChanged", function(_, _, val)
         GLDG_readConfigString_change(val and true or false)
         GLDG:RefreshConfigUI()
@@ -52,7 +59,7 @@ local function BuildGeneralSubTab(scroll)
     if IsGuildLeader and IsGuildLeader() then
         local writeGuildBtn = AceGUI:Create("Button")
         writeGuildBtn:SetText(L["Write the config string"] or "Write Guild Info String")
-        writeGuildBtn:SetRelativeWidth(0.35)
+        writeGuildBtn:SetFullWidth(true)
         writeGuildBtn:SetCallback("OnClick", function()
             SyncGuildSettings()
             GLDG_WriteGuildString()

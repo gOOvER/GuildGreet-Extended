@@ -36,9 +36,9 @@ Supports **all World of Warcraft flavors** from a single unified codebase:
 
 ## ✨ Key Features
 
-### 🎨 Complete Ace3 Rewrite & Modern Dark-Slate & Gold UI (`v13.0.0`)
+### 🎨 Complete Ace3 Rewrite & Modern Dark-Slate & Gold UI (`v13.1.0`)
 - **Built on Ace3**: Powered by `AceAddon-3.0`, `AceDB-3.0`, `AceGUI-3.0`, `AceEvent-3.0`, `AceTimer-3.0`, `AceLocale-3.0`, `AceSerializer-3.0`, `AceComm-3.0`, `LibSharedMedia-3.0`, `LibDataBroker-1.1`, and `LibDBIcon-1.0`.
-- **Unified Configuration Window (`/gg` or `/guildgreet`)**: Clean navigation (`General`, `Greetings`, `Characters`, `Sub-Window`, `Cleanup`, `Backup & Restore`, `Information`) plus full **AceDB-3.0 Profile Management** (`Default`, Character, Realm, Class, or Custom profiles).
+- **Unified Configuration Window (`/gg` or `/guildgreet`)**: Clean 6-tab navigation (`Settings`, `Greetings`, `Players`, `Cleanup`, `Colours`, `Profiles`) plus full **AceDB-3.0 Profile Management** (`Default`, Character, Guild, Class, or Custom profiles).
 - **Live UI Font Scaling (`10pt – 18pt`)**: Instant `A-` / `A+` buttons in the window header and a font selector (`LibSharedMedia-3.0`) dynamically scale all text, labels, buttons, inputs, and the floating in-game greeting queue.
 - **Persistent Window & Queue Positions**: Both the main configuration window (`GuildGreetConfigFrame`) and the floating greeting queue (`GuildGreetList`) automatically save and restore their exact screen coordinates when dragged.
 - **ElvUI & AddOnSkins Compatible**: Custom backdrop and checkbox/button textures work cleanly alongside ElvUI and AddOnSkins without missing checkmarks, double borders, or clipped text.
