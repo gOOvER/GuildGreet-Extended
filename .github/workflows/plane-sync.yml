@@ -1,0 +1,26 @@
+name: Plane Sync
+
+on:
+  issues:
+    types: [opened, edited, closed, reopened]
+  issue_comment:
+    types: [created]
+  pull_request:
+    types: [opened, reopened, ready_for_review, closed]
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  plane-sync:
+    uses: gOOvER/.github/.github/workflows/plane-sync.yml@main
+    with:
+      plane_base_url: "https://plane.goover.dev"
+    secrets:
+      PLANE_API_KEY: ${{ secrets.PLANE_API_KEY }}
+      PLANE_WORKSPACE_SLUG: ${{ secrets.PLANE_WORKSPACE_SLUG }}
+      PLANE_PROJECT_ID: ${{ secrets.PLANE_PROJECT_ID }}

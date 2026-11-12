@@ -5,6 +5,11 @@ All notable changes to **GuildGreet Extended** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Plane Issue & PR Sync Workflow (`.github/workflows/plane-sync.yml`)**: Connected repository issues, comments, pull requests, and commits to `plane.goover.dev` via `gOOvER/.github/.github/workflows/plane-sync.yml@main`.
+
 ## [13.1.0] - 2026-11-11
 
 ### Added

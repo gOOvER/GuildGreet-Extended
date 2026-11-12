@@ -3,7 +3,7 @@
 ## Title: GuildGreet-Extended
 ## Notes: Advanced guild greeting system with automated welcome messages, player tracking, and modular architecture
 ## Author: gOOvER
-## Version: 13.1.0
+## Version: 13.1.1
 ## IconTexture: Interface\Icons\Achievement_GuildPerk_EverybodysFriend
 ## AddonCompartmentFunc: GuildGreet_OnAddonCompartmentClick
 ## AddonCompartmentFuncOnEnter: GuildGreet_OnAddonCompartmentEnter
