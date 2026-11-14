@@ -144,3 +144,9 @@ Supports **all World of Warcraft flavors** from a single unified codebase:
 - **Complete Ace3 Rewrite & Modern Dark-Slate UI (v11.x – v13.x)**: **gOOvER** ([goover.dev](https://www.goover.dev))
 - **License**: [GNU General Public License v3.0 (GPL-3.0)](LICENSE)
 - **Support Development**: [donate.goover.dev](https://donate.goover.dev) • [Ko-fi](https://ko-fi.com/oldnoob) • [Buy Me a Coffee](https://www.buymeacoffee.com/goover)
+
+---
+
+## 🐛 Bug Reports & Feedback
+
+Found a bug or have a feature request? Please report it on the **[GitHub Issue Tracker](https://github.com/gOOvER/GuildGreet-Extended/issues)** (please include your WoW client version, addon version, and any Lua errors if available).
