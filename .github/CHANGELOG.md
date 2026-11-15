@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Main Selection Dropdown in Player Edit Popup (`GUI/Players.lua`)**: Allowed selecting any non-alt member of the active guild in the **Assign as Alt of Main** dropdown (even if they were not manually flagged as `Main` beforehand), and automatically sets `main = true` on the chosen target character when saving.
+
 ### Added
 - **Plane Issue & PR Sync Workflow (`.github/workflows/plane-sync.yml`)**: Connected repository issues, comments, pull requests, and commits to `plane.goover.dev` via `gOOvER/.github/.github/workflows/plane-sync.yml@main`.
 

@@ -108,21 +108,25 @@ local function GetMainsDropdownItems(excludePlayer)
     }
     if not GLDG_DataChar then return items end
 
+    local curGuild = GetActiveGuildName()
     local mainsList = {}
     for name, p in pairs(GLDG_DataChar) do
-        if type(p) == "table" and p.main and name ~= excludePlayer then
-            local short = Ambiguate(name)
-            local alias = (p.manualAlias and p.alias and p.alias ~= "") and p.alias or nil
-            local cHex = GetClassHex(p.enClass)
-            local text = cHex .. short .. "|r"
-            if alias then
-                text = text .. " " .. UIStyle.Hex.gold .. "[" .. alias .. "]|r"
+        if type(p) == "table" and not p.alt and name ~= excludePlayer then
+            local pGuild = CleanGuildName(p.guild)
+            if curGuild == "" or pGuild == "" or pGuild == curGuild then
+                local short = Ambiguate(name)
+                local alias = (p.manualAlias and p.alias and p.alias ~= "") and p.alias or nil
+                local cHex = GetClassHex(p.enClass)
+                local text = cHex .. short .. "|r"
+                if alias then
+                    text = text .. " " .. UIStyle.Hex.gold .. "[" .. alias .. "]|r"
+                end
+                table.insert(mainsList, {
+                    value = name,
+                    sortKey = string.lower(short),
+                    label = text,
+                })
             end
-            table.insert(mainsList, {
-                value = name,
-                sortKey = string.lower(short),
-                label = text,
-            })
         end
     end
     table.sort(mainsList, function(a, b) return a.sortKey < b.sortKey end)
@@ -689,6 +693,7 @@ local function EnsureEditPopup()
                 p.main = nil
                 p.alt = pendingMain
                 if GLDG_DataChar[pendingMain] then
+                    GLDG_DataChar[pendingMain].main = true
                     p.ignore = GLDG_DataChar[pendingMain].ignore
                 end
             end
