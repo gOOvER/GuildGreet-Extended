@@ -96,6 +96,73 @@ function GLDG:SetupGuildHooks()
 			GLDG:OnGuildFrameClosed()
 		end)
 	end
+
+	-- Attach quick-link button to Blizzard Guild / Communities UI
+	self:EnsureGuildPlayersButton()
+	if self.RegisterEvent then
+		self:RegisterEvent("ADDON_LOADED", "OnGuildAddonLoaded")
+	end
+end
+
+function GLDG:OnGuildAddonLoaded(_, addonName)
+	if addonName == "Blizzard_GuildUI" or addonName == "Blizzard_Communities" then
+		self:EnsureGuildPlayersButton()
+	end
+end
+
+function GLDG:EnsureGuildPlayersButton()
+	local label = (L and (L["Players"] or L["Manage Players"])) or "Spielerverwaltung"
+	local tip = (L and L["Open players tab"]) or "Spielerverwaltung öffnen"
+
+	if _G.GuildFrame and not self.guildPlayersBtn then
+		local btn = CreateFrame("Button", "GuildGreetGuildPlayersButton", _G.GuildFrame, "UIPanelButtonTemplate")
+		btn:SetSize(124, 22)
+		btn:SetPoint("TOPRIGHT", _G.GuildFrame, "TOPRIGHT", -38, -28)
+		btn:SetFrameLevel(_G.GuildFrame:GetFrameLevel() + 5)
+		btn:SetText(label)
+		btn:SetScript("OnClick", function()
+			if GLDG and GLDG.ShowConfigWindow then
+				GLDG:ShowConfigWindow("players")
+			end
+		end)
+		btn:SetScript("OnEnter", function(selfBtn)
+			if GameTooltip then
+				GameTooltip:SetOwner(selfBtn, "ANCHOR_TOP")
+				GameTooltip:SetText("GuildGreet", 1, 0.82, 0)
+				GameTooltip:AddLine(tip, 1, 1, 1)
+				GameTooltip:Show()
+			end
+		end)
+		btn:SetScript("OnLeave", function()
+			if GameTooltip then GameTooltip:Hide() end
+		end)
+		self.guildPlayersBtn = btn
+	end
+
+	if _G.CommunitiesFrame and not self.communitiesPlayersBtn then
+		local btn = CreateFrame("Button", "GuildGreetCommunitiesPlayersButton", _G.CommunitiesFrame, "UIPanelButtonTemplate")
+		btn:SetSize(128, 20)
+		btn:SetPoint("TOPRIGHT", _G.CommunitiesFrame, "TOPRIGHT", -56, -2)
+		btn:SetFrameLevel(_G.CommunitiesFrame:GetFrameLevel() + 5)
+		btn:SetText(label)
+		btn:SetScript("OnClick", function()
+			if GLDG and GLDG.ShowConfigWindow then
+				GLDG:ShowConfigWindow("players")
+			end
+		end)
+		btn:SetScript("OnEnter", function(selfBtn)
+			if GameTooltip then
+				GameTooltip:SetOwner(selfBtn, "ANCHOR_TOP")
+				GameTooltip:SetText("GuildGreet", 1, 0.82, 0)
+				GameTooltip:AddLine(tip, 1, 1, 1)
+				GameTooltip:Show()
+			end
+		end)
+		btn:SetScript("OnLeave", function()
+			if GameTooltip then GameTooltip:Hide() end
+		end)
+		self.communitiesPlayersBtn = btn
+	end
 end
 
 -- Setup communication hooks
@@ -177,6 +244,7 @@ end
 
 -- Guild frame opened callback
 function GLDG:OnGuildFrameOpened()
+	self:EnsureGuildPlayersButton()
 	-- Auto-update roster when guild window opens
 	if self.db.profile.AutoWho and self.db.profile.AutoUpdateOnGuildOpen then
 		self:ScheduleTimer(function()

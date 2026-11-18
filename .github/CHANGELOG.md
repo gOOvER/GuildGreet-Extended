@@ -5,12 +5,18 @@ All notable changes to **GuildGreet Extended** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [13.2.1] - 2026-11-18
 
 ### Fixed
+- **Login Greet Detection & Offline Level-Up Override (`GuildGreet.lua`, `core/GuildGreet-Messages.lua`, `core/GuildGreet-PlayerManager.lua`)**:
+  - Replaced hardcoded `string.sub(ERR_FRIEND_ONLINE_SS, 20)` pattern slicing with `GLDG_BuildSystemPattern` and stripped color codes in `ProcessSystemMessage` (plus `issecretvalue` guard) so login system messages match reliably across locales and clients.
+  - Added offline-to-online transition fallback in `ScanGuildRoster` / `UpdateCharacterData` so logins are queued even when `CHAT_MSG_SYSTEM` doesn't match, and prevented offline level-ups detected at login (`justLoggedIn`) from setting `newlvl = true` and overriding `"Logged in"` / `"Relog"` in the greet popup.
+- **Login Summary Popup Always Enabled (`core/GuildGreet-Utils.lua`, `core/GuildGreet-HelpUtils.lua`, `GUI/Settings.lua`)**: Ensured `DeltaPopup` is always enabled (`true`) on login so the offline changes summary popup is active by default.
 - **Main Selection Dropdown in Player Edit Popup (`GUI/Players.lua`)**: Allowed selecting any non-alt member of the active guild in the **Assign as Alt of Main** dropdown (even if they were not manually flagged as `Main` beforehand), and automatically sets `main = true` on the chosen target character when saving.
 
 ### Added
+- **Click-to-Sort on All Players Table Columns (`GUI/Players.lua`)**: Made all 6 column headers (**Character**, **First Name**, **Role / Main**, **Level & Rank**, **Public Note**, **Actions**) clickable to toggle ascending/descending sorting without sort icons.
+- **Blizzard Guild UI Quick-Link Button (`core/GuildGreet-Hooks.lua`, `GuildGreet.lua`)**: Wired `InitializeHooks()` in `OnEnable()` and added a **"Spielerverwaltung" / "Players"** button to `GuildFrame` and `CommunitiesFrame` that opens GuildGreet directly on the Players tab.
 - **Plane Issue & PR Sync Workflow (`.github/workflows/plane-sync.yml`)**: Connected repository issues, comments, pull requests, and commits to `plane.goover.dev` via `gOOvER/.github/.github/workflows/plane-sync.yml@main`.
 
 ## [13.1.0] - 2026-11-11

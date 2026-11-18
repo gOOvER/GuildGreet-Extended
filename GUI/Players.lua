@@ -21,6 +21,8 @@ local UIStyle = GLDG.UIStyle
 local searchFilter = ""
 local roleFilter = "all"
 local editingPlayer = nil
+local sortColumn = "name"
+local sortAscending = true
 
 local playersPanel = nil
 local rowPool = {}
@@ -213,8 +215,83 @@ local function GetFilteredPlayers()
         end
     end
 
+    local function getRoleSortKey(p)
+        if not p then return "" end
+        if p.main then
+            return "1_main"
+        end
+        local m = (p.alt and p.alt ~= "" and Ambiguate(p.alt)) or (p.twinkMainName and p.twinkMainName ~= "" and p.twinkMainName) or ""
+        if m ~= "" then
+            return "2_" .. string.lower(m)
+        end
+        return ""
+    end
+
+    local function compareStrings(va, vb, asc)
+        if (va == "") ~= (vb == "") then
+            if asc then
+                return va ~= ""
+            else
+                return va == ""
+            end
+        end
+        if va ~= vb then
+            if asc then
+                return va < vb
+            else
+                return va > vb
+            end
+        end
+        return nil
+    end
+
     table.sort(results, function(a, b)
-        return string.lower(Ambiguate(a)) < string.lower(Ambiguate(b))
+        local pa = GLDG_DataChar[a]
+        local pb = GLDG_DataChar[b]
+
+        if sortColumn == "alias" then
+            local va = string.lower(strtrim((pa and GetEffectiveAlias(pa)) or ""))
+            local vb = string.lower(strtrim((pb and GetEffectiveAlias(pb)) or ""))
+            local cmp = compareStrings(va, vb, sortAscending)
+            if cmp ~= nil then return cmp end
+        elseif sortColumn == "role" then
+            local cmp = compareStrings(getRoleSortKey(pa), getRoleSortKey(pb), sortAscending)
+            if cmp ~= nil then return cmp end
+        elseif sortColumn == "lvlrank" then
+            local la = tonumber(pa and pa.lvl) or 0
+            local lb = tonumber(pb and pb.lvl) or 0
+            if la ~= lb then
+                if sortAscending then return la < lb else return la > lb end
+            end
+            local ra = tonumber(pa and pa.rank) or 99
+            local rb = tonumber(pb and pb.rank) or 99
+            if ra ~= rb then
+                if sortAscending then return ra < rb else return ra > rb end
+            end
+        elseif sortColumn == "note" then
+            local va = string.lower(strtrim((pa and pa.pNote) or ""))
+            local vb = string.lower(strtrim((pb and pb.pNote) or ""))
+            local cmp = compareStrings(va, vb, sortAscending)
+            if cmp ~= nil then return cmp end
+        elseif sortColumn == "actions" then
+            local oa = (GLDG_Online and GLDG_Online[a] ~= nil) and 1 or 0
+            local ob = (GLDG_Online and GLDG_Online[b] ~= nil) and 1 or 0
+            if oa ~= ob then
+                if sortAscending then return oa > ob else return oa < ob end
+            end
+            local ia = (pa and pa.ignore) and 1 or 0
+            local ib = (pb and pb.ignore) and 1 or 0
+            if ia ~= ib then
+                if sortAscending then return ia < ib else return ia > ib end
+            end
+        end
+
+        local na = string.lower(Ambiguate(a))
+        local nb = string.lower(Ambiguate(b))
+        if sortColumn == "name" and not sortAscending then
+            return na > nb
+        end
+        return na < nb
     end)
 
     return results, totalInGuild
@@ -1198,18 +1275,19 @@ RefreshPlayersList = function()
     local hdrH = math.max(26, fontSize + 13)
     hdr:SetHeight(hdrH)
 
-    local function placeHdr(fs, x, w)
-        UIStyle:ApplyFont(fs, -1)
-        fs:ClearAllPoints()
-        fs:SetPoint("LEFT", hdr, "LEFT", x, 0)
-        fs:SetWidth(w)
+    local function placeHdr(btn, x, w)
+        UIStyle:ApplyFont(btn.label, -1)
+        btn:ClearAllPoints()
+        btn:SetPoint("LEFT", hdr, "LEFT", x, 0)
+        btn:SetSize(w, hdrH)
     end
     placeHdr(hdr.hName, cols.xName, cols.wName)
     placeHdr(hdr.hAlias, cols.xAlias, cols.wAlias)
     placeHdr(hdr.hRole, cols.xRole, cols.wRole)
     placeHdr(hdr.hLvlRank, cols.xLvlRank, cols.wLvlRank)
     placeHdr(hdr.hNote, cols.xNote, cols.wNote)
-    UIStyle:ApplyFont(hdr.hActions, -1)
+    UIStyle:ApplyFont(hdr.hActions.label, -1)
+    hdr.hActions:SetHeight(hdrH)
 
     -- Filter & Sort Players
     local filtered, totalInGuild = GetFilteredPlayers()
@@ -1468,21 +1546,40 @@ local function EnsurePlayersPanel(hostFrame)
     UIStyle:ApplyBox(colHeader, UIStyle.Colors.bgHeader, UIStyle.Colors.borderSubtle)
     panel.colHeader = colHeader
 
-    local function makeHdrLabel(text, justify)
-        local fs = colHeader:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    local function makeHdrButton(colKey, text, justify)
+        local btn = CreateFrame("Button", nil, colHeader)
+        btn:SetHeight(28)
+        local fs = btn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        fs:SetAllPoints(btn)
         fs:SetJustifyH(justify or "LEFT")
         fs:SetWordWrap(false)
         fs:SetTextColor(unpack(UIStyle.Colors.gold))
         fs:SetText(text)
-        return fs
+        btn.label = fs
+        btn:SetScript("OnEnter", function()
+            fs:SetTextColor(1, 1, 1, 1)
+        end)
+        btn:SetScript("OnLeave", function()
+            fs:SetTextColor(unpack(UIStyle.Colors.gold))
+        end)
+        btn:SetScript("OnClick", function()
+            if sortColumn == colKey then
+                sortAscending = not sortAscending
+            else
+                sortColumn = colKey
+                sortAscending = true
+            end
+            RefreshPlayersList()
+        end)
+        return btn
     end
 
-    colHeader.hName    = makeHdrLabel(L["Character"] or "Charakter")
-    colHeader.hAlias   = makeHdrLabel(L["First Name"] or "Vorname")
-    colHeader.hRole    = makeHdrLabel(L["Role / Main"] or "Rolle / Main")
-    colHeader.hLvlRank = makeHdrLabel(L["Level & Rank"] or "Stufe & Rang")
-    colHeader.hNote    = makeHdrLabel(L["Public Note"] or "Öffentliche Notiz")
-    colHeader.hActions = makeHdrLabel(L["Actions"] or "Aktion", "RIGHT")
+    colHeader.hName    = makeHdrButton("name", L["Character"] or "Charakter")
+    colHeader.hAlias   = makeHdrButton("alias", L["First Name"] or "Vorname")
+    colHeader.hRole    = makeHdrButton("role", L["Role / Main"] or "Rolle / Main")
+    colHeader.hLvlRank = makeHdrButton("lvlrank", L["Level & Rank"] or "Stufe & Rang")
+    colHeader.hNote    = makeHdrButton("note", L["Public Note"] or "Öffentliche Notiz")
+    colHeader.hActions = makeHdrButton("actions", L["Actions"] or "Aktion", "RIGHT")
     colHeader.hActions:SetPoint("RIGHT", colHeader, "RIGHT", -30, 0)
     colHeader.hActions:SetWidth(64)
 

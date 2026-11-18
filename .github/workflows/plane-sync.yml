@@ -24,3 +24,4 @@ jobs:
       PLANE_API_KEY: ${{ secrets.PLANE_API_KEY }}
       PLANE_WORKSPACE_SLUG: ${{ secrets.PLANE_WORKSPACE_SLUG }}
       PLANE_PROJECT_ID: ${{ secrets.PLANE_PROJECT_ID }}
+

@@ -615,10 +615,12 @@ function GLDG.Messages:TreatAchievement(message, playerName)
 		end
 
 		-- Queue for achievement greeting if enabled
-		if not GLDG_Data.GuildSettings.SupressAchievment and GLDG.Utils:TableSize(GLDG_DataGreet.Achievment) > 0 and not GLDG_DataChar[playerName].own then
+		if not GLDG_Data.GuildSettings.SupressAchievment and GLDG.Utils:TableSize(GLDG_DataGreet.Achievment) > 0 and not GLDG_DataChar[playerName].own and not (GLDG.IsOwnCharacter and GLDG:IsOwnCharacter(playerName)) then
 			GLDG_DataChar[playerName].achievment = achievementText
-			GLDG_Queue[playerName] = GLDG_GetLogtime(playerName)
-			GLDG_ShowQueue()
+			if not (GLDG.IsOwnCharacter and GLDG:IsOwnCharacter(playerName)) and not (GLDG_DataChar[playerName] and GLDG_DataChar[playerName].own) then
+				GLDG_Queue[playerName] = GLDG_GetLogtime(playerName)
+				GLDG_ShowQueue()
+			end
 		end
 	end
 end
@@ -636,10 +638,12 @@ end
 -------------------------------
 
 function GLDG.Messages:ProcessSystemMessage(msg)
-	if not msg then return end
+	if not msg or (issecretvalue and issecretvalue(msg)) then return end
+	local cleanMsg = string.gsub(msg, "|c%x%x%x%x%x%x%x%x", "")
+	cleanMsg = string.gsub(cleanMsg, "|r", "")
 	
 	-- Check for player coming online
-	local _, _, player = string.find(msg, GLDG_ONLINE)
+	local _, _, player = string.find(cleanMsg, GLDG_ONLINE)
 	if player then
 		self:HandlePlayerOnline(player)
 		return
@@ -690,8 +694,12 @@ function GLDG.Messages:HandlePlayerOnline(playerName)
 	
 	-- Normalize player name
 	local shortName, realm = string.split("-", playerName)
-	if not realm and GLDG.Realm then 
-		playerName = shortName.."-"..string.gsub(GLDG.Realm, " ", "") 
+	if not realm or realm == "" then
+		if GLDG.Realm then
+			playerName = shortName.."-"..string.gsub(GLDG.Realm, " ", "")
+		end
+	else
+		playerName = shortName.."-"..string.gsub(realm, " ", "")
 	end
 	
 	-- Store online time
@@ -722,8 +730,10 @@ function GLDG.Messages:HandlePlayerOnline(playerName)
 			if not GLDG_Offline[playerName] and GLDG.Utils:TableSize(GLDG_DataGreet.Greet) == 0 then
 				return
 			end
-			GLDG_Queue[playerName] = GLDG_GetLogtime(playerName)
-			GLDG_ShowQueue()
+			if not (GLDG.IsOwnCharacter and GLDG:IsOwnCharacter(playerName)) and not (GLDG_DataChar[playerName] and GLDG_DataChar[playerName].own) then
+				GLDG_Queue[playerName] = GLDG_GetLogtime(playerName)
+				GLDG_ShowQueue()
+			end
 		end
 	end
 end
@@ -733,8 +743,12 @@ function GLDG.Messages:HandlePlayerOffline(playerName)
 	
 	-- Normalize player name
 	local shortName, realm = string.split("-", playerName)
-	if not realm and GLDG.Realm then 
-		playerName = shortName.."-"..string.gsub(GLDG.Realm, " ", "") 
+	if not realm or realm == "" then
+		if GLDG.Realm then
+			playerName = shortName.."-"..string.gsub(GLDG.Realm, " ", "")
+		end
+	else
+		playerName = shortName.."-"..string.gsub(realm, " ", "")
 	end
 	
 	-- Remove from online list
@@ -784,7 +798,7 @@ function GLDG.Messages:HandleGuildJoin(playerName)
 	GLDG_DataChar[playerName].guild = GLDG.unique_GuildName
 	
 	-- Add to greeting queue if not suppressed
-	if not GLDG_Data.GuildSettings.SupressJoin and GLDG.Utils:TableSize(GLDG_DataGreet.Welcome) > 0 then
+	if not GLDG_Data.GuildSettings.SupressJoin and GLDG.Utils:TableSize(GLDG_DataGreet.Welcome) > 0 and not (GLDG.IsOwnCharacter and GLDG:IsOwnCharacter(playerName)) then
 		GLDG_Queue[playerName] = GLDG_GetLogtime(playerName)
 		GLDG_ShowQueue()
 	end
@@ -806,8 +820,10 @@ function GLDG.Messages:HandlePromotion(playerName, oldRank, newRank)
 		
 		-- Add to greeting queue if not suppressed
 		if not GLDG_Data.GuildSettings.SupressRank and GLDG.Utils:TableSize(GLDG_DataGreet.NewRank) > 0 then
-			GLDG_Queue[playerName] = GLDG_GetLogtime(playerName)
-			GLDG_ShowQueue()
+			if not (GLDG.IsOwnCharacter and GLDG:IsOwnCharacter(playerName)) and not (GLDG_DataChar[playerName] and GLDG_DataChar[playerName].own) then
+				GLDG_Queue[playerName] = GLDG_GetLogtime(playerName)
+				GLDG_ShowQueue()
+			end
 		end
 		
 		-- Show promotion notification

@@ -679,7 +679,7 @@ local function BuildOtherSubTab(scroll)
 
     local deltaPopup = AceGUI:Create("CheckBox")
     deltaPopup:SetLabel(L["Show popup box summarising offline changes at login"] or "Show summary popup of offline changes at login")
-    deltaPopup:SetValue(gs.DeltaPopup == true)
+    deltaPopup:SetValue(gs.DeltaPopup ~= false)
     deltaPopup:SetFullWidth(true)
     deltaPopup:SetDisabled(gs.UseGuildDefault == true)
     deltaPopup:SetCallback("OnValueChanged", function(_, _, val)

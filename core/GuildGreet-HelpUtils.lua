@@ -49,7 +49,7 @@ function GLDG.HelpUtils:StartupCheck()
 		-- nothing pending and at least one complete -> assume we're done
 		--GLDG_Print("All done")
 
-		if (GLDG_TableSize(GLDG_ChangesText)>0 and GLDG_Data.GuildSettings.DeltaPopup==true) then
+		if (GLDG_TableSize(GLDG_ChangesText)>0 and GLDG_Data.GuildSettings.DeltaPopup ~= false) then
 			-- display text
 			GLDG_list = GLDG_ChangesText
 			GLDG_CreatePasteListFrame()

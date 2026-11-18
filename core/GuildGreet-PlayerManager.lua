@@ -114,6 +114,7 @@ function GLDG.PlayerManager:RosterImport(silent)
 	local cleanRealm = string.gsub(GLDG.Realm or "", " ", "")
 	local localizedMale = LOCALIZED_CLASS_NAMES_MALE or {}
 	GLDG_Online = GLDG_Online or {}
+	local newlyOnline = {}
 
 	for index = 1, numTotal do
 		local name, rank, rankIndex, level, classDisplayName, zone, publicNote, officerNote, isOnline, status, class, achievementPoints, achievementRank, isMobile = GetGuildRosterInfo(index)
@@ -147,14 +148,18 @@ function GLDG.PlayerManager:RosterImport(silent)
 				isMobile = isMobile or false
 			}
 
+			local wasOnline = (GLDG_Online[name] ~= nil)
 			if isOnline then
 				GLDG_Online[name] = GLDG_Online[name] or GetTime()
+				if not wasOnline and self.initialRosterDone then
+					newlyOnline[name] = true
+				end
 			else
 				GLDG_Online[name] = nil
 			end
 
 			-- Mark own character
-			if (name == GLDG.Player .. "-" .. cleanRealm) then
+			if (GLDG.IsOwnCharacter and GLDG:IsOwnCharacter(name)) or (name == GLDG.Player .. "-" .. cleanRealm) then
 				newRoster[name].own = true
 			end
 
@@ -167,7 +172,7 @@ function GLDG.PlayerManager:RosterImport(silent)
 	end
 
 	-- Update main character data with new roster
-	self:UpdateCharacterData(newRoster)
+	self:UpdateCharacterData(newRoster, newlyOnline)
 
 	-- Automatically detect Twink / Alt / Main references in public & officer notes
 	self:DetectMainFromNotes()
@@ -322,11 +327,15 @@ end
 -- Update Character Data --
 -------------------------------
 
-function GLDG.PlayerManager:UpdateCharacterData(newRoster)
+function GLDG.PlayerManager:UpdateCharacterData(newRoster, newlyOnline)
 	-- Initialize character data if not exists
 	if not GLDG_DataChar then
 		GLDG_DataChar = {}
 	end
+
+	local isInitialScan = not self.initialRosterDone
+	local offlineLevels = isInitialScan and {} or nil
+	local offlineRanks = isInitialScan and {} or nil
 
 	-- Update existing characters and add new ones
 	for playerName, playerData in pairs(newRoster) do
@@ -337,14 +346,30 @@ function GLDG.PlayerManager:UpdateCharacterData(newRoster)
 		local existing = GLDG_DataChar[playerName]
 		local oldLvl = existing.lvl
 		local oldRank = existing.rank
+		local isSelf = (GLDG.IsOwnCharacter and GLDG:IsOwnCharacter(playerName)) or existing.own or playerData.own
+		local justLoggedIn = (newlyOnline and newlyOnline[playerName])
+			or (GLDG_Online and GLDG_Online[playerName] and (GetTime() - GLDG_Online[playerName]) < 3)
+
+		if justLoggedIn then
+			existing.newlvl = nil
+		end
 
 		-- Detect guild member level-up before overwriting level
 		if oldLvl and playerData.lvl and playerData.lvl > oldLvl then
 			existing.storedLvl = oldLvl
 			local gs = GLDG_Data and GLDG_Data.GuildSettings
-			if not existing.own and not existing.ignore and gs and not gs.SupressLevel then
+			if not isSelf and not existing.ignore and gs and not gs.SupressLevel and not justLoggedIn then
 				local minLvl = tonumber(gs.MinLevelUp) or 0
-				if playerData.lvl >= minLvl and (not gs.OnlyLevelUpOnline or playerData.online) then
+				if isInitialScan then
+					-- Record offline level-up for login summary instead of flooding the greet list
+					if playerData.lvl >= minLvl then
+						local entry = string.format("%s (%d -> %d)", Ambiguate(playerName, "guild"), oldLvl, playerData.lvl)
+						table.insert(offlineLevels, entry)
+						if GLDG_AddToStartupList then
+							GLDG_AddToStartupList((L["Guild"] or "Gilde") .. ": " .. Ambiguate(playerName, "guild") .. " " .. (L["increased level from"] or "Stufe") .. " " .. tostring(oldLvl) .. " -> " .. tostring(playerData.lvl))
+						end
+					end
+				elseif playerData.lvl >= minLvl and (not gs.OnlyLevelUpOnline or playerData.online) then
 					if GLDG_DataGreet and GLDG_DataGreet.NewLevel and GLDG.Utils:TableSize(GLDG_DataGreet.NewLevel) > 0 then
 						existing.newlvl = true
 						GLDG_Queue = GLDG_Queue or {}
@@ -364,8 +389,14 @@ function GLDG.PlayerManager:UpdateCharacterData(newRoster)
 		-- Detect guild member promotion (lower rank index = higher guild rank)
 		if oldRank and playerData.rank and playerData.rank < oldRank then
 			local gs = GLDG_Data and GLDG_Data.GuildSettings
-			if not existing.own and not existing.ignore and gs and not gs.SupressRank then
-				if GLDG_DataGreet and GLDG_DataGreet.NewRank and GLDG.Utils:TableSize(GLDG_DataGreet.NewRank) > 0 then
+			if not isSelf and not existing.ignore and gs and not gs.SupressRank then
+				if isInitialScan then
+					local entry = string.format("%s (%s)", Ambiguate(playerName, "guild"), tostring(playerData.rankname or "?"))
+					table.insert(offlineRanks, entry)
+					if GLDG_AddToStartupList then
+						GLDG_AddToStartupList((L["Guild"] or "Gilde") .. ": " .. entry)
+					end
+				elseif GLDG_DataGreet and GLDG_DataGreet.NewRank and GLDG.Utils:TableSize(GLDG_DataGreet.NewRank) > 0 then
 					existing.newrank = true
 					GLDG_Queue = GLDG_Queue or {}
 					if not GLDG_Queue[playerName] then
@@ -403,6 +434,12 @@ function GLDG.PlayerManager:UpdateCharacterData(newRoster)
 		if playerData.alt then
 			existing.alt = playerData.alt
 		end
+
+		if newlyOnline and newlyOnline[playerName] and not isSelf and not existing.ignore then
+			if not (GLDG_Queue and GLDG_Queue[playerName]) and GLDG.Messages and GLDG.Messages.HandlePlayerOnline then
+				GLDG.Messages:HandlePlayerOnline(playerName)
+			end
+		end
 	end
 	
 	-- Mark characters no longer in guild
@@ -414,6 +451,29 @@ function GLDG.PlayerManager:UpdateCharacterData(newRoster)
 			GLDG_DataChar[playerName].pNote = nil
 			GLDG_DataChar[playerName].oNote = nil
 		end
+	end
+
+	self.initialRosterDone = true
+
+	if isInitialScan and ((offlineLevels and #offlineLevels > 0) or (offlineRanks and #offlineRanks > 0)) then
+		local function summarize(items)
+			local shown = {}
+			local limit = math.min(#items, 6)
+			for i = 1, limit do shown[i] = items[i] end
+			local text = table.concat(shown, ", ")
+			if #items > limit then
+				text = text .. string.format(" (+%d %s)", #items - limit, L["more"] or "weitere")
+			end
+			return text
+		end
+		local parts = {}
+		if #offlineLevels > 0 then
+			table.insert(parts, string.format("%d %s: %s", #offlineLevels, L["Level up"] or "Stufenaufstieg(e)", summarize(offlineLevels)))
+		end
+		if #offlineRanks > 0 then
+			table.insert(parts, string.format("%d %s: %s", #offlineRanks, L["promotion"] or "Beförderung(en)", summarize(offlineRanks)))
+		end
+		GLDG:PrintHelp("|cffd9b54a" .. (L["While you were away"] or "Während deiner Abwesenheit") .. ":|r " .. table.concat(parts, " | "))
 	end
 end
 

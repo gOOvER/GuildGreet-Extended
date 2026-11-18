@@ -697,8 +697,8 @@ function GLDG.GUI:FriendsUpdate()
 								GLDG:PrintHelp("["..Ambiguate(name, "guild").."] "..string.format(L["has increased his level from %s to %s"],GLDG_DataChar[name].lvl, level))
 							end
 						end
-						if (GLDG_TableSize(GLDG_DataGreet.NewLevel) > 0) and (GLDG_Data.GuildSettings.SupressLevel==false) and (not GLDG_DataChar[name].ignore) and (level > GLDG_Data.GuildSettings.MinLevelUp) then
-							if (GLDG_Online[pl] or GLDG_Data.GuildSettings.NoGratsOnLogin==false) then
+						if (GLDG_TableSize(GLDG_DataGreet.NewLevel) > 0) and (GLDG_Data.GuildSettings.SupressLevel==false) and (not GLDG_DataChar[name].ignore) and (not GLDG_DataChar[name].own) and not (GLDG.IsOwnCharacter and GLDG:IsOwnCharacter(name)) and (level > GLDG_Data.GuildSettings.MinLevelUp) then
+							if GLDG.PlayerManager and GLDG.PlayerManager.initialRosterDone and (GLDG_Online[pl] or GLDG_Data.GuildSettings.NoGratsOnLogin==false) then
 								GLDG_DataChar[name].newlvl = true
 							end
 						end

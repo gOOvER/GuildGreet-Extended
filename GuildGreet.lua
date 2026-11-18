@@ -253,10 +253,25 @@ GLDG_SubTab2Frame.Tab4 = L["Other"]
 
 
 -- Strings we look for
-GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(ERR_FRIEND_ONLINE_SS, 20)
--- Fix for RealUI 8 users - split long line for readability
-local online_pattern = string.gsub(ERR_FRIEND_ONLINE_SS, "|cff00ff00online|r", "online")
-GLDG_ONLINE 		= ".*%[(.+)%]%S*"..string.sub(online_pattern, 20)
+local function GLDG_BuildSystemPattern(fmt, ...)
+	if type(fmt) ~= "string" or fmt == "" then
+		return nil
+	end
+	local cleaned = string.gsub(fmt, "|c%x%x%x%x%x%x%x%x", "")
+	cleaned = string.gsub(cleaned, "|r", "")
+	local formatted = string.format(cleaned, ...)
+	local escaped = string.gsub(formatted, "([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
+	return escaped
+end
+
+local onlinePattern = GLDG_BuildSystemPattern(ERR_FRIEND_ONLINE_SS, "\001NAME1\001", "\002NAME2\002")
+if onlinePattern then
+	onlinePattern = string.gsub(onlinePattern, "\001NAME1\001", ".-")
+	onlinePattern = string.gsub(onlinePattern, "\002NAME2\002", "(.+)")
+	GLDG_ONLINE = onlinePattern
+else
+	GLDG_ONLINE = "%[(.+)%].*online"
+end
 GLDG_OFFLINE		= string.format(ERR_FRIEND_OFFLINE_S, "(.+)")
 GLDG_JOINED			= string.format(ERR_GUILD_JOIN_S, "(.+)")
 GLDG_PROMO			= string.format(ERR_GUILD_PROMOTE_SSS, "(.+)", "(.+)", "(.+)")
@@ -518,6 +533,11 @@ function GLDG:OnEnable()
 
 	-- Ensure greeting queue frame exists
 	self:CreateQueueFrame()
+
+	-- Initialize Blizzard UI & guild hooks
+	if self.InitializeHooks then
+		self:InitializeHooks()
+	end
 
 	-- Run full initialization if not yet done
 	if not GLDG_InitComplete then
@@ -1147,6 +1167,16 @@ function GLDG_ShowToolTip(self, element)
 	GameTooltip:Show()
 end
 
+function GLDG:IsOwnCharacter(name)
+	if not name or name == "" then return false end
+	local player = UnitName("player")
+	if not player or player == "" then return false end
+	if Ambiguate(name, "none") == player then return true end
+	local realm = (self.Realm or GetRealmName() or ""):gsub("%s+", "")
+	if realm ~= "" and name == (player .. "-" .. realm) then return true end
+	return self.Player and name == self.Player or false
+end
+
 function GLDG:ShowQueue()
 	local listFrame = self:CreateQueueFrame()
 	if not listFrame or not GLDG_Data then return end
@@ -1162,10 +1192,14 @@ function GLDG:ShowQueue()
 		if uLine then uLine:Hide(); uLine.queueKey = nil end
 	end
 
-	-- Collect and sort queued players
+	-- Collect and sort queued players (never show own character in the greet list)
 	local sorted = {}
 	for name in pairs(GLDG_Queue or {}) do
-		table.insert(sorted, name)
+		if self:IsOwnCharacter(name) or (GLDG_DataChar and GLDG_DataChar[name] and GLDG_DataChar[name].own) then
+			GLDG_Queue[name] = nil
+		else
+			table.insert(sorted, name)
+		end
 	end
 	table.sort(sorted)
 
@@ -2360,8 +2394,10 @@ function GLDG_UpdateChannel(joined, player)
 					-- Debug statement removed.." is not been online before")
 					if not GLDG_Offline[player] and (GLDG_Data.GuildSettings.SupressGreet==true or (GLDG_TableSize(GLDG_DataGreet.Greet) == 0)) then return end
 					-- Debug statement removed.." should be greeted")
-					GLDG_Queue[player] = GLDG_GetLogtime(player)
-					GLDG_ShowQueue()
+					if not GLDG:IsOwnCharacter(player) and not GLDG_DataChar[player].own then
+						GLDG_Queue[player] = GLDG_GetLogtime(player)
+						GLDG_ShowQueue()
+					end
 				end
 
 				-- if no class info is available, this player has never been /who queried before -> do it now

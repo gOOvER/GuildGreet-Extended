@@ -737,7 +737,7 @@ function GLDG.Utils:InitFull()
 	if not GLDG_Data.UseLocalTime		then GLDG_Data.UseLocalTime = false end
 	if not GLDG.db.profile.ShowNewerVersions	then GLDG.db.profile.ShowNewerVersions = false end
 	if not GLDG_Data.AutoWho		then GLDG_Data.AutoWho = false end
-	if not GLDG_Data.GuildSettings.DeltaPopup		then GLDG_Data.GuildSettings.DeltaPopup = false end
+	GLDG_Data.GuildSettings.DeltaPopup = true
 	if not GLDG.db.profile.ExtendPlayerMenu then GLDG.db.profile.ExtendPlayerMenu = false end
 	-- convert for API 6.0.2 begin
 	if GLDG_Data.GuildSettings.SupressGreet==1		then GLDG_Data.GuildSettings.SupressGreet = true end
