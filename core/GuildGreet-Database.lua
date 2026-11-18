@@ -407,7 +407,7 @@ function GLDG.Database:ApplyDefaultGuildSettings()
 		settings.SupressAchievment=false
 		settings.NoGratsOnLogin=true
 		settings.DeltaPopup=true
-		settings.RelogTime = 2
+		settings.RelogTime = 0
 		settings.MinLevelUp = 20
 		
 		GLDG_Data[GLDG.unique_GuildName] = settings
@@ -502,7 +502,7 @@ end
 
 function GLDG.Database:GenerateConfigString()
 	local gstring1 = 0
-	local gstring2 = GLDG_Data.GuildSettings.RelogTime or 2
+	local gstring2 = GLDG_Data.GuildSettings.RelogTime or 0
 	local gstring3 = GLDG_Data.GuildSettings.MinLevelUp or 20
 	local gstring4
 

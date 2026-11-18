@@ -83,7 +83,7 @@ local defaults = {
 		-- Guild-spezifische Einstellungen
 		GuildSettings = {
 			UseGuildDefault = false,
-			RelogTime = 2,
+			RelogTime = 0,
 			MinLevelUp = 0,
 			GreetAsMain = false,
 			Randomize = false,
@@ -252,26 +252,19 @@ GLDG_SubTab2Frame.Tab3 = L["Greeting"]
 GLDG_SubTab2Frame.Tab4 = L["Other"]
 
 
--- Strings we look for
-local function GLDG_BuildSystemPattern(fmt, ...)
+local function GLDG_BuildOnlinePattern(fmt)
 	if type(fmt) ~= "string" or fmt == "" then
-		return nil
+		return "%[([^%]]+)%].*online"
 	end
 	local cleaned = string.gsub(fmt, "|c%x%x%x%x%x%x%x%x", "")
 	cleaned = string.gsub(cleaned, "|r", "")
-	local formatted = string.format(cleaned, ...)
-	local escaped = string.gsub(formatted, "([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
-	return escaped
+	local formatted = string.format(cleaned, "NAME1", "NAME2")
+	local suffix = string.match(formatted, "%]|?h?(.*)$") or " online"
+	local escapedSuffix = string.gsub(suffix, "([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
+	return "%[([^%]]+)%]%S*" .. escapedSuffix
 end
 
-local onlinePattern = GLDG_BuildSystemPattern(ERR_FRIEND_ONLINE_SS, "\001NAME1\001", "\002NAME2\002")
-if onlinePattern then
-	onlinePattern = string.gsub(onlinePattern, "\001NAME1\001", ".-")
-	onlinePattern = string.gsub(onlinePattern, "\002NAME2\002", "(.+)")
-	GLDG_ONLINE = onlinePattern
-else
-	GLDG_ONLINE = "%[(.+)%].*online"
-end
+GLDG_ONLINE = GLDG_BuildOnlinePattern(ERR_FRIEND_ONLINE_SS)
 GLDG_OFFLINE		= string.format(ERR_FRIEND_OFFLINE_S, "(.+)")
 GLDG_JOINED			= string.format(ERR_GUILD_JOIN_S, "(.+)")
 GLDG_PROMO			= string.format(ERR_GUILD_PROMOTE_SSS, "(.+)", "(.+)", "(.+)")

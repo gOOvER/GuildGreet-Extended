@@ -5,6 +5,13 @@ All notable changes to **GuildGreet Extended** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [13.2.2] - 2026-11-18
+
+### Fixed
+- **Online Detection, Connected-Realm Fallback & Relog Suppression (`GuildGreet.lua`, `core/GuildGreet-Messages.lua`, `core/GuildGreet-Utils.lua`, `core/GuildGreet-Database.lua`, `GUI/Settings.lua`)**:
+  - Simplified `GLDG_ONLINE` to match the `[Player]` token + localized suffix from `ERR_FRIEND_ONLINE_SS` with or without `|Hplayer:...|h` links.
+  - Added connected-realm prefix lookup in `HandlePlayerOnline` when `CHAT_MSG_SYSTEM` omits the realm suffix, fell back to `Greet` if `GreetBack` is empty, guarded `WHO_NUM_RESULTS` with `issecretvalue`, and changed the default `RelogTime` from `2` minutes to `0` so quick relogs appear in the greet queue immediately.
+
 ## [13.2.1] - 2026-11-18
 
 ### Fixed

@@ -705,8 +705,19 @@ function GLDG.Messages:HandlePlayerOnline(playerName)
 	-- Store online time
 	GLDG_Online[playerName] = GetTime()
 	
-	-- Check if this is a known player
+	-- Check if this is a known player (with connected-realm fallback)
 	local p = GLDG_DataChar[playerName]
+	if not p and shortName and GLDG_DataChar then
+		local prefix = string.lower(shortName) .. "-"
+		for k, v in pairs(GLDG_DataChar) do
+			if string.sub(string.lower(k), 1, #prefix) == prefix then
+				playerName = k
+				p = v
+				GLDG_Online[playerName] = GLDG_Online[playerName] or GetTime()
+				break
+			end
+		end
+	end
 	if p and not p.ignore and (not p.own or GLDG_Data.GuildSettings.IncludeOwn) then
 		-- Show player list if enabled
 		if GLDG_Data.GuildSettings.ListNames then
@@ -716,18 +727,21 @@ function GLDG.Messages:HandlePlayerOnline(playerName)
 		if p.alt and GLDG_Offline[p.alt] then
 			GLDG_Offline[playerName] = GLDG_Offline[p.alt]
 		end
-		if GLDG_Offline[playerName] and type(GLDG_Offline[playerName]) == "number" then
-			if (GLDG_Online[playerName] - GLDG_Offline[playerName]) < ((GLDG_Data.GuildSettings.RelogTime or 2) * 60) then
+		local relogMin = tonumber(GLDG_Data.GuildSettings.RelogTime) or 0
+		if relogMin > 0 and GLDG_Offline[playerName] and type(GLDG_Offline[playerName]) == "number" then
+			if (GLDG_Online[playerName] - GLDG_Offline[playerName]) < (relogMin * 60) then
 				return
 			end
 		end
 
 		-- Add to greeting queue if not suppressed
 		if not GLDG_Data.GuildSettings.SupressGreet then
-			if GLDG_Offline[playerName] and GLDG.Utils:TableSize(GLDG_DataGreet.GreetBack) == 0 then
+			local hasGreet = GLDG.Utils:TableSize(GLDG_DataGreet.Greet) > 0
+			local hasGreetBack = GLDG.Utils:TableSize(GLDG_DataGreet.GreetBack) > 0
+			if GLDG_Offline[playerName] and not hasGreetBack and not hasGreet then
 				return
 			end
-			if not GLDG_Offline[playerName] and GLDG.Utils:TableSize(GLDG_DataGreet.Greet) == 0 then
+			if not GLDG_Offline[playerName] and not hasGreet then
 				return
 			end
 			if not (GLDG.IsOwnCharacter and GLDG:IsOwnCharacter(playerName)) and not (GLDG_DataChar[playerName] and GLDG_DataChar[playerName].own) then
@@ -996,7 +1010,7 @@ function GLDG.Messages:OnEvent(mainObj, event, ...)
 		GLDG_ParseWho()
 
 	-- who responses going to chat
-	elseif ( event == "CHAT_MSG_SYSTEM" ) and (arg1 and strfind(arg1, WHO_NUM_RESULTS) ) then
+	elseif ( event == "CHAT_MSG_SYSTEM" ) and (arg1 and not (issecretvalue and issecretvalue(arg1)) and strfind(arg1, WHO_NUM_RESULTS) ) then
 		GLDG_ParseWho()
 
 	-- guild members and/or friends joining/leaving

@@ -630,7 +630,7 @@ function GLDG.Utils:InitFull()
 	end
 
 
-	if not GLDG_Data.GuildSettings.RelogTime then GLDG_Data.GuildSettings.RelogTime = 2 end
+	if GLDG_Data.GuildSettings.RelogTime == nil then GLDG_Data.GuildSettings.RelogTime = 0 end
 	if not GLDG_Data.GuildSettings.MinLevelUp then GLDG_Data.GuildSettings.MinLevelUp = 0 end
 	GLDG_Data.UpdateTime = 0
 	if not GLDG_Data.GuildSettings.UseGuildDefault then GLDG_Data.GuildSettings.UseGuildDefault = false end
